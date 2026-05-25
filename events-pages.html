@@ -1,0 +1,265 @@
+<!-- ══════════════════════════════════════
+     EVENTS LIST
+══════════════════════════════════════ -->
+<div class="page" id="page-events">
+  <div class="page-header">
+    <div class="page-title">Events</div>
+    <div class="page-sub">All ImpactGrid photo events. Click an event to manage it.</div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <h2>All Events</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button>
+        <button class="btn btn-gold" onclick="nav('createevent',null)">+ Create Event</button>
+      </div>
+    </div>
+    <div class="card-body table-wrap" id="eventsList">
+      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CREATE EVENT
+══════════════════════════════════════ -->
+<div class="page" id="page-createevent">
+  <div class="page-header">
+    <div class="page-title">Create Event</div>
+    <div class="page-sub">Set up a new photo event. An access code and link will be generated automatically.</div>
+  </div>
+  <div class="ws-layout">
+    <div>
+      <div class="card">
+        <div class="card-head"><h2>Event Details</h2></div>
+        <div class="card-body">
+          <div id="createEventAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
+
+          <div class="form-grid" style="margin-bottom:12px;">
+            <div class="field-group">
+              <div class="field-label">Event Name *</div>
+              <input type="text" id="ev-name" class="form-input" placeholder="e.g. Johnson Wedding 2026"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Event Type *</div>
+              <select id="ev-type" class="form-select">
+                <option value="professional">Professional</option>
+                <option value="kids">Kids Event</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-bottom:12px;">
+            <div class="field-group">
+              <div class="field-label">Owner Name</div>
+              <input type="text" id="ev-owner-name" class="form-input" placeholder="e.g. Sarah Johnson"/>
+              <div class="field-hint">The person who manages this event</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Owner Email</div>
+              <input type="email" id="ev-owner" class="form-input" placeholder="owner@email.com"/>
+              <div class="field-hint">Used to send access link &amp; notifications</div>
+            </div>
+          </div>
+
+          <!-- Owner Avatar -->
+          <div class="form-grid" style="margin-bottom:12px;">
+            <div class="field-group">
+              <div class="field-label">Owner Avatar <span style="font-weight:400;color:var(--text3);font-size:11px;">(optional)</span></div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div id="ev-avatar-preview" onclick="document.getElementById('ev-avatar-input').click()" style="width:56px;height:56px;border-radius:50%;background:var(--bg3);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .2s;" title="Click to upload photo">
+                  <span id="ev-avatar-placeholder" style="font-size:22px;user-select:none;">👤</span>
+                  <img id="ev-avatar-img" style="display:none;width:100%;height:100%;object-fit:cover;" alt="Owner avatar"/>
+                </div>
+                <div style="flex:1;">
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('ev-avatar-input').click()">Upload Photo</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="ev-avatar-clear" onclick="clearOwnerAvatar()" style="display:none;color:var(--red);">✕ Remove</button>
+                  <div class="field-hint" style="margin-top:4px;">JPG or PNG · Shown in the event list</div>
+                </div>
+              </div>
+              <input type="file" id="ev-avatar-input" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="previewOwnerAvatar(event)"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Expiry Date</div>
+              <input type="date" id="ev-expiry" class="form-input"/>
+              <div class="field-hint">Default is 30 days from today</div>
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-bottom:16px;">
+            <div class="field-group">
+              <div class="field-label">Access Code</div>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="ev-code" class="form-input" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/>
+                <button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;">Generate</button>
+              </div>
+              <div class="field-hint">Guests need this to access the event</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Template</div>
+              <select id="ev-template" class="form-select">
+                <option value="professional">Professional (Dark)</option>
+                <option value="kids">Kids (Bright)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+            <div class="toggle on" id="ev-watermark-toggle" onclick="toggleWatermark()"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Watermark Enabled</div>
+              <div style="font-size:11px;color:var(--text3);">Preview images will have an ImpactGrid watermark</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+            <div class="toggle on" id="ev-code-toggle" onclick="toggleRequireCode()"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Require Access Code</div>
+              <div style="font-size:11px;color:var(--text3);">Guests must enter the code to view the gallery</div>
+            </div>
+          </div>
+
+          <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="createEvent()">
+            Create Event →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ws-sticky">
+      <div class="hint-box">
+        <strong>How events work</strong><br><br>
+        After creating an event you can upload photos to it from the <strong>Upload Photos</strong> section.<br><br>
+        Guests visit the event link, enter the code if required, and browse watermarked previews.<br><br>
+        They can click <strong>Find My Photos</strong> to use face recognition, then request a download.<br><br>
+        You approve or reject download requests from the <strong>Download Requests</strong> section.
+      </div>
+      <div class="hint-box hint-warn" style="margin-top:12px;">
+        <strong>30-day expiry</strong><br>
+        Events and all their photos are automatically deleted after the expiry date. Make sure the owner downloads what they need before then.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     UPLOAD PHOTOS
+══════════════════════════════════════ -->
+<div class="page" id="page-uploadphotos">
+  <div class="page-header">
+    <div class="page-title">Upload Photos</div>
+    <div class="page-sub">Upload photos to an event. Preview versions are generated automatically.</div>
+  </div>
+  <div class="ws-layout">
+    <div>
+      <div class="card">
+        <div class="card-head"><h2>Select Event</h2></div>
+        <div class="card-body">
+          <div class="field-group">
+            <div class="field-label">Event</div>
+            <select id="upload-event-select" class="form-select" onchange="onUploadEventChange()">
+              <option value="">— Select an event —</option>
+            </select>
+          </div>
+          <div id="upload-event-info" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:4px;">
+            <div style="font-size:12px;color:var(--text2);" id="upload-event-meta"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="upload-dropcard" style="display:none;">
+        <div class="card-head"><h2>Upload Photos</h2></div>
+        <div class="card-body">
+          <div class="upload-zone" id="photoDropZone"
+            onclick="document.getElementById('photoFileIn').click()"
+            ondragover="onDragOver(event,'photoDropZone')"
+            ondragleave="onDragLeave(event,'photoDropZone')"
+            ondrop="onDrop(event,'photoDropZone',handlePhotoFiles)">
+            <div class="upload-zone-ico">📸</div>
+            <div class="upload-zone-title">Drop photos here or click to browse</div>
+            <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div>
+            <input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotoInputChange(event)"/>
+          </div>
+          <div id="photoUploadProgress" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <div class="card" id="upload-photos-list-card" style="display:none;">
+        <div class="card-head">
+          <h2>Event Photos</h2>
+          <button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button>
+        </div>
+        <div class="card-body" id="eventPhotosList">
+          <div class="empty"><div class="empty-ico">📸</div><div class="empty-txt">No photos yet.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ws-sticky">
+      <div class="hint-box">
+        <strong>Upload tips</strong><br><br>
+        You can upload multiple photos at once.<br><br>
+        Each photo is stored in:<br>
+        <code>/events/{event_id}/preview/</code><br>
+        <code>/events/{event_id}/original/</code><br><br>
+        Preview images are compressed. Original images are full quality and only shared after approval.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DOWNLOAD REQUESTS
+══════════════════════════════════════ -->
+<div class="page" id="page-downloadrequests">
+  <div class="page-header">
+    <div class="page-title">Download Requests</div>
+    <div class="page-sub">Review and approve guest photo download requests.</div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <h2>Pending Requests</h2>
+      <button class="btn btn-ghost btn-sm" onclick="loadDownloadRequests()">↻ Refresh</button>
+    </div>
+    <div class="card-body table-wrap" id="downloadRequestsList">
+      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     REVIEWS
+══════════════════════════════════════ -->
+<div class="page" id="page-reviews">
+  <div class="page-header">
+    <div class="page-title">Event Reviews</div>
+    <div class="page-sub">Guest reviews submitted from event pages. Approve to publish on the homepage, reject or delete to remove.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>All Reviews</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="filterReviews('all',    this)">All</button>
+        <button class="btn btn-ghost btn-sm" id="rev-filter-pending"  onclick="filterReviews('pending',  this)">⏳ Pending</button>
+        <button class="btn btn-ghost btn-sm" id="rev-filter-approved" onclick="filterReviews('approved', this)">✅ Approved</button>
+        <button class="btn btn-ghost btn-sm" id="rev-filter-rejected" onclick="filterReviews('rejected', this)">✕ Rejected</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadEventReviews()">↻ Refresh</button>
+      </div>
+    </div>
+    <div class="card-body table-wrap" id="reviewsList">
+      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+    </div>
+  </div>
+
+  <div class="hint-box" style="max-width:560px;">
+    <strong>How reviews work</strong><br><br>
+    Guests submit reviews directly from the event gallery page. They land here as <strong>Pending</strong>.<br><br>
+    When you click <strong>✓ Approve</strong>, the review is:<br>
+    • Marked approved in the Events database<br>
+    • Mirrored into the main site database<br>
+    • Displayed automatically in the <strong>Event Reviews</strong> section on the homepage<br><br>
+    Rejecting or deleting also removes it from the homepage if it was previously approved.
+  </div>
+</div>
