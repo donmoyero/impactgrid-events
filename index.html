@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>ImpactGrid Events — Book. Deliver. Repurpose.</title>
-<meta name="description" content="The platform creators use to book events, deliver media, and repurpose content. Upload once. Use everywhere."/>
+<title>ImpactGrid Events — Book. Deliver. Get Paid.</title>
+<meta name="description" content="Upload event media once. Clients browse a cinematic gallery. Downloads lock until payment clears."/>
 <link rel="icon" href="logo.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -277,196 +277,6 @@
 }
 
 /* ═══════════════════════════════════════
-   WHAT YOU GET
-═══════════════════════════════════════ */
-.features-section {
-  padding: 100px 48px;
-  background: var(--bg);
-}
-.features-inner {
-  max-width: var(--max-w);
-  margin: 0 auto;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 48px;
-}
-
-.feature-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  padding: 32px 28px;
-  transition: border-color .2s, transform .2s;
-}
-.feature-card:hover {
-  border-color: var(--border2);
-  transform: translateY(-3px);
-}
-.feature-card.gold-border {
-  border-color: var(--gold-glo);
-}
-
-.feature-ico {
-  font-size: 28px;
-  margin-bottom: 16px;
-}
-.feature-title {
-  font-family: var(--fd);
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: -.02em;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-.feature-desc {
-  font-size: 13px;
-  color: var(--text2);
-  line-height: 1.65;
-}
-.feature-tag {
-  display: inline-block;
-  margin-top: 14px;
-  font-family: var(--fm);
-  font-size: 10px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--gold);
-  background: var(--gold-dim);
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-
-/* ═══════════════════════════════════════
-   TIERS
-═══════════════════════════════════════ */
-.tiers-section {
-  padding: 100px 48px;
-  background: var(--bg2);
-  border-top: 1px solid var(--border);
-}
-.tiers-inner {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.tiers-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 48px;
-}
-
-.tier-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  padding: 32px 28px;
-  position: relative;
-}
-.tier-card.featured {
-  border-color: var(--gold);
-  background: var(--card2);
-}
-.tier-badge {
-  position: absolute;
-  top: -1px; right: 24px;
-  background: var(--gold);
-  color: #07090f;
-  font-family: var(--fm);
-  font-size: 9px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 0 0 8px 8px;
-}
-
-.tier-name {
-  font-family: var(--fd);
-  font-size: 18px;
-  font-weight: 900;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.tier-price {
-  font-family: var(--fd);
-  font-size: 32px;
-  font-weight: 900;
-  color: var(--gold);
-  letter-spacing: -.04em;
-  margin-bottom: 4px;
-}
-.tier-price span {
-  font-size: 14px;
-  color: var(--text3);
-  font-family: var(--fb);
-  font-weight: 400;
-}
-.tier-desc {
-  font-size: 12px;
-  color: var(--text2);
-  margin-bottom: 24px;
-  line-height: 1.6;
-}
-.tier-divider {
-  height: 1px;
-  background: var(--border);
-  margin-bottom: 20px;
-}
-.tier-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.tier-features li {
-  font-size: 12px;
-  color: var(--text2);
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  line-height: 1.5;
-}
-.tier-features li::before {
-  content: '✓';
-  color: var(--green);
-  font-weight: 700;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.tier-cta {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 12px;
-  border-radius: 10px;
-  font-family: var(--fd);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: .02em;
-  text-decoration: none;
-  transition: opacity .2s, transform .2s;
-  cursor: pointer;
-  border: none;
-}
-.tier-cta.primary {
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  color: #07090f;
-}
-.tier-cta.ghost {
-  background: transparent;
-  border: 1px solid var(--border2);
-  color: var(--text2);
-}
-.tier-cta:hover { opacity: .85; transform: translateY(-1px); }
-
-/* ═══════════════════════════════════════
    CTA BANNER
 ═══════════════════════════════════════ */
 .cta-section {
@@ -504,9 +314,7 @@
     gap: 40px;
   }
   .hero-stats { grid-template-columns: 1fr 1fr; }
-  .features-grid { grid-template-columns: 1fr; }
-  .tiers-grid { grid-template-columns: 1fr; }
-  .steps-section, .features-section, .tiers-section, .cta-section { padding: 60px 24px; }
+  .steps-section, .cta-section { padding: 60px 24px; }
 }
 </style>
 </head>
@@ -524,15 +332,15 @@
     <div>
       <div class="hero-label">
         <span class="hero-label-dot"></span>
-        Creator Event Platform
+        Creator Event Platform — Early Access
       </div>
       <h1 class="hero-h1">
         Book.<br>
         Deliver.<br>
-        <em>Repurpose.</em>
+        <em>Get paid.</em>
       </h1>
       <p class="hero-sub">
-        Upload event media once. Your clients get a cinematic gallery. Downloads unlock on payment. AI turns your content into social.
+        Upload event media once. Clients get a cinematic gallery. Downloads stay locked until they pay.
       </p>
       <div class="hero-ctas">
         <a href="auth/join.html" class="btn-hero-primary">Start for free →</a>
@@ -548,14 +356,6 @@
       <div class="stat-tile">
         <div class="stat-num">HD</div>
         <div class="stat-label">Locked until payment</div>
-      </div>
-      <div class="stat-tile">
-        <div class="stat-num">AI</div>
-        <div class="stat-label">Recaps, carousels, captions generated automatically</div>
-      </div>
-      <div class="stat-tile">
-        <div class="stat-num">0%</div>
-        <div class="stat-label">Platform fee on your bookings</div>
       </div>
       <div class="stat-tile span2">
         <div class="stat-label" style="margin-bottom:10px;font-weight:600;color:var(--text);">Workflow</div>
@@ -607,122 +407,6 @@
         <div class="step-title">Send an invoice</div>
         <div class="step-desc">Generate and send a Stripe invoice in one click. Downloads unlock automatically on payment.</div>
       </div>
-      <div class="step-block">
-        <div class="step-num">05</div>
-        <div class="step-icon">✨</div>
-        <div class="step-title">Repurpose with AI</div>
-        <div class="step-desc">After delivery, generate Instagram carousels, TikTok recaps, story slides, and captions.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════
-     WHAT YOU GET
-═══════════════════════════════════════ -->
-<section class="features-section">
-  <div class="features-inner">
-    <div class="section-eyebrow">What's included</div>
-    <div class="section-title">Everything in one place.</div>
-    <div class="features-grid">
-      <div class="feature-card gold-border">
-        <div class="feature-ico">🎬</div>
-        <div class="feature-title">Cinematic galleries</div>
-        <div class="feature-desc">Immersive, mobile-first event pages. Lightbox, transitions, face search. Your brand, not ours.</div>
-        <span class="feature-tag">Live now</span>
-      </div>
-      <div class="feature-card">
-        <div class="feature-ico">🔒</div>
-        <div class="feature-title">Locked downloads</div>
-        <div class="feature-desc">Clients preview at compressed resolution. Full-res only unlocks after they pay. Clean and simple.</div>
-        <span class="feature-tag">Live now</span>
-      </div>
-      <div class="feature-card">
-        <div class="feature-ico">📄</div>
-        <div class="feature-title">Invoicing + Stripe</div>
-        <div class="feature-desc">Create invoices, collect deposits, process payments. Payouts go directly to you.</div>
-        <span class="feature-tag">Coming soon</span>
-      </div>
-      <div class="feature-card">
-        <div class="feature-ico">📅</div>
-        <div class="feature-title">Booking system</div>
-        <div class="feature-desc">Your public creator page at impactgrid.com/@you. Client inquiry → quote → deposit → confirmed.</div>
-        <span class="feature-tag">Coming soon</span>
-      </div>
-      <div class="feature-card">
-        <div class="feature-ico">🤖</div>
-        <div class="feature-title">AI content engine</div>
-        <div class="feature-desc">Generate Instagram carousels, TikTok recaps, captions, and story slides from your event uploads.</div>
-        <span class="feature-tag">Coming soon</span>
-      </div>
-      <div class="feature-card">
-        <div class="feature-ico">📊</div>
-        <div class="feature-title">Analytics</div>
-        <div class="feature-desc">See which events get the most views, which photos get favourited, and download conversion rates.</div>
-        <span class="feature-tag">Coming soon</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════
-     TIERS
-═══════════════════════════════════════ -->
-<section class="tiers-section">
-  <div class="tiers-inner">
-    <div class="section-eyebrow">Pricing</div>
-    <div class="section-title">Start free. Scale when ready.</div>
-    <div class="tiers-grid">
-
-      <div class="tier-card">
-        <div class="tier-name">Free</div>
-        <div class="tier-price">£0 <span>/ month</span></div>
-        <div class="tier-desc">Try it out with no commitment.</div>
-        <div class="tier-divider"></div>
-        <ul class="tier-features">
-          <li>1 active event</li>
-          <li>Up to 100 photos</li>
-          <li>Cinematic gallery</li>
-          <li>Access code protection</li>
-          <li>ImpactGrid branding</li>
-        </ul>
-        <a href="auth/join.html" class="tier-cta ghost">Get started</a>
-      </div>
-
-      <div class="tier-card featured">
-        <div class="tier-badge">Popular</div>
-        <div class="tier-name">Creator</div>
-        <div class="tier-price">£29 <span>/ month</span></div>
-        <div class="tier-desc">For photographers and event creators running a real business.</div>
-        <div class="tier-divider"></div>
-        <ul class="tier-features">
-          <li>Unlimited events</li>
-          <li>Unlimited uploads</li>
-          <li>Custom branding</li>
-          <li>Locked downloads + invoicing</li>
-          <li>Stripe payouts</li>
-          <li>Analytics</li>
-          <li>AI content tools (when live)</li>
-        </ul>
-        <a href="auth/join.html" class="tier-cta primary">Start free trial</a>
-      </div>
-
-      <div class="tier-card">
-        <div class="tier-name">Studio</div>
-        <div class="tier-price">£79 <span>/ month</span></div>
-        <div class="tier-desc">For agencies and teams doing this at scale.</div>
-        <div class="tier-divider"></div>
-        <ul class="tier-features">
-          <li>Everything in Creator</li>
-          <li>Team access</li>
-          <li>White labelling</li>
-          <li>Advanced AI tools</li>
-          <li>Automation workflows</li>
-          <li>Priority support</li>
-        </ul>
-        <a href="auth/join.html" class="tier-cta ghost">Talk to us</a>
-      </div>
-
     </div>
   </div>
 </section>
