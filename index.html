@@ -879,24 +879,44 @@
 
 
 
-<!-- GALLERY STRIP -->
+  <!-- GALLERY STRIP -->
   <div class="gallery-strip">
     <div class="gallery-row">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=560&q=85&fit=crop" alt="Wedding portrait" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1488161628813-04466f872be2?w=480&q=85&fit=crop" alt="Studio suit editorial" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=540&q=85&fit=crop" alt="Wedding ceremony" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=500&q=85&fit=crop" alt="Elegant couple" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=500&q=85&fit=crop" alt="Fashion editorial" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=540&q=85&fit=crop" alt="Bridal shoot" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=500&q=85&fit=crop" alt="Event night" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=500&q=85&fit=crop" alt="Corporate event" />
-      <!-- Duplicates for seamless loop -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=560&q=85&fit=crop" alt="Wedding portrait" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1488161628813-04466f872be2?w=480&q=85&fit=crop" alt="Studio suit editorial" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=540&q=85&fit=crop" alt="Wedding ceremony" />
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=500&q=85&fit=crop" alt="Elegant couple" />
+      <!-- Nigerian trad couple - Tope A Asokere, verified -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1661956601349-f61c959a8fd4?w=600&q=85&fit=crop" alt="Nigerian traditional wedding" />
+      <!-- Studio fashion gown editorial -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&q=85&fit=crop" alt="Fashion editorial" />
+      <!-- Nigerian trad couple verified Tope Asokere -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=560&q=85&fit=crop" alt="Nigerian traditional couple" />
+      <!-- Dark studio editorial fashion man -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1488161628813-04466f872be2?w=500&q=85&fit=crop" alt="Studio editorial" />
+      <!-- Elegant white bridal shoot -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=560&q=85&fit=crop" alt="Bridal shoot" />
+      <!-- Elegant fashion model outdoor -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=500&q=85&fit=crop" alt="Fashion model" />
+      <!-- Nigerian groomsmen tuxedo - Tope Asokere -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=540&q=85&fit=crop" alt="Wedding portrait" />
+      <!-- Couple wedding elegant -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?w=500&q=85&fit=crop" alt="Elegant couple" />
     </div>
-  </div>
+    <div class="gallery-row">
+      <!-- High fashion studio white background editorial -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=560&q=85&fit=crop" alt="Fashion shoot" />
+      <!-- Nigerian traditional couple - warm studio tones -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=500&q=85&fit=crop" alt="African traditional" />
+      <!-- Studio model clean minimal -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=560&q=85&fit=crop" alt="Studio model" />
+      <!-- White wedding ceremony moment -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=540&q=85&fit=crop" alt="Wedding ceremony" />
+      <!-- Nigerian trad couple royal blue -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=500&q=85&fit=crop&crop=entropy" alt="Traditional attire" />
+      <!-- Studio dark background fashion editorial -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=540&q=85&fit=crop" alt="Fashion editorial" />
+      <!-- Elegant gown outdoor shoot -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&q=85&fit=crop" alt="Editorial portrait" />
+      <!-- Couple outdoor elegant -->
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=500&q=85&fit=crop" alt="Couple shoot" />
+    </div>
   </div>
 
 
@@ -1117,6 +1137,40 @@
       </div>
     </div>
   </footer>
+
+  <script>
+  (function(){
+    var GALLERY_LS_KEY = 'ig_gallery_strip';
+    var HERO_LS_KEY    = 'ig_hero_grid';
+
+    /* ── Apply scrolling gallery strip ── */
+    function applyGalleryStrip(){
+      var urls = JSON.parse(localStorage.getItem(GALLERY_LS_KEY) || 'null');
+      if(!urls || !urls.length) return;
+      var row = document.querySelector('.gallery-row');
+      if(!row) return;
+      /* Build images + duplicates for seamless loop */
+      var allUrls = urls.concat(urls); /* duplicate for scroll loop */
+      row.innerHTML = allUrls.map(function(u, i){
+        return '<img class="gallery-img" src="'+u+'" alt="Gallery image '+(i+1)+'" />';
+      }).join('');
+    }
+
+    /* ── Apply hero background grid ── */
+    function applyHeroGrid(){
+      var urls = JSON.parse(localStorage.getItem(HERO_LS_KEY) || 'null');
+      if(!urls || !urls.length) return;
+      var container = document.querySelector('.hero-images');
+      if(!container) return;
+      container.innerHTML = urls.map(function(u, i){
+        return '<img src="'+u+'" alt="Hero image '+(i+1)+'" />';
+      }).join('');
+    }
+
+    applyGalleryStrip();
+    applyHeroGrid();
+  })();
+  </script>
 
 </body>
 </html>
