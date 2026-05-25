@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Join ImpactGrid — Start Creating</title>
+<meta name="description" content="Join ImpactGrid Creator Studio free. Start creating content with AI today."/>
+<link rel="icon" href="favicon.ico"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+/* join.html — page-specific styles only. Tokens/reset/nav/fonts → shared.css + nav.js */
+
+.join-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 55% 55% at 20% 30%,rgba(201,126,8,.07),transparent),
+    radial-gradient(ellipse 40% 40% at 80% 70%,rgba(45,110,219,.04),transparent);}
+[data-theme="dark"] .join-bg{
+  background:radial-gradient(ellipse 55% 55% at 20% 30%,rgba(240,180,41,.07),transparent),
+    radial-gradient(ellipse 40% 40% at 80% 70%,rgba(79,142,247,.04),transparent);}
+
+/* PAGE */
+.page{position:relative;z-index:1;padding:80px 20px 60px;}
+
+/* HERO */
+.hero{text-align:center;max-width:520px;margin:0 auto 32px;}
+.hero h1{font-size:clamp(26px,4vw,38px);margin-bottom:12px;}
+.hero p{font-size:14px;color:var(--text2);line-height:1.7;}
+
+/* TYPE SELECTOR */
+.type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;max-width:660px;margin:0 auto 28px;}
+.type-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r2);
+  padding:20px 16px;cursor:pointer;transition:all .2s;text-align:center;}
+.type-card:hover{border-color:var(--gold-glo);transform:translateY(-2px);}
+.type-card.selected{border-color:var(--gold);background:var(--gold-dim);}
+.type-ico{font-size:26px;margin-bottom:8px;}
+.type-title{font-family:var(--fd);font-size:14px;font-weight:900;margin-bottom:4px;}
+.type-desc{font-size:11px;color:var(--text2);line-height:1.5;}
+
+/* FORM CARD */
+.form-wrap{max-width:500px;margin:0 auto;}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:36px 32px;box-shadow:0 20px 60px rgba(0,0,0,.07);display:none;}
+[data-theme="dark"] .form-card{box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.form-card.visible{display:block;animation:fadeUp .35s cubic-bezier(.16,1,.3,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.form-card-title{font-family:var(--fd);font-size:17px;font-weight:900;margin-bottom:4px;}
+.form-card-sub{font-size:12px;color:var(--text2);margin-bottom:22px;line-height:1.6;}
+
+/* ALERT */
+.alert{font-size:13px;padding:11px 14px;border-radius:9px;margin-bottom:16px;
+  display:none;line-height:1.55;}
+.alert.show{display:block;}
+.alert.error{background:var(--red-dim);color:var(--red);border:1px solid rgba(217,79,59,.15);}
+[data-theme="dark"] .alert.error{color:#f75f4f;}
+.alert.success{background:var(--green-dim);color:var(--green);border:1px solid rgba(15,168,118,.2);}
+
+/* FIELDS */
+.field{margin-bottom:14px;}
+.field-label{display:block;font-size:11px;font-weight:600;color:var(--text2);
+  margin-bottom:6px;font-family:var(--fm);letter-spacing:.05em;text-transform:uppercase;}
+.field-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;}
+.form-input{width:100%;padding:11px 14px;border-radius:9px;
+  border:1px solid var(--border2);background:var(--bg);
+  color:var(--text);font-size:13px;font-family:var(--fb);
+  outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--gold);}
+.form-input::placeholder{color:var(--text3);}
+.form-select{width:100%;padding:11px 14px;border-radius:9px;
+  border:1px solid var(--border2);background:var(--bg);
+  color:var(--text);font-size:13px;font-family:var(--fb);
+  outline:none;transition:border-color .2s;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239099b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.form-select:focus{border-color:var(--gold);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* PASSWORD FIELD WITH EYE */
+.pass-wrap{position:relative;}
+.pass-wrap .form-input{padding-right:42px;}
+.pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;padding:4px;
+  color:var(--text3);font-size:16px;line-height:1;transition:color .2s;
+  display:flex;align-items:center;justify-content:center;}
+.pass-eye:hover{color:var(--text2);}
+
+/* PASSWORD STRENGTH */
+.strength-bar{display:flex;gap:4px;margin-top:7px;}
+.strength-seg{height:3px;flex:1;border-radius:2px;background:var(--border2);
+  transition:background .3s;}
+.strength-seg.weak{background:#d94f3b;}
+.strength-seg.fair{background:#f0b429;}
+.strength-seg.good{background:#2d6edb;}
+.strength-seg.strong{background:#0fa876;}
+.strength-label{font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--fm);
+  font-weight:700;letter-spacing:.05em;transition:color .3s;}
+.strength-label.weak{color:#d94f3b;}
+.strength-label.fair{color:#f0b429;}
+.strength-label.good{color:#2d6edb;}
+.strength-label.strong{color:#0fa876;}
+
+/* FEATURES STRIP */
+.features-strip{margin:16px 0;padding:14px 16px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);}
+.features-strip-title{font-family:var(--fm);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:10px;font-weight:700;}
+.feature-item{display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--text2);margin-bottom:7px;}
+.feature-item:last-child{margin-bottom:0;}
+.feature-item-icon{font-size:13px;}
+
+/* SUBMIT */
+.btn-submit{width:100%;padding:13px;border-radius:10px;
+  font-family:var(--fd);font-size:14px;font-weight:900;
+  letter-spacing:-.01em;cursor:pointer;border:none;
+  transition:all .2s;margin-top:6px;
+  display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;}
+[data-theme="dark"] .btn-gold{color:#07090f;}
+.btn-blue{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.14);}
+.btn-submit:disabled{opacity:.55;transform:none;cursor:not-allowed;box-shadow:none;}
+
+/* DOTS LOADER */
+.dots{display:inline-flex;gap:4px;align-items:center;margin-left:4px;}
+.dot{width:4px;height:4px;border-radius:50%;background:currentColor;
+  opacity:.4;animation:dp 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s;}
+.dot:nth-child(3){animation-delay:.4s;}
+@keyframes dp{0%,80%,100%{opacity:.3;}40%{opacity:1;}}
+
+/* DIVIDER + FOOTER */
+.divider{height:1px;background:var(--border);margin:18px 0;}
+.form-footer{font-size:13px;color:var(--text2);text-align:center;}
+.form-footer a{color:var(--gold);font-weight:700;}
+.form-footer a:hover{text-decoration:underline;}
+
+/* SUCCESS CARD */
+.success-card{background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:40px 32px;
+  box-shadow:0 20px 60px rgba(0,0,0,.07);text-align:center;display:none;}
+[data-theme="dark"] .success-card{box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.success-card.visible{display:block;animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both;}
+.success-ico{font-size:44px;margin-bottom:14px;}
+.success-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  border-radius:100px;background:var(--green-dim);border:1px solid rgba(15,168,118,.2);
+  color:var(--green);font-family:var(--fm);font-size:10px;font-weight:700;
+  letter-spacing:.05em;margin-bottom:14px;}
+.success-title{font-family:var(--fd);font-size:22px;font-weight:900;margin-bottom:8px;}
+.success-body{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px;}
+.success-features{background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:16px;margin-bottom:20px;text-align:left;}
+.success-features-title{font-family:var(--fm);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:10px;font-weight:700;}
+.success-feature{display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--text2);margin-bottom:8px;}
+.success-feature:last-child{margin-bottom:0;}
+.btn-dash{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;
+  border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:900;
+  cursor:pointer;border:none;transition:all .2s;}
+.btn-dash-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;}
+[data-theme="dark"] .btn-dash-gold{color:#07090f;}
+.btn-dash-blue{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;}
+.btn-dash:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.15);}
+
+@media(max-width:480px){
+  .form-card{padding:28px 20px;border-radius:16px;}
+  .form-grid{grid-template-columns:1fr;}
+  .type-grid{grid-template-columns:1fr 1fr;}
+  .nav-link{display:none;}
+}
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KVJC5DE2WT');
+  </script>
+</head>
+<body>
+
+<!-- Scripts: SDK → credentials → auth → nav (required load order) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="nav.js"></script>
+
+<div class="join-bg"></div>
+
+<!-- Shared Nav -->
+<div id="ig-nav"></div>
+<script>renderNav('join.html');</script>
+
+<div class="page">
+
+  <div class="hero">
+    <h1>Join ImpactGrid</h1>
+    <p>The creator intelligence platform. Pick your account type and sign up with email.</p>
+  </div>
+
+  <!-- Type selector -->
+  <div class="type-grid">
+    <div class="type-card" id="type-pro" onclick="selectType('professional')">
+      <div class="type-ico">🎬</div>
+      <div class="type-title">Creator</div>
+      <div class="type-desc">Grow on TikTok, YouTube &amp; Instagram with AI tools</div>
+    </div>
+    <div class="type-card" id="type-emp" onclick="selectType('employer')">
+      <div class="type-ico">🏢</div>
+      <div class="type-title">Employer</div>
+      <div class="type-desc">Hire creators and professionals from the network</div>
+    </div>
+    <div class="type-card" id="type-photo" onclick="selectType('photographer')">
+      <div class="type-ico">📸</div>
+      <div class="type-title">Photographer</div>
+      <div class="type-desc">Deliver event photos with AI face search &amp; galleries</div>
+    </div>
+  </div>
+
+  <div class="form-wrap">
+
+    <!-- ══════════════════════════════════
+         CREATOR FORM
+    ══════════════════════════════════ -->
+    <div class="form-card" id="form-professional">
+      <div class="form-card-title">🎬 Creator Account</div>
+      <div class="form-card-sub">Free forever. No card required. Get instant access to Creator Studio.</div>
+      <div class="alert" id="pro-alert"></div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">First Name *</label>
+          <input id="pro-fname" class="form-input" type="text" placeholder="Sarah"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Last Name *</label>
+          <input id="pro-lname" class="form-input" type="text" placeholder="Johnson"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email Address *</label>
+        <input id="pro-email" class="form-input" type="email" placeholder="you@email.com"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Password *</label>
+        <div class="pass-wrap">
+          <input id="pro-pass" class="form-input" type="password" placeholder="Min. 8 characters"
+            oninput="checkStrength(this,'pro-strength','pro-strength-label')"/>
+          <button type="button" class="pass-eye" onclick="togglePass('pro-pass',this)" aria-label="Show password">
+            👁
+          </button>
+        </div>
+        <div class="strength-bar" id="pro-strength">
+          <div class="strength-seg" id="pro-s1"></div>
+          <div class="strength-seg" id="pro-s2"></div>
+          <div class="strength-seg" id="pro-s3"></div>
+          <div class="strength-seg" id="pro-s4"></div>
+        </div>
+        <div class="strength-label" id="pro-strength-label"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Confirm Password *</label>
+        <div class="pass-wrap">
+          <input id="pro-pass2" class="form-input" type="password" placeholder="Repeat your password"/>
+          <button type="button" class="pass-eye" onclick="togglePass('pro-pass2',this)" aria-label="Show password">
+            👁
+          </button>
+        </div>
+      </div>
+
+      <div class="features-strip">
+        <div class="features-strip-title">✦ Free Creator Access Includes</div>
+        <div class="feature-item"><span class="feature-item-icon">📡</span> Live trend feed — UK &amp; global</div>
+        <div class="feature-item"><span class="feature-item-icon">✍️</span> AI content generator (3 uses/month)</div>
+        <div class="feature-item"><span class="feature-item-icon">🎨</span> Carousel builder</div>
+        <div class="feature-item"><span class="feature-item-icon">📅</span> Weekly content planner</div>
+        <div class="feature-item"><span class="feature-item-icon">🤖</span> Dijo AI — your creator brain</div>
+      </div>
+
+      <button class="btn-submit btn-gold" id="pro-submit" onclick="joinCreator()">Create Free Account →</button>
+      <div class="divider"></div>
+      <div class="form-footer">Already have an account? <a href="login.html">Sign in</a></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         EMPLOYER FORM
+    ══════════════════════════════════ -->
+    <div class="form-card" id="form-employer">
+      <div class="form-card-title">🏢 Employer Account</div>
+      <div class="form-card-sub">Post jobs and find creators and professionals on the ImpactGrid network.</div>
+      <div class="alert" id="emp-alert"></div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">Your Name *</label>
+          <input id="emp-name" class="form-input" type="text" placeholder="James Wilson"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Company Name *</label>
+          <input id="emp-company" class="form-input" type="text" placeholder="Acme Corp"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email Address *</label>
+        <input id="emp-email" class="form-input" type="email" placeholder="you@company.com"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Password *</label>
+        <div class="pass-wrap">
+          <input id="emp-pass" class="form-input" type="password" placeholder="Min. 8 characters"
+            oninput="checkStrength(this,'emp-strength','emp-strength-label')"/>
+          <button type="button" class="pass-eye" onclick="togglePass('emp-pass',this)" aria-label="Show password">
+            👁
+          </button>
+        </div>
+        <div class="strength-bar" id="emp-strength">
+          <div class="strength-seg" id="emp-s1"></div>
+          <div class="strength-seg" id="emp-s2"></div>
+          <div class="strength-seg" id="emp-s3"></div>
+          <div class="strength-seg" id="emp-s4"></div>
+        </div>
+        <div class="strength-label" id="emp-strength-label"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Confirm Password *</label>
+        <div class="pass-wrap">
+          <input id="emp-pass2" class="form-input" type="password" placeholder="Repeat your password"/>
+          <button type="button" class="pass-eye" onclick="togglePass('emp-pass2',this)" aria-label="Show password">
+            👁
+          </button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">Industry</label>
+          <input id="emp-industry" class="form-input" type="text" placeholder="e.g. Marketing, Finance"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Company Size</label>
+          <select id="emp-size" class="form-select">
+            <option value="">Select…</option>
+            <option>1–10 employees</option>
+            <option>11–50 employees</option>
+            <option>51–200 employees</option>
+            <option>200+ employees</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Website</label>
+        <input id="emp-website" class="form-input" type="url" placeholder="https://yourcompany.com"/>
+      </div>
+
+      <div class="features-strip">
+        <div class="features-strip-title">✦ Employer Access Includes</div>
+        <div class="feature-item"><span class="feature-item-icon">📋</span> Post unlimited job listings</div>
+        <div class="feature-item"><span class="feature-item-icon">👤</span> Browse creator &amp; professional profiles</div>
+        <div class="feature-item"><span class="feature-item-icon">📥</span> Receive &amp; manage applications</div>
+        <div class="feature-item"><span class="feature-item-icon">📊</span> Employer dashboard &amp; analytics</div>
+      </div>
+
+      <button class="btn-submit btn-blue" id="emp-submit" onclick="joinEmployer()">Create Employer Account →</button>
+      <div class="divider"></div>
+      <div class="form-footer">Already have an account? <a href="login.html">Sign in</a></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PHOTOGRAPHER FORM
+    ══════════════════════════════════ -->
+    <div class="form-card" id="form-photographer">
+      <div class="form-card-title">📸 Photographer Account</div>
+      <div class="form-card-sub">Create events, upload photos, and deliver galleries with AI face search. Free to start.</div>
+      <div class="alert" id="photo-alert"></div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">First Name *</label>
+          <input id="photo-fname" class="form-input" type="text" placeholder="Marcus"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Last Name *</label>
+          <input id="photo-lname" class="form-input" type="text" placeholder="Thomas"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email Address *</label>
+        <input id="photo-email" class="form-input" type="email" placeholder="you@email.com"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Password *</label>
+        <div class="pass-wrap">
+          <input id="photo-pass" class="form-input" type="password" placeholder="Min. 8 characters"
+            oninput="checkStrength(this,'photo-strength','photo-strength-label')"/>
+          <button type="button" class="pass-eye" onclick="togglePass('photo-pass',this)" aria-label="Show password">👁</button>
+        </div>
+        <div class="strength-bar" id="photo-strength">
+          <div class="strength-seg" id="photo-s1"></div>
+          <div class="strength-seg" id="photo-s2"></div>
+          <div class="strength-seg" id="photo-s3"></div>
+          <div class="strength-seg" id="photo-s4"></div>
+        </div>
+        <div class="strength-label" id="photo-strength-label"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Confirm Password *</label>
+        <div class="pass-wrap">
+          <input id="photo-pass2" class="form-input" type="password" placeholder="Repeat your password"/>
+          <button type="button" class="pass-eye" onclick="togglePass('photo-pass2',this)" aria-label="Show password">👁</button>
+        </div>
+      </div>
+
+      <div class="features-strip">
+        <div class="features-strip-title">✦ Photographer Access Includes</div>
+        <div class="feature-item"><span class="feature-item-icon">📅</span> Create &amp; manage photo events</div>
+        <div class="feature-item"><span class="feature-item-icon">🤳</span> AI face search — guests find their photos instantly</div>
+        <div class="feature-item"><span class="feature-item-icon">📤</span> Bulk photo upload with QR delivery</div>
+        <div class="feature-item"><span class="feature-item-icon">⭐</span> Guest reviews &amp; event analytics</div>
+        <div class="feature-item"><span class="feature-item-icon">✉️</span> Direct mail to guests</div>
+      </div>
+
+      <button class="btn-submit btn-gold" id="photo-submit" onclick="joinPhotographer()">Create Photographer Account →</button>
+      <div class="divider"></div>
+      <div class="form-footer">Already have an account? <a href="login.html">Sign in</a></div>
+    </div>
+
+    <!-- SUCCESS CARD -->
+    <div class="success-card" id="success-card">
+      <div class="success-ico">🎉</div>
+      <div class="success-pill">✅ Account Active</div>
+      <div class="success-title" id="success-title"></div>
+      <div class="success-body" id="success-body"></div>
+      <div class="success-features" id="success-features"></div>
+      <div id="success-action"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+/* ── Theme ── */
+/* Theme handled by nav.js — do not redeclare here */
+
+/* ── Type selector ── */
+function selectType(type) {
+  document.getElementById('type-pro').classList.toggle('selected', type === 'professional');
+  document.getElementById('type-emp').classList.toggle('selected', type === 'employer');
+  document.getElementById('type-photo').classList.toggle('selected', type === 'photographer');
+  document.getElementById('form-professional').classList.toggle('visible', type === 'professional');
+  document.getElementById('form-employer').classList.toggle('visible', type === 'employer');
+  document.getElementById('form-photographer').classList.toggle('visible', type === 'photographer');
+  document.getElementById('success-card').classList.remove('visible');
+  setTimeout(function() {
+    var visible = document.querySelector('.form-card.visible');
+    if (visible) visible.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
+}
+
+/* ── Show/hide password ── */
+function togglePass(inputId, btn) {
+  var inp = document.getElementById(inputId);
+  var isHidden = inp.type === 'password';
+  inp.type = isHidden ? 'text' : 'password';
+  btn.textContent = isHidden ? '🙈' : '👁';
+}
+
+/* ── Password strength ── */
+function checkStrength(input, barId, labelId) {
+  var val = input.value;
+  var score = 0;
+  if (val.length >= 8)  score++;
+  if (val.length >= 12) score++;
+  if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  var level = 0;
+  if (val.length === 0) level = 0;
+  else if (score <= 1) level = 1;  // weak
+  else if (score === 2) level = 2; // fair
+  else if (score === 3 || score === 4) level = 3; // good
+  else level = 4; // strong
+
+  var labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  var classes = ['', 'weak', 'fair', 'good', 'strong'];
+  /* prefix = everything before the last '-pass' segment */
+  var prefix = barId.replace('-strength', '');
+
+  for (var i = 1; i <= 4; i++) {
+    var seg = document.getElementById(prefix + '-s' + i);
+    seg.className = 'strength-seg';
+    if (i <= level) seg.classList.add(classes[level]);
+  }
+
+  var lbl = document.getElementById(labelId);
+  lbl.textContent = val.length > 0 ? labels[level] : '';
+  lbl.className = 'strength-label' + (val.length > 0 ? ' ' + classes[level] : '');
+}
+
+/* ── Alert helpers ── */
+function showAlert(id, msg, type) {
+  var el = document.getElementById(id);
+  el.innerHTML = msg;
+  el.className = 'alert ' + type + ' show';
+}
+function hideAlert(id) {
+  document.getElementById(id).className = 'alert';
+}
+function setBtn(id, html, disabled) {
+  var el = document.getElementById(id);
+  el.innerHTML = html;
+  el.disabled = disabled;
+}
+
+/* ── Success card ── */
+function showSuccess(type, name, dashUrl) {
+  document.getElementById('form-professional').classList.remove('visible');
+  document.getElementById('form-employer').classList.remove('visible');
+  document.getElementById('form-photographer').classList.remove('visible');
+  var isPro = type === 'creator';
+  var isPhoto = type === 'photographer';
+  document.getElementById('success-title').textContent = 'Welcome to ImpactGrid, ' + name + '!';
+  document.getElementById('success-body').textContent = isPro
+    ? 'Your Creator Studio is ready. Start exploring trends, generating content, and growing your audience.'
+    : isPhoto
+    ? 'Your Photographer Dashboard is ready. Create your first event and start delivering photos.'
+    : 'Your employer account is ready. Post jobs and find the right creators and professionals.';
+  var html = '<div class="success-features-title">✦ Your Free Access</div>';
+  if (isPro) {
+    html += '<div class="success-feature"><span>📡</span> Live trend feed</div>';
+    html += '<div class="success-feature"><span>✍️</span> AI content generator (3 uses/month)</div>';
+    html += '<div class="success-feature"><span>📅</span> Weekly content planner</div>';
+    html += '<div class="success-feature"><span>🤖</span> Dijo AI</div>';
+  } else if (isPhoto) {
+    html += '<div class="success-feature"><span>📅</span> Create &amp; manage events</div>';
+    html += '<div class="success-feature"><span>🤳</span> AI face search</div>';
+    html += '<div class="success-feature"><span>📤</span> Bulk upload &amp; QR delivery</div>';
+    html += '<div class="success-feature"><span>⭐</span> Reviews &amp; analytics</div>';
+  } else {
+    html += '<div class="success-feature"><span>📋</span> Unlimited job listings</div>';
+    html += '<div class="success-feature"><span>👤</span> Browse profiles</div>';
+    html += '<div class="success-feature"><span>📊</span> Employer dashboard</div>';
+  }
+  document.getElementById('success-features').innerHTML = html;
+  var btnClass = (isPro || isPhoto) ? 'btn-dash-gold' : 'btn-dash-blue';
+  var btnLabel = isPro ? 'Creator Studio' : isPhoto ? 'Dashboard' : 'Dashboard';
+  document.getElementById('success-action').innerHTML =
+    '<a href="' + dashUrl + '" class="btn-dash ' + btnClass + '">Go to ' + btnLabel + ' →</a>';
+  var card = document.getElementById('success-card');
+  card.classList.add('visible');
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Photographer signup ── */
+async function joinPhotographer() {
+  hideAlert('photo-alert');
+  var fname = document.getElementById('photo-fname').value.trim();
+  var lname = document.getElementById('photo-lname').value.trim();
+  var email = document.getElementById('photo-email').value.trim();
+  var pass  = document.getElementById('photo-pass').value;
+  var pass2 = document.getElementById('photo-pass2').value;
+
+  if (!fname || !lname) { showAlert('photo-alert', 'Please enter your first and last name.', 'error'); return; }
+  if (!email)           { showAlert('photo-alert', 'Please enter your email address.', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('photo-alert', 'Please enter a valid email address.', 'error'); return; }
+  if (!pass || pass.length < 8) { showAlert('photo-alert', 'Password must be at least 8 characters.', 'error'); return; }
+  if (pass !== pass2)   { showAlert('photo-alert', 'Passwords do not match. Please check and try again.', 'error'); return; }
+
+  setBtn('photo-submit', 'Creating account… <span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>', true);
+
+  try {
+    var c = getSupabase();
+    if (!c) throw new Error('Auth service not ready — please refresh and try again.');
+    var fullName = fname + ' ' + lname;
+    var res = await c.auth.signUp({
+      email: email,
+      password: pass,
+      options: { data: { full_name: fullName, role: 'photographer' } }
+    });
+    if (res.error) throw res.error;
+
+    var userId = res.data.user ? res.data.user.id : null;
+    if (userId && res.data.session) {
+      try {
+        await c.from('profiles').upsert({
+          user_id:    userId,
+          full_name:  fullName,
+          email:      email,
+          role:       'photographer',
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+      } catch(upsertErr) {
+        console.warn('[ImpactGrid] Photographer profile upsert skipped:', upsertErr.message || upsertErr);
+      }
+    }
+
+    showSuccess('photographer', fname, 'dashboard.html');
+  } catch(err) {
+    console.error('[ImpactGrid] joinPhotographer() caught:', err);
+    var msg = err.message || 'Something went wrong. Please try again.';
+    if (msg.includes('already registered') || msg.includes('already been registered')) {
+      msg = 'This email is already registered. <a href="login.html">Sign in instead?</a>';
+    }
+    showAlert('photo-alert', msg, 'error');
+    setBtn('photo-submit', 'Create Photographer Account →', false);
+  }
+}
+
+/* ── Creator signup ── */
+async function joinCreator() {
+  hideAlert('pro-alert');
+  var fname = document.getElementById('pro-fname').value.trim();
+  var lname = document.getElementById('pro-lname').value.trim();
+  var email = document.getElementById('pro-email').value.trim();
+  var pass  = document.getElementById('pro-pass').value;
+  var pass2 = document.getElementById('pro-pass2').value;
+
+  if (!fname || !lname) { showAlert('pro-alert', 'Please enter your first and last name.', 'error'); return; }
+  if (!email)           { showAlert('pro-alert', 'Please enter your email address.', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('pro-alert', 'Please enter a valid email address.', 'error'); return; }
+  if (!pass || pass.length < 8) { showAlert('pro-alert', 'Password must be at least 8 characters.', 'error'); return; }
+  if (pass !== pass2)   { showAlert('pro-alert', 'Passwords do not match. Please check and try again.', 'error'); return; }
+
+  setBtn('pro-submit', 'Creating account… <span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>', true);
+
+  try {
+    var c = getSupabase();
+    if (!c) throw new Error('Auth service not ready — please refresh and try again.');
+    var fullName = fname + ' ' + lname;
+    var res = await c.auth.signUp({
+      email: email,
+      password: pass,
+      options: { data: { full_name: fullName, role: 'creator' } }
+    });
+    if (res.error) { console.error('[ImpactGrid] Creator signUp error:', res.error); throw res.error; }
+
+    var userId = res.data.user ? res.data.user.id : null;
+
+    /* ✅ FIX: Only upsert the profile row if we have an active session.
+       With email confirmation enabled, signUp returns a user but NO session
+       (session is null until the user confirms their email). Attempting an
+       upsert without a session sends no auth token → RLS blocks it → 403.
+       We use user_metadata.full_name (set above in signUp options) as the
+       fallback so the profile is created on first login via onAuthStateChange
+       in nav.js _loadProfile(). */
+    if (userId && res.data.session) {
+      try {
+        await c.from('profiles').upsert({
+          user_id:    userId,
+          full_name:  fullName,
+          email:      email,
+          role:       'creator',
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+      } catch(upsertErr) {
+        /* Non-fatal — profile will be created on first login */
+        console.warn('[ImpactGrid] Profile upsert skipped (no session yet):', upsertErr.message || upsertErr);
+      }
+    }
+
+    showSuccess('creator', fname, 'creator-studio.html');
+  } catch(err) {
+    console.error('[ImpactGrid] joinCreator() caught:', err);
+    var msg = err.message || 'Something went wrong. Please try again.';
+    if (msg.includes('already registered') || msg.includes('already been registered')) {
+      msg = 'This email is already registered. <a href="login.html">Sign in instead?</a>';
+    }
+    showAlert('pro-alert', msg, 'error');
+    setBtn('pro-submit', 'Create Free Account →', false);
+  }
+}
+
+/* ── Employer signup ── */
+async function joinEmployer() {
+  hideAlert('emp-alert');
+  var name     = document.getElementById('emp-name').value.trim();
+  var company  = document.getElementById('emp-company').value.trim();
+  var email    = document.getElementById('emp-email').value.trim();
+  var pass     = document.getElementById('emp-pass').value;
+  var pass2    = document.getElementById('emp-pass2').value;
+  var industry = document.getElementById('emp-industry').value.trim();
+  var size     = document.getElementById('emp-size').value;
+  var website  = document.getElementById('emp-website').value.trim();
+
+  if (!name)    { showAlert('emp-alert', 'Please enter your name.', 'error'); return; }
+  if (!company) { showAlert('emp-alert', 'Please enter your company name.', 'error'); return; }
+  if (!email)   { showAlert('emp-alert', 'Please enter your email address.', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('emp-alert', 'Please enter a valid email address.', 'error'); return; }
+  if (!pass || pass.length < 8) { showAlert('emp-alert', 'Password must be at least 8 characters.', 'error'); return; }
+  if (pass !== pass2) { showAlert('emp-alert', 'Passwords do not match. Please check and try again.', 'error'); return; }
+
+  setBtn('emp-submit', 'Creating account… <span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>', true);
+
+  try {
+    var c = getSupabase();
+    if (!c) throw new Error('Auth service not ready — please refresh and try again.');
+    var res = await c.auth.signUp({
+      email: email, password: pass,
+      options: { data: { full_name: name, role: 'employer', company_name: company } }
+    });
+    if (res.error) { console.error('[ImpactGrid] Employer signUp error:', res.error); throw res.error; }
+
+    var userId = res.data.user ? res.data.user.id : null;
+
+    /* ✅ FIX: Same as joinCreator — only upsert if session exists.
+       Without email confirmation, session is available immediately.
+       With email confirmation enabled, session is null until confirmed. */
+    if (userId && res.data.session) {
+      try {
+        await c.from('profiles').upsert({
+          user_id:      userId,
+          full_name:    name,
+          email:        email,
+          role:         'employer',
+          company_name: company,
+          industry:     industry || null,
+          company_size: size || null,
+          website:      website || null,
+          updated_at:   new Date().toISOString()
+        }, { onConflict: 'user_id' });
+      } catch(upsertErr) {
+        /* Non-fatal — profile will be created on first login */
+        console.warn('[ImpactGrid] Employer profile upsert skipped (no session yet):', upsertErr.message || upsertErr);
+      }
+    }
+
+    showSuccess('employer', name.split(' ')[0], 'employer-dashboard.html');
+  } catch(err) {
+    console.error('[ImpactGrid] joinEmployer() caught:', err);
+    var msg = err.message || 'Something went wrong. Please try again.';
+    if (msg.includes('already registered') || msg.includes('already been registered')) {
+      msg = 'This email is already registered. <a href="login.html">Sign in instead?</a>';
+    }
+    showAlert('emp-alert', msg, 'error');
+    setBtn('emp-submit', 'Create Employer Account →', false);
+  }
+}
+
+/* ── Init ── */
+(function() {
+  /* Auto-redirect if already logged in */
+  var c = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if (c) {
+    c.auth.getSession().then(function(r) {
+      if (r.data && r.data.session) {
+        window.location.href = 'creator-studio.html';
+      }
+    }).catch(function() {});
+  }
+
+  /* Pre-select account type from URL param (?type=employer or ?type=creator) */
+  var params = new URLSearchParams(window.location.search);
+  var type = params.get('type');
+  if (type === 'employer') selectType('employer');
+  else if (type === 'photographer') selectType('photographer');
+  else selectType('professional');
+})();
+
+</script>
+</body>
+</html>
