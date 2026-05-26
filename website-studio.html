@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>Portfolio Studio · ImpactGrid</title>
+<title>Website Studio · ImpactGrid</title>
 <link rel="icon" href="https://impactgridgroup.com/favicon.ico" type="image/x-icon"/>
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
@@ -14,13 +14,13 @@
   gtag('config', 'G-KVJC5DE2WT');
 </script>
 <link rel="stylesheet" href="shared.css"/>
-<link rel="stylesheet" href="portfolio-studio.css"/>
+<link rel="stylesheet" href="website-studio.css"/>
 <style>
 /* ── Mobile scroll fix ──────────────────────────────
    Aggressive override — targets every possible source
    of overflow:hidden that can trap scroll on iOS/Android.
    Uses !important throughout because shared.css and
-   portfolio-studio.css may set conflicting values.
+   website-studio.css may set conflicting values.
 ──────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   html {
@@ -92,7 +92,7 @@
 <!-- ══════════════ NAV ══════════════ -->
 <div id="ig-nav"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="ig-supabase.js"></script>
+<script src="plan-config.js"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script src="nav.js"></script>
@@ -103,7 +103,7 @@
   <!-- ══ SCREEN 1: DASHBOARD (list of portfolios) ══ -->
   <div class="ps-screen active" id="screenDash">
 
-    <!-- ── User Plan Banner — populated automatically from window.igUser (ig-supabase) ── -->
+    <!-- ── User Plan Banner — populated automatically from window.igUser (nav.js) ── -->
     <div class="ps-user-banner" id="psUserBanner" style="display:none;">
       <div class="ps-user-banner-left">
         <div class="ps-welcome" id="psWelcome">Welcome back 👋</div>
@@ -120,11 +120,11 @@
       <div class="ps-page-hero-text">
         <div class="ps-showcase-eyebrow" style="margin-bottom:14px">✦ Built by Dijo</div>
         <h1 class="ps-showcase-title" style="font-size:clamp(28px,4.5vw,52px);margin-bottom:16px">We build your entire<br/><em style="color:var(--gold,#c9a84c);font-style:italic">website</em></h1>
-        <p class="ps-showcase-sub" style="margin-bottom:28px;max-width:420px">From hero to contact form — your portfolio is a complete, live website. One click. No code.</p>
+        <p class="ps-showcase-sub" style="margin-bottom:28px;max-width:420px">From hero to contact form — your website is complete and live. One click. No code.</p>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button class="dash-create-btn" id="dashCreateBtn" onclick="psHandleCreate()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Build My Portfolio
+            Build My Website
           </button>
           <span style="font-size:11px;color:#7a8199">Free to start · No credit card · Live in 5 min</span>
         </div>
@@ -134,7 +134,7 @@
         <!-- Mobile-only demo disclaimer — visible only when no portfolios exist -->
         <div class="ps-demo-notice" id="psDemoNotice" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          These are <strong>example portfolios</strong> — not yours. Tap <em>Build My Portfolio</em> above to create yours.
+          These are <strong>example websites</strong> — not yours. Tap <em>Build My Website</em> above to create yours.
         </div>
         <div class="ps-website-card ps-hero-card">
           <div class="ps-website-card-browser">
@@ -267,11 +267,11 @@
     .ps-hero-card:hover { transform: translateY(-6px) !important; }
     </style>
 
-    <!-- Portfolio list -->
+    <!-- Website list -->
     <div class="dash-section">
       <div class="dash-section-header">
-        <span class="dash-section-title">Your Portfolios</span>
-        <span class="dash-section-count" id="dashCount">0 portfolios</span>
+        <span class="dash-section-title">Your Websites</span>
+        <span class="dash-section-count" id="dashCount">0 websites</span>
         <a href="creator-studio.html" class="ps-back-to-hub">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="15 18 9 12 15 6"/></svg>
           Creator Studio
@@ -281,17 +281,17 @@
         <!-- Populated by JS -->
         <div class="dash-empty" id="dashEmpty">
           <div class="dash-empty-icon">✦</div>
-          <div class="dash-empty-title">No portfolios yet</div>
-          <div class="dash-empty-sub">Create your first AI-powered portfolio in minutes</div>
+          <div class="dash-empty-title">No websites yet</div>
+          <div class="dash-empty-sub">Create your first AI-powered website in minutes</div>
         </div>
       </div>
     </div>
 
-    <!-- ══ PORTFOLIO DESIGN SHOWCASE ══ -->
+    <!-- ══ WEBSITE DESIGN SHOWCASE ══ -->
     <div class="ps-showcase-section">
       <div class="ps-showcase-header">
         <div class="ps-showcase-eyebrow">✦ Design Gallery</div>
-        <h2 class="ps-showcase-title">Portfolios that win brand deals</h2>
+        <h2 class="ps-showcase-title">Websites that win brand deals</h2>
         <p class="ps-showcase-sub">Real designs built by Dijo — every one unique to the creator's niche.</p>
       </div>
 
@@ -1110,7 +1110,7 @@
               <span class="cat-portfolio-hint">Add bookable services brands can pay for instantly</span>
               <a id="catViewPortfolioBtn" href="#" target="_blank" class="cat-view-portfolio-btn" onclick="openPreviewTab();return false;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                View Portfolio
+                View Website
               </a>
             </div>
             <div class="be-sec">
@@ -1332,7 +1332,7 @@ select:focus-visible {
    3. Upload to Cloudinary via /media/upload on the Render server
    4. Replace the base64 src with the real Cloudinary preview URL
    The window._ob/beLogoDataUrl globals are kept for backward-compat
-   with populateBuilder() which reads them during portfolio generation.
+   with populateBuilder() which reads them during website generation.
 ──────────────────────────────────────────────────────────────────────── */
 window._obLogoDataUrl = null;
 window._beLogoDataUrl = null;
@@ -1418,13 +1418,12 @@ async function beHandleLogoUpload(input) {
 
 <script>
   document.addEventListener('DOMContentLoaded', async function() {
-    if (typeof renderNav === 'function') renderNav('portfolio-studio.html');
+    if (typeof renderNav === 'function') renderNav('website-studio.html');
     if (typeof initAuth === 'function') await initAuth();
     if (typeof window.checkAuth === 'function') window.checkAuth();
   });
 </script>
-<script src="plan-config.js"></script>
 <script src="plan-gate.js"></script>
-<script src="portfolio-studio.js"></script>
+<script src="website-studio.js"></script>
 </body>
 </html>
