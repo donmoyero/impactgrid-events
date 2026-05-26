@@ -6,10 +6,49 @@
 <title>Login — ImpactGrid</title>
 <meta name="description" content="Sign in to your ImpactGrid Creator Studio."/>
 <link rel="icon" href="favicon.ico"/>
-<link rel="manifest" href="manifest.json"/>
-<link rel="stylesheet" href="shared.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KVJC5DE2WT');
+</script>
+
 <style>
-/* login.html — page-specific styles only. Tokens/reset/nav/fonts → shared.css + nav.js */
+/* ── CSS tokens (inlined — no shared.css dependency) ── */
+:root{
+  --bg:#f8f9fc; --bg2:#f0f2f7; --bg3:#e6e9f0;
+  --card:#ffffff;
+  --border:rgba(0,0,0,0.07); --border2:rgba(0,0,0,0.13);
+  --text:#0d1017; --text2:#4a5068; --text3:#9099b0;
+  --gold:#c97e08; --gold2:#a86505; --gold3:#e09010;
+  --gold-dim:rgba(201,126,8,0.09); --gold-glo:rgba(201,126,8,0.30);
+  --green:#0fa876; --green-dim:rgba(15,168,118,0.10);
+  --red:#d94f3b;  --red-dim:rgba(217,79,59,0.09);
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'DM Sans',system-ui,sans-serif;
+  --fm:'DM Mono',monospace;
+}
+[data-theme="dark"]{
+  --bg:#07090f; --bg2:#0d1018; --bg3:#141824;
+  --card:#111420;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#e8ecf4; --text2:#8892aa; --text3:#4a5270;
+  --gold:#f0b429; --gold2:#d49a10; --gold3:#f5c842;
+  --gold-dim:rgba(240,180,41,0.10); --gold-glo:rgba(240,180,41,0.30);
+  --green:#2dd4a0; --green-dim:rgba(45,212,160,0.10);
+  --red:#f75f4f;  --red-dim:rgba(247,95,79,0.10);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;transition:background .3s,color .3s;}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;border:none;font-family:inherit;}
 
 /* ── background glow ── */
 .login-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -20,6 +59,28 @@
   background:
     radial-gradient(ellipse 55% 55% at 20% 30%, rgba(240,180,41,.07), transparent),
     radial-gradient(ellipse 40% 40% at 80% 70%, rgba(79,142,247,.04), transparent);}
+
+/* ── minimal nav ── */
+.top-nav{
+  position:fixed;top:0;left:0;right:0;height:60px;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;
+  background:rgba(248,249,252,0.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);}
+[data-theme="dark"] .top-nav{background:rgba(7,9,15,0.90);}
+.nav-logo{font-family:var(--fd);font-weight:900;font-size:17px;
+  letter-spacing:-.02em;color:var(--text);text-decoration:none;}
+.nav-logo span{color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.btn-theme{width:30px;height:30px;border-radius:7px;
+  border:1px solid var(--border2);background:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--text2);transition:all .2s;}
+.btn-theme:hover{border-color:var(--gold);color:var(--gold);}
+.nav-home{font-size:13px;color:var(--text2);padding:6px 14px;
+  border-radius:7px;border:1px solid var(--border2);transition:all .2s;}
+.nav-home:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ── page layout ── */
 .page{min-height:100vh;display:flex;align-items:center;justify-content:center;
@@ -35,11 +96,10 @@
 
 /* card header */
 .card-logo{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:24px;}
-.card-logo-img{width:28px;height:28px;object-fit:contain;border-radius:6px;}
-.card-logo-mark{width:28px;height:28px;border-radius:8px;
+.card-logo-mark{width:32px;height:32px;border-radius:9px;
   background:linear-gradient(135deg,var(--gold),var(--gold2));
-  display:none;align-items:center;justify-content:center;
-  font-size:11px;font-weight:900;color:#fff;}
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:11px;font-weight:700;color:#fff;letter-spacing:.05em;}
 [data-theme="dark"] .card-logo-mark{color:#07090f;}
 .card-logo-name{font-family:var(--fd);font-weight:900;font-size:16px;letter-spacing:-.03em;}
 .card h1{font-family:var(--fd);font-size:24px;font-weight:900;
@@ -111,12 +171,6 @@
 .dot:nth-child(3){animation-delay:.4s;}
 @keyframes dp{0%,80%,100%{opacity:.3;}40%{opacity:1;}}
 
-/* bottom divider */
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0;
-  font-family:var(--fm);font-size:10px;color:var(--text3);
-  text-transform:uppercase;letter-spacing:.12em;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-
 /* footer links */
 .card-footer{text-align:center;font-size:13px;color:var(--text2);margin-top:18px;}
 .card-footer a{color:var(--gold);font-weight:700;}
@@ -131,31 +185,44 @@
 
 @media(max-width:480px){
   .card{padding:32px 22px;border-radius:16px;}
-  .nav-link{display:none;}
+  .top-nav{padding:0 16px;}
 }
 </style>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KVJC5DE2WT');
-  </script>
 </head>
 <body>
 
-<!-- Scripts: SDK → credentials → auth → nav (required load order) -->
+<!-- Supabase CDN — only external dependency -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="supabase-config.js"></script>
-<script src="auth.js"></script>
-<script src="nav.js"></script>
+
+<script>
+/* ── Supabase client (inlined — no supabase-config.js needed) ── */
+var _SUPABASE_URL = 'https://exeiojgldxqaakkybdij.supabase.co';
+var _SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4ZWlvamdsZHhxYWFra3liZGlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDc4NTcsImV4cCI6MjA4ODkyMzg1N30.aRXgeHqaOxkidwpWVGEOKBQAeo9_C5Fk3Gu5ZlbmxTQ';
+var _sbClient = null;
+
+function getSupabase() {
+  if (_sbClient) return _sbClient;
+  if (typeof supabase === 'undefined' || typeof supabase.createClient !== 'function') {
+    console.error('[ImpactGrid] Supabase SDK not loaded yet');
+    return null;
+  }
+  _sbClient = supabase.createClient(_SUPABASE_URL, _SUPABASE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'ig-auth-token' }
+  });
+  return _sbClient;
+}
+</script>
 
 <div class="login-bg"></div>
 
-<!-- Shared Nav (renderNav called after nav.js loads) -->
-<div id="ig-nav"></div>
-<script>renderNav('login.html');</script>
+<!-- Minimal nav -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo">Impact<span>Grid</span></a>
+  <div class="nav-right">
+    <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    <a href="index.html" class="nav-home">← Home</a>
+  </div>
+</nav>
 
 <!-- page -->
 <div class="page">
@@ -163,8 +230,6 @@
 
     <!-- logo -->
     <div class="card-logo">
-      <img src="logo.png" class="card-logo-img" alt="ImpactGrid"
-        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
       <div class="card-logo-mark">IG</div>
       <span class="card-logo-name">ImpactGrid</span>
     </div>
@@ -222,20 +287,29 @@
 </div>
 
 <script>
+/* ── Theme ── */
+(function(){
+  var saved = localStorage.getItem('ig_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  var btn = document.getElementById('themeBtn');
+  if(btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+})();
 
-/* Theme handled by nav.js — do not redeclare here */
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ig_theme', next);
+  var btn = document.getElementById('themeBtn');
+  if(btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+}
 
 /* ── Password eye toggle ── */
 function togglePw() {
   var inp = document.getElementById('password');
   var btn = document.getElementById('eyeBtn');
-  if (inp.type === 'password') {
-    inp.type = 'text';
-    btn.textContent = '🙈';
-  } else {
-    inp.type = 'password';
-    btn.textContent = '👁';
-  }
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else                         { inp.type = 'password'; btn.textContent = '👁'; }
 }
 
 /* ── Alert ── */
@@ -254,57 +328,33 @@ function redirectByRole(user, role) {
   }
 }
 
-/* ── Handle Google OAuth redirect back to this page ──
-   ✅ FIX: getSession() is called AFTER the client is ready.
-   Profile fetch for role is fully wrapped in try/catch so
-   a 403 (RLS not set up yet) never blocks the redirect —
-   user is already authenticated, default to 'creator'. ── */
+/* ── Handle OAuth callback / existing session ── */
 (function() {
-  var client = (typeof getSupabase === 'function') ? getSupabase() : null;
+  var client = getSupabase();
   if (!client) return;
-
   client.auth.getSession().then(function(res) {
-    if (res.data && res.data.session) {
-      var user = res.data.session.user;
-
-      /* Only redirect if this is an OAuth callback (hash in URL) OR
-         if the user has an active session and didn't just come here to log in.
-         We check for hash to avoid redirecting email/password users who
-         landed on login.html directly while already logged in. */
-      var isOAuthCallback = window.location.hash && window.location.hash.length > 1;
-      var isAlreadyLoggedIn = !isOAuthCallback && !window.location.search.includes('logout');
-
-      if (isOAuthCallback || isAlreadyLoggedIn) {
-        /* ✅ Profile fetch for role — safe try/catch, never blocks redirect */
-        client.from('profiles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single()
-          .then(function(profRes) {
-            var role = (profRes.data && profRes.data.role) || 'creator';
-            redirectByRole(user, role);
-          })
-          .catch(function() {
-            /* Profile unavailable (403/RLS/missing row) — still redirect safely */
-            redirectByRole(user, 'creator');
-          });
-      }
-    }
-  }).catch(function() {});
+    if (!res.data || !res.data.session) return;
+    var user = res.data.session.user;
+    var isOAuthCallback  = window.location.hash && window.location.hash.length > 1;
+    var isAlreadyLoggedIn = !isOAuthCallback && !window.location.search.includes('logout');
+    if (!isOAuthCallback && !isAlreadyLoggedIn) return;
+    client.from('profiles').select('role').eq('user_id', user.id).single()
+      .then(function(p){ redirectByRole(user, (p.data && p.data.role) || 'creator'); })
+      .catch(function(){ redirectByRole(user, 'creator'); });
+  }).catch(function(){});
 })();
 
 /* ── Google Sign-In ── */
 async function googleSignIn() {
+  var c = getSupabase();
+  if (!c) { showAlert('Auth service not ready — please refresh.', 'error'); return; }
   try {
-    var c = getSupabase();
-    if (!c) { showAlert('Auth service not ready — please refresh.', 'error'); return; }
     var res = await c.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin + '/login.html' }
     });
-    if (res.error) { console.error('[ImpactGrid] Google sign-in error:', res.error); throw res.error; }
+    if (res.error) throw res.error;
   } catch(err) {
-    console.error('[ImpactGrid] googleSignIn caught:', err);
     showAlert('Google sign-in failed: ' + (err.message || 'Please try again.'), 'error');
   }
 }
@@ -315,12 +365,8 @@ async function login() {
   var email    = document.getElementById('email').value.trim();
   var password = document.getElementById('password').value;
 
-  if (!email || !password) {
-    showAlert('Please enter your email and password.', 'error'); return;
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showAlert('Please enter a valid email address.', 'error'); return;
-  }
+  if (!email || !password) { showAlert('Please enter your email and password.', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('Please enter a valid email address.', 'error'); return; }
 
   btn.disabled = true;
   btn.innerHTML = 'Signing in <span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';
@@ -331,38 +377,26 @@ async function login() {
       showAlert('Auth service not ready — please refresh.', 'error');
       btn.disabled = false; btn.innerHTML = 'Sign In →'; return;
     }
-
     var res = await client.auth.signInWithPassword({ email: email, password: password });
-    if (res.error) { console.error('[ImpactGrid] signInWithPassword error:', res.error); throw res.error; }
+    if (res.error) throw res.error;
 
-    /* ✅ FIX: Profile fetch uses user_id column (not id) to match schema.
-       Wrapped in try/catch — a 403 or missing row never blocks login.
-       User is already authenticated at this point; just default to 'creator'. */
     var role = 'creator';
     try {
-      var profRes = await client.from('profiles').select('role').eq('user_id', res.data.user.id).single();
-      if (profRes.data && profRes.data.role) role = profRes.data.role;
-    } catch(profErr) {
-      console.warn('[ImpactGrid] Profile fetch skipped — defaulting to creator role:', profErr.message || profErr);
-    }
+      var p = await client.from('profiles').select('role').eq('user_id', res.data.user.id).single();
+      if (p.data && p.data.role) role = p.data.role;
+    } catch(e) {}
 
     redirectByRole(res.data.user, role);
 
   } catch(e) {
-    console.error('[ImpactGrid] login() caught:', e);
     var msg = e.message || 'Login failed. Please check your details.';
-    if (msg.toLowerCase().includes('invalid login') || msg.toLowerCase().includes('invalid credentials')) {
-      msg = 'Incorrect email or password. Please try again.';
-    }
-    if (msg.toLowerCase().includes('email not confirmed')) {
-      msg = 'Please check your email and click the confirmation link before signing in.';
-    }
+    if (/invalid login|invalid credentials/i.test(msg)) msg = 'Incorrect email or password. Please try again.';
+    if (/email not confirmed/i.test(msg))               msg = 'Please check your email and confirm your account before signing in.';
     showAlert(msg, 'error');
     btn.disabled = false;
     btn.innerHTML = 'Sign In →';
   }
 }
-
 </script>
 </body>
 </html>
