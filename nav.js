@@ -132,7 +132,7 @@
                 '<div class="dd-email" id="userEmail"></div>' +
                 '<div class="dd-div"></div>' +
                 '<a href="dashboard.html" id="ddDashLink">My Dashboard</a>' +
-                '<a href="owner.html">Account Settings</a>' +
+                '<a href="settings.html">Account Settings</a>' +
                 '<div class="dd-div"></div>' +
                 '<button onclick="igSignOut()">Sign out</button>' +
               '</div>' +
