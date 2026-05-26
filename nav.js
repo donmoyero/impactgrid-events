@@ -48,7 +48,6 @@
   /* ── Top-level nav links ── */
   var NAV_LINKS = [
     { href: 'index.html',        label: 'Home' },
-    { href: 'events-pages.html', label: 'Events' },
     { href: 'join.html',         label: 'Pricing' },
     { href: 'dashboard.html',    label: 'Dashboard', authOnly: true, id: 'navDashLink' },
   ];
@@ -66,7 +65,6 @@
 
     var mobileLinks = [
       { href:'index.html',        label:'Home' },
-      { href:'events-pages.html', label:'Events' },
       { href:'join.html',         label:'Pricing' },
       { href:'dashboard.html',    label:'Dashboard', id:'mobDashLink' },
     ].map(function(l) {
