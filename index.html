@@ -834,12 +834,8 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-images">
-      <img src="https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=900&q=85&fit=crop" alt="Nigerian traditional wedding" />
-      <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&q=85&fit=crop" alt="Fashion editorial" />
-      <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=700&q=85&fit=crop" alt="Wedding portrait" />
-      <img src="https://images.unsplash.com/photo-1488161628813-04466f872be2?w=700&q=85&fit=crop" alt="Studio editorial" />
-      <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=700&q=85&fit=crop" alt="Wedding" />
+    <div class="hero-images" id="heroImagesGrid">
+      <!-- loaded dynamically from Supabase site_content -->
     </div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -862,41 +858,11 @@
 
   <!-- GALLERY STRIP -->
   <div class="gallery-strip">
-    <div class="gallery-row">
-      <!-- Nigerian trad couple - Tope A Asokere, verified -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1661956601349-f61c959a8fd4?w=600&q=85&fit=crop" alt="Nigerian traditional wedding" />
-      <!-- Studio fashion gown editorial -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&q=85&fit=crop" alt="Fashion editorial" />
-      <!-- Nigerian trad couple verified Tope Asokere -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=560&q=85&fit=crop" alt="Nigerian traditional couple" />
-      <!-- Dark studio editorial fashion man -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1488161628813-04466f872be2?w=500&q=85&fit=crop" alt="Studio editorial" />
-      <!-- Elegant white bridal shoot -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=560&q=85&fit=crop" alt="Bridal shoot" />
-      <!-- Elegant fashion model outdoor -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=500&q=85&fit=crop" alt="Fashion model" />
-      <!-- Nigerian groomsmen tuxedo - Tope Asokere -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=540&q=85&fit=crop" alt="Wedding portrait" />
-      <!-- Couple wedding elegant -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?w=500&q=85&fit=crop" alt="Elegant couple" />
+    <div class="gallery-row" id="galleryRow1">
+      <!-- loaded dynamically from Supabase site_content -->
     </div>
-    <div class="gallery-row">
-      <!-- High fashion studio white background editorial -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=560&q=85&fit=crop" alt="Fashion shoot" />
-      <!-- Nigerian traditional couple - warm studio tones -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=500&q=85&fit=crop" alt="African traditional" />
-      <!-- Studio model clean minimal -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=560&q=85&fit=crop" alt="Studio model" />
-      <!-- White wedding ceremony moment -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=540&q=85&fit=crop" alt="Wedding ceremony" />
-      <!-- Nigerian trad couple royal blue -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=500&q=85&fit=crop&crop=entropy" alt="Traditional attire" />
-      <!-- Studio dark background fashion editorial -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=540&q=85&fit=crop" alt="Fashion editorial" />
-      <!-- Elegant gown outdoor shoot -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&q=85&fit=crop" alt="Editorial portrait" />
-      <!-- Couple outdoor elegant -->
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=500&q=85&fit=crop" alt="Couple shoot" />
+    <div class="gallery-row" id="galleryRow2">
+      <!-- loaded dynamically from Supabase site_content -->
     </div>
   </div>
 
@@ -1069,6 +1035,95 @@
       <p class="cta-note">Free forever plan available &nbsp;·&nbsp; No credit card &nbsp;·&nbsp; Set up in under 5 minutes</p>
     </div>
   </section>
+
+  <script>
+  /* ── Dynamic gallery & hero images from Supabase site_content ── */
+  (function(){
+    var DEFAULT_GALLERY = [
+      'https://images.unsplash.com/photo-1661956601349-f61c959a8fd4?w=600&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=560&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=500&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=560&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=500&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=540&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?w=500&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=560&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=500&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=560&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=540&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=500&q=85&fit=crop&crop=entropy',
+      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=540&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=500&q=85&fit=crop'
+    ];
+    var DEFAULT_HERO = [
+      'https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=900&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=700&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=700&q=85&fit=crop',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=700&q=85&fit=crop'
+    ];
+
+    function renderHero(urls){
+      var el = document.getElementById('heroImagesGrid');
+      if(!el) return;
+      var list = (urls && urls.length) ? urls : DEFAULT_HERO;
+      el.innerHTML = list.slice(0,5).map(function(url,i){
+        return '<img src="'+url+'" alt="ImpactGrid portfolio '+(i+1)+'" loading="'+(i===0?'eager':'lazy')+'"/>';
+      }).join('');
+    }
+
+    function renderGallery(urls){
+      var list = (urls && urls.length) ? urls : DEFAULT_GALLERY;
+      // split into two rows, duplicated for seamless scroll
+      var half = Math.ceil(list.length / 2);
+      var row1 = list.slice(0, half);
+      var row2 = list.slice(half);
+      // pad if uneven
+      if(!row2.length) row2 = row1.slice();
+
+      function makeImgs(arr){
+        // duplicate for seamless infinite scroll
+        return arr.concat(arr).map(function(url){
+          return '<img class="gallery-img" src="'+url+'" alt="ImpactGrid portfolio" loading="lazy"/>';
+        }).join('');
+      }
+
+      var r1 = document.getElementById('galleryRow1');
+      var r2 = document.getElementById('galleryRow2');
+      if(r1) r1.innerHTML = makeImgs(row1);
+      if(r2) r2.innerHTML = makeImgs(row2);
+    }
+
+    async function loadGalleryImages(){
+      try {
+        // Wait for supabase client to be ready (defined in supabase-config.js)
+        var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+        if(!sb){ renderHero(null); renderGallery(null); return; }
+
+        var res = await sb.from('site_content').select('key,value').in('key',['gallery_strip','hero_grid']);
+        var rows = (res && res.data) ? res.data : [];
+        var kv = {};
+        rows.forEach(function(r){ try{ kv[r.key] = JSON.parse(r.value); }catch(e){ kv[r.key] = null; } });
+
+        renderHero(kv['hero_grid'] || null);
+        renderGallery(kv['gallery_strip'] || null);
+      } catch(e) {
+        // Supabase unavailable — fall back to defaults silently
+        renderHero(null);
+        renderGallery(null);
+      }
+    }
+
+    // Run after DOM + supabase-config.js have both loaded
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', loadGalleryImages);
+    } else {
+      loadGalleryImages();
+    }
+  })();
+  </script>
 
   <!-- FOOTER (rendered by nav.js) -->
   <div id="ig-footer"></div>
