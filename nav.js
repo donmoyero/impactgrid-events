@@ -609,10 +609,11 @@
     document.dispatchEvent(new CustomEvent('ig-plan-ready', { detail: { plan: _cachedPlan, aiUses: _cachedAiUses } }));
 
     // ── Update nav display ──
-    window.setNavUser({ email: fallbackEmail, user_metadata: { full_name: name, avatar_url: avatarUrl } });
+    var effectiveRole = (role === 'admin' || fallbackEmail === 'admin@impactgridgroup.com') ? 'admin' : role;
+    var displayName = effectiveRole === 'admin' ? 'Admin' : name;
+    window.setNavUser({ email: fallbackEmail, user_metadata: { full_name: displayName, avatar_url: avatarUrl } });
 
     // ── Update dashboard links based on role (admin email also gets admin panel) ──
-    var effectiveRole = (role === 'admin' || fallbackEmail === 'admin@impactgridgroup.com') ? 'admin' : role;
     _setDashboardLinks(effectiveRole);
 
     // ── Update any element with data-ig-name (greeting, welcome text etc.) ──
