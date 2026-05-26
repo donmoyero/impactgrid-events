@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════════════════
-   IMPACTGRID CREATOR STUDIO — portfolio-studio.js  v2.1
+   IMPACTGRID CREATOR STUDIO — website-studio.js  v2.1
 
    Architecture matches carousel-studio.js exactly:
    ┌─────────────────────────────────────────────────────┐
    │  Browser (this file)                                │
-   │    → POST /portfolio/generate  (Render server)      │
-   │    → POST /portfolio/regen     (Render server)      │
+   │    → POST /website/generate  (Render server)      │
+   │    → POST /website/regen     (Render server)      │
    │    → Supabase REST API (direct, anon key only)      │
    │                                                     │
    │  Render server (portfolio-engine.js)                │
@@ -123,7 +123,7 @@ if (typeof canUse  === 'undefined')  { window.canUse   = function() { return tru
 
 /* ── THEMES — used ONLY for the published portfolio mini-site (buildPortfolioHTML).
    The app UI theme is controlled entirely by shared.css + nav.js toggleTheme().
-   Do NOT use these values to style anything inside portfolio-studio.html. ── */
+   Do NOT use these values to style anything inside website-studio.html. ── */
 const THEMES = {
   dark:     { bg:"#1a1814", accent:"#c97e08", text:"#f0ede8", sub:"rgba(240,237,232,0.55)", surface:"#23201a", border:"rgba(255,255,255,0.07)", gradient:"linear-gradient(160deg,#1a1814 0%,#2a2318 100%)" },
   navy:     { bg:"#0f172a", accent:"#4f8ef7", text:"#f0ede8", sub:"rgba(240,237,232,0.55)", surface:"#162035", border:"rgba(255,255,255,0.07)", gradient:"linear-gradient(160deg,#0f172a 0%,#1e3a5f 100%)" },
@@ -297,7 +297,7 @@ async function checkPortfolioAccess() {
 
   // Not logged in at all
   if (!loggedIn) {
-    showUpgradeBar('Sign in to create your portfolio', false);
+    showUpgradeBar('Sign in to create your website', false);
     return false;
   }
 
@@ -320,14 +320,14 @@ async function checkPortfolioAccess() {
     var nextPKey  = plan === 'free' ? 'professional' : 'enterprise';
     var nextLabel = (typeof igPlanLabel === 'function') ? igPlanLabel(nextPKey) : (plan === 'free' ? 'Professional' : 'Enterprise');
     var nextLimit = _getPlanCfg(nextPKey).portfolios;
-    var msg = planLabel + ' plan includes up to ' + portfolioLimit + ' portfolio' + (portfolioLimit !== 1 ? 's' : '')
+    var msg = planLabel + ' plan includes up to ' + portfolioLimit + ' website' + (portfolioLimit !== 1 ? 's' : '')
             + ' — upgrade to ' + nextLabel + ' for ' + nextLimit;
 
     // Show full upgrade modal for hard blocks
     if (typeof window.showPlanGate === 'function') {
       window.showPlanGate({
         icon:     '📁',
-        title:    'Portfolio limit reached',
+        title:    'Website limit reached',
         subtitle: msg
       });
     } else {
@@ -766,7 +766,7 @@ async function savePortfolioToDB(pf){
     || localStorage.getItem('ig_user_id');
 
   if (!userId) {
-    showUpgradeBar('Sign in to save your portfolio', false);
+    showUpgradeBar('Sign in to save your website', false);
     return false;
   }
 
@@ -838,7 +838,7 @@ async function savePortfolioToDB(pf){
     catch(_) {
       console.error('[Save] Non-JSON response:', res.status, text.slice(0, 200));
       if (res.status === 413) {
-        showToast('Portfolio too large to save — remove local image uploads and try again');
+        showToast('Website too large to save — remove local image uploads and try again');
       } else if (res.status === 502 || res.status === 503) {
         showToast('Server is waking up — please try saving again in 30 seconds');
       } else {
@@ -881,7 +881,7 @@ async function savePortfolioToDB(pf){
       } catch (patchErr) {
         console.warn('[Save] Image patch failed (non-critical):', patchErr.message);
       }
-      showToast("Portfolio saved ✓");
+      showToast("Website saved ✓");
       // Refresh the preview pill URL in case slug changed
       const pill = document.getElementById("previewUrlPill");
       if (pill && pf.slug) pill.textContent = `impactgridgroup.com/p.html?slug=${pf.slug}`;
@@ -913,12 +913,12 @@ async function deletePortfolio(id) {
   const pf = psState.portfolios.find(p => p.id === id);
   if (!pf) return;
 
-  const label = pf.name ? `"${pf.name}"` : 'this portfolio';
+  const label = pf.name ? `"${pf.name}"` : 'this website';
   const plan  = _getPlan();
   const isFreeUser = (plan === 'free') && !_isAdmin();
 
   const warningMsg = isFreeUser
-    ? `Delete ${label}?\n\n⚠ Free plan warning: this action cannot be undone. Creating a new portfolio uses AI credits — if you've used yours up, you won't be able to rebuild this portfolio without upgrading.\n\nAre you sure you want to permanently delete it?`
+    ? `Delete ${label}?\n\n⚠ Free plan warning: this action cannot be undone. Creating a new website uses AI credits — if you've used yours up, you won't be able to rebuild this website without upgrading.\n\nAre you sure you want to permanently delete it?`
     : `Delete ${label}? This can't be undone.`;
 
   if (!confirm(warningMsg)) return;
@@ -934,7 +934,7 @@ async function deletePortfolio(id) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast('Portfolio deleted');
+      showToast('Website deleted');
       // Remove from local state immediately — no need to re-fetch
       psState.portfolios = psState.portfolios.filter(p => p.id !== id);
       // Bust the portfolio cache
@@ -959,7 +959,7 @@ function renderDashGrid() {
   const count = document.getElementById("dashCount");
   if (!grid) return;
 
-  count.textContent = psState.portfolios.length + " portfolio" + (psState.portfolios.length !== 1 ? "s" : "");
+  count.textContent = psState.portfolios.length + " website" + (psState.portfolios.length !== 1 ? "s" : "");
   // Keep localStorage in sync so settings.html usage bar reads the real count without a DB call
   try { localStorage.setItem('ig_portfolio_count', String(psState.portfolios.length)); } catch(e) {}
   grid.querySelectorAll(".pf-card").forEach(c => c.remove());
@@ -1247,13 +1247,13 @@ function checkStripeReturn() {
 /* Only editing and previewing the builder UI requires a paid plan.        */
 function showFreeEditWall() {
   if (typeof window.showUpgradeBar_gate === 'function') {
-    window.showUpgradeBar_gate('Editing portfolios requires a paid plan — upgrade to unlock the builder.', true, { persistent: false });
+    window.showUpgradeBar_gate('Editing websites requires a paid plan — upgrade to unlock the builder.', true, { persistent: false });
   }
 }
 
 function showFreePreviewWall() {
   if (typeof window.showUpgradeBar_gate === 'function') {
-    window.showUpgradeBar_gate('Live preview requires a paid plan — upgrade to see your portfolio in action.', true, { persistent: false });
+    window.showUpgradeBar_gate('Live preview requires a paid plan — upgrade to see your website in action.', true, { persistent: false });
   }
 }
 
@@ -1267,7 +1267,7 @@ function openPortfolio(id, action) {
   // the live page without the user re-publishing. Force them to unpublish first.
   // Admin is exempt — they can always edit regardless of publish state.
   if (action === 'edit' && pf.published && !_isAdmin()) {
-    showToast('This portfolio is live — unpublish it first to make changes.');
+    showToast('This website is live — unpublish it first to make changes.');
     // Still show the builder in read-only preview so they can see it,
     // but disable the Save/Publish buttons.
     psState.activePortfolio = JSON.parse(JSON.stringify(pf));
@@ -1291,7 +1291,7 @@ function openPortfolio(id, action) {
       var notice = document.createElement('div');
       notice.id = 'blLockedNotice';
       notice.style.cssText = 'width:100%;text-align:center;font-size:11px;color:var(--gold);font-family:var(--fm);padding:6px 0 0;letter-spacing:.3px;';
-      notice.textContent = '✦ Portfolio is live — unpublish to edit';
+      notice.textContent = '✦ Website is live — unpublish to edit';
       footer.appendChild(notice);
     }
     mobilePanelShow('preview');
@@ -1339,7 +1339,7 @@ function copyPreviewUrl() {
   const pill = document.getElementById("previewUrlPill");
   if (!pill) return;
   const text = pill.textContent.trim();
-  if (!text || text.includes("—")) { showToast("No URL yet — save your portfolio first"); return; }
+  if (!text || text.includes("—")) { showToast("No URL yet — save your website first"); return; }
   const url = text.startsWith("http") ? text : "https://" + text;
   navigator.clipboard.writeText(url).then(() => {
     showToast("✓ Link copied!");
@@ -1401,7 +1401,7 @@ function goToStep(n) {
   const back = document.getElementById("obBackBtn");
   if (back) back.style.display = n > 1 ? "" : "none";
   const next = document.getElementById("obNextBtn");
-  if (next) { next.textContent = n === 4 ? "✦ Build My Portfolio" : "Continue →"; next.disabled = false; }
+  if (next) { next.textContent = n === 4 ? "✦ Build My Website" : "Continue →"; next.disabled = false; }
   const titles = ["Tell Dijo about yourself","Connect your platforms","Add your services & work","Choose your style"];
   const subs   = ["The more detail you give, the better Dijo builds.","Connect the platforms you're active on.","What do you offer? Add at least one service.","Pick a visual style and let Dijo do the rest."];
   const te = document.getElementById("obTitle"); if (te) te.textContent = titles[n-1] || "";
@@ -1617,7 +1617,7 @@ async function startGeneration() {
     await sleep(600);
     if (overlay) overlay.classList.add("hidden");
     psState.generating = false;
-    showToast("✦ Portfolio built by Dijo!");
+    showToast("✦ Website built by Dijo!");
 
   } catch (err) {
     clearTimeout(wakeTimer);
