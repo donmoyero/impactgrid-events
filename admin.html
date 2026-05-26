@@ -265,9 +265,7 @@ tr:hover td{background:var(--bg2);}
     <div class="sb-section">
       <div class="sb-section-label">🌐 Website</div>
       <nav class="sb-nav">
-        <a href="#" onclick="return nav('homepage',this)"><span class="sb-ico">📝</span>Homepage Content</a>
         <a href="#" onclick="return nav('hero',this)"><span class="sb-ico">🎞️</span>Hero Slideshow</a>
-        <a href="#" onclick="return nav('galleryimages',this)"><span class="sb-ico">🖼️</span>Gallery Images</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -310,93 +308,181 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
     </div>
-    <!-- HERO SLIDESHOW -->
+    <!-- HERO SLIDESHOW (expanded — all homepage images) -->
     <div class="page" id="page-hero">
-      <div class="page-header"><div class="page-title">Hero Slideshow</div><div class="page-sub">Upload images or videos that play full-screen at the top of the homepage.</div></div>
-      <div class="ws-layout">
-        <div>
-          <div class="card">
-            <div class="card-head"><h2>📤 Upload New Slide</h2></div>
-            <div class="card-body">
-              <div class="upload-zone" id="heroDropZone" onclick="document.getElementById('heroFileIn').click()" ondragover="onDragOver(event,'heroDropZone')" ondragleave="onDragLeave(event,'heroDropZone')" ondrop="onDrop(event,'heroDropZone',uploadHeroFile)">
-                <div class="upload-zone-ico">🎞️</div>
-                <div class="upload-zone-title">Drop a photo or video here, or click to browse</div>
-                <div class="upload-zone-sub">JPG · PNG · WebP · MP4 · MOV · WebM · Max 200MB</div>
-                <input type="file" id="heroFileIn" accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp" onchange="handleHeroFile(event)"/>
-              </div>
-              <div class="upload-prog" id="heroUploadProg">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;"><span style="font-size:12px;font-weight:600;color:var(--gold);" id="heroUploadName">Uploading…</span><span style="font-size:11px;color:var(--text3);" id="heroUploadPct">0%</span></div>
-                <div class="prog-track"><div class="prog-fill" id="heroUploadBar" style="width:0%;"></div></div>
-              </div>
+      <div class="page-header">
+        <div class="page-title">Homepage Images</div>
+        <div class="page-sub">Drag &amp; drop images for every visual section of the homepage. Each section saves independently.</div>
+      </div>
+
+      <!-- ── SECTION 1: HERO SLIDES ── -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-heroslides')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">🎞️</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">Hero Slideshow</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px;">Full-screen slides that play at the very top of the homepage</div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-head"><h2>🖼️ Current Slides</h2><button class="btn btn-ghost btn-sm" onclick="loadHeroSlides()">↻ Refresh</button></div>
-            <div class="card-body">
-              <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Click ✏️ to edit a slide's caption. Toggle the switch to show/hide.</p>
+          <span id="chev-heroslides" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
+        </div>
+        <div id="sec-heroslides" style="border-top:1px solid var(--border);">
+          <div style="padding:20px;">
+            <div class="upload-zone" id="heroDropZone" onclick="document.getElementById('heroFileIn').click()" ondragover="onDragOver(event,'heroDropZone')" ondragleave="onDragLeave(event,'heroDropZone')" ondrop="onDrop(event,'heroDropZone',uploadHeroFile)">
+              <div class="upload-zone-ico">🎞️</div>
+              <div class="upload-zone-title">Drop a photo or video here, or click to browse</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP · MP4 · MOV · WebM · Max 200MB</div>
+              <input type="file" id="heroFileIn" accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp" onchange="handleHeroFile(event)"/>
+            </div>
+            <div class="upload-prog" id="heroUploadProg">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;"><span style="font-size:12px;font-weight:600;color:var(--gold);" id="heroUploadName">Uploading…</span><span style="font-size:11px;color:var(--text3);" id="heroUploadPct">0%</span></div>
+              <div class="prog-track"><div class="prog-fill" id="heroUploadBar" style="width:0%;"></div></div>
+            </div>
+            <div style="margin-top:16px;">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Click ✏️ to edit a slide's caption. Toggle the switch to show/hide.</div>
               <div class="slide-list" id="heroSlideList"><div class="empty"><div class="empty-ico">🎞️</div><div class="empty-txt">Loading slides…</div></div></div>
             </div>
           </div>
-        </div>
-        <div class="ws-sticky">
-          <div class="caption-editor" id="heroCaptionEditor">
-            <h3>✏️ Slide Caption</h3>
-            <div id="heroCaptionInner"><div style="text-align:center;padding:40px 20px;color:var(--text3);"><div style="font-size:28px;margin-bottom:10px;">👈</div><div style="font-size:12px;">Select a slide from the left to edit its caption.</div></div></div>
+          <div style="padding:0 20px 20px;">
+            <div class="caption-editor" id="heroCaptionEditor">
+              <h3>✏️ Slide Caption</h3>
+              <div id="heroCaptionInner"><div style="text-align:center;padding:30px 20px;color:var(--text3);"><div style="font-size:24px;margin-bottom:8px;">👆</div><div style="font-size:12px;">Select a slide above to edit its caption.</div></div></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- GALLERY IMAGES -->
-    <div class="page" id="page-galleryimages">
-      <div class="page-header">
-        <div class="page-title">Gallery Images</div>
-        <div class="page-sub">Control the scrolling strip and the hero background grid on the homepage.</div>
+
+      <!-- ── SECTION 2: HERO BACKGROUND GRID ── -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-herogrid')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">🏞️</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">Hero Background Grid</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px;">The 5 split images visible behind the hero headline</div>
+            </div>
+          </div>
+          <span id="chev-herogrid" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
+        </div>
+        <div id="sec-herogrid" style="display:none;border-top:1px solid var(--border);">
+          <div style="padding:20px;">
+            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Exactly 5 images. First image spans both rows on the left. Drag to reorder or drop files to upload.</p>
+            <!-- drop zone -->
+            <div class="upload-zone" id="hgDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hgFileIn').click()" ondragover="onDragOver(event,'hgDropZone')" ondragleave="onDragLeave(event,'hgDropZone')" ondrop="onDropSection(event,'hgDropZone','heroGridList','hero_grid',5)">
+              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-title">Drop images here or click to upload</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP · up to 5 images</div>
+              <input type="file" id="hgFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'heroGridList','hero_grid',5)"/>
+            </div>
+            <div id="hgUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
+            <div id="heroGridList" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('heroGridList','hero_grid',5)">+ Add URL</button>
+              <button class="btn btn-gold" onclick="saveSectionList('heroGridList','hero_grid','Hero grid')">💾 Save Hero Grid</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="ws-layout">
-        <div>
 
-          <!-- SCROLLING STRIP -->
-          <div class="card">
-            <div class="card-head">
-              <h2>🎞️ Scrolling Gallery Strip</h2>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-ghost btn-sm" onclick="addGalleryRow()">+ Add Image</button>
-                <button class="btn btn-gold" onclick="saveGalleryImages()">💾 Save &amp; Apply</button>
-              </div>
-            </div>
-            <div class="card-body">
-              <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">These images scroll across the homepage. Paste any image URL — Unsplash, your own CDN, anything. Drag rows to reorder.</p>
-              <div id="galleryStripList" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <!-- ── SECTION 3: SCROLLING GALLERY STRIP ── -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-gallerystrip')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">🎬</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">Scrolling Gallery Strip</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px;">The auto-scrolling image band below the hero section</div>
             </div>
           </div>
-
-          <!-- HERO BACKGROUND GRID -->
-          <div class="card">
-            <div class="card-head">
-              <h2>🏞️ Hero Background Grid</h2>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-ghost btn-sm" onclick="addHeroGridRow()">+ Add Image</button>
-                <button class="btn btn-gold" onclick="saveGalleryImages()">💾 Save &amp; Apply</button>
-              </div>
-            </div>
-            <div class="card-body">
-              <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">The 5 split images visible behind the hero headline. First image spans both rows.</p>
-              <div id="heroGridList" style="display:flex;flex-direction:column;gap:8px;"></div>
-            </div>
-          </div>
-
+          <span id="chev-gallerystrip" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
         </div>
-        <div class="ws-sticky">
-          <div class="hint-box">
-            <strong>How it works</strong><br><br>
-            Changes are saved to the <code>site_content</code> Supabase table. The homepage reads this on every page load — visitors see your changes immediately, no redeploy needed.<br><br>
-            Paste a full image URL in each row. Unsplash format:<br>
-            <code>https://images.unsplash.com/photo-XXXXXXXX?w=600&q=85&fit=crop</code><br><br>
-            You can also use your own hosted images.
+        <div id="sec-gallerystrip" style="display:none;border-top:1px solid var(--border);">
+          <div style="padding:20px;">
+            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Add as many images as you like. They scroll continuously in two rows. Drag to reorder.</p>
+            <div class="upload-zone" id="gsDropZone" style="margin-bottom:14px;" onclick="document.getElementById('gsFileIn').click()" ondragover="onDragOver(event,'gsDropZone')" ondragleave="onDragLeave(event,'gsDropZone')" ondrop="onDropSection(event,'gsDropZone','galleryStripList','gallery_strip',99)">
+              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-title">Drop images here or click to upload</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files</div>
+              <input type="file" id="gsFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'galleryStripList','gallery_strip',99)"/>
+            </div>
+            <div id="gsUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
+            <div id="galleryStripList" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('galleryStripList','gallery_strip',99)">+ Add URL</button>
+              <button class="btn btn-gold" onclick="saveSectionList('galleryStripList','gallery_strip','Gallery strip')">💾 Save Gallery Strip</button>
+            </div>
           </div>
-          <a href="index.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview Homepage</a>
-          <button class="btn btn-ghost" style="display:flex;justify-content:center;width:100%;margin-top:8px;" onclick="resetGalleryImages()">↺ Reset to Defaults</button>
         </div>
+      </div>
+
+      <!-- ── SECTION 4: WHO IT'S FOR CARDS ── -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-whocards')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">👥</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">"Who It's For" Cards</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px;">The three split-image cards below the hero section</div>
+            </div>
+          </div>
+          <span id="chev-whocards" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
+        </div>
+        <div id="sec-whocards" style="display:none;border-top:1px solid var(--border);">
+          <div style="padding:20px;">
+            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Exactly 3 images — one per card (Weddings, Corporate, Parties &amp; Events).</p>
+            <div class="upload-zone" id="wcDropZone" style="margin-bottom:14px;" onclick="document.getElementById('wcFileIn').click()" ondragover="onDragOver(event,'wcDropZone')" ondragleave="onDragLeave(event,'wcDropZone')" ondrop="onDropSection(event,'wcDropZone','whoCardsList','who_cards',3)">
+              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-title">Drop images here or click to upload</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP · 3 images max</div>
+              <input type="file" id="wcFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'whoCardsList','who_cards',3)"/>
+            </div>
+            <div id="wcUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
+            <div id="whoCardsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('whoCardsList','who_cards',3)">+ Add URL</button>
+              <button class="btn btn-gold" onclick="saveSectionList('whoCardsList','who_cards','Who-it\'s-for cards')">💾 Save Cards</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 5: HOW IT WORKS IMAGE ── -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-howimage')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">⚙️</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">"How It Works" Image</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px;">The side image in the "Simple workflow. Powerful results." section</div>
+            </div>
+          </div>
+          <span id="chev-howimage" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
+        </div>
+        <div id="sec-howimage" style="display:none;border-top:1px solid var(--border);">
+          <div style="padding:20px;">
+            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Single image displayed beside the workflow steps.</p>
+            <div class="upload-zone" id="hiDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hiFileIn').click()" ondragover="onDragOver(event,'hiDropZone')" ondragleave="onDragLeave(event,'hiDropZone')" ondrop="onDropSection(event,'hiDropZone','howImageList','how_image',1)">
+              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-title">Drop an image here or click to upload</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP · 1 image</div>
+              <input type="file" id="hiFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleSectionFiles(event,'howImageList','how_image',1)"/>
+            </div>
+            <div id="hiUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
+            <div id="howImageList" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('howImageList','how_image',1)">+ Add URL</button>
+              <button class="btn btn-gold" onclick="saveSectionList('howImageList','how_image','How it works image')">💾 Save Image</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint-box" style="margin-bottom:18px;">
+        <strong>How it works</strong><br><br>
+        Uploading a file sends it to Supabase storage and saves the URL automatically. You can also paste any URL directly. Changes go live immediately — no redeploy needed.
+        <br><br>
+        <a href="index.html" target="_blank" class="btn btn-green btn-sm" style="margin-top:6px;display:inline-flex;">🔗 Preview Homepage</a>
       </div>
     </div>
     <!-- UPDATES -->
@@ -758,9 +844,7 @@ function nav(id,el){
     uploadphotos:'loadUploadPhotos',
     downloadrequests:'loadDownloadRequests',
     reviews:'loadEventReviews',
-    homepage:'loadHomepageEditor',
-    hero:'loadHeroSlides',
-    galleryimages:'loadGalleryImagesPage'
+    hero:'loadAllHomepageSections'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
   return false;
@@ -1607,11 +1691,9 @@ async function loadSent(){
   }
 }
 
-/* ── GALLERY IMAGES MANAGER ─────────────────────────────────────────────── */
+/* ── HOMEPAGE IMAGES MANAGER ────────────────────────────────────────────── */
 
-var GALLERY_LS_KEY = 'ig_gallery_strip';
-var HERO_LS_KEY    = 'ig_hero_grid';
-
+/* Default fallback images */
 var DEFAULT_GALLERY_STRIP = [
   'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=560&q=85&fit=crop',
   'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=480&q=85&fit=crop',
@@ -1622,7 +1704,6 @@ var DEFAULT_GALLERY_STRIP = [
   'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=500&q=85&fit=crop',
   'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=500&q=85&fit=crop'
 ];
-
 var DEFAULT_HERO_GRID = [
   'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&q=85&fit=crop',
   'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=700&q=85&fit=crop',
@@ -1630,135 +1711,225 @@ var DEFAULT_HERO_GRID = [
   'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=700&q=85&fit=crop',
   'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&fit=crop'
 ];
+var DEFAULT_WHO_CARDS = [
+  'https://images.unsplash.com/photo-1519741497674-611481863552?w=700&q=85&fit=crop',
+  'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=700&q=85&fit=crop',
+  'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=700&q=85&fit=crop'
+];
+var DEFAULT_HOW_IMAGE = [
+  'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=900&q=85&fit=crop'
+];
 
-async function loadGalleryImagesPage(){
-  // Show cached version instantly while Supabase loads
-  var strip = JSON.parse(localStorage.getItem(GALLERY_LS_KEY) || 'null') || DEFAULT_GALLERY_STRIP;
-  var hero  = JSON.parse(localStorage.getItem(HERO_LS_KEY)    || 'null') || DEFAULT_HERO_GRID;
-  renderImageList('galleryStripList', strip, 'strip');
-  renderImageList('heroGridList',     hero,  'hero');
+/* Section collapse toggle */
+function toggleSection(id){
+  var el   = document.getElementById(id);
+  var chev = document.getElementById('chev-' + id.replace('sec-',''));
+  if(!el) return;
+  var open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if(chev) chev.style.transform = open ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
 
-  // Then fetch from Supabase and update if there's newer data
+/* Load ALL homepage sections when the hero page opens */
+async function loadAllHomepageSections(){
+  loadHeroSlides();
+  var keys = ['hero_grid','gallery_strip','who_cards','how_image'];
+  var defaults = { hero_grid: DEFAULT_HERO_GRID, gallery_strip: DEFAULT_GALLERY_STRIP, who_cards: DEFAULT_WHO_CARDS, how_image: DEFAULT_HOW_IMAGE };
+  var listIds  = { hero_grid: 'heroGridList', gallery_strip: 'galleryStripList', who_cards: 'whoCardsList', how_image: 'howImageList' };
+  var maxes    = { hero_grid: 5, gallery_strip: 99, who_cards: 3, how_image: 1 };
+
+  /* Show cached/defaults immediately */
+  keys.forEach(function(k){
+    var cached = null;
+    try{ cached = JSON.parse(localStorage.getItem('ig_'+k)); }catch(e){}
+    renderSectionList(listIds[k], cached || defaults[k], k, maxes[k]);
+  });
+
+  /* Fetch from Supabase and update */
   try {
     var sb = getSupabase();
-    var {data, error} = await sb.from('site_content').select('key,value').in('key',['gallery_strip','hero_grid']);
+    var {data, error} = await sb.from('site_content').select('key,value').in('key', keys);
     if(error) throw error;
     if(data && data.length){
       var kv = {};
       data.forEach(function(r){ try{ kv[r.key] = JSON.parse(r.value); }catch(e){} });
-      if(kv['gallery_strip']){ strip = kv['gallery_strip']; localStorage.setItem(GALLERY_LS_KEY, JSON.stringify(strip)); }
-      if(kv['hero_grid'])    { hero  = kv['hero_grid'];     localStorage.setItem(HERO_LS_KEY,    JSON.stringify(hero));  }
-      renderImageList('galleryStripList', strip, 'strip');
-      renderImageList('heroGridList',     hero,  'hero');
+      keys.forEach(function(k){
+        if(kv[k]){
+          try{ localStorage.setItem('ig_'+k, JSON.stringify(kv[k])); }catch(e){}
+          renderSectionList(listIds[k], kv[k], k, maxes[k]);
+        }
+      });
     }
-  } catch(e) {
-    // Supabase unavailable — cached/default version already shown
-    console.warn('Gallery load from Supabase failed:', e.message);
-  }
+  } catch(e){ console.warn('Section load failed:', e.message); }
 }
 
-function renderImageList(containerId, urls, type){
+/* Render a list of URL rows for a section */
+function renderSectionList(containerId, urls, key, max){
   var el = document.getElementById(containerId);
   if(!el) return;
   el.innerHTML = '';
-  urls.forEach(function(url, i){
-    el.appendChild(makeImageRow(url, i, type));
-  });
+  urls.forEach(function(url, i){ el.appendChild(makeSectionRow(url, i, key, max)); });
 }
 
-function makeImageRow(url, index, type){
+/* Build one image row */
+function makeSectionRow(url, index, key, max){
   var row = document.createElement('div');
   row.className = 'slide-row';
-  row.dataset.type  = type;
+  row.setAttribute('draggable','true');
+  row.dataset.key   = key;
   row.dataset.index = index;
+
+  /* drag-reorder handlers */
+  row.addEventListener('dragstart', function(e){
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
+    row._dragging = true;
+    setTimeout(function(){ row.style.opacity = '0.4'; }, 0);
+  });
+  row.addEventListener('dragend', function(){
+    row.style.opacity = '';
+    row._dragging = false;
+  });
+  row.addEventListener('dragover', function(e){
+    e.preventDefault();
+    var list = row.parentElement;
+    var dragging = list.querySelector('[draggable][style*="opacity"]') ||
+                   Array.from(list.children).find(function(c){ return c._dragging; });
+    if(dragging && dragging !== row){
+      var rect = row.getBoundingClientRect();
+      var after = e.clientY > rect.top + rect.height/2;
+      if(after) list.insertBefore(dragging, row.nextSibling);
+      else       list.insertBefore(dragging, row);
+    }
+  });
+
   row.innerHTML =
-    '<img class="slide-thumb" src="'+url+'" onerror="this.style.opacity=\'0.3\'" style="background:var(--bg3);" />'
+    '<img class="slide-thumb" src="'+esc(url)+'" onerror="this.style.opacity=\'0.25\'" style="background:var(--bg3);cursor:grab;" />'
     + '<div class="slide-info">'
-    +   '<input type="text" value="'+url+'" placeholder="Paste image URL…"'
-    +   ' oninput="updateThumb(this)" style="font-size:11px;font-family:var(--fm);letter-spacing:0;" />'
+    +   '<input type="text" value="'+esc(url)+'" placeholder="Paste image URL…"'
+    +   ' oninput="updateSectionThumb(this)" style="font-size:11px;font-family:var(--fm);letter-spacing:0;" />'
     + '</div>'
     + '<div class="slide-actions">'
-    +   '<button class="btn btn-ghost btn-icon" title="Move up"    onclick="moveImageRow(this,\'up\')"   >↑</button>'
-    +   '<button class="btn btn-ghost btn-icon" title="Move down"  onclick="moveImageRow(this,\'down\')" >↓</button>'
-    +   '<button class="btn btn-red  btn-icon" title="Remove"      onclick="removeImageRow(this)"        >✕</button>'
+    +   '<button class="btn btn-ghost btn-icon" title="Move up"   onclick="moveSectionRow(this,\'up\')"  >↑</button>'
+    +   '<button class="btn btn-ghost btn-icon" title="Move down" onclick="moveSectionRow(this,\'down\')" >↓</button>'
+    +   '<button class="btn btn-red  btn-icon" title="Remove"     onclick="removeSectionRow(this)"        >✕</button>'
     + '</div>';
   return row;
 }
 
-function updateThumb(input){
+function updateSectionThumb(input){
   var thumb = input.closest('.slide-row').querySelector('.slide-thumb');
   thumb.style.opacity = '1';
   thumb.src = input.value;
 }
-
-function moveImageRow(btn, dir){
+function moveSectionRow(btn, dir){
   var row = btn.closest('.slide-row');
   var list = row.parentElement;
-  if(dir === 'up' && row.previousElementSibling) list.insertBefore(row, row.previousElementSibling);
-  if(dir === 'down' && row.nextElementSibling)   list.insertBefore(row.nextElementSibling, row);
+  if(dir==='up'   && row.previousElementSibling) list.insertBefore(row, row.previousElementSibling);
+  if(dir==='down' && row.nextElementSibling)     list.insertBefore(row.nextElementSibling, row);
 }
+function removeSectionRow(btn){ btn.closest('.slide-row').remove(); }
 
-function removeImageRow(btn){
-  btn.closest('.slide-row').remove();
-}
-
-function addGalleryRow(){
-  var el = document.getElementById('galleryStripList');
-  var count = el.children.length;
-  el.appendChild(makeImageRow('', count, 'strip'));
+function addSectionRow(containerId, key, max){
+  var el = document.getElementById(containerId);
+  if(el.children.length >= max){ toast('⚠️','Max '+max+' images for this section',''); return; }
+  el.appendChild(makeSectionRow('', el.children.length, key, max));
   el.lastElementChild.querySelector('input').focus();
 }
 
-function addHeroGridRow(){
-  var el = document.getElementById('heroGridList');
-  var count = el.children.length;
-  if(count >= 5){ toast('⚠️','Max 5 hero images','The hero grid uses exactly 5 images'); return; }
-  el.appendChild(makeImageRow('', count, 'hero'));
-  el.lastElementChild.querySelector('input').focus();
-}
-
-function getUrlsFromList(containerId){
+function getSectionUrls(containerId){
   return Array.from(document.querySelectorAll('#'+containerId+' .slide-row input'))
-    .map(function(i){ return i.value.trim(); })
-    .filter(Boolean);
+    .map(function(i){ return i.value.trim(); }).filter(Boolean);
 }
 
-async function saveGalleryImages(){
-  var strip = getUrlsFromList('galleryStripList');
-  var hero  = getUrlsFromList('heroGridList');
-  if(!strip.length){ toast('⚠️','Add at least one strip image',''); return; }
-  if(!hero.length){  toast('⚠️','Add at least one hero image','');  return; }
-
-  var btn = document.querySelector('[onclick="saveGalleryImages()"]');
+async function saveSectionList(containerId, key, label){
+  var urls = getSectionUrls(containerId);
+  if(!urls.length){ toast('⚠️','No images to save','Add at least one image'); return; }
+  var btn = event && event.target;
   if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
-
   try {
     var sb = getSupabase();
-    var {error} = await sb.from('site_content').upsert([
-      { key: 'gallery_strip', value: JSON.stringify(strip) },
-      { key: 'hero_grid',     value: JSON.stringify(hero)  }
-    ], { onConflict: 'key' });
-
+    var {error} = await sb.from('site_content').upsert([{ key: key, value: JSON.stringify(urls) }], { onConflict: 'key' });
     if(error) throw error;
-
-    // Also keep localStorage as cache
-    localStorage.setItem(GALLERY_LS_KEY, JSON.stringify(strip));
-    localStorage.setItem(HERO_LS_KEY,    JSON.stringify(hero));
-    toast('✅','Gallery images saved!','Homepage updated — visitors will see changes immediately');
-  } catch(e) {
+    try{ localStorage.setItem('ig_'+key, JSON.stringify(urls)); }catch(e){}
+    toast('✅', label+' saved!', 'Homepage updated immediately');
+  } catch(e){
     toast('⚠️','Save failed', e.message || 'Check Supabase connection');
   } finally {
-    if(btn){ btn.disabled = false; btn.textContent = '💾 Save Changes'; }
+    if(btn){ btn.disabled = false; btn.textContent = '💾 Save '+(label.split(' ')[0]||''); }
   }
 }
 
-function resetGalleryImages(){
-  if(!confirm('Reset both gallery and hero images to defaults?')) return;
-  localStorage.removeItem(GALLERY_LS_KEY);
-  localStorage.removeItem(HERO_LS_KEY);
-  loadGalleryImagesPage();
-  toast('↺','Reset to defaults','');
+/* Drop files onto a section upload zone */
+function onDropSection(e, zoneId, listId, key, max){
+  e.preventDefault();
+  document.getElementById(zoneId).classList.remove('drag');
+  var files = Array.from(e.dataTransfer.files || []).filter(function(f){ return f.type.startsWith('image/'); });
+  if(!files.length) return;
+  uploadSectionFiles(files, listId, key, max);
 }
+
+function handleSectionFiles(e, listId, key, max){
+  var files = Array.from(e.target.files || []).filter(function(f){ return f.type.startsWith('image/'); });
+  e.target.value = '';
+  if(!files.length) return;
+  uploadSectionFiles(files, listId, key, max);
+}
+
+async function uploadSectionFiles(files, listId, key, max){
+  var el = document.getElementById(listId);
+  var progId = { heroGridList:'hgUploadProg', galleryStripList:'gsUploadProg', whoCardsList:'wcUploadProg', howImageList:'hiUploadProg' }[listId];
+  var prog = progId ? document.getElementById(progId) : null;
+
+  /* Check limit */
+  var current = el ? el.children.length : 0;
+  if(current + files.length > max){
+    files = files.slice(0, Math.max(0, max - current));
+    if(!files.length){ toast('⚠️','Limit reached','Max '+max+' images for this section'); return; }
+    toast('⚠️','Trimmed to '+max+' images','Only the first files were used');
+  }
+
+  if(prog){ prog.style.display = 'block'; prog.textContent = 'Uploading 0 / '+files.length+'…'; }
+
+  var sb = getSupabase();
+  var uploaded = [];
+  for(var i = 0; i < files.length; i++){
+    var file = files[i];
+    var ext  = file.name.split('.').pop() || 'jpg';
+    var path = 'site-images/'+key+'-'+Date.now()+'-'+i+'.'+ext;
+    if(prog) prog.textContent = 'Uploading '+(i+1)+' / '+files.length+' — '+file.name;
+    try {
+      var {error: upErr} = await sb.storage.from(BUCKET).upload(path, file, { upsert: true });
+      if(upErr) throw upErr;
+      var {data: urlData} = sb.storage.from(BUCKET).getPublicUrl(path);
+      if(urlData && urlData.publicUrl) uploaded.push(urlData.publicUrl);
+    } catch(e){
+      toast('⚠️','Upload failed: '+file.name, e.message || '');
+    }
+  }
+
+  if(prog){ prog.style.display = 'none'; prog.textContent = ''; }
+
+  if(uploaded.length){
+    var currentCount = el ? el.children.length : 0;
+    uploaded.forEach(function(url, idx){
+      if(el) el.appendChild(makeSectionRow(url, currentCount + idx, key, max));
+    });
+    toast('✅', uploaded.length+' image'+(uploaded.length>1?'s':'')+' uploaded', 'Click Save to publish');
+  }
+}
+
+/* Keep old aliases so hero slides page still works */
+var GALLERY_LS_KEY = 'ig_gallery_strip';
+var HERO_LS_KEY    = 'ig_hero_grid';
+function addGalleryRow(){ addSectionRow('galleryStripList','gallery_strip',99); }
+function addHeroGridRow(){ addSectionRow('heroGridList','hero_grid',5); }
+function saveGalleryImages(){
+  saveSectionList('galleryStripList','gallery_strip','Gallery strip');
+  saveSectionList('heroGridList','hero_grid','Hero grid');
+}
+function loadGalleryImagesPage(){ loadAllHomepageSections(); }
+
 </script>
 </body>
 </html>
