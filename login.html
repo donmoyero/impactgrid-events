@@ -249,12 +249,8 @@ function showAlert(msg, type) {
 function redirectByRole(user, role) {
   if (role === 'admin' || (user.email && user.email === 'admin@impactgridgroup.com')) {
     window.location.href = 'admin.html';
-  } else if (role === 'photographer') {
-    window.location.href = 'dashboard.html';
-  } else if (role === 'employer') {
-    window.location.href = 'employer-dashboard.html';
   } else {
-    window.location.href = 'creator-studio.html';
+    window.location.href = 'dashboard.html';
   }
 }
 
@@ -304,7 +300,7 @@ async function googleSignIn() {
     if (!c) { showAlert('Auth service not ready — please refresh.', 'error'); return; }
     var res = await c.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/creator-studio.html' }
+      options: { redirectTo: window.location.origin + '/login.html' }
     });
     if (res.error) { console.error('[ImpactGrid] Google sign-in error:', res.error); throw res.error; }
   } catch(err) {
