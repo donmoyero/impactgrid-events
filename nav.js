@@ -56,13 +56,13 @@
   /* ─────────────────────────────────────────
      RENDER NAV
   ───────────────────────────────────────── */
-  /* Icon map for nav links */
+  /* Icon map for nav links — inline SVG, no emoji */
   var NAV_ICONS = {
-    'index.html':            '🏠',
-    'portfolio-studio.html': '🌐',
-    'pricing.html':          '🏷️',
-    'dashboard.html':        '📊',
-    'admin.html':            '⚙️',
+    'index.html':            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>',
+    'portfolio-studio.html': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    'pricing.html':          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    'dashboard.html':        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+    'admin.html':            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>',
   };
 
   function renderNav(activePage) {
@@ -158,7 +158,7 @@
         '</ul>' +
 
         '<div class="nav-bottom">' +
-          '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>' +
+          '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">Dark mode</button>' +
 
           /* ── GUEST: shown when logged out ── */
           '<div id="navGuest" class="nav-guest" style="display:flex;flex-direction:column;gap:7px;">' +
@@ -223,7 +223,7 @@
         '</div>' +
         '<div class="mob-theme-row">' +
           '<span>Theme</span>' +
-          '<button class="mob-tbtn" id="mobTBtn" onclick="toggleTheme()">🌙 Dark</button>' +
+          '<button class="mob-tbtn" id="mobTBtn" onclick="toggleTheme()">Dark</button>' +
         '</div>' +
       '</div>';
 
@@ -300,7 +300,7 @@
           '<div class="footer-bot">' +
             '<span>© 2026 ImpactGrid Group Ltd. All rights reserved.</span>' +
             '<div class="footer-legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>' +
-            '<button class="footer-tbtn" onclick="toggleTheme()" id="footerTBtn" aria-label="Toggle dark/light mode">🌙 Dark Mode</button>' +
+            '<button class="footer-tbtn" onclick="toggleTheme()" id="footerTBtn" aria-label="Toggle dark/light mode">Dark mode</button>' +
           '</div>' +
         '</div>' +
       '</footer>';
@@ -315,14 +315,18 @@
   var _isDark = false;
   function _applyTheme(dark) {
     _isDark = dark;
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    var ico = dark ? '☀️' : '🌙';
-    var tb = document.getElementById('themeBtn');   if(tb) tb.textContent = ico;
-    var fb = document.getElementById('footerTBtn'); if(fb) fb.textContent = dark ? '☀️ Light Mode' : '🌙 Dark Mode';
-    var mb = document.getElementById('mobTBtn');    if(mb) mb.textContent = dark ? '☀️ Light' : '🌙 Dark';
+    if (dark) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    var tb = document.getElementById('themeBtn');   if(tb) tb.textContent = dark ? 'Light mode' : 'Dark mode';
+    var fb = document.getElementById('footerTBtn'); if(fb) fb.textContent = dark ? 'Light mode' : 'Dark mode';
+    var mb = document.getElementById('mobTBtn');    if(mb) mb.textContent = dark ? 'Light' : 'Dark';
     try { localStorage.setItem('ig_theme', dark ? 'dark' : 'light'); } catch(e) {}
   }
   window.toggleTheme = function() { _applyTheme(!_isDark); };
+  /* Only activate dark if the user has previously chosen it — light is the default */
   (function() {
     try { if (localStorage.getItem('ig_theme') === 'dark') _applyTheme(true); } catch(e) {}
   })();
@@ -383,7 +387,7 @@
      INIT
   ───────────────────────────────────────── */
   function _initNavInteractions() {
-    try { if (localStorage.getItem('ig_theme') === 'dark') _applyTheme(true); } catch(e) {}
+    /* Theme already restored at IIFE boot — nothing else needed here */
   }
 
   /* ─────────────────────────────────────────
