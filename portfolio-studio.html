@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>Portfolio Studio · ImpactGrid</title>
+<link rel="icon" href="https://impactgridgroup.com/favicon.ico" type="image/x-icon"/>
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KVJC5DE2WT');
+</script>
+<link rel="stylesheet" href="shared.css"/>
+<link rel="stylesheet" href="portfolio-studio.css"/>
+<style>
+/* ── Mobile scroll fix ──────────────────────────────
+   Aggressive override — targets every possible source
+   of overflow:hidden that can trap scroll on iOS/Android.
+   Uses !important throughout because shared.css and
+   portfolio-studio.css may set conflicting values.
+──────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  html {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    position: relative !important;
+  }
+  /* Shell: full normal document flow */
+  .ps-shell {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: relative !important;
+    display: block !important;
+  }
+  /* Screens: stack vertically; only .active is shown */
+  .ps-screen {
+    display: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+  .ps-screen.active {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+  /* Builder panels: let them flow naturally */
+  .builder-wrap,
+  .builder-left,
+  .builder-right,
+  .be-panel,
+  .onboard-wrap,
+  .ob-wrap {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: relative !important;
+    max-height: none !important;
+  }
+  /* Preview iframe should stay bounded */
+  .builder-right iframe,
+  #livePreviewFrame {
+    height: 420px !important;
+    max-height: 420px !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ NAV ══════════════ -->
+<div id="ig-nav"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="ig-supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="nav.js"></script>
+
+<!-- ══════════════ SHELL ══════════════ -->
+<div class="ps-shell">
+
+  <!-- ══ SCREEN 1: DASHBOARD (list of portfolios) ══ -->
+  <div class="ps-screen active" id="screenDash">
+
+    <!-- ── User Plan Banner — populated automatically from window.igUser (ig-supabase) ── -->
+    <div class="ps-user-banner" id="psUserBanner" style="display:none;">
+      <div class="ps-user-banner-left">
+        <div class="ps-welcome" id="psWelcome">Welcome back 👋</div>
+        <div class="ps-plan-row">
+          <span class="ps-plan-badge" id="psPlanBadge">Free</span>
+          <span class="ps-trial-info" id="psTrialInfo"></span>
+        </div>
+      </div>
+      <a href="pricing.html" class="ps-upgrade-link" id="psUpgradeLink" style="display:none;">Upgrade plan →</a>
+    </div>
+
+    <!-- ══ PAGE HERO: website showcase ══ -->
+    <div class="ps-page-hero">
+      <div class="ps-page-hero-text">
+        <div class="ps-showcase-eyebrow" style="margin-bottom:14px">✦ Built by Dijo</div>
+        <h1 class="ps-showcase-title" style="font-size:clamp(28px,4.5vw,52px);margin-bottom:16px">We build your entire<br/><em style="color:var(--gold,#c9a84c);font-style:italic">website</em></h1>
+        <p class="ps-showcase-sub" style="margin-bottom:28px;max-width:420px">From hero to contact form — your portfolio is a complete, live website. One click. No code.</p>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <button class="dash-create-btn" id="dashCreateBtn" onclick="psHandleCreate()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Build My Portfolio
+          </button>
+          <span style="font-size:11px;color:#7a8199">Free to start · No credit card · Live in 5 min</span>
+        </div>
+      </div>
+
+      <div class="ps-hero-cards">
+        <!-- Mobile-only demo disclaimer — visible only when no portfolios exist -->
+        <div class="ps-demo-notice" id="psDemoNotice" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          These are <strong>example portfolios</strong> — not yours. Tap <em>Build My Portfolio</em> above to create yours.
+        </div>
+        <div class="ps-website-card ps-hero-card">
+          <div class="ps-website-card-browser">
+            <div class="ps-browser-bar">
+              <span class="ps-browser-dot red"></span><span class="ps-browser-dot amber"></span><span class="ps-browser-dot green"></span>
+              <span class="ps-browser-url">impactgrid.app/p/sarahjfitness</span>
+            </div>
+            <div class="ps-website-preview dark-gold-prev">
+              <div class="ps-prev-nav"><div class="ps-prev-logo"></div><div class="ps-prev-nav-links"><span></span><span></span><span></span></div><div class="ps-prev-cta-sm"></div></div>
+              <div class="ps-prev-hero">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=450&fit=crop&q=75" alt="Dark gold portfolio — fitness creator" loading="eager"/>
+                <div class="ps-prev-hero-overlay">
+                  <div class="ps-prev-eyebrow">FITNESS CREATOR</div>
+                  <div class="ps-prev-h1">Sarah Johnson</div>
+                  <div class="ps-prev-sub-line">285K followers · 4.7% engagement</div>
+                  <div class="ps-prev-btn-row"><div class="ps-prev-btn gold">Work With Me</div><div class="ps-prev-btn ghost">View Rates</div></div>
+                </div>
+              </div>
+              <div class="ps-prev-stats-bar">
+                <div class="ps-prev-stat"><div class="ps-prev-stat-val">285K</div><div class="ps-prev-stat-lbl">Followers</div></div>
+                <div class="ps-prev-stat"><div class="ps-prev-stat-val">4.7%</div><div class="ps-prev-stat-lbl">Engagement</div></div>
+                <div class="ps-prev-stat"><div class="ps-prev-stat-val">2.1M</div><div class="ps-prev-stat-lbl">Monthly Views</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="ps-website-card-info"><span class="ps-website-theme-pill dark">Dark Gold</span><div class="ps-website-card-name">Sarah Johnson</div><div class="ps-website-card-niche">Fitness &amp; Lifestyle · 285K</div></div>
+        </div>
+
+        <div class="ps-website-card ps-hero-card ps-hero-card-mid">
+          <div class="ps-website-card-browser">
+            <div class="ps-browser-bar">
+              <span class="ps-browser-dot red"></span><span class="ps-browser-dot amber"></span><span class="ps-browser-dot green"></span>
+              <span class="ps-browser-url">impactgrid.app/p/marcuscreates</span>
+            </div>
+            <div class="ps-website-preview clean-light-prev">
+              <div class="ps-prev-nav clean"><div class="ps-prev-logo dark"></div><div class="ps-prev-nav-links dark"><span></span><span></span><span></span></div><div class="ps-prev-cta-sm blue"></div></div>
+              <div class="ps-prev-hero clean-hero">
+                <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&h=200&fit=crop&q=75" alt="Clean light portfolio — food creator" loading="eager" style="object-position:center 30%"/>
+                <div class="ps-prev-hero-overlay clean-ov">
+                  <div class="ps-prev-eyebrow blue-txt">FOOD &amp; TRAVEL</div>
+                  <div class="ps-prev-h1 dark-txt">Marcus Creates</div>
+                  <div class="ps-prev-sub-line dark-txt" style="opacity:.6">London · 140K YouTube · 89K TikTok</div>
+                  <div class="ps-prev-btn-row"><div class="ps-prev-btn blue">Book a Collab</div><div class="ps-prev-btn ghost-dark">My Rates</div></div>
+                </div>
+              </div>
+              <div class="ps-prev-stats-bar clean-bar">
+                <div class="ps-prev-stat dark-stat"><div class="ps-prev-stat-val">229K</div><div class="ps-prev-stat-lbl">Total Following</div></div>
+                <div class="ps-prev-stat dark-stat"><div class="ps-prev-stat-val">£1.2K</div><div class="ps-prev-stat-lbl">Avg Rate Card</div></div>
+                <div class="ps-prev-stat dark-stat"><div class="ps-prev-stat-val">38</div><div class="ps-prev-stat-lbl">Collabs Done</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="ps-website-card-info"><span class="ps-website-theme-pill clean">Clean Light</span><div class="ps-website-card-name">Marcus Creates</div><div class="ps-website-card-niche">Food &amp; Travel · 229K</div></div>
+        </div>
+
+        <div class="ps-website-card ps-hero-card">
+          <div class="ps-website-card-browser">
+            <div class="ps-browser-bar">
+              <span class="ps-browser-dot red"></span><span class="ps-browser-dot amber"></span><span class="ps-browser-dot green"></span>
+              <span class="ps-browser-url">impactgrid.app/p/ellastyle</span>
+            </div>
+            <div class="ps-website-preview rose-prev-card">
+              <div class="ps-prev-nav rose-nav"><div class="ps-prev-logo rose-logo"></div><div class="ps-prev-nav-links"><span></span><span></span><span></span></div><div class="ps-prev-cta-sm rose"></div></div>
+              <div class="ps-prev-hero">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=450&fit=crop&q=75" alt="Rose editorial portfolio — fashion creator" loading="eager"/>
+                <div class="ps-prev-hero-overlay rose-ov">
+                  <div class="ps-prev-eyebrow rose-txt">FASHION EDITOR</div>
+                  <div class="ps-prev-h1">Ella Moreau</div>
+                  <div class="ps-prev-sub-line">Paris-based · 512K Instagram</div>
+                  <div class="ps-prev-btn-row"><div class="ps-prev-btn rose-btn">Enquire Now</div><div class="ps-prev-btn ghost">Lookbook</div></div>
+                </div>
+              </div>
+              <div class="ps-prev-stats-bar rose-bar">
+                <div class="ps-prev-stat"><div class="ps-prev-stat-val">512K</div><div class="ps-prev-stat-lbl">Followers</div></div>
+                <div class="ps-prev-stat"><div class="ps-prev-stat-val">6.2%</div><div class="ps-prev-stat-lbl">Engagement</div></div>
+                <div class="ps-prev-stat"><div class="ps-prev-stat-val">€3.5K</div><div class="ps-prev-stat-lbl">Avg Campaign</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="ps-website-card-info"><span class="ps-website-theme-pill rose">Rose Edit</span><div class="ps-website-card-name">Ella Moreau</div><div class="ps-website-card-niche">Fashion &amp; Lifestyle · 512K</div></div>
+        </div>
+      </div><!-- /ps-hero-cards -->
+    </div><!-- /ps-page-hero -->
+
+    <style>
+    .ps-page-hero {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 40px;
+      align-items: center;
+      padding: 48px 32px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      .ps-page-hero { grid-template-columns: 1fr; gap: 32px; padding: 32px 20px 28px; }
+    }
+    .ps-hero-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      align-items: end;
+    }
+    @media (max-width: 700px) {
+      .ps-hero-cards { grid-template-columns: 1fr; }
+      .ps-hero-card-mid { display: none; }
+    }
+    /* Demo notice — shown on mobile above the sample cards */
+    .ps-demo-notice {
+      display: none; /* shown via JS on mobile */
+      grid-column: 1 / -1;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #a8afc2;
+      background: rgba(201,168,76,.08);
+      border: 1px solid rgba(201,168,76,.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      line-height: 1.5;
+    }
+    .ps-demo-notice svg { flex-shrink: 0; color: #c9a84c; }
+    .ps-demo-notice strong { color: #c9a84c; font-weight: 700; }
+    .ps-demo-notice em { font-style: normal; font-weight: 600; color: #eef0f6; }
+    @media (max-width: 900px) {
+      .ps-demo-notice { display: flex !important; }
+    }
+    .ps-hero-card { transition: transform .3s ease; }
+    .ps-hero-card-mid { transform: translateY(-18px); }
+    .ps-hero-card:hover { transform: translateY(-6px) !important; }
+    </style>
+
+    <!-- Portfolio list -->
+    <div class="dash-section">
+      <div class="dash-section-header">
+        <span class="dash-section-title">Your Portfolios</span>
+        <span class="dash-section-count" id="dashCount">0 portfolios</span>
+        <a href="creator-studio.html" class="ps-back-to-hub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="15 18 9 12 15 6"/></svg>
+          Creator Studio
+        </a>
+      </div>
+      <div class="dash-grid" id="dashGrid">
+        <!-- Populated by JS -->
+        <div class="dash-empty" id="dashEmpty">
+          <div class="dash-empty-icon">✦</div>
+          <div class="dash-empty-title">No portfolios yet</div>
+          <div class="dash-empty-sub">Create your first AI-powered portfolio in minutes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PORTFOLIO DESIGN SHOWCASE ══ -->
+    <div class="ps-showcase-section">
+      <div class="ps-showcase-header">
+        <div class="ps-showcase-eyebrow">✦ Design Gallery</div>
+        <h2 class="ps-showcase-title">Portfolios that win brand deals</h2>
+        <p class="ps-showcase-sub">Real designs built by Dijo — every one unique to the creator's niche.</p>
+      </div>
+
+      <!-- Photoshoot / creator imagery strip -->
+      <div class="ps-photo-strip">
+        <div class="ps-photo-item">
+          <img src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&h=750&fit=crop&q=80" alt="Creator lifestyle photoshoot — woman at desk with camera" loading="lazy"/>
+          <div class="ps-photo-overlay">
+            <span class="ps-photo-tag">Lifestyle</span>
+          </div>
+        </div>
+        <div class="ps-photo-item tall">
+          <img src="https://images.unsplash.com/photo-1598346762291-aee88549193f?w=600&h=900&fit=crop&q=80" alt="Professional studio brand photoshoot" loading="lazy"/>
+          <div class="ps-photo-overlay">
+            <span class="ps-photo-tag">Studio</span>
+          </div>
+        </div>
+        <div class="ps-photo-item">
+          <img src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?w=600&h=750&fit=crop&q=80" alt="Content creator filming setup with ring light" loading="lazy"/>
+          <div class="ps-photo-overlay">
+            <span class="ps-photo-tag">Behind the scenes</span>
+          </div>
+        </div>
+        <div class="ps-photo-item tall">
+          <img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=600&h=900&fit=crop&q=80" alt="Fitness creator editorial photoshoot" loading="lazy"/>
+          <div class="ps-photo-overlay">
+            <span class="ps-photo-tag">Fitness</span>
+          </div>
+        </div>
+        <div class="ps-photo-item">
+          <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600&h=750&fit=crop&q=80" alt="Fashion and style content creator photography" loading="lazy"/>
+          <div class="ps-photo-overlay">
+            <span class="ps-photo-tag">Fashion</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ps-showcase-section -->
+
+    <!-- Showcase CSS -->
+    <style>
+    /* ── Photo strip ─────────────────────────────────── */
+    .ps-showcase-section {
+      padding: 0 0 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .ps-showcase-header,
+    .ps-website-showcase-header {
+      text-align: center;
+      padding: 64px 20px 40px;
+    }
+    .ps-showcase-eyebrow {
+      font-size: 10px;
+      font-family: var(--fm, monospace);
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold, #c9a84c);
+      margin-bottom: 12px;
+    }
+    .ps-showcase-title {
+      font-family: var(--fd, sans-serif);
+      font-size: clamp(26px, 4vw, 42px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      color: var(--text, #eef0f6);
+      margin: 0 0 12px;
+    }
+    .ps-showcase-sub {
+      font-size: 15px;
+      color: #a8afc2;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    .ps-photo-strip {
+      display: flex;
+      gap: 10px;
+      padding: 0 20px;
+      align-items: flex-end;
+      height: 420px;
+      overflow: hidden;
+    }
+    .ps-photo-item {
+      flex: 1;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      height: 340px;
+      transition: flex .4s cubic-bezier(.4,0,.2,1), height .4s;
+    }
+    .ps-photo-item.tall { height: 420px; flex: 1.3; }
+    .ps-photo-item:hover { flex: 1.8; }
+    .ps-photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .6s ease;
+    }
+    .ps-photo-item:hover img { transform: scale(1.04); }
+    .ps-photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(5,5,10,.85) 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+    }
+    .ps-photo-tag {
+      font-size: 10px;
+      font-family: var(--fm, monospace);
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      padding: 4px 10px;
+      border-radius: 99px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* ── Website preview cards ────────────────────── */
+    .ps-website-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      padding: 0 20px;
+    }
+    @media (max-width: 900px) { .ps-website-cards { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .ps-photo-strip { height: 220px; } .ps-photo-item { height: 180px; } .ps-photo-item.tall { height: 220px; } }
+
+    .ps-website-card {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .ps-website-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 48px rgba(0,0,0,.35);
+    }
+
+    /* Browser chrome */
+    .ps-website-card-browser { background: #1a1a1a; }
+    .ps-browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #141414;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .ps-browser-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .ps-browser-dot.red   { background: #ff5f57; }
+    .ps-browser-dot.amber { background: #ffbd2e; }
+    .ps-browser-dot.green { background: #28c840; }
+    .ps-browser-url {
+      flex: 1; text-align: center;
+      font-size: 10px; font-family: monospace;
+      color: rgba(255,255,255,.3);
+      background: rgba(255,255,255,.06);
+      border-radius: 4px;
+      padding: 3px 8px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    /* Preview area inside browser */
+    .ps-website-preview {
+      position: relative;
+      overflow: hidden;
+      height: 260px;
+    }
+    .ps-prev-nav {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(0,0,0,.4);
+      backdrop-filter: blur(8px);
+    }
+    .ps-prev-nav.clean { background: rgba(255,255,255,.88); backdrop-filter: blur(8px); }
+    .ps-prev-nav.rose-nav { background: rgba(20,8,12,.65); backdrop-filter: blur(8px); }
+    .ps-prev-logo { width: 40px; height: 10px; border-radius: 3px; background: rgba(255,255,255,.25); flex-shrink: 0; }
+    .ps-prev-logo.dark { background: rgba(0,0,0,.2); }
+    .ps-prev-logo.rose-logo { background: rgba(255,180,180,.3); }
+    .ps-prev-nav-links { display: flex; gap: 8px; flex: 1; }
+    .ps-prev-nav-links span { width: 28px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); }
+    .ps-prev-nav-links.dark span { background: rgba(0,0,0,.15); }
+    .ps-prev-cta-sm { width: 36px; height: 14px; border-radius: 4px; background: #c9a84c; }
+    .ps-prev-cta-sm.blue { background: #2d6edb; }
+    .ps-prev-cta-sm.rose { background: #d4696f; }
+    .ps-prev-hero { position: relative; width: 100%; height: 100%; }
+    .ps-prev-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ps-prev-hero-overlay {
+      position: absolute; inset: 0; z-index: 3;
+      background: linear-gradient(to bottom, rgba(0,0,0,.08) 0%, rgba(0,0,0,.7) 100%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 14px 16px 12px;
+    }
+    .ps-prev-hero-overlay.clean-ov { background: linear-gradient(to bottom, rgba(255,255,255,.04) 0%, rgba(255,255,255,.72) 100%); }
+    .ps-prev-hero-overlay.rose-ov  { background: linear-gradient(to bottom, rgba(20,5,8,.1) 0%, rgba(15,3,6,.75) 100%); }
+    .ps-prev-eyebrow { font-size: 7px; font-weight: 800; letter-spacing: .14em; color: #c9a84c; margin-bottom: 3px; }
+    .ps-prev-eyebrow.blue-txt { color: #2d6edb; }
+    .ps-prev-eyebrow.rose-txt { color: #d4696f; }
+    .ps-prev-h1 { font-size: 16px; font-weight: 900; color: #fff; line-height: 1.1; letter-spacing: -.02em; }
+    .ps-prev-h1.dark-txt { color: #111; }
+    .ps-prev-sub-line { font-size: 8px; color: rgba(255,255,255,.65); margin: 3px 0 8px; }
+    .ps-prev-btn-row { display: flex; gap: 5px; }
+    .ps-prev-btn { font-size: 7px; font-weight: 700; padding: 4px 9px; border-radius: 4px; }
+    .ps-prev-btn.gold  { background: #c9a84c; color: #07090f; }
+    .ps-prev-btn.blue  { background: #2d6edb; color: #fff; }
+    .ps-prev-btn.rose-btn { background: #d4696f; color: #fff; }
+    .ps-prev-btn.ghost     { border: 1px solid rgba(255,255,255,.3); color: rgba(255,255,255,.8); }
+    .ps-prev-btn.ghost-dark { border: 1px solid rgba(0,0,0,.18); color: rgba(0,0,0,.65); }
+
+    .ps-prev-stats-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 4;
+      display: flex; justify-content: space-around;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+      padding: 8px 12px 6px;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+    .ps-prev-stats-bar.clean-bar { background: rgba(255,255,255,.9); border-top: 1px solid rgba(0,0,0,.06); }
+    .ps-prev-stats-bar.rose-bar  { background: rgba(15,3,6,.82); }
+    .ps-prev-stat { text-align: center; }
+    .ps-prev-stat-val { font-size: 10px; font-weight: 900; color: #c9a84c; line-height: 1; }
+    .ps-prev-stat.dark-stat .ps-prev-stat-val { color: #2d6edb; }
+    .ps-prev-stat-lbl { font-size: 6px; color: rgba(255,255,255,.45); letter-spacing: .04em; text-transform: uppercase; margin-top: 2px; }
+    .ps-prev-stat.dark-stat .ps-prev-stat-lbl { color: rgba(0,0,0,.4); }
+
+    /* Theme pill badges */
+    .ps-website-theme-pill {
+      display: inline-block;
+      font-size: 9px; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 9px; border-radius: 99px;
+    }
+    .ps-website-theme-pill.dark  { background: rgba(201,168,76,.15); color: #c9a84c; border: 1px solid rgba(201,168,76,.25); }
+    .ps-website-theme-pill.clean { background: rgba(45,110,219,.15); color: #5b9af0; border: 1px solid rgba(45,110,219,.25); }
+    .ps-website-theme-pill.rose  { background: rgba(212,105,111,.15); color: #e08287; border: 1px solid rgba(212,105,111,.25); }
+
+    .ps-website-card-info {
+      padding: 14px 16px 16px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .ps-website-card-name {
+      font-size: 14px; font-weight: 800;
+      color: var(--text, #eef0f6);
+      letter-spacing: -.01em;
+      margin-top: 4px;
+    }
+    .ps-website-card-niche { font-size: 11px; color: #7a8199; }
+
+    /* Bottom CTA */
+    .ps-showcase-cta {
+      text-align: center;
+      padding: 56px 20px 0;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+    }
+    .ps-showcase-cta-note {
+      font-size: 12px; color: #7a8199; margin: 0;
+    }
+    </style>
+
+  </div><!-- /screenDash -->
+
+  <!-- ══ SCREEN 2: ONBOARDING (AI intake) ══ -->
+  <div class="ps-screen" id="screenOnboard">
+    <div class="onboard-wrap">
+      <button class="ps-back-btn" onclick="showScreen('screenDash')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Back
+      </button>
+
+      <div class="ob-header">
+        <div class="ob-step-track">
+          <div class="ob-step active" id="obStep1">1</div>
+          <div class="ob-step-line"></div>
+          <div class="ob-step" id="obStep2">2</div>
+          <div class="ob-step-line"></div>
+          <div class="ob-step" id="obStep3">3</div>
+          <div class="ob-step-line"></div>
+          <div class="ob-step" id="obStep4">4</div>
+        </div>
+        <div class="ob-title" id="obTitle">Tell Dijo about yourself</div>
+        <div class="ob-sub" id="obSub">The more detail you give, the better Dijo builds.</div>
+      </div>
+
+      <!-- Step 1: Identity -->
+      <div class="ob-step-content active" id="obContent1">
+        <div class="ob-grid">
+          <div class="ob-field">
+            <label class="ob-lbl" for="obName">Your name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+            <input class="ob-input" id="obName" name="obName" placeholder="e.g. Sarah Johnson" oninput="obValidate()" required aria-required="true" autocomplete="name"/>
+          </div>
+          <div class="ob-field">
+            <label class="ob-lbl" for="obNiche">Your niche / title <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+            <input class="ob-input" id="obNiche" name="obNiche" placeholder="e.g. Fitness & Lifestyle Creator" oninput="obValidate()" required aria-required="true"/>
+          </div>
+          <div class="ob-field ob-full">
+            <label class="ob-lbl" for="obAbout">What do you do? Tell Dijo everything.</label>
+            <textarea class="ob-textarea" id="obAbout" name="obAbout" placeholder="I create fitness content for women over 30, I specialise in home workouts, nutrition tips and mindset. I work with supplement brands and activewear. I've been creating for 3 years and have built a highly engaged community..."></textarea>
+          </div>
+          <div class="ob-field">
+            <label class="ob-lbl" for="obLocation">Location</label>
+            <input class="ob-input" id="obLocation" name="obLocation" placeholder="e.g. Manchester, UK" autocomplete="address-level2"/>
+          </div>
+          <div class="ob-field">
+            <label class="ob-lbl" for="obEmail">Contact email <span aria-hidden="true">*</span><span class="sr-only">(required)</span> <span style="color:var(--sub,#888);font-weight:400;font-size:11px">— brands use this to reach you</span></label>
+            <input class="ob-input" id="obEmail" name="obEmail" type="email" placeholder="hello@yoursite.com" oninput="obValidate()" required aria-required="true" aria-describedby="obEmailError" autocomplete="email"/>
+            <div id="obEmailError" role="alert" style="display:none;font-size:11px;color:#f87171;margin-top:4px;font-family:monospace">Please enter a valid email so brands can contact you</div>
+          </div>
+          <div class="ob-field ob-full">
+            <label class="ob-lbl">Logo (optional) <span style="color:var(--sub,#888);font-weight:400">— upload your brand logo</span></label>
+            <div class="ob-logo-upload" id="obLogoUploadArea" onclick="document.getElementById('obLogoFile').click()">
+              <img id="obLogoPreview" src="" alt="" style="display:none;max-height:56px;max-width:180px;object-fit:contain;border-radius:6px;"/>
+              <span id="obLogoPlaceholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Click to upload logo
+              </span>
+              <input type="file" id="obLogoFile" accept="image/*" style="display:none" onchange="obHandleLogoUpload(this)"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Social platforms -->
+      <div class="ob-step-content" id="obContent2">
+        <div class="ob-platforms-grid">
+
+          <!-- YouTube — CONNECTED -->
+          <div class="ob-plat-card connected" id="platCardYT">
+            <div class="ob-plat-top">
+              <div class="ob-plat-icon yt">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.8 5 12 5 12 5s-4.8 0-7 .1c-.4 0-1.2.1-2 .9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.7 2.2.8C6.8 19 12 19 12 19s4.8 0 7-.2c.4 0 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22 9.6 21.8 8 21.8 8zM10 15V9l5.2 3-5.2 3z"/></svg>
+              </div>
+              <div>
+                <div class="ob-plat-name">YouTube</div>
+                <div class="ob-plat-status connected-badge">✓ Connected</div>
+              </div>
+            </div>
+            <input class="ob-input sm" id="obYTUrl" placeholder="Channel URL or @handle" oninput="updatePreviewLive()"/>
+            <input class="ob-input sm" id="obYTSubs" placeholder="Subscriber count (e.g. 45K)" style="margin-top:6px" oninput="updatePreviewLive()"/>
+          </div>
+
+          <!-- TikTok — CONNECTED -->
+          <div class="ob-plat-card connected" id="platCardTT">
+            <div class="ob-plat-top">
+              <div class="ob-plat-icon tt">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.17 8.17 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+              </div>
+              <div>
+                <div class="ob-plat-name">TikTok</div>
+                <div class="ob-plat-status connected-badge">✓ Connected</div>
+              </div>
+            </div>
+            <input class="ob-input sm" id="obTTUrl" placeholder="TikTok URL or @handle" oninput="updatePreviewLive()"/>
+            <input class="ob-input sm" id="obTTFollowers" placeholder="Follower count (e.g. 120K)" style="margin-top:6px" oninput="updatePreviewLive()"/>
+          </div>
+
+          <!-- Instagram — COMING SOON -->
+          <div class="ob-plat-card coming-soon">
+            <div class="ob-plat-top">
+              <div class="ob-plat-icon ig">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+              </div>
+              <div>
+                <div class="ob-plat-name">Instagram</div>
+                <div class="ob-plat-status soon-badge">Coming Soon</div>
+              </div>
+            </div>
+            <div class="ob-coming-msg">Instagram API integration is in progress. Your profile link will still display.</div>
+            <input class="ob-input sm" id="obIGUrl" placeholder="Instagram profile URL" oninput="updatePreviewLive()"/>
+          </div>
+
+          <!-- LinkedIn -->
+          <div class="ob-plat-card optional">
+            <div class="ob-plat-top">
+              <div class="ob-plat-icon li">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+              </div>
+              <div>
+                <div class="ob-plat-name">LinkedIn</div>
+                <div class="ob-plat-status opt-badge">Optional</div>
+              </div>
+            </div>
+            <input class="ob-input sm" id="obLIUrl" placeholder="LinkedIn profile URL" oninput="updatePreviewLive()"/>
+          </div>
+
+          <!-- Twitter/X -->
+          <div class="ob-plat-card optional">
+            <div class="ob-plat-top">
+              <div class="ob-plat-icon tw">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </div>
+              <div>
+                <div class="ob-plat-name">Twitter / X</div>
+                <div class="ob-plat-status opt-badge">Optional</div>
+              </div>
+            </div>
+            <input class="ob-input sm" id="obTWUrl" placeholder="Twitter/X profile URL" oninput="updatePreviewLive()"/>
+          </div>
+
+          <!-- Pinterest -->
+          <div class="ob-plat-card optional">
+            <div class="ob-plat-top">
+              <div class="ob-plat-icon pin">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 0C5.4 0 0 5.4 0 12c0 5.1 3.2 9.5 7.7 11.3-.1-.9-.2-2.4 0-3.4.2-.9 1.4-5.9 1.4-5.9s-.4-.7-.4-1.8c0-1.7.9-2.9 2.3-2.9 1.1 0 1.6.8 1.6 1.8 0 1.1-.7 2.7-1 4.2-.3 1.2.6 2.2 1.8 2.2 2.1 0 3.7-2.2 3.7-5.4 0-2.8-2-4.8-4.9-4.8-3.3 0-5.3 2.5-5.3 5.1 0 1 .4 2.1.9 2.7.1.1.1.2 0 .4l-.3 1.4c-.1.3-.3.4-.5.3-2-.9-3.2-3.8-3.2-6.1 0-5 3.6-9.5 10.4-9.5 5.5 0 9.7 3.9 9.7 9.1 0 5.4-3.4 9.8-8.2 9.8-1.6 0-3.1-.8-3.6-1.8l-1 3.7c-.4 1.4-1.3 3.1-1.9 4.2.7.2 1.4.3 2.2.3 6.6 0 12-5.4 12-12S18.6 0 12 0z"/></svg>
+              </div>
+              <div>
+                <div class="ob-plat-name">Pinterest</div>
+                <div class="ob-plat-status opt-badge">Optional</div>
+              </div>
+            </div>
+            <input class="ob-input sm" id="obPINUrl" placeholder="Pinterest profile URL" oninput="updatePreviewLive()"/>
+          </div>
+
+        </div>
+
+        <div class="ob-field ob-full" style="margin-top:20px">
+          <label class="ob-lbl">Total following across all platforms</label>
+          <input class="ob-input" id="obTotalFollowers" placeholder="e.g. 285K" oninput="updatePreviewLive()"/>
+        </div>
+        <div class="ob-two-col" style="margin-top:10px">
+          <div class="ob-field">
+            <label class="ob-lbl">Avg engagement rate</label>
+            <input class="ob-input" id="obEngagement" placeholder="e.g. 4.7%" oninput="updatePreviewLive()"/>
+          </div>
+          <div class="ob-field">
+            <label class="ob-lbl">Monthly views / plays</label>
+            <input class="ob-input" id="obMonthlyViews" placeholder="e.g. 2.1M" oninput="updatePreviewLive()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Services & rates -->
+      <div class="ob-step-content" id="obContent3">
+        <div class="ob-section-intro">What services do you offer? Dijo will format this into a beautiful rate card and services section.</div>
+
+        <div class="ob-services-list" id="obServicesList">
+          <!-- Rows added by JS -->
+        </div>
+        <button class="ob-add-btn" onclick="addServiceRow()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add service
+        </button>
+
+        <div class="ob-divider"></div>
+        <div class="ob-section-intro">Work examples / projects (optional but recommended)</div>
+        <div class="ob-projects-list" id="obProjectsList"></div>
+        <button class="ob-add-btn" onclick="addProjectRow()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add project / collaboration
+        </button>
+
+        <div class="ob-divider"></div>
+        <div class="ob-section-intro">Testimonials (optional)</div>
+        <div class="ob-testimonials-list" id="obTestimonialsList"></div>
+        <button class="ob-add-btn" onclick="addTestimonialRow()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add testimonial
+        </button>
+      </div>
+
+      <!-- Step 4: Design & AI generate -->
+      <div class="ob-step-content" id="obContent4">
+        <div class="ob-section-intro">Choose a visual style. Dijo will pick images and videos that match your niche and build your entire portfolio.</div>
+
+        <div class="ob-theme-grid">
+          <div class="ob-theme-opt active" data-theme="dark" onclick="selectTheme(this,'dark')">
+            <div class="ob-theme-preview dark-prev">
+              <div class="ob-tp-bar"></div>
+              <div class="ob-tp-line"></div>
+              <div class="ob-tp-line short"></div>
+            </div>
+            <div class="ob-theme-name">Dark Gold</div>
+          </div>
+          <div class="ob-theme-opt" data-theme="navy" onclick="selectTheme(this,'navy')">
+            <div class="ob-theme-preview navy-prev">
+              <div class="ob-tp-bar"></div>
+              <div class="ob-tp-line"></div>
+              <div class="ob-tp-line short"></div>
+            </div>
+            <div class="ob-theme-name">Navy Pro</div>
+          </div>
+          <div class="ob-theme-opt" data-theme="clean" onclick="selectTheme(this,'clean')">
+            <div class="ob-theme-preview clean-prev">
+              <div class="ob-tp-bar"></div>
+              <div class="ob-tp-line"></div>
+              <div class="ob-tp-line short"></div>
+            </div>
+            <div class="ob-theme-name">Clean Light</div>
+          </div>
+          <div class="ob-theme-opt" data-theme="midnight" onclick="selectTheme(this,'midnight')">
+            <div class="ob-theme-preview midnight-prev">
+              <div class="ob-tp-bar"></div>
+              <div class="ob-tp-line"></div>
+              <div class="ob-tp-line short"></div>
+            </div>
+            <div class="ob-theme-name">Midnight</div>
+          </div>
+          <div class="ob-theme-opt" data-theme="rose" onclick="selectTheme(this,'rose')">
+            <div class="ob-theme-preview rose-prev">
+              <div class="ob-tp-bar"></div>
+              <div class="ob-tp-line"></div>
+              <div class="ob-tp-line short"></div>
+            </div>
+            <div class="ob-theme-name">Rose Edit</div>
+          </div>
+          <div class="ob-theme-opt" data-theme="forest" onclick="selectTheme(this,'forest')">
+            <div class="ob-theme-preview forest-prev">
+              <div class="ob-tp-bar"></div>
+              <div class="ob-tp-line"></div>
+              <div class="ob-tp-line short"></div>
+            </div>
+            <div class="ob-theme-name">Forest</div>
+          </div>
+        </div>
+
+        <div class="ob-field" style="margin-top:20px">
+          <label class="ob-lbl">Custom accent colour</label>
+          <div class="ob-color-row">
+            <input type="color" class="ob-color-pick" id="obAccentColor" value="#c97e08" oninput="updatePreviewLive()"/>
+            <span class="ob-color-val" id="obColorVal">#c97e08</span>
+          </div>
+        </div>
+
+        <div class="ob-ai-generate-box" id="obAIBox">
+          <div class="ob-ai-icon">✦</div>
+          <div class="ob-ai-text">
+            <div class="ob-ai-title">Dijo is ready to build</div>
+            <div class="ob-ai-sub">AI will write your headline, bio, T&Cs, privacy policy, pick your hero visuals and design every section based on your niche.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav buttons -->
+      <div class="ob-nav">
+        <button class="ob-btn-back" id="obBackBtn" onclick="obBack()" style="display:none">← Back</button>
+        <div style="flex:1"></div>
+        <button class="ob-btn-next" id="obNextBtn" onclick="obNext()" disabled>Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: BUILDER / EDITOR ══ -->
+  <div class="ps-screen" id="screenBuilder">
+    <div class="builder-shell">
+
+      <!-- Mobile-only: Edit / Preview tab bar -->
+      <div class="builder-mobile-bar" id="builderMobileBar">
+        <div class="bm-tabs">
+          <button class="bm-tab active" id="bmTabEdit" onclick="mobilePanelShow('edit')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="margin-right:5px"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </button>
+          <button class="bm-tab" id="bmTabPreview" onclick="mobilePanelShow('preview')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="margin-right:5px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview
+          </button>
+        </div>
+      </div>
+
+      <!-- Col 1: Vertical icon rail -->
+      <nav class="bl-rail">
+          <button class="bl-rail-tab active" data-tab="tabContent" onclick="setEditTab(this,'tabContent')" title="Content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span>Content</span>
+          </button>
+          <button class="bl-rail-tab" data-tab="tabDesign" onclick="setEditTab(this,'tabDesign')" title="Design">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 20v-8.5"/><path d="M8 20h8"/></svg>
+            <span>Design</span>
+          </button>
+          <button class="bl-rail-tab" data-tab="tabSocial" onclick="setEditTab(this,'tabSocial')" title="Social">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Social</span>
+          </button>
+          <button class="bl-rail-tab" data-tab="tabLegal" onclick="setEditTab(this,'tabLegal')" title="Legal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Legal</span>
+          </button>
+          <button class="bl-rail-tab" data-tab="tabCatalogue" onclick="setEditTab(this,'tabCatalogue')" title="Shop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span>Shop</span>
+          </button>
+      </nav>
+
+      <!-- Col 2: Edit panel -->
+      <aside class="builder-left">
+
+        <!-- Mobile-only sticky top bar: back + save/publish -->
+        <div class="mob-panel-topbar">
+          <button class="mob-topbar-back" onclick="mobilePanelShow('preview')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
+            Preview
+          </button>
+          <button class="mob-topbar-back" onclick="confirmBackToDash()" style="margin-left:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
+            Portfolios
+          </button>
+          <div style="flex:1"></div>
+          <button class="mob-topbar-save" onclick="savePortfolio()">Save</button>
+          <button class="mob-topbar-publish" onclick="publishPortfolio()">Publish ↑</button>
+        </div>
+
+        <div class="bl-panel">
+
+
+          <div class="bl-panel-header">
+            <div class="bl-header-row">
+              <button class="ps-back-btn" onclick="confirmBackToDash()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="15 18 9 12 15 6"/></svg>
+                Portfolios
+              </button>
+              <a href="creator-studio.html" class="ps-back-to-hub" style="margin-left:auto">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="15 18 9 12 15 6"/></svg>
+                Creator Studio
+              </a>
+            </div>
+            <div class="bl-panel-title" id="blPanelTitle">Content
+              <button class="bl-mob-preview-btn" onclick="mobilePanelShow('preview')" title="View preview">Preview ↗</button>
+            </div>
+            <!-- Mobile-only tab strip inside panel -->
+            <div class="bl-mob-tabs">
+              <button class="bl-mob-tab active" onclick="setEditTab(this,'tabContent')"><span>Content</span></button>
+              <button class="bl-mob-tab" onclick="setEditTab(this,'tabDesign')"><span>Design</span></button>
+              <button class="bl-mob-tab" onclick="setEditTab(this,'tabSocial')"><span>Social</span></button>
+              <button class="bl-mob-tab" onclick="setEditTab(this,'tabLegal')"><span>Legal</span></button>
+              <button class="bl-mob-tab" onclick="setEditTab(this,'tabCatalogue')"><span>Shop</span></button>
+            </div>
+          </div>
+
+          <div class="bl-body">
+
+          <!-- TAB: Content -->
+          <div class="bl-tab-content active" id="tabContent">
+            <div class="content-tab-hint">✏️ Edit your portfolio text and visuals below — changes update the preview live.</div>
+            <div class="be-sec">
+              <div class="be-sec-title">Headline</div>
+              <textarea class="ob-input" id="ePortHeadline" style="min-height:56px" oninput="updatePreviewLive()"></textarea>
+              <button class="ob-ai-mini-btn" onclick="regenSection('headline')">✦ Rewrite with Dijo</button>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Bio / About</div>
+              <textarea class="ob-input" id="ePortBio" style="min-height:90px" oninput="updatePreviewLive()"></textarea>
+              <button class="ob-ai-mini-btn" onclick="regenSection('bio')">✦ Rewrite with Dijo</button>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Tagline</div>
+              <input class="ob-input" id="ePortTagline" oninput="updatePreviewLive()"/>
+              <button class="ob-ai-mini-btn" onclick="regenSection('tagline')">✦ Rewrite with Dijo</button>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Logo <span style="font-weight:400;opacity:.6;font-size:11px">— optional brand logo shown in nav</span></div>
+              <div class="ob-logo-upload" id="beLogoUploadArea" onclick="document.getElementById('beLogoFile').click()" style="min-height:60px">
+                <img id="beLogoPreview" src="" alt="" style="display:none;max-height:48px;max-width:160px;object-fit:contain;border-radius:4px;"/>
+                <span id="beLogoPlaceholder" style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.4)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  Upload logo
+                </span>
+                <input type="file" id="beLogoFile" accept="image/*" style="display:none" onchange="beHandleLogoUpload(this)"/>
+              </div>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Profile Photo <span style="font-weight:400;opacity:.6;font-size:11px">— shown beside your bio in the About section</span></div>
+              <div class="ob-logo-upload" id="profilePhotoUploadArea" onclick="document.getElementById('profilePhotoFile').click()" style="min-height:80px;position:relative">
+                <img id="profilePhotoPrev" src="" alt="" style="display:none;max-height:72px;max-width:72px;object-fit:cover;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;"/>
+                <span id="profilePhotoPlaceholder" style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.4)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  Upload your photo — appears next to your bio
+                </span>
+                <input type="file" id="profilePhotoFile" accept="image/*" style="display:none" onchange="handleProfilePhotoUpload(event)"/>
+              </div>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Hero Visuals <span style="font-weight:400;opacity:.6;font-size:11px">— max 4 shown in slideshow</span></div>
+              <div class="hero-media-strip" id="heroMediaStrip">
+                <!-- thumbnails populated by JS -->
+              </div>
+              <div class="hero-visual-actions">
+                <div class="dzone-sm" id="dzoneHero" onclick="document.getElementById('heroUpload').click()" ondragover="dzOver(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'hero')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right:5px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Upload your own photos / videos</span>
+                </div>
+                <button class="ob-ai-mini-btn" onclick="regenSection('media')">✦ Let Dijo repick visuals</button>
+              </div>
+              <input type="file" id="heroUpload" accept="image/*,video/*" multiple style="display:none" onchange="handleHeroUpload(event)"/>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Gallery Photos <span style="font-weight:400;opacity:.6;font-size:11px">— full collection shown in Gallery page</span></div>
+              <div class="hero-media-strip" id="galleryMediaStrip" style="margin-bottom:10px">
+                <!-- thumbnails populated by JS -->
+              </div>
+              <div class="hero-visual-actions">
+                <div class="dzone-sm" id="dzoneGallery" onclick="document.getElementById('galleryUpload').click()" ondragover="dzOver(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'gallery')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right:5px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Upload gallery photos</span>
+                </div>
+              </div>
+              <input type="file" id="galleryUpload" accept="image/*" multiple style="display:none" onchange="handleGalleryUpload(event)"/>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Services</div>
+              <div id="eServicesEdit"></div>
+              <button class="ob-add-btn sm" onclick="addEditServiceRow()">+ Add service</button>
+            </div>
+          </div>
+
+          <!-- TAB: Design -->
+          <div class="bl-tab-content" id="tabDesign">
+            <div class="be-sec">
+              <div class="be-sec-title">Theme</div>
+              <div class="ob-theme-grid compact">
+                <div class="ob-theme-opt active" data-theme="dark" onclick="selectEditTheme(this,'dark')">
+                  <div class="ob-theme-preview dark-prev"></div>
+                  <div class="ob-theme-name">Dark Gold</div>
+                </div>
+                <div class="ob-theme-opt" data-theme="navy" onclick="selectEditTheme(this,'navy')">
+                  <div class="ob-theme-preview navy-prev"></div>
+                  <div class="ob-theme-name">Navy Pro</div>
+                </div>
+                <div class="ob-theme-opt" data-theme="clean" onclick="selectEditTheme(this,'clean')">
+                  <div class="ob-theme-preview clean-prev"></div>
+                  <div class="ob-theme-name">Clean</div>
+                </div>
+                <div class="ob-theme-opt" data-theme="midnight" onclick="selectEditTheme(this,'midnight')">
+                  <div class="ob-theme-preview midnight-prev"></div>
+                  <div class="ob-theme-name">Midnight</div>
+                </div>
+                <div class="ob-theme-opt" data-theme="rose" onclick="selectEditTheme(this,'rose')">
+                  <div class="ob-theme-preview rose-prev"></div>
+                  <div class="ob-theme-name">Rose</div>
+                </div>
+                <div class="ob-theme-opt" data-theme="forest" onclick="selectEditTheme(this,'forest')">
+                  <div class="ob-theme-preview forest-prev"></div>
+                  <div class="ob-theme-name">Forest</div>
+                </div>
+              </div>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Accent Colour</div>
+              <div class="ob-color-row">
+                <input type="color" class="ob-color-pick" id="eAccentColor" value="#c97e08" oninput="updatePreviewLive()"/>
+                <span class="ob-color-val" id="eColorVal">#c97e08</span>
+              </div>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Font Style</div>
+              <select class="ob-input" id="eFontStyle" onchange="updatePreviewLive()">
+                <option value="syne">Syne — Bold Editorial</option>
+                <option value="playfair">Playfair — Luxury Serif</option>
+                <option value="mono">Space Mono — Tech</option>
+                <option value="dm">DM Sans — Clean Modern</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- TAB: Social -->
+          <div class="bl-tab-content" id="tabSocial">
+            <div class="be-sec">
+              <div class="be-sec-title">YouTube</div>
+              <input class="ob-input" id="eSocYT" placeholder="Channel URL" oninput="updatePreviewLive()"/>
+              <input class="ob-input" id="eSocYTSubs" placeholder="Subscribers" style="margin-top:6px" oninput="updatePreviewLive()"/>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">TikTok</div>
+              <input class="ob-input" id="eSocTT" placeholder="TikTok URL" oninput="updatePreviewLive()"/>
+              <input class="ob-input" id="eSocTTFollowers" placeholder="Followers" style="margin-top:6px" oninput="updatePreviewLive()"/>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Instagram <span class="soon-pill">Coming Soon</span></div>
+              <input class="ob-input" id="eSocIG" placeholder="Profile URL (display only)" oninput="updatePreviewLive()"/>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Other links</div>
+              <input class="ob-input" id="eSocLI" placeholder="LinkedIn URL" oninput="updatePreviewLive()"/>
+              <input class="ob-input" id="eSocTW" placeholder="Twitter/X URL" style="margin-top:6px" oninput="updatePreviewLive()"/>
+              <input class="ob-input" id="eSocPIN" placeholder="Pinterest URL" style="margin-top:6px" oninput="updatePreviewLive()"/>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Analytics</div>
+              <input class="ob-input" id="eSocFollowers" placeholder="Total followers" oninput="updatePreviewLive()"/>
+              <input class="ob-input" id="eSocEngagement" placeholder="Avg engagement rate" style="margin-top:6px" oninput="updatePreviewLive()"/>
+              <input class="ob-input" id="eSocViews" placeholder="Monthly views" style="margin-top:6px" oninput="updatePreviewLive()"/>
+            </div>
+          </div>
+
+          <!-- TAB: Legal -->
+          <div class="bl-tab-content" id="tabLegal">
+            <div class="be-sec">
+              <div class="be-sec-title">Terms & Conditions</div>
+              <div class="legal-ai-banner">
+                <span>✦ AI-generated based on your niche &amp; services</span>
+                <button onclick="regenSection('terms')">Regenerate</button>
+              </div>
+              <textarea class="ob-input" id="eLegalTerms" style="min-height:160px;font-size:11px;line-height:1.6" oninput="updatePreviewLive()"></textarea>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Privacy Policy</div>
+              <div class="legal-ai-banner">
+                <span>✦ AI-generated based on data you collect</span>
+                <button onclick="regenSection('privacy')">Regenerate</button>
+              </div>
+              <textarea class="ob-input" id="eLegalPrivacy" style="min-height:160px;font-size:11px;line-height:1.6" oninput="updatePreviewLive()"></textarea>
+            </div>
+          </div>
+
+          <!-- TAB: Catalogue -->
+          <div class="bl-tab-content" id="tabCatalogue">
+            <div class="cat-portfolio-link-row">
+              <span class="cat-portfolio-hint">Add bookable services brands can pay for instantly</span>
+              <a id="catViewPortfolioBtn" href="#" target="_blank" class="cat-view-portfolio-btn" onclick="openPreviewTab();return false;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View Portfolio
+              </a>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Payouts</div>
+              <div class="cat-connect-status" id="catConnectStatus">
+                <div class="cat-connect-badge" id="catConnectBadge">⚡ Bank not connected</div>
+                <p class="cat-connect-note">Connect your bank so brands pay you directly. ImpactGrid takes 5% per booking.</p>
+                <button class="ob-ai-mini-btn" id="catConnectBtn" onclick="stripeOnboard()">Connect Bank Account →</button>
+              </div>
+            </div>
+            <div class="be-sec">
+              <div class="be-sec-title">Bookable Items</div>
+              <div id="catItemsList"></div>
+              <button class="ob-add-btn sm" onclick="addCatalogueItem()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add item
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /bl-body -->
+        </div><!-- /bl-panel -->
+
+        <!-- Bottom actions -->
+        <div class="bl-footer">
+          <button class="bl-save-btn" onclick="savePortfolio()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save
+          </button>
+          <button class="bl-publish-btn" id="blPublishBtn" onclick="publishPortfolio()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Publish &amp; Get Link
+          </button>
+        </div>
+      </aside>
+
+      <!-- Center: Live preview -->
+      <div class="builder-center">
+        <div class="preview-toolbar">
+          <div class="preview-device-btns">
+            <button class="pdb active" id="pdbDesktop" onclick="setPreviewDevice('desktop')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Desktop
+            </button>
+            <button class="pdb" id="pdbMobile" onclick="setPreviewDevice('mobile')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>Mobile
+            </button>
+          </div>
+          <div style="flex:1"></div>
+          <div class="preview-url-pill" id="previewUrlPill" onclick="copyPreviewUrl()" title="Click to copy link" style="cursor:pointer;user-select:none">impactgrid.app/p.html?slug=—</div>
+          <button class="preview-open-btn" onclick="openPreviewTab()">Open Preview ↗</button>
+        </div>
+
+        <!-- Loading overlay during AI generation -->
+        <div class="gen-overlay" id="genOverlay">
+          <div class="gen-inner">
+            <div class="gen-ring"></div>
+            <div class="gen-title" id="genTitle">Dijo is building your portfolio…</div>
+            <div class="gen-steps" id="genSteps">
+              <div class="gen-step active" id="gs1">✦ Analysing your niche</div>
+              <div class="gen-step" id="gs2">✦ Selecting hero visuals</div>
+              <div class="gen-step" id="gs3">✦ Writing your headline & bio</div>
+              <div class="gen-step" id="gs4">✦ Generating T&Cs & Privacy Policy</div>
+              <div class="gen-step" id="gs5">✦ Building your portfolio</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-wrap" id="previewWrap">
+          <div class="preview-frame desktop" id="previewFrame">
+            <iframe id="previewIframe" title="Portfolio Preview" sandbox="allow-scripts allow-same-origin"></iframe>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: PUBLISH SUCCESS ══ -->
+  <div class="ps-screen" id="screenPublished">
+    <div class="pub-success-wrap">
+      <div class="pub-confetti" id="pubConfetti"></div>
+      <div class="pub-card">
+        <div class="pub-icon">🚀</div>
+        <div class="pub-title">You're Live!</div>
+        <div class="pub-sub">Your portfolio is published and ready to share.</div>
+
+        <div class="pub-link-box">
+          <span class="pub-link-icon">🔗</span>
+          <span class="pub-link-text" id="pubLinkText">impactgrid.app/p.html?slug=—</span>
+          <button class="pub-copy-btn" onclick="copyPublishedLink()">Copy</button>
+        </div>
+
+        <div class="pub-share-row">
+          <div class="pub-share-label">Share to</div>
+          <div class="pub-share-btns">
+            <button class="pub-share-btn yt" onclick="shareToYouTube()">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.8 5 12 5 12 5s-4.8 0-7 .1c-.4 0-1.2.1-2 .9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.7 2.2.8C6.8 19 12 19 12 19s4.8 0 7-.2c.4 0 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22 9.6 21.8 8 21.8 8zM10 15V9l5.2 3-5.2 3z"/></svg>
+              YouTube
+            </button>
+            <button class="pub-share-btn tt" onclick="shareToTikTok()">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.17 8.17 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+              TikTok
+            </button>
+            <button class="pub-share-btn ig" onclick="shareToInstagram()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+              Instagram <span class="soon-pill mini">Copy link</span>
+            </button>
+            <button class="pub-share-btn li" onclick="shareToLinkedIn()">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+              LinkedIn
+            </button>
+          </div>
+        </div>
+
+        <div class="pub-stats-row">
+          <div class="pub-stat">
+            <div class="pub-stat-val" id="pubViewCount">0</div>
+            <div class="pub-stat-lbl">Views</div>
+          </div>
+          <div class="pub-stat">
+            <div class="pub-stat-val" id="pubEnqCount">0</div>
+            <div class="pub-stat-lbl">Enquiries</div>
+          </div>
+          <div class="pub-stat">
+            <div class="pub-stat-val" id="pubDaysLive">0</div>
+            <div class="pub-stat-lbl">Days live</div>
+          </div>
+        </div>
+
+        <div class="pub-actions">
+          <button class="pub-edit-btn" onclick="showScreen('screenBuilder')">Edit Portfolio</button>
+          <button class="pub-new-btn" onclick="showScreen('screenDash')">← All Portfolios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /ps-shell -->
+
+<!-- Toast shelf -->
+<div class="ps-toast-shelf" id="psToastShelf"></div>
+
+<!-- Contact Modal -->
+<div id="contactModal" class="contact-modal" style="display:none;" onclick="if(event.target===this)closeContactForm()">
+  <div class="contact-box">
+    <h3>Work With Me</h3>
+    <label for="cName" class="sr-only">Your Name</label>
+    <input id="cName" name="cName" placeholder="Your Name" required aria-required="true" autocomplete="name"/>
+    <label for="cEmail" class="sr-only">Your Email</label>
+    <input id="cEmail" name="cEmail" type="email" placeholder="Your Email" required aria-required="true" autocomplete="email"/>
+    <label for="cMsg" class="sr-only">Tell me about your project</label>
+    <textarea id="cMsg" name="cMsg" placeholder="Tell me about your project" required aria-required="true"></textarea>
+    <div id="cStatus" role="status" aria-live="polite" style="font-size:12px;min-height:16px;margin-bottom:4px;font-family:monospace"></div>
+    <button type="button" onclick="sendInquiry()">Send</button>
+    <button type="button" onclick="closeContactForm()">Cancel</button>
+  </div>
+</div>
+
+<style>
+.ob-logo-upload{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  border:1.5px dashed rgba(255,255,255,.18);border-radius:10px;
+  padding:18px 20px;cursor:pointer;transition:.2s;min-height:72px;
+  background:rgba(255,255,255,.03);
+}
+.ob-logo-upload:hover{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.06)}
+#obLogoPlaceholder{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.45)}
+#previewUrlPill:hover{background:rgba(255,255,255,.12);opacity:1}
+#previewUrlPill.copied{background:rgba(74,222,128,.18);color:#4ade80;transition:background .15s,color .15s}
+
+/* ── ACCESSIBILITY FIXES ────────────────────────────── */
+
+/* Screen-reader only utility */
+.sr-only {
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+/* Fix 3 — Visible focus rings on all interactive elements */
+:focus-visible {
+  outline: 2px solid #c9a84c;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #c9a84c;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(201,168,76,.22);
+}
+
+/* Fix 4 — Secondary text contrast: minimum #9ca3af on dark (#0c0a07 bg ≈ 5.8:1) */
+.dash-sub,
+.ob-sub,
+.ob-section-intro,
+.ob-plat-status.opt-badge,
+.ob-coming-msg,
+.be-sec-title,
+.content-tab-hint {
+  color: #a8afc2; /* was too light; now ≥4.5:1 on dark bg */
+}
+
+/* Placeholder contrast — at least 4.5:1 on dark inputs */
+.ob-input::placeholder,
+.ob-textarea::placeholder {
+  color: #7a8199;
+  opacity: 1;
+}
+</style>
+
+<script>
+/* ── Logo upload handlers — upload to Cloudinary immediately on file select ──
+   Both onboard (ob) and builder (be) logos follow the same pattern:
+   1. Show raw preview instantly so the UI feels responsive
+   2. Compress locally (canvas, 3840px cap, 0.88 quality)
+   3. Upload to Cloudinary via /media/upload on the Render server
+   4. Replace the base64 src with the real Cloudinary preview URL
+   The window._ob/beLogoDataUrl globals are kept for backward-compat
+   with populateBuilder() which reads them during portfolio generation.
+──────────────────────────────────────────────────────────────────────── */
+window._obLogoDataUrl = null;
+window._beLogoDataUrl = null;
+window._profilePhotoDataUrl = null;
+async function obHandleLogoUpload(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+
+  var preview     = document.getElementById('obLogoPreview');
+  var placeholder = document.getElementById('obLogoPlaceholder');
+
+  // Step 1 — show raw preview immediately
+  var rawDataUrl = await new Promise(function(resolve) {
+    var r = new FileReader();
+    r.onload = function(e) { resolve(e.target.result); };
+    r.readAsDataURL(file);
+  });
+  window._obLogoDataUrl = rawDataUrl;
+  preview.src = rawDataUrl;
+  preview.style.display = 'block';
+  preview.style.opacity = '0.6';
+  if (placeholder) placeholder.style.display = 'none';
+
+  // Step 2 — compress + upload to Cloudinary
+  try {
+    if (typeof compressImageLocally === 'function' && typeof uploadToCloudinary === 'function') {
+      var compressed = await compressImageLocally(rawDataUrl, 800, 0.92); // logos: smaller cap, higher quality
+      var urls = await uploadToCloudinary(compressed, 'logos', 'logo');
+      if (urls) {
+        window._obLogoDataUrl = urls.preview;
+        preview.src = urls.preview;
+      }
+    }
+  } catch(err) {
+    console.warn('[obHandleLogoUpload] Cloudinary error:', err);
+    // Keep base64 preview — will be uploaded on save via uploadPortfolioAssets
+  } finally {
+    preview.style.opacity = '1';
+  }
+}
+
+window._beLogoDataUrl = null;
+async function beHandleLogoUpload(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+
+  var preview     = document.getElementById('beLogoPreview');
+  var placeholder = document.getElementById('beLogoPlaceholder');
+
+  // Step 1 — show raw preview immediately
+  var rawDataUrl = await new Promise(function(resolve) {
+    var r = new FileReader();
+    r.onload = function(e) { resolve(e.target.result); };
+    r.readAsDataURL(file);
+  });
+  window._beLogoDataUrl = rawDataUrl;
+  if (preview) { preview.src = rawDataUrl; preview.style.display = 'block'; preview.style.opacity = '0.6'; }
+  if (placeholder) placeholder.style.display = 'none';
+  if (typeof updatePreviewLive === 'function') updatePreviewLive();
+
+  // Step 2 — compress + upload to Cloudinary
+  try {
+    if (typeof compressImageLocally === 'function' && typeof uploadToCloudinary === 'function') {
+      var compressed = await compressImageLocally(rawDataUrl, 800, 0.92);
+      var urls = await uploadToCloudinary(compressed, 'logos', 'logo');
+      if (urls) {
+        window._beLogoDataUrl = urls.preview;
+        if (preview) preview.src = urls.preview;
+        // Push the real URL into the active portfolio so save picks it up
+        if (window.psState && window.psState.activePortfolio) {
+          window.psState.activePortfolio.logo_url = urls.preview;
+        }
+        if (typeof updatePreviewLive === 'function') updatePreviewLive();
+      }
+    }
+  } catch(err) {
+    console.warn('[beHandleLogoUpload] Cloudinary error:', err);
+  } finally {
+    if (preview) preview.style.opacity = '1';
+  }
+}
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async function() {
+    if (typeof renderNav === 'function') renderNav('portfolio-studio.html');
+    if (typeof initAuth === 'function') await initAuth();
+    if (typeof window.checkAuth === 'function') window.checkAuth();
+  });
+</script>
+<script src="plan-config.js"></script>
+<script src="plan-gate.js"></script>
+<script src="portfolio-studio.js"></script>
+</body>
+</html>
