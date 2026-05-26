@@ -47,9 +47,10 @@
 
   /* ── Top-level nav links ── */
   var NAV_LINKS = [
-    { href: 'index.html',        label: 'Home' },
-    { href: 'join.html',         label: 'Pricing' },
-    { href: 'dashboard.html',    label: 'Dashboard', authOnly: true, id: 'navDashLink' },
+    { href: 'index.html',            label: 'Home' },
+    { href: 'portfolio-studio.html', label: 'Website' },
+    { href: 'pricing.html',          label: 'Pricing' },
+    { href: 'dashboard.html',        label: 'Dashboard', authOnly: true, id: 'navDashLink' },
   ];
 
   /* ─────────────────────────────────────────
@@ -64,9 +65,10 @@
     }).join('');
 
     var mobileLinks = [
-      { href:'index.html',        label:'Home' },
-      { href:'join.html',         label:'Pricing' },
-      { href:'dashboard.html',    label:'Dashboard', id:'mobDashLink' },
+      { href:'index.html',            label:'Home' },
+      { href:'portfolio-studio.html', label:'Website' },
+      { href:'pricing.html',          label:'Pricing' },
+      { href:'dashboard.html',        label:'Dashboard', id:'mobDashLink' },
     ].map(function(l) {
       var cls = l.href === activePage ? ' class="active"' : '';
       var id  = l.id ? ' id="' + l.id + '"' : '';
@@ -93,55 +95,77 @@
       '.nav-mega-label{font-size:13px;font-weight:600;color:var(--text);}' +
       '.nav-mega-desc{font-size:11px;color:var(--text3);margin-top:1px;}' +
       '.logo{cursor:pointer;}' +
-      '@media(max-width:768px){' +
-        '.logo{cursor:pointer;-webkit-tap-highlight-color:transparent;}' +
+      /* ── RIGHT-SIDE VERTICAL NAV OVERRIDES ── */
+      '.nav{position:fixed;top:0;right:0;left:auto;bottom:0;width:220px;height:100vh;flex-direction:column;align-items:stretch;padding:28px 16px;border-left:1px solid var(--border2);border-bottom:none;z-index:1100;overflow-y:auto;}' +
+      '.nav-in{display:none;}' +
+      '.nav .logo{display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:32px;text-decoration:none;}' +
+      '.nav .nav-links{display:flex;flex-direction:column;gap:2px;list-style:none;flex:1;}' +
+      '.nav .nav-links li{width:100%;}' +
+      '.nav .nav-links a{display:block;padding:10px 12px;border-radius:8px;font-size:13.5px;width:100%;}' +
+      '.nav-bottom{display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid var(--border2);margin-top:auto;}' +
+      '.nav-guest{flex-direction:column!important;gap:7px!important;}' +
+      '.nav-guest .btn-ghost-sm,.nav-guest .btn-gold-sm{width:100%;text-align:center;}' +
+      '.nav .theme-btn{width:100%;text-align:left;padding:8px 12px;border-radius:8px;}' +
+      '.nav .hamburger{display:none!important;}' +
+      '.nav .u-drop{left:0;right:auto;top:auto;bottom:calc(100% + 6px);}' +
+      'body{padding-right:220px!important;padding-top:0!important;}' +
+      '@media(max-width:900px){' +
+        '.nav{width:64px;padding:20px 8px;}' +
+        '.nav .logo-text,.nav .nav-links a span,.nav-bottom .btn-ghost-sm span,.nav-bottom .btn-gold-sm span{display:none;}' +
+        '.nav .nav-links a{padding:10px;text-align:center;font-size:18px;}' +
+        'body{padding-right:64px!important;}' +
+      '}' +
+      '@media(max-width:600px){' +
+        '.nav{width:100%;height:auto;flex-direction:row;position:fixed;top:auto;bottom:0;left:0;right:0;border-left:none;border-top:1px solid var(--border2);padding:8px 16px;}' +
+        '.nav .logo{display:none;}' +
+        '.nav .nav-links{flex-direction:row;gap:0;justify-content:space-around;}' +
+        '.nav-bottom{display:none;}' +
+        '.nav .hamburger{display:flex!important;}' +
+        'body{padding-right:0!important;padding-bottom:60px!important;}' +
       '}' +
       '</style>' +
 
-      /* ── Nav ── */
+      /* ── Right-side vertical nav ── */
       '<nav class="nav" id="mainNav" aria-label="Main navigation">' +
-        '<div class="nav-in">' +
+        '<a href="index.html" class="logo" id="navLogo">' +
+          '<img src="logo.png" class="logo-img" alt="ImpactGrid" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
+          '<div class="logo-mark" style="display:none;">IG</div>' +
+          '<span class="logo-text">ImpactGrid</span>' +
+        '</a>' +
 
-          '<a href="index.html" class="logo" id="navLogo">' +
-            '<img src="logo.png" class="logo-img" alt="ImpactGrid" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
-            '<div class="logo-mark" style="display:none;">IG</div>' +
-            '<span class="logo-text">ImpactGrid</span>' +
-          '</a>' +
+        '<ul class="nav-links">' +
+          desktopLinks +
+        '</ul>' +
 
-          '<ul class="nav-links">' +
-            desktopLinks +
-          '</ul>' +
+        '<div class="nav-bottom">' +
+          '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>' +
 
-          '<div class="nav-right">' +
-            '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>' +
-
-            /* ── GUEST: shown when logged out ── */
-            '<div id="navGuest" class="nav-guest" style="display:flex;align-items:center;gap:7px;">' +
-              '<a href="login.html" class="btn-ghost-sm">Login</a>' +
-              '<a href="join.html" class="btn-gold-sm">Join Free</a>' +
-            '</div>' +
-
-            /* ── USER: shown when logged in (hidden by default, revealed by checkAuth) ── */
-            '<div id="navUser" style="display:none;position:relative;">' +
-              '<button class="user-btn" onclick="toggleDD()" aria-label="Account menu">' +
-                '<div class="u-av" id="userAv">?</div>' +
-                '<span class="u-name" id="userName">Account</span>' +
-                '<span class="u-chev">▾</span>' +
-              '</button>' +
-              '<div class="u-drop" id="uDrop">' +
-                '<div class="dd-email" id="userEmail"></div>' +
-                '<div class="dd-div"></div>' +
-                '<a href="dashboard.html" id="ddDashLink">My Dashboard</a>' +
-                '<a href="settings.html">Account Settings</a>' +
-                '<div class="dd-div"></div>' +
-                '<button onclick="igSignOut()">Sign out</button>' +
-              '</div>' +
-            '</div>' +
-
-            '<button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobSidebar" onclick="openSidebar()">' +
-              '<span></span><span></span><span></span>' +
-            '</button>' +
+          /* ── GUEST: shown when logged out ── */
+          '<div id="navGuest" class="nav-guest" style="display:flex;flex-direction:column;gap:7px;">' +
+            '<a href="login.html" class="btn-ghost-sm">Login</a>' +
+            '<a href="join.html" class="btn-gold-sm">Join Free</a>' +
           '</div>' +
+
+          /* ── USER: shown when logged in ── */
+          '<div id="navUser" style="display:none;position:relative;">' +
+            '<button class="user-btn" onclick="toggleDD()" aria-label="Account menu">' +
+              '<div class="u-av" id="userAv">?</div>' +
+              '<span class="u-name" id="userName">Account</span>' +
+              '<span class="u-chev">▾</span>' +
+            '</button>' +
+            '<div class="u-drop" id="uDrop">' +
+              '<div class="dd-email" id="userEmail"></div>' +
+              '<div class="dd-div"></div>' +
+              '<a href="dashboard.html" id="ddDashLink">My Dashboard</a>' +
+              '<a href="settings.html">Account Settings</a>' +
+              '<div class="dd-div"></div>' +
+              '<button onclick="igSignOut()">Sign out</button>' +
+            '</div>' +
+          '</div>' +
+
+          '<button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobSidebar" onclick="openSidebar()">' +
+            '<span></span><span></span><span></span>' +
+          '</button>' +
         '</div>' +
       '</nav>' +
 
