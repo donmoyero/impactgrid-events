@@ -933,55 +933,8 @@
       </div>
       <p class="section-body">Pixieset and Pic-Time were built for portrait and wedding studios. ImpactGrid was built for every event that happens at night, on a court, or in a crowd.</p>
     </div>
-    <div class="who-grid">
-      <div class="who-card">
-        <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=75&fit=crop" alt="Sports" />
-        <div class="who-overlay"></div>
-        <div class="who-label">
-          <div class="who-type">Sport</div>
-          <div class="who-name">Sports Days & Matches</div>
-        </div>
-      </div>
-      <div class="who-card">
-        <img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&q=75&fit=crop" alt="Party" />
-        <div class="who-overlay"></div>
-        <div class="who-label">
-          <div class="who-type">Social</div>
-          <div class="who-name">Nightlife & Parties</div>
-        </div>
-      </div>
-      <div class="who-card">
-        <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=600&q=75&fit=crop" alt="Corporate" />
-        <div class="who-overlay"></div>
-        <div class="who-label">
-          <div class="who-type">Corporate</div>
-          <div class="who-name">Brand Activations</div>
-        </div>
-      </div>
-      <div class="who-card">
-        <img src="https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=600&q=75&fit=crop" alt="Music" />
-        <div class="who-overlay"></div>
-        <div class="who-label">
-          <div class="who-type">Live Music</div>
-          <div class="who-name">Concerts & Festivals</div>
-        </div>
-      </div>
-      <div class="who-card">
-        <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=75&fit=crop" alt="Graduation" />
-        <div class="who-overlay"></div>
-        <div class="who-label">
-          <div class="who-type">Education</div>
-          <div class="who-name">Proms & Graduations</div>
-        </div>
-      </div>
-      <div class="who-card">
-        <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&q=75&fit=crop" alt="Content Creator" />
-        <div class="who-overlay"></div>
-        <div class="who-label">
-          <div class="who-type">Creator</div>
-          <div class="who-name">Content Creators</div>
-        </div>
-      </div>
+    <div class="who-grid" id="whoGrid">
+      <!-- loaded dynamically from Supabase site_content (who_cards) -->
     </div>
   </div>
 
@@ -1021,7 +974,7 @@
         </div>
       </div>
       <div class="how-visual">
-        <img class="how-img" src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80&fit=crop" alt="Wedding event" />
+        <img class="how-img" id="howImage" src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80&fit=crop" alt="Wedding event" />
         <div class="how-badge">
           <strong>2 min</strong>
           From upload to live gallery
@@ -1138,7 +1091,7 @@
     }
   }
 
-  /* ── Dynamic gallery & hero images from Supabase site_content ── */
+  /* ── Dynamic homepage images from Supabase site_content ── */
   (function(){
     var DEFAULT_GALLERY = [
       'https://images.unsplash.com/photo-1661956601349-f61c959a8fd4?w=600&q=85&fit=crop',
@@ -1165,6 +1118,23 @@
       'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=700&q=85&fit=crop',
       'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=700&q=85&fit=crop'
     ];
+    var DEFAULT_WHO = [
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=75&fit=crop',
+      'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&q=75&fit=crop',
+      'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=600&q=75&fit=crop',
+      'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=600&q=75&fit=crop',
+      'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=75&fit=crop',
+      'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&q=75&fit=crop'
+    ];
+    var WHO_LABELS = [
+      {type:'Sport',   name:'Sports Days & Matches'},
+      {type:'Social',  name:'Nightlife & Parties'},
+      {type:'Corporate',name:'Brand Activations'},
+      {type:'Live Music',name:'Concerts & Festivals'},
+      {type:'Education',name:'Proms & Graduations'},
+      {type:'Creator', name:'Content Creators'}
+    ];
+    var DEFAULT_HOW = 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80&fit=crop';
 
     function renderHero(urls){
       var el = document.getElementById('heroImagesGrid');
@@ -1177,51 +1147,70 @@
 
     function renderGallery(urls){
       var list = (urls && urls.length) ? urls : DEFAULT_GALLERY;
-      // split into two rows, duplicated for seamless scroll
       var half = Math.ceil(list.length / 2);
       var row1 = list.slice(0, half);
       var row2 = list.slice(half);
-      // pad if uneven
       if(!row2.length) row2 = row1.slice();
-
       function makeImgs(arr){
-        // duplicate for seamless infinite scroll
         return arr.concat(arr).map(function(url){
           return '<img class="gallery-img" src="'+url+'" alt="ImpactGrid portfolio" loading="lazy"/>';
         }).join('');
       }
-
       var r1 = document.getElementById('galleryRow1');
       var r2 = document.getElementById('galleryRow2');
       if(r1) r1.innerHTML = makeImgs(row1);
       if(r2) r2.innerHTML = makeImgs(row2);
     }
 
-    async function loadGalleryImages(){
-      try {
-        // Wait for supabase client to be ready (defined in supabase-config.js)
-        var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-        if(!sb){ renderHero(null); renderGallery(null); return; }
+    function renderWhoCards(urls){
+      var el = document.getElementById('whoGrid');
+      if(!el) return;
+      var list = (urls && urls.length) ? urls : DEFAULT_WHO;
+      el.innerHTML = list.map(function(url, i){
+        var lbl = WHO_LABELS[i] || {type:'Event', name:'Event Photography'};
+        return '<div class="who-card">'
+          + '<img src="'+url+'" alt="'+lbl.type+'" loading="lazy"/>'
+          + '<div class="who-overlay"></div>'
+          + '<div class="who-label">'
+          + '<div class="who-type">'+lbl.type+'</div>'
+          + '<div class="who-name">'+lbl.name+'</div>'
+          + '</div></div>';
+      }).join('');
+    }
 
-        var res = await sb.from('site_content').select('key,value').in('key',['gallery_strip','hero_grid']);
+    function renderHowImage(urls){
+      var el = document.getElementById('howImage');
+      if(!el) return;
+      var url = (urls && urls.length) ? urls[0] : DEFAULT_HOW;
+      el.src = url;
+    }
+
+    async function loadHomepageImages(){
+      try {
+        var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+        if(!sb){
+          renderHero(null); renderGallery(null); renderWhoCards(null); renderHowImage(null);
+          return;
+        }
+        var res = await sb.from('site_content').select('key,value')
+          .in('key',['gallery_strip','hero_grid','who_cards','how_image']);
         var rows = (res && res.data) ? res.data : [];
         var kv = {};
         rows.forEach(function(r){ try{ kv[r.key] = JSON.parse(r.value); }catch(e){ kv[r.key] = null; } });
 
         renderHero(kv['hero_grid'] || null);
         renderGallery(kv['gallery_strip'] || null);
+        renderWhoCards(kv['who_cards'] || null);
+        renderHowImage(kv['how_image'] || null);
       } catch(e) {
-        // Supabase unavailable — fall back to defaults silently
-        renderHero(null);
-        renderGallery(null);
+        renderHero(null); renderGallery(null); renderWhoCards(null); renderHowImage(null);
       }
     }
 
-    // Run after DOM + supabase-config.js have both loaded
     if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', loadGalleryImages);
+      document.addEventListener('DOMContentLoaded', loadHomepageImages);
     } else {
-      loadGalleryImages();
+      loadHomepageImages();
     }
   })();
   </script>
