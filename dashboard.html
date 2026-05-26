@@ -175,6 +175,8 @@ tr:hover td{background:var(--bg2);}
 @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}.quick-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
 @media(max-width:700px){:root{--sidebar-w:280px;}.sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);transition:transform .3s ease;}.sidebar.open{transform:translateX(0);}.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:499;backdrop-filter:blur(2px);}.sidebar-overlay.open{display:block;}.page{padding:18px 16px;}.mobile-menu-btn{display:flex!important;}.stats-row{grid-template-columns:repeat(2,1fr)!important;}.quick-grid{grid-template-columns:repeat(2,1fr)!important;}}
 @media(min-width:701px){.mobile-menu-btn{display:none!important;}.sidebar-overlay{display:none!important;}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-KVJC5DE2WT');</script>
@@ -1088,20 +1090,34 @@ function initInvoiceForm(){
 }
 
 async function autoInvoiceNumber(force){
+  /* Set an instant fallback so field is never blank */
+  var el = document.getElementById('inv-number');
+  if (el && (force || !el.value)) {
+    var ts = 'INV-' + String(Date.now()).slice(-6);
+    el.value = ts;
+    updateInvoicePreview();
+  }
+  /* Then fetch the real sequential number from DB */
   try {
-    var { data } = await getSupabase().from('invoices').select('invoice_number').eq('owner_id', _currentUser.id).order('created_at', {ascending:false}).limit(1);
+    if (!_currentUser || !_currentUser.id) return;
+    var { data } = await getSupabase()
+      .from('invoices')
+      .select('invoice_number')
+      .eq('owner_id', _currentUser.id)
+      .order('created_at', {ascending:false})
+      .limit(1);
     var next = 'INV-000001';
     if (data && data.length) {
       var last = data[0].invoice_number || 'INV-000000';
       var num = parseInt(last.replace(/\D/g,''), 10) || 0;
       next = 'INV-' + String(num + 1).padStart(6, '0');
     }
-    var el = document.getElementById('inv-number');
-    if (el && (force || !el.value)) el.value = next;
+    var el2 = document.getElementById('inv-number');
+    if (el2 && (force || !el2.value || el2.value.startsWith('INV-') && el2.value.length === 10)) {
+      el2.value = next;
+    }
     updateInvoicePreview();
   } catch(e) {
-    var el2 = document.getElementById('inv-number');
-    if (el2 && (force || !el2.value)) el2.value = 'INV-000001';
     updateInvoicePreview();
   }
 }
@@ -1260,31 +1276,159 @@ function invAlert(msg, ok){
   el.textContent = msg;
 }
 
+/* ── Invoice send modal state ── */
+var _invSendData = null;
+
 async function saveAndSendInvoice(){
   var d = getInvoiceData();
   if (!d.clientName) { invAlert('Client name is required.', false); return; }
   if (!d.clientEmail) { invAlert('Client email is required to send.', false); return; }
   if (!d.lines.length) { invAlert('Add at least one line item.', false); return; }
-  var btn = document.querySelector('#page-createinvoice .btn-gold');
+
+  _invSendData = d;
+
+  /* Show modal */
+  var modal = document.getElementById('inv-send-modal');
+  if (modal) { modal.style.display = 'flex'; }
+  document.getElementById('inv-modal-to').textContent  = d.clientEmail;
+  document.getElementById('inv-modal-num').textContent = d.number || '—';
+  document.getElementById('inv-modal-message').value   = '';
+
+  /* Fetch AI message */
+  await fetchAIInvoiceMessage(d);
+}
+
+async function fetchAIInvoiceMessage(d){
+  var loading = document.getElementById('inv-modal-loading');
+  var ta      = document.getElementById('inv-modal-message');
+  var btn     = document.getElementById('inv-modal-send-btn');
+  var regen   = document.getElementById('inv-regen-btn');
+  if (loading) loading.style.display = 'block';
+  if (ta)      ta.style.display = 'none';
+  if (btn)     btn.disabled = true;
+  if (regen)   regen.disabled = true;
+  try {
+    var res = await fetch(EVENTS_API + '/api/generate-invoice-message', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({
+        bizName      : d.bizName,
+        clientName   : d.clientName,
+        invoiceNumber: d.number,
+        total        : d.total,
+        dueDate      : d.dueDate,
+        lines        : d.lines,
+        notes        : d.notes
+      })
+    });
+    var resp = await res.json();
+    if (!res.ok) throw new Error(resp.error || 'AI error');
+    if (ta) ta.value = resp.message || '';
+  } catch(e) {
+    /* Fallback to plain message if AI fails */
+    if (ta) ta.value = buildInvoiceEmailBody(d);
+  } finally {
+    if (loading) loading.style.display = 'none';
+    if (ta)      ta.style.display = 'block';
+    if (btn)     btn.disabled = false;
+    if (regen)   regen.disabled = false;
+  }
+}
+
+async function regenInvMessage(){
+  if (_invSendData) await fetchAIInvoiceMessage(_invSendData);
+}
+
+function closeInvModal(){
+  var modal = document.getElementById('inv-send-modal');
+  if (modal) modal.style.display = 'none';
+  _invSendData = null;
+}
+
+/* Build the invoice HTML for PDF generation */
+function buildInvoiceHTMLForPDF(d){
+  var dueStr   = d.dueDate ? new Date(d.dueDate).toLocaleDateString('en-GB') : 'Due on Receipt';
+  var dateStr  = d.date    ? new Date(d.date).toLocaleDateString('en-GB')    : new Date().toLocaleDateString('en-GB');
+  var linesHtml = d.lines.map(function(l, i){
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(l.desc)+'</td><td class="right">'+l.qty+'</td><td class="right">'+fmtGBP(l.rate)+'</td><td class="right">'+fmtGBP(l.amount)+'</td></tr>';
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">No line items</td></tr>';
+  var bizName     = d.bizName     ? esc(d.bizName)     : 'Impact Grid Events';
+  var bizLocation = d.bizLocation ? '<br><span style="color:#666;font-size:12px;">'+esc(d.bizLocation)+'</span>' : '';
+  var payBlock = 'Payment — Bank Transfer<br>Account Name: '+(d.bankName||'—')+'<br>Account Number: '+(d.bankAccount||'—')+(d.bankSort?'<br>Sort Code / Routing: '+esc(d.bankSort):'');
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(d.number||'Invoice')+'</title>' +
+    '<style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:Georgia,serif;color:#111;background:#fff;padding:40px;max-width:720px;margin:auto}' +
+    'h1{font-size:38px;font-weight:900;letter-spacing:-.04em;font-family:sans-serif}' +
+    'table{width:100%;border-collapse:collapse;margin:24px 0}' +
+    'th{background:#f0f0f0;padding:9px 12px;text-align:left;font-size:12px;font-family:sans-serif;text-transform:uppercase;letter-spacing:.06em}' +
+    'td{padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}' +
+    '.right{text-align:right}.total-row td{font-weight:700;font-size:14px}' +
+    '.balance-row td{font-weight:900;font-size:15px;border-top:2px solid #111;padding-top:12px}' +
+    '.footer{margin-top:36px;padding-top:18px;border-top:1px solid #ddd;font-size:12px;color:#555;line-height:1.8}' +
+    '</style></head><body>' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">' +
+      '<div style="font-size:14px;line-height:1.7;"><strong>'+bizName+'</strong>'+bizLocation+'</div>' +
+      '<div style="text-align:right;">' +
+        '<h1>INVOICE</h1>' +
+        '<div style="font-family:monospace;font-size:13px;color:#555;">'+esc(d.number||'—')+'</div>' +
+        '<div style="display:inline-block;background:#f5f5f5;border-radius:6px;padding:8px 14px;text-align:center;margin-top:6px;">' +
+          '<div style="font-size:11px;color:#888;font-family:sans-serif;">Balance Due</div>' +
+          '<div style="font-size:24px;font-weight:900;font-family:sans-serif;">'+fmtGBP(d.total)+'</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:13px;color:#555;margin-bottom:8px;">' +
+      '<div>Invoice Date: <strong style="color:#111;">'+dateStr+'</strong></div>' +
+      '<div>Terms: <strong style="color:#111;">'+dueStr+'</strong></div>' +
+    '</div>' +
+    '<div style="margin-bottom:16px;font-size:13px;"><strong>Bill To:</strong> '+esc(d.clientName||'—')+'</div>' +
+    '<table><thead><tr><th>#</th><th>Description</th><th class="right">Qty</th><th class="right">Rate</th><th class="right">Amount</th></tr></thead>' +
+      '<tbody>'+linesHtml+'</tbody>' +
+      '<tfoot>' +
+        '<tr><td colspan="4" class="right" style="border:none;padding-top:12px;font-size:12px;color:#888;">Sub Total</td><td class="right" style="border:none;padding-top:12px;">'+fmtGBP(d.subtotal)+'</td></tr>' +
+        (d.discount>0?'<tr><td colspan="4" class="right" style="border:none;font-size:12px;color:#888;">Discount</td><td class="right" style="border:none;color:#c00;">(-) '+fmtGBP(d.discount)+'</td></tr>':'') +
+        '<tr class="total-row"><td colspan="4" class="right" style="border-top:1px solid #ddd;padding-top:10px;">Total</td><td class="right" style="border-top:1px solid #ddd;padding-top:10px;">'+fmtGBP(d.total)+'</td></tr>' +
+        '<tr class="balance-row"><td colspan="4" class="right">Balance Due</td><td class="right">'+fmtGBP(d.total)+'</td></tr>' +
+      '</tfoot>' +
+    '</table>' +
+    '<div class="footer">'+payBlock+(d.notes?'<br><br>'+esc(d.notes):'')+'</div>' +
+    '</body></html>';
+}
+
+async function confirmSendInvoice(){
+  var d = _invSendData;
+  if (!d) return;
+  var message = (document.getElementById('inv-modal-message')||{}).value || buildInvoiceEmailBody(d);
+  var btn = document.getElementById('inv-modal-send-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
   try {
     await saveInvoiceToDB(d, true);
-    var emailBody = buildInvoiceEmailBody(d);
-    var res = await fetch(EVENTS_API + '/api/send-mail', {
-      method: 'POST',
+    var invoiceHtml = buildInvoiceHTMLForPDF(d);
+    var bizName     = d.bizName || 'Impact Grid Events';
+    var subject     = 'Invoice ' + d.number + ' from ' + bizName;
+    var res = await fetch(EVENTS_API + '/api/send-invoice', {
+      method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: d.clientEmail, subject: 'Invoice '+d.number+' — Impact Grid Events', body: emailBody })
+      body   : JSON.stringify({
+        to          : d.clientEmail,
+        subject     : subject,
+        message     : message,
+        invoiceHtml : invoiceHtml,
+        invoiceNumber: d.number,
+        bizName     : bizName
+      })
     });
     var resp = await res.json();
     if (!res.ok || !resp.success) throw new Error(resp.error || 'Send failed');
-    toast('✅', 'Invoice sent!', 'To: ' + d.clientEmail);
+    closeInvModal();
+    toast('✅', 'Invoice sent!', 'PDF attached · To: ' + d.clientEmail);
     invAlert('✅ Invoice saved and sent to ' + d.clientEmail, true);
     resetInvoiceForm();
   } catch(e) {
     invAlert('Error: ' + e.message, false);
     toast('⚠️', 'Failed', e.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '📨 Save & Send to Client'; }
+    if (btn) { btn.disabled = false; btn.textContent = '📨 Send Invoice'; }
   }
 }
 
@@ -1358,7 +1502,58 @@ function downloadInvoicePDF(){
       '<button onclick="window.print()">🖨 Download / Print as PDF</button>' +
       '<button onclick="window.close()" style="background:#eee;color:#111;">Close</button>' +
     '</div>' +
-    '</body></html>');
+    '
+<!-- ══ INVOICE SEND REVIEW MODAL ══════════════════════════════ -->
+<div id="inv-send-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5);">
+    <!-- Header -->
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-size:16px;font-weight:800;">Review Before Sending</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">AI has drafted a cover message — edit it freely before sending</div>
+      </div>
+      <button onclick="closeInvModal()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+    <!-- Body -->
+    <div style="padding:20px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:16px;">
+      <!-- Sending to -->
+      <div style="display:flex;gap:10px;padding:12px 14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);align-items:center;">
+        <div style="font-size:18px;">📧</div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em;">Sending to</div>
+          <div id="inv-modal-to" style="font-size:14px;font-weight:600;"></div>
+        </div>
+        <div style="margin-left:auto;padding:4px 10px;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:6px;font-size:11px;font-family:var(--fm);color:var(--gold);" id="inv-modal-num"></div>
+      </div>
+      <!-- AI Message label -->
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);">Cover Message</div>
+        <button id="inv-regen-btn" onclick="regenInvMessage()" style="font-size:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <span id="inv-regen-ico">✦</span> Regenerate
+        </button>
+      </div>
+      <!-- AI loading state -->
+      <div id="inv-modal-loading" style="display:none;padding:20px;text-align:center;color:var(--text3);font-size:13px;">
+        <div style="display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;margin-bottom:8px;"></div>
+        <div>Composing message…</div>
+      </div>
+      <!-- Editable message textarea -->
+      <textarea id="inv-modal-message" rows="10" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:var(--text);line-height:1.7;resize:vertical;font-family:inherit;" placeholder="Loading AI message…"></textarea>
+      <!-- PDF notice -->
+      <div style="display:flex;gap:10px;padding:12px 14px;background:var(--green-dim);border:1px solid rgba(15,168,118,.2);border-radius:10px;align-items:center;">
+        <div style="font-size:18px;">📎</div>
+        <div style="font-size:12px;color:var(--green);line-height:1.5;">Your invoice PDF will be generated and attached to this email automatically.</div>
+      </div>
+    </div>
+    <!-- Footer actions -->
+    <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;">
+      <button onclick="closeInvModal()" class="btn btn-ghost" style="flex:1;justify-content:center;">Cancel</button>
+      <button id="inv-modal-send-btn" onclick="confirmSendInvoice()" class="btn btn-gold" style="flex:2;justify-content:center;padding:12px;">📨 Send Invoice</button>
+    </div>
+  </div>
+</div>
+
+</body></html>');
   win.document.close();
   /* Auto-trigger print dialog after a short delay for rendering */
   setTimeout(function(){ try { win.print(); } catch(e){} }, 600);
@@ -1429,15 +1624,22 @@ async function resendInvoice(id){
       bankName: data.bank_name || '', bankAccount: data.bank_account || '', bankSort: data.bank_sort || ''
     };
     if (!d.clientEmail) { toast('⚠️', 'No email on file', 'Edit the invoice to add an email'); return; }
-    var res = await fetch(EVENTS_API + '/api/send-mail', {
+    /* Generate AI message then send with PDF */
+    var msgRes  = await fetch(EVENTS_API + '/api/generate-invoice-message', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ bizName: d.bizName, clientName: d.clientName, invoiceNumber: d.number, total: d.total, dueDate: d.dueDate, lines: d.lines, notes: d.notes })
+    });
+    var msgData = await msgRes.json();
+    var message = (msgData.message || buildInvoiceEmailBody(d));
+    var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: d.clientEmail, subject: 'Invoice '+d.number+' — Impact Grid Events', body: buildInvoiceEmailBody(d) })
+      body: JSON.stringify({ to: d.clientEmail, subject: 'Invoice '+d.number+' from '+(d.bizName||'Impact Grid Events'), message: message, invoiceHtml: buildInvoiceHTMLForPDF(d), invoiceNumber: d.number, bizName: d.bizName||'Impact Grid Events' })
     });
     var resp = await res.json();
     if (!res.ok || !resp.success) throw new Error(resp.error || 'Send failed');
     await getSupabase().from('invoices').update({ sent: true }).eq('id', id);
-    toast('✅', 'Invoice resent!', 'To: ' + d.clientEmail);
+    toast('✅', 'Invoice resent!', 'PDF attached · To: ' + d.clientEmail);
     loadInvoices();
   } catch(e) { toast('⚠️', 'Failed', e.message); }
 }
