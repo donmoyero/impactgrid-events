@@ -389,7 +389,7 @@ tr:hover td{background:var(--bg2);}
         <div class="ws-sticky">
           <div class="hint-box">
             <strong>How it works</strong><br><br>
-            Changes are saved to <code>localStorage</code> and applied to the homepage instantly — no page reload needed.<br><br>
+            Changes are saved to the <code>site_content</code> Supabase table. The homepage reads this on every page load — visitors see your changes immediately, no redeploy needed.<br><br>
             Paste a full image URL in each row. Unsplash format:<br>
             <code>https://images.unsplash.com/photo-XXXXXXXX?w=600&q=85&fit=crop</code><br><br>
             You can also use your own hosted images.
@@ -1631,11 +1631,30 @@ var DEFAULT_HERO_GRID = [
   'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&fit=crop'
 ];
 
-function loadGalleryImagesPage(){
+async function loadGalleryImagesPage(){
+  // Show cached version instantly while Supabase loads
   var strip = JSON.parse(localStorage.getItem(GALLERY_LS_KEY) || 'null') || DEFAULT_GALLERY_STRIP;
   var hero  = JSON.parse(localStorage.getItem(HERO_LS_KEY)    || 'null') || DEFAULT_HERO_GRID;
   renderImageList('galleryStripList', strip, 'strip');
   renderImageList('heroGridList',     hero,  'hero');
+
+  // Then fetch from Supabase and update if there's newer data
+  try {
+    var sb = getSupabase();
+    var {data, error} = await sb.from('site_content').select('key,value').in('key',['gallery_strip','hero_grid']);
+    if(error) throw error;
+    if(data && data.length){
+      var kv = {};
+      data.forEach(function(r){ try{ kv[r.key] = JSON.parse(r.value); }catch(e){} });
+      if(kv['gallery_strip']){ strip = kv['gallery_strip']; localStorage.setItem(GALLERY_LS_KEY, JSON.stringify(strip)); }
+      if(kv['hero_grid'])    { hero  = kv['hero_grid'];     localStorage.setItem(HERO_LS_KEY,    JSON.stringify(hero));  }
+      renderImageList('galleryStripList', strip, 'strip');
+      renderImageList('heroGridList',     hero,  'hero');
+    }
+  } catch(e) {
+    // Supabase unavailable — cached/default version already shown
+    console.warn('Gallery load from Supabase failed:', e.message);
+  }
 }
 
 function renderImageList(containerId, urls, type){
@@ -1704,14 +1723,33 @@ function getUrlsFromList(containerId){
     .filter(Boolean);
 }
 
-function saveGalleryImages(){
+async function saveGalleryImages(){
   var strip = getUrlsFromList('galleryStripList');
   var hero  = getUrlsFromList('heroGridList');
   if(!strip.length){ toast('⚠️','Add at least one strip image',''); return; }
   if(!hero.length){  toast('⚠️','Add at least one hero image','');  return; }
-  localStorage.setItem(GALLERY_LS_KEY, JSON.stringify(strip));
-  localStorage.setItem(HERO_LS_KEY,    JSON.stringify(hero));
-  toast('✅','Gallery images saved!','Homepage will reflect changes on next load');
+
+  var btn = document.querySelector('[onclick="saveGalleryImages()"]');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+
+  try {
+    var sb = getSupabase();
+    var {error} = await sb.from('site_content').upsert([
+      { key: 'gallery_strip', value: JSON.stringify(strip) },
+      { key: 'hero_grid',     value: JSON.stringify(hero)  }
+    ], { onConflict: 'key' });
+
+    if(error) throw error;
+
+    // Also keep localStorage as cache
+    localStorage.setItem(GALLERY_LS_KEY, JSON.stringify(strip));
+    localStorage.setItem(HERO_LS_KEY,    JSON.stringify(hero));
+    toast('✅','Gallery images saved!','Homepage updated — visitors will see changes immediately');
+  } catch(e) {
+    toast('⚠️','Save failed', e.message || 'Check Supabase connection');
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = '💾 Save Changes'; }
+  }
 }
 
 function resetGalleryImages(){
