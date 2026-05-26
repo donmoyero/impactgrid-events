@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,29 +26,25 @@
        INDEX — component styles only.
        Resets, fonts, nav, footer, buttons and
        grid utilities all come from shared.css.
-       The nav gets dark styling automatically
-       via data-theme="dark" on <html>.
+       The nav gets dark styling automatically via data-theme="dark" toggled by nav.js.
     ════════════════════════════════════════ */
 
-    /* Page-local design tokens */
+    /* Page-local design tokens — mapped to shared.css variables */
     :root {
-      --ix-black:   #080808;
-      --ix-surface: #161514;
-      --ix-border:  rgba(255,255,255,0.08);
-      --ix-white:   #F5F3EF;
-      --ix-accent:  #C8A97E;
-      --ix-dim:     rgba(200,169,126,0.15);
-      --ix-muted:   rgba(245,243,239,0.45);
-      --ix-mid:     rgba(245,243,239,0.7);
+      --ix-black:   var(--bg);
+      --ix-surface: var(--bg2);
+      --ix-border:  var(--border);
+      --ix-white:   var(--text);
+      --ix-accent:  var(--gold);
+      --ix-dim:     var(--gold-dim);
+      --ix-muted:   var(--text3);
+      --ix-mid:     var(--text2);
       --ix-display: 'Fraunces', Georgia, serif;
     }
 
     body {
-      background: var(--ix-black) !important;
-      color: var(--ix-white);
       overflow-x: hidden;
     }
-    body::after { display: none !important; }
 
     /* ── HERO ──────────────────────────────────────── */
     .hero {
@@ -92,6 +88,12 @@
         radial-gradient(ellipse 60% 60% at 50% 50%, rgba(8,8,8,0.2), transparent),
         linear-gradient(to bottom, rgba(8,8,8,0.5) 0%, rgba(8,8,8,0.3) 40%, rgba(8,8,8,0.85) 100%);
     }
+    /* In light mode hero still needs a dark overlay for readability over photos */
+    html:not([data-theme="dark"]) .hero-overlay {
+      background:
+        radial-gradient(ellipse 60% 60% at 50% 50%, rgba(20,12,4,0.25), transparent),
+        linear-gradient(to bottom, rgba(20,12,4,0.55) 0%, rgba(20,12,4,0.35) 40%, rgba(20,12,4,0.82) 100%);
+    }
 
     .hero-content {
       position: relative;
@@ -134,7 +136,7 @@
       font-weight: 300;
       line-height: 1.03;
       letter-spacing: -0.03em;
-      color: var(--ix-white);
+      color: #F5F3EF;
       margin-bottom: 28px;
     }
     .hero-headline em {
@@ -145,7 +147,7 @@
     .hero-sub {
       font-size: clamp(16px, 1.8vw, 19px);
       font-weight: 300;
-      color: var(--ix-mid);
+      color: rgba(245,243,239,0.75);
       max-width: 520px;
       margin: 0 auto 44px;
       line-height: 1.65;
@@ -161,7 +163,7 @@
     .hero-note {
       margin-top: 20px;
       font-size: 13px;
-      color: var(--ix-muted);
+      color: rgba(245,243,239,0.5);
     }
 
     /* ── TICKER ──────────────────────────────────── */
@@ -223,7 +225,7 @@
       font-weight: 300;
       line-height: 1.1;
       letter-spacing: -0.025em;
-      color: var(--ix-white);
+      color: var(--text);
     }
     .section-title em { font-style: italic; color: var(--ix-accent); }
 
@@ -296,7 +298,7 @@
       overflow: hidden;
       transition: border-color 0.3s;
     }
-    .bento-card:hover { border-color: rgba(200,169,126,0.3); }
+    .bento-card:hover { border-color: var(--gold); }
 
     .bento-card.wide { grid-column: span 2; }
     .bento-card.tall { grid-row: span 2; }
@@ -317,7 +319,7 @@
       font-family: var(--ix-display);
       font-size: 22px;
       font-weight: 400;
-      color: var(--ix-white);
+      color: var(--text);
       margin-bottom: 10px;
       line-height: 1.2;
     }
@@ -398,7 +400,7 @@
       font-family: var(--ix-display);
       font-size: 22px;
       font-weight: 400;
-      color: var(--ix-white);
+      color: #F5F3EF;
       line-height: 1.15;
     }
 
@@ -448,7 +450,7 @@
       font-family: var(--ix-display);
       font-size: 20px;
       font-weight: 400;
-      color: var(--ix-white);
+      color: var(--text);
       margin-bottom: 8px;
     }
     .step-text p {
@@ -473,14 +475,14 @@
       bottom: -20px;
       left: -20px;
       background: var(--ix-accent);
-      color: var(--ix-black);
+      color: var(--bg);
       border-radius: 12px;
       padding: 18px 22px;
       font-size: 13px;
       font-weight: 500;
       max-width: 220px;
       line-height: 1.4;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      box-shadow: var(--sh2);
     }
     .how-badge strong {
       display: block;
@@ -526,12 +528,12 @@
       text-transform: uppercase;
       color: var(--ix-muted);
       border-bottom: 1px solid var(--ix-border);
-      background: rgba(255,255,255,0.02);
+      background: var(--bg2);
     }
     thead th:first-child { color: var(--ix-mid); }
     thead th.highlight {
       color: var(--ix-accent);
-      background: rgba(200,169,126,0.06);
+      background: var(--gold-dim);
     }
 
     tbody tr {
@@ -539,19 +541,19 @@
       transition: background 0.2s;
     }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody tr:hover { background: var(--bg2); }
 
     td {
       padding: 18px 24px;
       vertical-align: middle;
       color: var(--ix-mid);
     }
-    td:first-child { color: var(--ix-white); font-weight: 400; }
-    td.highlight { background: rgba(200,169,126,0.04); }
+    td:first-child { color: var(--text); font-weight: 400; }
+    td.highlight { background: var(--gold-dim); }
 
     .check { color: var(--ix-accent); font-size: 16px; }
-    .cross { color: rgba(255,255,255,0.2); font-size: 16px; }
-    .partial { color: rgba(200,169,126,0.5); font-size: 13px; font-weight: 300; }
+    .cross { color: var(--text3); font-size: 16px; }
+    .partial { color: var(--gold); font-size: 13px; font-weight: 300; opacity: 0.6; }
 
     /* ── TESTIMONIALS ─────────────────────────────── */
     .testimonials {
@@ -586,7 +588,7 @@
       gap: 24px;
       transition: border-color 0.3s;
     }
-    .quote-card:hover { border-color: rgba(200,169,126,0.25); }
+    .quote-card:hover { border-color: var(--gold); }
 
     .quote-stars {
       color: var(--ix-accent);
@@ -598,7 +600,7 @@
       font-size: 18px;
       font-weight: 300;
       font-style: italic;
-      color: var(--ix-white);
+      color: var(--text);
       line-height: 1.5;
       flex: 1;
     }
@@ -618,7 +620,7 @@
     .quote-name {
       font-size: 14px;
       font-weight: 500;
-      color: var(--ix-white);
+      color: var(--text);
     }
     .quote-role { font-size: 12px; color: var(--ix-muted); }
 
@@ -645,13 +647,13 @@
       font-weight: 300;
       line-height: 1.08;
       letter-spacing: -0.03em;
-      color: var(--ix-white);
+      color: var(--text);
       margin-bottom: 20px;
     }
     .cta-title em { font-style: italic; color: var(--ix-accent); }
     .cta-sub {
       font-size: 17px;
-      color: var(--ix-mid);
+      color: var(--text2);
       font-weight: 300;
       margin-bottom: 36px;
       line-height: 1.6;
@@ -669,9 +671,12 @@
       border-radius: 12px;
       overflow: hidden;
       border: 1px solid rgba(200,169,126,0.35);
-      background: rgba(255,255,255,0.04);
+      background: var(--bg2);
       backdrop-filter: blur(8px);
       transition: border-color .2s, box-shadow .2s;
+    }
+    [data-theme="dark"] .nl-form {
+      background: rgba(255,255,255,0.04);
     }
     .nl-form:focus-within {
       border-color: rgba(200,169,126,0.7);
@@ -684,11 +689,11 @@
       outline: none;
       padding: 15px 18px;
       font-size: 14px;
-      color: var(--ix-white);
+      color: var(--text);
       font-family: var(--fb);
       min-width: 0;
     }
-    .nl-input::placeholder { color: rgba(255,255,255,0.35); }
+    .nl-input::placeholder { color: var(--text3); }
     .nl-btn {
       flex-shrink: 0;
       background: var(--ix-accent);
@@ -715,7 +720,7 @@
     .nl-note {
       margin-top: 14px;
       font-size: 12px;
-      color: var(--ix-muted);
+      color: var(--text3);
     }
 
     /* ── RESPONSIVE ───────────────────────────────── */
