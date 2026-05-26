@@ -324,11 +324,13 @@
       display: flex;
       gap: 4px;
       height: 360px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      animation: drift 50s linear infinite;
     }
-    .gallery-row::-webkit-scrollbar { display: none; }
-    .gallery-row:nth-child(2) { margin-top: 4px; }
+    .gallery-row:nth-child(2) { animation-direction: reverse; animation-duration: 42s; margin-top: 4px; }
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
     .gallery-img {
       height: 100%;
       width: auto;
