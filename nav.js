@@ -56,12 +56,25 @@
   /* ─────────────────────────────────────────
      RENDER NAV
   ───────────────────────────────────────── */
+  /* Icon map for nav links */
+  var NAV_ICONS = {
+    'index.html':            '🏠',
+    'portfolio-studio.html': '🌐',
+    'pricing.html':          '🏷️',
+    'dashboard.html':        '📊',
+    'admin.html':            '⚙️',
+  };
+
   function renderNav(activePage) {
 
     var desktopLinks = NAV_LINKS.map(function(l) {
-      var cls = l.href === activePage ? ' class="active"' : '';
-      var id  = l.id ? ' id="' + l.id + '"' : '';
-      return '<li><a href="' + l.href + '"' + cls + id + '>' + l.label + '</a></li>';
+      var cls  = l.href === activePage ? ' class="active"' : '';
+      var id   = l.id ? ' id="' + l.id + '"' : '';
+      var icon = NAV_ICONS[l.href] || '•';
+      return '<li><a href="' + l.href + '"' + cls + id + '>' +
+               '<span class="nav-icon" aria-hidden="true">' + icon + '</span>' +
+               '<span class="nav-label">' + l.label + '</span>' +
+             '</a></li>';
     }).join('');
 
     var mobileLinks = [
@@ -95,47 +108,50 @@
       '.nav-mega-label{font-size:13px;font-weight:600;color:var(--text);}' +
       '.nav-mega-desc{font-size:11px;color:var(--text3);margin-top:1px;}' +
       '.logo{cursor:pointer;}' +
-      /* ── RIGHT-SIDE VERTICAL NAV OVERRIDES ── */
-      '.nav{position:fixed;top:0;right:0;left:auto;bottom:0;width:220px;height:100vh;flex-direction:column;align-items:stretch;padding:28px 16px;border-left:1px solid var(--border2);border-bottom:none;z-index:1100;overflow-y:auto;}' +
+      /* ── LEFT-SIDE VERTICAL NAV OVERRIDES ── */
+      '.nav{position:fixed;top:0;left:0;right:auto;bottom:0;width:var(--nav-w-collapsed);height:100vh;flex-direction:column;align-items:stretch;padding:20px 0 24px;border-right:1px solid var(--border2);border-bottom:none;z-index:1100;overflow:hidden;transition:width 0.3s cubic-bezier(0.4,0,0.2,1);}' +
+      '.nav.expanded{width:var(--nav-w);box-shadow:4px 0 32px rgba(0,0,0,0.14);}' +
+      '[data-theme="dark"] .nav.expanded{box-shadow:4px 0 48px rgba(0,0,0,0.55);}' +
+      '.nav-backdrop{display:none;position:fixed;inset:0;z-index:1099;background:rgba(0,0,0,0.35);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);}' +
+      '.nav-backdrop.open{display:block;}' +
+      '.nav-handle{display:none!important;}' +
       '.nav-in{display:none;}' +
-      '.nav .logo{display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:32px;text-decoration:none;}' +
-      '.nav .nav-links{display:flex;flex-direction:column;gap:2px;list-style:none;flex:1;}' +
+      '.nav .logo{display:flex;align-items:center;gap:9px;padding:0 11px;margin-bottom:32px;cursor:pointer;white-space:nowrap;}' +
+      '.nav .logo .logo-text{opacity:0;transition:opacity 0.15s ease;pointer-events:none;}' +
+      '.nav.expanded .logo .logo-text{opacity:1;pointer-events:auto;}' +
+      '.nav .nav-links{display:flex;flex-direction:column;gap:2px;list-style:none;flex:1;padding:0 8px;}' +
       '.nav .nav-links li{width:100%;}' +
-      '.nav .nav-links a{display:block;padding:10px 12px;border-radius:8px;font-size:13.5px;width:100%;}' +
-      '.nav-bottom{display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid var(--border2);margin-top:auto;}' +
+      '.nav .nav-links a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13.5px;overflow:hidden;white-space:nowrap;}' +
+      '.nav .nav-links a .nav-label{opacity:0;transition:opacity 0.15s ease;pointer-events:none;}' +
+      '.nav.expanded .nav-links a .nav-label{opacity:1;pointer-events:auto;}' +
+      '.nav .nav-icon{font-size:17px;flex-shrink:0;width:22px;text-align:center;}' +
+      '.nav-bottom{display:flex;flex-direction:column;gap:8px;padding:16px 8px 0;margin-top:auto;border-top:1px solid var(--border);overflow:hidden;}' +
+      '.nav-bottom>*{opacity:0;pointer-events:none;transition:opacity 0.15s ease;}' +
+      '.nav.expanded .nav-bottom>*{opacity:1;pointer-events:auto;}' +
       '.nav-guest{flex-direction:column!important;gap:7px!important;}' +
       '.nav-guest .btn-ghost-sm,.nav-guest .btn-gold-sm{width:100%;text-align:center;}' +
       '.nav .theme-btn{width:100%;text-align:left;padding:8px 12px;border-radius:8px;}' +
       '.nav .hamburger{display:none!important;}' +
-      '.nav .u-drop{left:0;right:auto;top:auto;bottom:calc(100% + 6px);}' +
-      'body{padding-right:220px!important;padding-top:0!important;}' +
-      '@media(max-width:900px){' +
-        '.nav{width:64px;padding:20px 8px;}' +
-        '.nav .logo-text,.nav .nav-links a span,.nav-bottom .btn-ghost-sm span,.nav-bottom .btn-gold-sm span{display:none;}' +
-        '.nav .nav-links a{padding:10px;text-align:center;font-size:18px;}' +
-        'body{padding-right:64px!important;}' +
-      '}' +
-      '@media(max-width:600px){' +
-        '.nav{width:100%;height:auto;flex-direction:row;position:fixed;top:auto;bottom:0;left:0;right:0;border-left:none;border-top:1px solid var(--border2);padding:8px 16px;}' +
-        '.nav .logo{display:none;}' +
-        '.nav .nav-links{flex-direction:row;gap:0;justify-content:space-around;}' +
-        '.nav-bottom{display:none;}' +
-        '.nav .hamburger{display:flex!important;}' +
-        'body{padding-right:0!important;padding-bottom:60px!important;}' +
+      '.nav .u-drop{left:calc(100% + 6px);right:auto;top:0;bottom:auto;}' +
+      'body{padding-left:var(--nav-w-collapsed)!important;padding-right:0!important;padding-top:0!important;}' +
+      '.page-wrap{padding-left:var(--nav-w-collapsed)!important;padding-right:0!important;}' +
+      '@media(max-width:768px){' +
+        '.nav{width:0!important;padding:0!important;border-right:none!important;box-shadow:none!important;}' +
+        '.nav *{opacity:0!important;pointer-events:none!important;}' +
+        'body{padding-left:0!important;}' +
+        '.page-wrap{padding-left:0!important;}' +
       '}' +
       '</style>' +
 
-      /* ── Right-side vertical nav ── */
-      /* Pull-tab handle — sits on the left edge of the nav, always visible */
-      '<button class="nav-handle" id="navHandle" onclick="toggleNavCollapse()" aria-label="Toggle sidebar">' +
-        '<svg viewBox="0 0 8 12"><polyline points="6,1 1,6 6,11"/></svg>' +
-      '</button>' +
+      /* ── Left-side vertical nav ── */
+      /* Backdrop — sits between nav and page when expanded, click to collapse */
+      '<div class="nav-backdrop" id="navBackdrop" onclick="toggleNavExpand()"></div>' +
       '<nav class="nav" id="mainNav" aria-label="Main navigation">' +
-        '<a href="index.html" class="logo" id="navLogo">' +
+        '<button class="logo" id="navLogo" onclick="toggleNavExpand()" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mainNav">' +
           '<img src="logo.png" class="logo-img" alt="ImpactGrid" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
           '<div class="logo-mark" style="display:none;">IG</div>' +
           '<span class="logo-text">ImpactGrid</span>' +
-        '</a>' +
+        '</button>' +
 
         '<ul class="nav-links">' +
           desktopLinks +
@@ -226,13 +242,16 @@
       _handleAuthEvent(buf.event, buf.session);
     }
 
+    /* Logo click on mobile opens the mobile sidebar instead */
     var logo = document.getElementById('navLogo');
     if (logo) {
       logo.addEventListener('click', function(e) {
         if (window.innerWidth <= 768) {
           e.preventDefault();
+          e.stopPropagation();
           openSidebar();
         }
+        /* Desktop: onclick="toggleNavExpand()" in HTML handles it */
       });
     }
   }
@@ -248,7 +267,13 @@
   ───────────────────────────────────────── */
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
+      /* Close mobile sidebar */
       window.closeSidebar();
+      /* Collapse expanded desktop nav */
+      var nav = document.getElementById('mainNav');
+      if (nav && nav.classList.contains('expanded')) {
+        window.toggleNavExpand();
+      }
     }
   });
 
@@ -813,30 +838,36 @@
   })();
 
   /* ─────────────────────────────────────────
-     COLLAPSIBLE SIDEBAR
+     NAV EXPAND / COLLAPSE
+     Logo click → expands nav as overlay + shows backdrop.
+     Backdrop click or Escape → collapses back to logo strip.
   ───────────────────────────────────────── */
-  window.toggleNavCollapse = function() {
-    var nav    = document.getElementById('mainNav');
-    var body   = document.body;
-    var wrap   = document.querySelector('.page-wrap');
+  window.toggleNavExpand = function() {
+    var nav      = document.getElementById('mainNav');
+    var backdrop = document.getElementById('navBackdrop');
+    var logo     = document.getElementById('navLogo');
     if (!nav) return;
-    var collapsed = nav.classList.toggle('collapsed');
-    body.classList.toggle('nav-collapsed', collapsed);
-    if (wrap) wrap.classList.toggle('nav-collapsed', collapsed);
-    try { localStorage.setItem('ig_nav_collapsed', collapsed ? '1' : '0'); } catch(e) {}
+    var expanded = nav.classList.toggle('expanded');
+    if (backdrop) backdrop.classList.toggle('open', expanded);
+    if (logo)     logo.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    try { localStorage.setItem('ig_nav_expanded', expanded ? '1' : '0'); } catch(e) {}
   };
 
-  /* Restore collapse state on load */
+  /* Keep old name as alias so any page calling toggleNavCollapse() still works */
+  window.toggleNavCollapse = window.toggleNavExpand;
+
+  /* Restore expanded state on load */
   (function() {
     function _restoreNav() {
       try {
-        if (localStorage.getItem('ig_nav_collapsed') === '1') {
-          var nav  = document.getElementById('mainNav');
+        if (localStorage.getItem('ig_nav_expanded') === '1') {
+          var nav      = document.getElementById('mainNav');
+          var backdrop = document.getElementById('navBackdrop');
+          var logo     = document.getElementById('navLogo');
           if (!nav) return;
-          nav.classList.add('collapsed');
-          document.body.classList.add('nav-collapsed');
-          var wrap = document.querySelector('.page-wrap');
-          if (wrap) wrap.classList.add('nav-collapsed');
+          nav.classList.add('expanded');
+          if (backdrop) backdrop.classList.add('open');
+          if (logo)     logo.setAttribute('aria-expanded', 'true');
         }
       } catch(e) {}
     }
