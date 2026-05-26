@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — ImpactGrid</title>
+  <meta name="description" content="Manage your ImpactGrid account, profile, security and integrations." />
+  <link rel="icon" href="favicon.ico" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* ── Layout ── */
+    .settings-wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: calc(var(--nav-h) + 48px) 20px 80px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* ── Sidebar ── */
+    .s-sidebar {
+      position: sticky;
+      top: calc(var(--nav-h) + 20px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 8px;
+      box-shadow: var(--sh);
+    }
+    .s-sidebar-head {
+      padding: 14px 12px 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .s-sidebar-head strong {
+      font-family: var(--fd); font-size: 16px;
+      font-weight: 900; display: block; letter-spacing: -0.02em;
+    }
+    .s-sidebar-head span {
+      font-size: 10px; font-family: var(--fm);
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3);
+    }
+
+    /* Sidebar group label */
+    .s-nav-group {
+      font-size: 9px; font-family: var(--fm);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text3); padding: 10px 12px 4px;
+    }
+
+    .s-nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: var(--r);
+      font-size: 13px; font-weight: 500; color: var(--text2);
+      cursor: pointer; transition: all 0.2s;
+      border: 1px solid transparent; margin-bottom: 2px;
+      background: none; width: 100%; text-align: left; font-family: var(--fb);
+      position: relative;
+    }
+    .s-nav-btn:hover { background: var(--bg2); color: var(--text); }
+    .s-nav-btn.active {
+      background: var(--gold-dim); border-color: var(--gold-glo);
+      color: var(--gold); font-weight: 600;
+    }
+    .s-nav-icon {
+      width: 26px; height: 26px; border-radius: 7px;
+      background: var(--bg2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0; transition: background 0.2s;
+    }
+    .s-nav-btn.active .s-nav-icon { background: var(--gold-glo); }
+    .s-nav-soon {
+      margin-left: auto; font-size: 9px; font-family: var(--fm);
+      background: var(--blue-dim); color: var(--blue);
+      border: 1px solid rgba(45,110,219,0.2);
+      padding: 2px 6px; border-radius: 4px; letter-spacing: 0.06em;
+    }
+
+    /* ── Main ── */
+    .s-main { min-width: 0; }
+    .s-panel { display: none; animation: fadeUp 0.3s ease both; }
+    .s-panel.active { display: block; }
+
+    /* ── Cards ── */
+    .s-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r2); padding: 28px;
+      margin-bottom: 18px; box-shadow: var(--sh);
+    }
+    .s-card-head {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px;
+      margin-bottom: 24px; padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .s-card-head h3 { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; }
+    .s-card-head p { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.55; }
+
+    /* ── Avatar ── */
+    .av-row {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 26px; padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .av-circle {
+      width: 72px; height: 72px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--fd); font-size: 26px; font-weight: 900;
+      color: #fff; flex-shrink: 0; box-shadow: var(--sh-gold);
+      position: relative; overflow: hidden;
+    }
+    [data-theme="dark"] .av-circle { color: #07090f; }
+    .av-circle img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .av-info h4 { font-size: 15px; font-weight: 700; }
+    .av-info p { font-size: 12px; color: var(--text3); margin-top: 3px; }
+    .av-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .av-info label {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: var(--r);
+      border: 1px solid var(--border2); font-size: 12px; font-weight: 600;
+      color: var(--text2); cursor: pointer; transition: all 0.2s; font-family: var(--fb);
+    }
+    .av-info label:hover { border-color: var(--gold); color: var(--gold); }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ── Save row ── */
+    .save-row {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 10px; margin-top: 22px; padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .save-ok {
+      font-size: 12px; color: var(--green); font-family: var(--fm);
+      opacity: 0; transition: opacity 0.3s; margin-right: auto;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .save-ok.show { opacity: 1; }
+
+    /* ── Security items ── */
+    .sec-item {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--border);
+    }
+    .sec-item:first-child { padding-top: 0; }
+    .sec-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .sec-info h4 { font-size: 14px; font-weight: 700; }
+    .sec-info p { font-size: 12.5px; color: var(--text2); margin-top: 4px; line-height: 1.6; }
+    .sec-info .sec-meta {
+      font-size: 11px; font-family: var(--fm); color: var(--text3);
+      margin-top: 4px;
+    }
+
+    /* ── Password strength ── */
+    .pw-bars { display: flex; gap: 4px; margin-top: 8px; }
+    .pw-bar { height: 3px; flex: 1; border-radius: 99px; background: var(--bg3); transition: background 0.3s; }
+    .pw-bar.weak   { background: var(--red); }
+    .pw-bar.medium { background: var(--gold); }
+    .pw-bar.strong { background: var(--green); }
+    .pw-hint { font-size: 11px; color: var(--text3); font-family: var(--fm); margin-top: 6px; }
+
+    /* Password visibility toggle */
+    .pw-wrap { position: relative; }
+    .pw-wrap .form-input { padding-right: 52px; }
+    .pw-eye {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      font-family: var(--fm); font-size: 10px; letter-spacing: 0.06em;
+      color: var(--text3); cursor: pointer; background: none; border: none;
+      padding: 4px; transition: color 0.2s;
+    }
+    .pw-eye:hover { color: var(--gold); }
+
+    /* ── Toggle switch ── */
+    .toggle {
+      width: 40px; height: 22px; border-radius: 99px;
+      background: var(--bg3); border: 1px solid var(--border2);
+      position: relative; cursor: pointer; transition: all 0.25s; flex-shrink: 0;
+    }
+    .toggle.on { background: var(--gold); border-color: var(--gold2); }
+    .toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform 0.25s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    }
+    .toggle.on::after { transform: translateX(18px); }
+
+    /* ── Pref items ── */
+    .pref-item {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .pref-item:first-child { padding-top: 0; }
+    .pref-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .pref-info h4 { font-size: 14px; font-weight: 700; }
+    .pref-info p { font-size: 12.5px; color: var(--text2); margin-top: 3px; }
+
+    /* ── Theme picker ── */
+    .theme-opts { display: flex; gap: 7px; }
+    .theme-opt {
+      padding: 7px 14px; border-radius: var(--r);
+      font-size: 12px; font-weight: 600;
+      border: 1px solid var(--border2); background: var(--bg2);
+      color: var(--text2); cursor: pointer; font-family: var(--fb); transition: all 0.2s;
+    }
+    .theme-opt.active { background: var(--gold-dim); border-color: var(--gold-glo); color: var(--gold); }
+
+    /* ── Integration items ── */
+    .int-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .int-item:first-child { padding-top: 0; }
+    .int-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .int-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--bg2); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .int-info { flex: 1; min-width: 0; }
+    .int-info h4 { font-size: 14px; font-weight: 700; }
+    .int-info p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .int-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-family: var(--fm); margin-top: 5px;
+      color: var(--text3);
+    }
+    .int-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
+    .int-dot.on { background: var(--green); }
+    .int-badge.on { color: var(--green); }
+
+    /* ── Buttons ── */
+    .btn-sm {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: var(--r);
+      font-size: 12px; font-weight: 600; font-family: var(--fb);
+      cursor: pointer; transition: all 0.2s; border: none; white-space: nowrap;
+    }
+    .btn-sm-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #fff; }
+    [data-theme="dark"] .btn-sm-gold { color: #07090f; }
+    .btn-sm-gold:hover { transform: translateY(-1px); box-shadow: var(--sh-gold); }
+    .btn-sm-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+    .btn-sm-ghost:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-sm-danger { background: var(--red-dim); border: 1px solid rgba(217,79,59,0.2); color: var(--red); }
+    .btn-sm-danger:hover { background: rgba(217,79,59,0.16); }
+    .btn-sm-blue { background: var(--blue-dim); border: 1px solid rgba(45,110,219,0.2); color: var(--blue); }
+
+    /* ── Account stats ── */
+    .acc-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 24px;
+    }
+    .acc-stat {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 16px; text-align: center;
+    }
+    .acc-stat strong {
+      display: block; font-family: var(--fd); font-size: 24px;
+      font-weight: 900; color: var(--gold); line-height: 1;
+    }
+    .acc-stat span {
+      font-size: 10px; color: var(--text3); font-family: var(--fm);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-top: 5px; display: block;
+    }
+
+    /* ── Danger card ── */
+    .s-card-danger { border-color: rgba(217,79,59,0.22); background: rgba(217,79,59,0.015); }
+    .s-card-danger .s-card-head { border-bottom-color: rgba(217,79,59,0.13); }
+    .s-card-danger .s-card-head h3 { color: var(--red); }
+
+    /* ── Coming soon overlay ── */
+    .soon-overlay {
+      text-align: center; padding: 32px 20px; color: var(--text3);
+    }
+    .soon-overlay .soon-icon { font-size: 32px; margin-bottom: 10px; }
+    .soon-overlay h4 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .soon-overlay p { font-size: 13px; line-height: 1.6; max-width: 320px; margin: 0 auto; }
+
+    /* ── Activity log items ── */
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-item:first-child { padding-top: 0; }
+    .act-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold); flex-shrink: 0; margin-top: 5px;
+    }
+    .act-dot.green { background: var(--green); }
+    .act-dot.blue  { background: var(--blue); }
+    .act-dot.red   { background: var(--red); }
+    .act-info h4 { font-size: 13px; font-weight: 600; }
+    .act-info p  { font-size: 11px; color: var(--text3); font-family: var(--fm); margin-top: 2px; }
+
+    /* ── Animal Avatar Picker ── */
+    .animal-picker-wrap {
+      margin-top: 20px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .animal-picker-label {
+      font-size: 12px; font-weight: 700; color: var(--text2);
+      margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+    }
+    .animal-picker-label span {
+      font-size: 10px; font-family: var(--fm); letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text3);
+      background: var(--bg2); border: 1px solid var(--border2);
+      padding: 2px 7px; border-radius: 4px;
+    }
+    .animal-grid {
+      display: grid; grid-template-columns: repeat(8, 1fr);
+      gap: 6px; margin-bottom: 10px;
+    }
+    @media (max-width: 600px) { .animal-grid { grid-template-columns: repeat(6, 1fr); } }
+    @media (max-width: 400px) { .animal-grid { grid-template-columns: repeat(5, 1fr); } }
+
+    .animal-opt {
+      aspect-ratio: 1; border-radius: 12px;
+      border: 2px solid var(--border); background: var(--bg2);
+      font-size: 22px; cursor: pointer; transition: all 0.18s;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .animal-opt:hover { border-color: var(--gold); transform: scale(1.08); background: var(--gold-dim); }
+    .animal-opt.selected {
+      border-color: var(--gold); background: var(--gold-dim);
+      box-shadow: 0 0 0 3px var(--gold-glo);
+    }
+    .animal-opt.selected::after {
+      content: '✓'; position: absolute; bottom: 2px; right: 3px;
+      font-size: 8px; font-weight: 900; color: var(--gold);
+      font-family: var(--fb);
+    }
+
+    .s-nav-btn-danger { color: var(--red, #e74c3c) !important; }
+    .s-nav-btn-danger:hover { background: rgba(231,76,60,.08) !important; color: var(--red, #e74c3c) !important; }
+    .s-nav-link { display: flex; }
+
+    /* Avatar circle in settings showing animal emoji */
+    .av-circle.av-animal {
+      font-size: 38px;
+      background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
+    }
+    [data-theme="dark"] .av-circle.av-animal {
+      background: linear-gradient(135deg, #1a1f2e, #1e2640);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+      .settings-wrap { grid-template-columns: 1fr; padding-top: calc(var(--nav-h) + 20px); }
+      .s-sidebar {
+        position: static; display: flex; flex-wrap: wrap;
+        gap: 4px; padding: 6px;
+      }
+      .s-sidebar-head { display: none; }
+      .s-nav-group { display: none; }
+      .s-nav-btn { width: auto; flex: 1; justify-content: center; min-width: 90px; padding: 8px 10px; }
+      .s-nav-icon { display: none; }
+      .s-nav-soon { display: none; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .acc-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .s-card { padding: 18px; }
+      .acc-stats { grid-template-columns: 1fr; }
+    }
+
+    /* ── Plan & Usage panel ── */
+    .plan-hero {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+      padding-bottom: 22px; border-bottom: 1px solid var(--border);
+    }
+    .plan-badge-large {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 4px 12px; border-radius: 999px;
+      border: 1.5px solid var(--gold-glo);
+      background: linear-gradient(135deg, var(--gold-dim), transparent);
+      color: var(--gold); margin-bottom: 8px;
+      font-family: var(--fm); font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+    .plan-name-large {
+      font-family: var(--fd); font-size: 28px; font-weight: 900;
+      letter-spacing: -.03em; line-height: 1;
+    }
+    .plan-tagline { font-size: 13px; color: var(--text2); margin-top: 5px; line-height: 1.5; }
+    .usage-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 4px; }
+    .usage-item { display: flex; flex-direction: column; gap: 6px; }
+    .usage-item-head { display: flex; align-items: center; justify-content: space-between; }
+    .usage-item-label { font-size: 12px; font-weight: 700; color: var(--text); }
+    .usage-item-count { font-size: 11px; font-family: var(--fm); color: var(--text3); }
+    .usage-item-count.warn { color: var(--red); font-weight: 700; }
+    .usage-item-count.ok   { color: var(--green); }
+    .usage-bar-track {
+      height: 6px; background: var(--bg3); border-radius: 99px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .usage-bar-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      transition: width .5s ease;
+    }
+    .usage-bar-fill.full { background: linear-gradient(90deg, var(--red), #e05a4a); }
+    .usage-bar-fill.warn { background: linear-gradient(90deg, var(--gold), #e07020); }
+    .usage-bar-fill.ok   { background: linear-gradient(90deg, var(--green), #20c080); }
+    .usage-note { font-size: 11px; color: var(--text3); font-family: var(--fm); margin-top: 2px; }
+    .feature-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .feature-table th {
+      text-align: left; padding: 10px 14px; font-size: 10px;
+      font-family: var(--fm); letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text3); border-bottom: 2px solid var(--border);
+    }
+    .feature-table td {
+      padding: 11px 14px; border-bottom: 1px solid var(--border);
+      color: var(--text2); vertical-align: middle;
+    }
+    .feature-table tr:last-child td { border-bottom: none; }
+    .feature-table td:first-child { color: var(--text); font-weight: 500; }
+    .feat-locked { color: var(--text3) !important; font-style: italic; font-weight: 400 !important; }
+    .feat-check  { color: var(--green); font-size: 15px; }
+    .feat-cross  { color: var(--text3); opacity: .4; font-size: 15px; }
+    .plan-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
+    @media (max-width: 700px) { .plan-cards { grid-template-columns: 1fr; } }
+    .plan-card {
+      border: 1.5px solid var(--border); border-radius: var(--r2);
+      padding: 20px; display: flex; flex-direction: column; gap: 8px;
+      transition: border-color .2s, transform .2s;
+    }
+    .plan-card:hover { border-color: var(--gold-glo); transform: translateY(-2px); }
+    .plan-card.current {
+      border-color: var(--gold-glo);
+      background: linear-gradient(160deg, var(--gold-dim), transparent 70%);
+    }
+    .plan-card-name { font-family: var(--fd); font-size: 15px; font-weight: 900; letter-spacing: -.02em; }
+    .plan-card-price {
+      font-family: var(--fd); font-size: 26px; font-weight: 900;
+      color: var(--gold); line-height: 1; letter-spacing: -.03em;
+    }
+    .plan-card-price span { font-size: 13px; color: var(--text2); font-weight: 500; }
+    .plan-card-desc { font-size: 11px; color: var(--text2); line-height: 1.5; flex: 1; }
+    .plan-card-cta {
+      display: block; text-align: center; padding: 9px 14px; border-radius: var(--r);
+      font-size: 12px; font-weight: 700; font-family: var(--fb); transition: .2s;
+      border: 1.5px solid var(--border); color: var(--text2); background: var(--bg2);
+      cursor: pointer; text-decoration: none;
+    }
+    .plan-card-cta.gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #fff; border-color: transparent; }
+    [data-theme="dark"] .plan-card-cta.gold { color: #07090f; }
+    .plan-card-cta.gold:hover { transform: translateY(-1px); box-shadow: var(--sh-gold); }
+    .plan-card-cta.current-label { background: var(--gold-dim); color: var(--gold); border-color: var(--gold-glo); cursor: default; }
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 10px; margin-top: 4px;
+    }
+    .tool-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: var(--r);
+      border: 1.5px solid var(--border); background: var(--bg2);
+      text-decoration: none; color: var(--text2);
+      font-size: 13px; font-weight: 600; position: relative;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .tool-link:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+    .tool-link.locked { opacity: .45; pointer-events: none; cursor: not-allowed; }
+    .tool-icon { font-size: 18px; flex-shrink: 0; }
+    .tool-info { display: flex; flex-direction: column; gap: 1px; }
+    .tool-name  { font-size: 12px; font-weight: 700; color: inherit; }
+    .tool-limit { font-size: 10px; color: var(--text3); font-family: var(--fm); }
+    .tool-lock-badge {
+      position: absolute; top: 7px; right: 8px;
+      font-size: 9px; font-family: var(--fm); letter-spacing: .06em;
+      background: var(--bg3); border: 1px solid var(--border2);
+      color: var(--text3); padding: 1px 5px; border-radius: 4px;
+    }
+
+    /* ── Trial Exhausted Blur Overlay ── */
+    .trial-blur-wrap {
+      position: relative;
+    }
+    .trial-blur-wrap .trial-blur-content {
+      filter: blur(4px);
+      pointer-events: none;
+      user-select: none;
+      transition: filter 0.3s ease;
+    }
+    .trial-blur-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(var(--card-rgb, 255,255,255), 0.55);
+      backdrop-filter: blur(2px);
+      border-radius: var(--r2);
+      z-index: 10;
+    }
+    [data-theme="dark"] .trial-blur-overlay {
+      background: rgba(10,13,22,0.55);
+    }
+    .trial-blur-card {
+      background: var(--card); border: 1.5px solid var(--gold-glo);
+      border-radius: var(--r2); padding: 24px 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.14), var(--sh-gold);
+      text-align: center; max-width: 320px; width: 90%;
+    }
+    .trial-blur-icon { font-size: 32px; margin-bottom: 10px; }
+    .trial-blur-card h4 {
+      font-family: var(--fd); font-size: 17px; font-weight: 900;
+      letter-spacing: -0.02em; margin-bottom: 6px; color: var(--text);
+    }
+    .trial-blur-card p {
+      font-size: 12.5px; color: var(--text2); line-height: 1.6; margin-bottom: 16px;
+    }
+    .trial-blur-card a {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border-radius: var(--r);
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #fff; font-size: 13px; font-weight: 700; font-family: var(--fb);
+      text-decoration: none; transition: .2s;
+    }
+    [data-theme="dark"] .trial-blur-card a { color: #07090f; }
+    .trial-blur-card a:hover { transform: translateY(-1px); box-shadow: var(--sh-gold); }
+    .trial-blur-card .trial-reset {
+      font-size: 10px; font-family: var(--fm); color: var(--text3);
+      margin-top: 10px; letter-spacing: 0.05em;
+    }
+
+    /* ── Trial exhausted top banner ── */
+    .trial-exhausted-banner {
+      display: none;
+      align-items: center; gap: 12px;
+      background: linear-gradient(135deg, rgba(217,79,59,0.1), rgba(217,79,59,0.05));
+      border: 1.5px solid rgba(217,79,59,0.3);
+      border-radius: var(--r2); padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .trial-exhausted-banner.show { display: flex; }
+    .trial-exhausted-banner .teb-icon { font-size: 22px; flex-shrink: 0; }
+    .trial-exhausted-banner .teb-text { flex: 1; min-width: 0; }
+    .trial-exhausted-banner .teb-text strong {
+      display: block; font-size: 13px; font-weight: 700; color: var(--red); margin-bottom: 2px;
+    }
+    .trial-exhausted-banner .teb-text span {
+      font-size: 12px; color: var(--text2);
+    }
+    .trial-exhausted-banner a {
+      flex-shrink: 0; padding: 8px 14px; border-radius: var(--r);
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #fff; font-size: 12px; font-weight: 700; font-family: var(--fb);
+      text-decoration: none; white-space: nowrap;
+    }
+    [data-theme="dark"] .trial-exhausted-banner a { color: #07090f; }
+  </style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KVJC5DE2WT');
+  </script>
+</head>
+<body>
+
+  <div id="ig-nav"></div>
+
+  <div class="page-wrap">
+    <div class="settings-wrap">
+
+      <!-- ══ SIDEBAR ══ -->
+      <aside class="s-sidebar">
+        <div class="s-sidebar-head">
+          <strong>Settings</strong>
+          <span>Account control</span>
+        </div>
+
+        <div class="s-nav-group">Account</div>
+        <button class="s-nav-btn active" data-panel="profile">
+          <span class="s-nav-icon">👤</span>Profile
+        </button>
+        <button class="s-nav-btn" data-panel="account">
+          <span class="s-nav-icon">⚙️</span>Account
+        </button>
+
+        <div class="s-nav-group">Security</div>
+        <button class="s-nav-btn" data-panel="security">
+          <span class="s-nav-icon">🔒</span>Password
+        </button>
+        <button class="s-nav-btn" data-panel="sessions">
+          <span class="s-nav-icon">📱</span>Devices & Sessions
+        </button>
+
+        <div class="s-nav-group">Platform</div>
+        <button class="s-nav-btn" data-panel="preferences">
+          <span class="s-nav-icon">🎨</span>Preferences
+        </button>
+        <div class="s-nav-group">Data</div>
+        <button class="s-nav-btn" data-panel="privacy">
+          <span class="s-nav-icon">👁️</span>Privacy
+        </button>
+
+        <div class="s-nav-group">Billing</div>
+        <button class="s-nav-btn" data-panel="plan">
+          <span class="s-nav-icon">⭐</span>Plan &amp; Usage
+        </button>
+
+        <div class="s-nav-group">Account Access</div>
+        <!-- Login link (shown when logged out) -->
+        <a href="login.html" class="s-nav-btn s-nav-link" id="sidebarLoginBtn" style="text-decoration:none;display:none">
+          <span class="s-nav-icon">🔑</span>Login
+        </a>
+        <!-- Logout button (shown when logged in) -->
+        <button class="s-nav-btn s-nav-btn-danger" id="sidebarLogoutBtn" onclick="igSignOut()" style="display:none">
+          <span class="s-nav-icon">🚪</span>Sign Out
+        </button>
+      </aside>
+
+      <!-- ══ MAIN ══ -->
+      <main class="s-main">
+
+
+
+        <!-- ─── PROFILE ─── -->
+        <section class="s-panel active" id="panel-profile">
+          <div class="s-card">
+            <div class="s-card-head">
+              <div>
+                <h3>Your Creator Profile</h3>
+                <p>Control how your content identity appears across ImpactGrid.</p>
+              </div>
+              <span class="chip chip-gold">Public</span>
+            </div>
+
+            <div class="av-row">
+              <div class="av-circle" id="s-av">
+                <span id="s-av-init">?</span>
+                <img id="s-av-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+                <span id="s-av-animal" style="display:none;font-size:38px;line-height:1;"></span>
+              </div>
+              <div class="av-info">
+                <h4>Profile Photo</h4>
+                <p>Upload a photo, or choose a unique animal avatar below.</p>
+                <div class="av-btns">
+                  <label>
+                    <input type="file" id="s-av-upload" accept="image/*" style="display:none" onchange="uploadAvatar(this.files[0])" />
+                    📷 Upload photo
+                  </label>
+                  <button class="btn-sm btn-sm-ghost" onclick="clearAvatarPhoto()" id="av-clear-btn" style="display:none;">✕ Remove photo</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Animal Avatar Picker -->
+            <div class="animal-picker-wrap">
+              <div class="animal-picker-label">
+                Choose an animal avatar <span>or upload a photo above</span>
+              </div>
+              <div class="animal-grid" id="animalGrid">
+                <!-- Populated by JS -->
+              </div>
+              <div style="font-size:11px;color:var(--text3);font-family:var(--fm);">
+                Your animal avatar shows on your profile when no photo is uploaded. Click to select, click again to deselect.
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" id="s-first" class="form-input" placeholder="First name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" id="s-last" class="form-input" placeholder="Last name" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="s-email-ro" class="form-input" readonly style="opacity:0.55;cursor:not-allowed" />
+              <div style="font-size:11px;color:var(--text3);margin-top:5px;font-family:var(--fm)">To change your email, go to the Account section.</div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Job Title</label>
+                <input type="text" id="s-title" class="form-input" placeholder="e.g. Content Creator" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" id="s-location" class="form-input" placeholder="e.g. London, UK" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Bio</label>
+              <textarea id="s-bio" class="form-textarea" placeholder="Tell the ImpactGrid community who you are and what you do…" style="min-height:88px"></textarea>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">LinkedIn URL</label>
+                <input type="url" id="s-linkedin" class="form-input" placeholder="https://linkedin.com/in/yourname" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Website / Portfolio</label>
+                <input type="url" id="s-website" class="form-input" placeholder="https://yoursite.com" />
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Account Type</label>
+              <select id="s-role" class="form-select">
+                <option value="professional">Professional</option>
+                <option value="employer">Employer / Recruiter</option>
+                <option value="creator">Creator</option>
+              </select>
+            </div>
+
+            <div class="save-row">
+              <span class="save-ok" id="profile-ok">✓ Profile saved</span>
+              <button class="btn btn-outline" onclick="loadProfile()">Cancel</button>
+              <button class="btn btn-gold" onclick="saveProfile()">Save Profile</button>
+            </div>
+            <div class="alert alert-error" id="profile-err"></div>
+          </div>
+        </section>
+
+        <!-- ─── ACCOUNT ─── -->
+        <section class="s-panel" id="panel-account">
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Account Overview</h3><p>Your ImpactGrid account status and details.</p></div>
+            </div>
+            <div class="acc-stats">
+              <div class="acc-stat"><strong id="stat-days">—</strong><span>Days active</span></div>
+              <div class="acc-stat"><strong id="stat-plan">Free</strong><span>Current plan</span></div>
+              <div class="acc-stat"><strong id="stat-role">—</strong><span>Account type</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Current Email</label>
+              <input type="email" id="s-cur-email" class="form-input" readonly style="opacity:0.55;cursor:not-allowed" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Email Address</label>
+              <input type="email" id="s-new-email" class="form-input" placeholder="Enter new email address" />
+            </div>
+            <div class="save-row">
+              <span class="save-ok" id="account-ok">✓ Confirmation email sent</span>
+              <button class="btn btn-gold" onclick="updateEmail()">Update Email</button>
+            </div>
+            <div class="alert alert-error"   id="account-err"></div>
+            <div class="alert alert-success" id="account-succ"></div>
+          </div>
+
+          <div class="s-card s-card-danger">
+            <div class="s-card-head">
+              <div><h3>Danger Zone</h3><p>These actions can't be undone. Be careful.</p></div>
+            </div>
+            <div class="sec-item" style="padding-top:0">
+              <div class="sec-info">
+                <h4>Delete Account</h4>
+                <p>Permanently remove your ImpactGrid account, profile, applications and all associated data. This action cannot be undone.</p>
+              </div>
+              <button class="btn-sm btn-sm-danger" onclick="confirmDelete()">Delete Account</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── SECURITY / PASSWORD ─── -->
+        <section class="s-panel" id="panel-security">
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Change Password</h3><p>Update your password. We recommend a strong, unique password not used elsewhere.</p></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Current Password</label>
+              <div class="pw-wrap">
+                <input type="password" id="s-cur-pw" class="form-input" placeholder="Enter your current password" />
+                <button class="pw-eye" onclick="togglePwVis('s-cur-pw',this)">SHOW</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <div class="pw-wrap">
+                <input type="password" id="s-new-pw" class="form-input"
+                  placeholder="Minimum 8 characters"
+                  oninput="checkPwStrength(this.value)" />
+                <button class="pw-eye" onclick="togglePwVis('s-new-pw',this)">SHOW</button>
+              </div>
+              <div class="pw-bars">
+                <div class="pw-bar" id="pw1"></div>
+                <div class="pw-bar" id="pw2"></div>
+                <div class="pw-bar" id="pw3"></div>
+                <div class="pw-bar" id="pw4"></div>
+              </div>
+              <div class="pw-hint" id="pw-hint">Enter a new password to check its strength</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <div class="pw-wrap">
+                <input type="password" id="s-confirm-pw" class="form-input"
+                  placeholder="Repeat new password"
+                  oninput="checkPwMatch()" />
+                <button class="pw-eye" onclick="togglePwVis('s-confirm-pw',this)">SHOW</button>
+              </div>
+              <div class="pw-hint" id="pw-match-hint"></div>
+            </div>
+
+            <div class="save-row">
+              <span class="save-ok" id="security-ok">✓ Password updated successfully</span>
+              <button class="btn btn-outline" onclick="clearPwFields()">Clear</button>
+              <button class="btn btn-gold" id="pw-submit-btn" onclick="changePassword()">Update Password</button>
+            </div>
+            <div class="alert alert-error" id="security-err"></div>
+          </div>
+
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Password Tips</h3><p>Keep your account as secure as possible.</p></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;">
+                <div style="font-size:18px;margin-bottom:6px;">✅</div>
+                <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Do</div>
+                <div style="font-size:12px;color:var(--text2);line-height:1.6;">Use 12+ characters, mix uppercase, numbers and symbols. Use a password manager.</div>
+              </div>
+              <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;">
+                <div style="font-size:18px;margin-bottom:6px;">❌</div>
+                <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Don't</div>
+                <div style="font-size:12px;color:var(--text2);line-height:1.6;">Reuse passwords from other sites or use obvious words like your name or birthday.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── DEVICES & SESSIONS ─── -->
+        <section class="s-panel" id="panel-sessions">
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Active Sessions</h3><p>Devices currently signed into your ImpactGrid account.</p></div>
+            </div>
+
+            <div class="sec-item" style="padding-top:0">
+              <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+                <div style="width:40px;height:40px;border-radius:10px;background:var(--green-dim);border:1px solid rgba(15,168,118,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💻</div>
+                <div class="sec-info">
+                  <h4>Current Session</h4>
+                  <p id="s-session-info">Loading session info…</p>
+                  <div class="sec-meta" id="s-session-time"></div>
+                </div>
+              </div>
+              <span class="chip chip-green">Active now</span>
+            </div>
+
+            <div class="sec-item">
+              <div class="sec-info">
+                <h4>Sign Out All Other Devices</h4>
+                <p>End all sessions except this one. Anyone else using your account will be signed out immediately.</p>
+              </div>
+              <button class="btn-sm btn-sm-danger" onclick="signOutAll()">Sign Out All</button>
+            </div>
+          </div>
+
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Login Activity</h3><p>Recent sign-in events on your account.</p></div>
+              <span class="chip chip-blue">Coming Soon</span>
+            </div>
+            <div id="activity-log"></div>
+          </div>
+        </section>
+
+
+        <!-- ─── PREFERENCES ─── -->
+        <section class="s-panel" id="panel-preferences">
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Appearance</h3><p>Customise how ImpactGrid looks and feels for you.</p></div>
+            </div>
+
+            <div class="pref-item" style="padding-top:0">
+              <div class="pref-info"><h4>Theme</h4><p>Choose between light and dark mode.</p></div>
+              <div class="theme-opts">
+                <button class="theme-opt active" id="opt-light" onclick="setTheme('light')">☀️ Light</button>
+                <button class="theme-opt" id="opt-dark" onclick="setTheme('dark')">🌙 Dark</button>
+              </div>
+            </div>
+
+
+            <div class="pref-item">
+              <div class="pref-info"><h4>Compact Dashboard</h4><p>Reduce card spacing in dashboard views for a denser layout.</p></div>
+              <div class="toggle" id="tog-compact" onclick="togglePref('compact')"></div>
+            </div>
+
+            <div class="pref-item">
+              <div class="pref-info"><h4>Reduce Motion</h4><p>Minimise animations and transitions across the platform.</p></div>
+              <div class="toggle" id="tog-motion" onclick="togglePref('motion')"></div>
+            </div>
+          </div>
+
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Dashboard Preferences</h3><p>Control what appears on your main dashboard.</p></div>
+              <span class="chip chip-blue">Coming Soon</span>
+            </div>
+            <div class="soon-overlay" style="padding:20px 0 4px;">
+              <p>Customisable dashboard widgets and layout reordering coming in the next release.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── PRIVACY ─── -->
+        <section class="s-panel" id="panel-privacy">
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Profile Visibility</h3><p>Control who can see your ImpactGrid profile.</p></div>
+            </div>
+
+            <div class="pref-item" style="padding-top:0">
+              <div class="pref-info">
+                <h4>Public Profile</h4>
+                <p>Allow anyone on ImpactGrid to view your profile and work history.</p>
+              </div>
+              <div class="toggle on" id="tog-pub" onclick="togglePref('pub')"></div>
+            </div>
+            <div class="pref-item">
+              <div class="pref-info">
+                <h4>Show Online Status</h4>
+                <p>Let others see when you're active on the platform.</p>
+              </div>
+              <div class="toggle" id="tog-online" onclick="togglePref('online')"></div>
+            </div>
+          </div>
+
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Data & Tracking</h3><p>Control how ImpactGrid uses your data.</p></div>
+            </div>
+            <div class="pref-item" style="padding-top:0">
+              <div class="pref-info">
+                <h4>Analytics Cookies</h4>
+                <p>Help us improve the platform with anonymous usage data.</p>
+              </div>
+              <div class="toggle on" id="tog-analytics" onclick="togglePref('analytics')"></div>
+            </div>
+            <div class="pref-item">
+              <div class="pref-info">
+                <h4>Personalisation</h4>
+                <p>Allow ImpactGrid to personalise job recommendations and content.</p>
+              </div>
+              <div class="toggle on" id="tog-personal" onclick="togglePref('personal')"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── PLAN & USAGE ─── -->
+        <section class="s-panel" id="panel-plan">
+
+          <!-- Trial exhausted banner — shown by JS when aiPct >= 100 -->
+          <div class="trial-exhausted-banner" id="trialExhaustedBanner">
+            <div class="teb-icon">🔒</div>
+            <div class="teb-text">
+              <strong id="teb-heading">You've used all your free AI credits this month</strong>
+              <span id="teb-body">AI-powered tools are locked until you upgrade or your credits reset on the 1st.</span>
+            </div>
+            <a href="join.html">Upgrade →</a>
+          </div>
+
+          <!-- Current Plan Hero -->
+          <div class="s-card">
+            <div class="s-card-head">
+              <div><h3>Your Plan</h3><p>Your current subscription and feature access.</p></div>
+              <a href="join.html" class="btn-sm btn-sm-ghost">View all plans</a>
+            </div>
+
+            <div class="plan-hero">
+              <div>
+                <div class="plan-badge-large" id="plan-badge-large">⭐ Free</div>
+                <div class="plan-name-large" id="plan-name-large">Free Plan</div>
+                <div class="plan-tagline" id="plan-tagline">Try ImpactGrid with no card needed.</div>
+              </div>
+              <div id="plan-upgrade-cta">
+                <a href="join.html" class="btn btn-gold">Upgrade Plan →</a>
+              </div>
+            </div>
+
+            <!-- Usage bars — populated by JS from igUser -->
+            <div class="usage-grid" id="usageGrid">
+              <!-- JS renders bars here -->
+            </div>
+          </div>
+
+          <!-- Tool Access — shows what's available on current plan -->
+          <!-- trial-blur-wrap is activated by JS when free trial AI uses are exhausted -->
+          <div class="trial-blur-wrap" id="toolsBlurWrap">
+            <div class="trial-blur-content" id="toolsBlurContent">
+              <div class="s-card">
+                <div class="s-card-head">
+                  <div><h3>Your Tools</h3><p>All ImpactGrid tools — click to open. Locked tools require a plan upgrade.</p></div>
+                </div>
+                <div class="tools-grid" id="toolsGrid">
+                  <!-- JS renders tool links here -->
+                </div>
+              </div>
+
+              <!-- Feature table -->
+              <div class="s-card">
+                <div class="s-card-head">
+                  <div><h3>What's Included</h3><p>A full breakdown of what your plan gives you.</p></div>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table class="feature-table">
+                    <thead>
+                      <tr>
+                        <th>Feature</th>
+                        <th>Your limit</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="featureTableBody">
+                      <!-- JS renders rows here -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!-- Overlay injected by JS when exhausted -->
+          </div>
+
+          <!-- Plan cards — upgrade options -->
+          <div class="s-card" id="plan-upgrade-section">
+            <div class="s-card-head">
+              <div><h3>Upgrade Your Plan</h3><p>Unlock more tools, more saves, and unlimited AI uses.</p></div>
+            </div>
+            <div class="plan-cards">
+              <div class="plan-card" id="pc-free">
+                <div class="plan-card-name">Free</div>
+                <div class="plan-card-price">£0 <span>/mo</span></div>
+                <div class="plan-card-desc" id="pc-free-desc">3 AI uses/mo · Browse events · Data deleted after 7 days</div>
+                <span class="plan-card-cta current-label" id="pc-free-cta">Current plan</span>
+              </div>
+              <div class="plan-card" id="pc-professional">
+                <div class="plan-card-name">Professional</div>
+                <div class="plan-card-price">£8.99 <span>/mo</span></div>
+                <div class="plan-card-desc" id="pc-professional-desc">100 AI uses/mo · Full dashboard access · Email support</div>
+                <a href="https://buy.stripe.com/cNiaEQgYEgpO0Akgik8N206" target="_blank" class="plan-card-cta gold" id="pc-professional-cta">Get Professional →</a>
+              </div>
+              <div class="plan-card" id="pc-enterprise">
+                <div class="plan-card-name">Enterprise</div>
+                <div class="plan-card-price">£13.99 <span>/mo</span></div>
+                <div class="plan-card-desc" id="pc-enterprise-desc">Unlimited AI · Full access · Priority support</div>
+                <a href="https://buy.stripe.com/28E28k4bS8Xmera2ru8N207" target="_blank" class="plan-card-cta gold" id="pc-enterprise-cta">Get Enterprise →</a>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="ig-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="ig-supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="plan-config.js"></script>
+  <script src="plan-gate.js"></script>
+  <script src="auth.js"></script>
+  <script src="nav.js"></script>
+  <script>
+    /* ✅ Restore avatar preview instantly from cache (before DB responds) */
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        var cached = localStorage.getItem('ig_avatar');
+        if (cached) {
+          var img = document.getElementById('s-av-img');
+          if (img) { img.src = cached; img.style.display = 'block'; }
+        }
+      } catch(e) {}
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderNav('settings.html');
+      renderFooter();
+      if (typeof window.checkAuth === 'function') window.checkAuth();
+      initSettings();
+      buildActivityLog();
+    });
+
+    /* ─── Sidebar Login / Logout auth-aware wiring ─── */
+    function _updateSidebarAuth(loggedIn) {
+      var loginBtn  = document.getElementById('sidebarLoginBtn');
+      var logoutBtn = document.getElementById('sidebarLogoutBtn');
+      if (loginBtn)  loginBtn.style.display  = loggedIn ? 'none' : 'flex';
+      if (logoutBtn) logoutBtn.style.display = loggedIn ? 'flex' : 'none';
+    }
+    document.addEventListener('ig-user-ready', function() { _updateSidebarAuth(true);  });
+    document.addEventListener('ig-nav-ready',  function() {
+      // Check session state already resolved
+      if (window.igUser) { _updateSidebarAuth(true); }
+      else {
+        try {
+          var plan = localStorage.getItem('ig_plan');
+          if (plan) _updateSidebarAuth(true);
+          else _updateSidebarAuth(false);
+        } catch(e) { _updateSidebarAuth(false); }
+      }
+    });
+    // Fallback: run after DOMContentLoaded in case events already fired
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        var loggedIn = !!(window.igUser || (function(){ try { return localStorage.getItem('ig_plan'); } catch(e){} })());
+        _updateSidebarAuth(loggedIn);
+      }, 600);
+    });
+
+    /* ─── Sidebar tabs ─── */
+    document.querySelectorAll('.s-nav-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.s-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.s-panel').forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    /* ─── Init ─── */
+    async function initSettings() {
+      var client     = getSupabase();
+      var sessionRes = await client.auth.getSession();
+      if (!sessionRes.data || !sessionRes.data.session) {
+        console.log("Guest mode");
+        return;
+      }
+      var user  = sessionRes.data.session.user;
+      var email = user.email || '';
+
+      document.getElementById('s-email-ro').value  = email;
+      document.getElementById('s-cur-email').value = email;
+      setInitials(email);
+
+      if (user.created_at) {
+        var days = Math.floor((Date.now() - new Date(user.created_at)) / 86400000);
+        document.getElementById('stat-days').textContent = days;
+      }
+
+      var sessionDate = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+      document.getElementById('s-session-info').textContent = 'Signed in as ' + email;
+      document.getElementById('s-session-time').textContent = sessionDate + ' · This device';
+
+      loadProfile(user, client);
+      loadPreferences();
+    }
+
+    function setInitials(str) {
+      var parts = str.split(/[\s@]/);
+      var init  = ((parts[0]||'')[0]||'') + ((parts[1]||'')[0]||'');
+      document.getElementById('s-av-init').textContent = init.toUpperCase() || '?';
+    }
+
+    /* ─── Load profile ─── */
+    function loadProfile(user, client) {
+      if (!client) client = getSupabase();
+      client.from('profiles').select('*').eq('user_id', user.id).single()
+        .then(function(res) {
+          var p = res.data; if (!p) return;
+          if (p.full_name) {
+            var pts = p.full_name.split(' ');
+            document.getElementById('s-first').value = pts[0] || '';
+            document.getElementById('s-last').value  = pts.slice(1).join(' ') || '';
+            setInitials(p.full_name);
+          }
+          if (p.role) {
+            document.getElementById('s-role').value = p.role;
+            document.getElementById('stat-role').textContent = p.role.charAt(0).toUpperCase() + p.role.slice(1);
+          }
+          if (p.bio)      document.getElementById('s-bio').value      = p.bio;
+          if (p.title)    document.getElementById('s-title').value    = p.title;
+          if (p.location) document.getElementById('s-location').value = p.location;
+          if (p.linkedin) document.getElementById('s-linkedin').value = p.linkedin;
+          if (p.website)  document.getElementById('s-website').value  = p.website;
+          if (p.avatar_url) {
+            var img = document.getElementById('s-av-img');
+            img.src = p.avatar_url; img.style.display = 'block';
+            /* ✅ Keep localStorage in sync with DB value */
+            try { localStorage.setItem('ig_avatar', p.avatar_url); } catch(e) {}
+          }
+        }).catch(function() {});
+    }
+
+    /* ─── Save profile ─── */
+    async function saveProfile() {
+      var client     = getSupabase();
+      var sessionRes = await client.auth.getSession();
+      if (!sessionRes.data || !sessionRes.data.session) return;
+      var user = sessionRes.data.session.user;
+      hideAlert('profile-err');
+
+      var first    = document.getElementById('s-first').value.trim();
+      var last     = document.getElementById('s-last').value.trim();
+      var full     = [first, last].filter(Boolean).join(' ');
+      var role     = document.getElementById('s-role').value;
+      var bio      = document.getElementById('s-bio').value.trim();
+      var title    = document.getElementById('s-title').value.trim();
+      var location = document.getElementById('s-location').value.trim();
+      var linkedin = document.getElementById('s-linkedin').value.trim();
+      var website  = document.getElementById('s-website').value.trim();
+
+      var res = await client.from('profiles').upsert({
+        user_id: user.id, email: user.email,
+        full_name: full, role, bio, title, location, linkedin, website,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+
+      if (res.error) {
+        showAlert('profile-err', res.error.message);
+      } else {
+        if (full) setInitials(full);
+        document.getElementById('stat-role').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+        flashOk('profile-ok');
+      }
+    }
+
+    /* ─── Avatar upload ─── */
+    async function uploadAvatar(file) {
+      if (!file) return;
+
+      const supabase = getSupabase();
+
+      // get logged in user
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        alert("You are not logged in");
+        return;
+      }
+
+      // fixed file path (important)
+      const filePath = user.id + '/avatar.png';
+
+      // upload file
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          upsert: true
+        });
+
+      if (error) {
+        console.error("UPLOAD ERROR:", error);
+        alert("Upload failed");
+        return;
+      }
+
+      // get public URL
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const avatarUrl = data.publicUrl;
+
+      // update avatar preview immediately
+      var img = document.getElementById('s-av-img');
+      img.src = avatarUrl; img.style.display = 'block';
+      try { localStorage.setItem('ig_avatar', avatarUrl); } catch(e) {}
+      /* Clear animal selection — photo takes priority */
+      _selectedAnimal = null;
+      try { localStorage.removeItem('ig_animal'); } catch(e) {}
+      document.querySelectorAll('.animal-opt').forEach(function(el) { el.classList.remove('selected'); });
+      var anim   = document.getElementById('s-av-animal');
+      var init   = document.getElementById('s-av-init');
+      var circle = document.getElementById('s-av');
+      if (anim)   { anim.style.display = 'none'; }
+      if (init)   { init.style.display = 'none'; }
+      if (circle) { circle.classList.remove('av-animal'); }
+      var clearBtn = document.getElementById('av-clear-btn');
+      if (clearBtn) clearBtn.style.display = '';
+
+      // save to database
+      const { error: dbError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarUrl })
+        .eq('user_id', user.id);
+
+      if (dbError) {
+        console.error("DB ERROR:", dbError);
+        alert("Database update failed");
+        return;
+      }
+
+      alert("Avatar uploaded successfully ✅");
+    }
+
+    /* ─── Update email ─── */
+    async function updateEmail() {
+      var client   = getSupabase();
+      var newEmail = document.getElementById('s-new-email').value.trim();
+      hideAlert('account-err'); hideAlert('account-succ');
+      if (!newEmail || !newEmail.includes('@')) return showAlert('account-err', 'Please enter a valid email address.');
+      var res = await client.auth.updateUser({ email: newEmail });
+      if (res.error) {
+        showAlert('account-err', res.error.message);
+      } else {
+        showAlert('account-succ', 'Confirmation email sent to ' + newEmail + '. Click the link to verify the change.');
+        document.getElementById('s-new-email').value = '';
+      }
+    }
+
+    /* ─── Change password ─── */
+    async function changePassword() {
+      var client    = getSupabase();
+      var curPw     = document.getElementById('s-cur-pw').value;
+      var newPw     = document.getElementById('s-new-pw').value;
+      var confirmPw = document.getElementById('s-confirm-pw').value;
+      hideAlert('security-err');
+
+      if (!curPw)            return showAlert('security-err', 'Please enter your current password.');
+      if (!newPw || newPw.length < 8) return showAlert('security-err', 'New password must be at least 8 characters.');
+      if (newPw !== confirmPw)        return showAlert('security-err', 'Passwords do not match.');
+      if (curPw === newPw)            return showAlert('security-err', 'New password must be different from your current password.');
+
+      /* Step 1: re-authenticate with current password */
+      var sessionRes = await client.auth.getSession();
+      if (!sessionRes.data || !sessionRes.data.session) return;
+      var email = sessionRes.data.session.user.email;
+
+      var reAuth = await client.auth.signInWithPassword({ email: email, password: curPw });
+      if (reAuth.error) {
+        showAlert('security-err', 'Current password is incorrect. Please try again.');
+        return;
+      }
+
+      /* Step 2: update to new password */
+      var btn = document.getElementById('pw-submit-btn');
+      btn.disabled = true; btn.textContent = 'Updating…';
+
+      var res = await client.auth.updateUser({ password: newPw });
+      btn.disabled = false; btn.textContent = 'Update Password';
+
+      if (res.error) {
+        showAlert('security-err', res.error.message);
+      } else {
+        clearPwFields();
+        flashOk('security-ok');
+      }
+    }
+
+    function clearPwFields() {
+      document.getElementById('s-cur-pw').value     = '';
+      document.getElementById('s-new-pw').value     = '';
+      document.getElementById('s-confirm-pw').value = '';
+      checkPwStrength('');
+      document.getElementById('pw-match-hint').textContent = '';
+    }
+
+    function togglePwVis(inputId, btn) {
+      var inp = document.getElementById(inputId);
+      if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'HIDE'; }
+      else { inp.type = 'password'; btn.textContent = 'SHOW'; }
+    }
+
+    function checkPwStrength(pw) {
+      var bars = ['pw1','pw2','pw3','pw4'].map(function(id) { return document.getElementById(id); });
+      var hint = document.getElementById('pw-hint');
+      bars.forEach(function(b) { b.className = 'pw-bar'; });
+      if (!pw) { hint.textContent = 'Enter a new password to check its strength'; return; }
+      var score = 0;
+      if (pw.length >= 8)  score++;
+      if (pw.length >= 12) score++;
+      if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      var cls   = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
+      var label = { weak:'Weak — add numbers and symbols', medium:'Fair — try a longer password', strong:'Strong password ✓' }[cls];
+      for (var i = 0; i < score; i++) bars[i].classList.add(cls);
+      hint.textContent = label;
+    }
+
+    function checkPwMatch() {
+      var newPw     = document.getElementById('s-new-pw').value;
+      var confirmPw = document.getElementById('s-confirm-pw').value;
+      var hint      = document.getElementById('pw-match-hint');
+      if (!confirmPw) { hint.textContent = ''; return; }
+      if (newPw === confirmPw) {
+        hint.textContent = '✓ Passwords match';
+        hint.style.color = 'var(--green)';
+      } else {
+        hint.textContent = '✗ Passwords do not match';
+        hint.style.color = 'var(--red)';
+      }
+    }
+
+    /* ─── Sign out all ─── */
+    async function signOutAll() {
+      if (!confirm('Sign out of all devices? You will need to log in again.')) return;
+      await getSupabase().auth.signOut({ scope: 'global' });
+      window.location.href = 'login.html';
+    }
+
+    /* ─── Delete account ─── */
+    async function confirmDelete() {
+      if (!confirm('⚠️ Delete your ImpactGrid account?\n\nThis permanently removes your profile, applications, and all data. It cannot be undone.')) return;
+      if (!confirm('Final confirmation — are you absolutely sure?')) return;
+      var client     = getSupabase();
+      var sessionRes = await client.auth.getSession();
+      if (!sessionRes.data || !sessionRes.data.session) return;
+      var uid = sessionRes.data.session.user.id;
+      await client.from('profiles').delete().eq('user_id', uid);
+      await client.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
+    /* ─── Activity log ─── */
+    function buildActivityLog() {
+      var el = document.getElementById('activity-log');
+      if (!el) return;
+      el.innerHTML =
+        '<div style="padding:18px 0 4px;font-size:13px;color:var(--text3);line-height:1.6;">' +
+          'Your recent sign-ins will appear here soon.' +
+        '</div>';
+    }
+
+    /* ─── Preferences ─── */
+    function loadPreferences() {
+      var theme = localStorage.getItem('ig_theme') || 'light';
+      setTheme(theme, false);
+      ['compact','motion','jobs','apps','msgs','trends','updates',
+       'pub','search','open','online','analytics','personal'].forEach(function(k) {
+        var el = document.getElementById('tog-'+k);
+        if (!el) return;
+        var v = localStorage.getItem('ig_pref_'+k);
+        if (v === 'true')  el.classList.add('on');
+        if (v === 'false') el.classList.remove('on');
+      });
+    }
+    function togglePref(k) {
+      var el = document.getElementById('tog-'+k);
+      el.classList.toggle('on');
+      localStorage.setItem('ig_pref_'+k, el.classList.contains('on'));
+    }
+    function setTheme(t, save) {
+      if (save !== false) localStorage.setItem('ig_theme', t);
+      var current = document.documentElement.getAttribute('data-theme') || 'light';
+      if (current !== t && typeof window.toggleTheme === 'function') {
+        window.toggleTheme();
+      } else {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+      document.getElementById('opt-light').classList.toggle('active', t === 'light');
+      document.getElementById('opt-dark').classList.toggle('active',  t === 'dark');
+    }
+
+    /* ─── Animal avatars ─── */
+    var ANIMALS = [
+      '🦁','🐯','🐻','🦊','🐺','🦝','🐼','🐨',
+      '🦄','🐸','🐧','🦋','🦩','🦚','🦜','🐦',
+      '🐬','🦭','🦈','🐙','🦕','🦖','🦔','🐿️',
+      '🦦','🦥','🦘','🦙','🦛','🦏','🐘','🦒',
+      '🐆','🐅','🦓','🦌','🐂','🐃','🐄','🐖',
+      '🦫','🦬','🐑','🦙','🐐','🦃','🦤','🪶',
+      '🐓','🦢','🦆','🦅','🦉','🦇','🐝','🪲',
+      '🐛','🦗','🕷️','🦞','🦀','🦑','🦐','🐡'
+    ];
+
+    var _selectedAnimal = null; /* emoji string or null */
+
+    function _buildAnimalGrid() {
+      var grid = document.getElementById('animalGrid');
+      if (!grid) return;
+      grid.innerHTML = ANIMALS.map(function(a) {
+        return '<div class="animal-opt" data-animal="' + a + '" onclick="selectAnimal(\'' + encodeURIComponent(a) + '\')" title="' + a + '">' + a + '</div>';
+      }).join('');
+    }
+
+    window.selectAnimal = function(encoded) {
+      var a = decodeURIComponent(encoded);
+      if (_selectedAnimal === a) {
+        /* Clicking same animal again → deselect */
+        _selectedAnimal = null;
+        document.querySelectorAll('.animal-opt').forEach(function(el) { el.classList.remove('selected'); });
+        /* Revert preview to initial/photo */
+        _refreshAvPreview();
+        /* Remove from localStorage */
+        try { localStorage.removeItem('ig_animal'); } catch(e) {}
+        return;
+      }
+      _selectedAnimal = a;
+      document.querySelectorAll('.animal-opt').forEach(function(el) {
+        el.classList.toggle('selected', el.dataset.animal === a);
+      });
+      /* Show animal in preview circle */
+      var img    = document.getElementById('s-av-img');
+      var init   = document.getElementById('s-av-init');
+      var anim   = document.getElementById('s-av-animal');
+      var circle = document.getElementById('s-av');
+      if (img)  { img.style.display  = 'none'; }
+      if (init) { init.style.display = 'none'; }
+      if (anim) { anim.style.display = ''; anim.textContent = a; }
+      if (circle) { circle.classList.add('av-animal'); }
+      try { localStorage.setItem('ig_animal', a); } catch(e) {}
+    };
+
+    function _refreshAvPreview() {
+      var img    = document.getElementById('s-av-img');
+      var init   = document.getElementById('s-av-init');
+      var anim   = document.getElementById('s-av-animal');
+      var circle = document.getElementById('s-av');
+      var cachedPhoto  = ''; try { cachedPhoto  = localStorage.getItem('ig_avatar') || ''; } catch(e) {}
+      var cachedAnimal = ''; try { cachedAnimal = localStorage.getItem('ig_animal') || ''; } catch(e) {}
+
+      if (circle) circle.classList.remove('av-animal');
+      if (cachedPhoto) {
+        if (img)  { img.src = cachedPhoto; img.style.display = 'block'; }
+        if (init) { init.style.display = 'none'; }
+        if (anim) { anim.style.display = 'none'; }
+        var clearBtn = document.getElementById('av-clear-btn');
+        if (clearBtn) clearBtn.style.display = '';
+      } else if (cachedAnimal) {
+        _selectedAnimal = cachedAnimal;
+        if (img)   { img.style.display  = 'none'; }
+        if (init)  { init.style.display = 'none'; }
+        if (anim)  { anim.style.display = ''; anim.textContent = cachedAnimal; }
+        if (circle){ circle.classList.add('av-animal'); }
+        /* Mark grid selection */
+        document.querySelectorAll('.animal-opt').forEach(function(el) {
+          el.classList.toggle('selected', el.dataset.animal === cachedAnimal);
+        });
+      } else {
+        if (img)  { img.style.display  = 'none'; }
+        if (anim) { anim.style.display = 'none'; }
+        if (init) { init.style.display = ''; }
+      }
+    }
+
+    window.clearAvatarPhoto = function() {
+      try { localStorage.removeItem('ig_avatar'); } catch(e) {}
+      var img = document.getElementById('s-av-img');
+      if (img) { img.src = ''; img.style.display = 'none'; }
+      var clearBtn = document.getElementById('av-clear-btn');
+      if (clearBtn) clearBtn.style.display = 'none';
+      _refreshAvPreview();
+      /* Also clear from DB */
+      (async function() {
+        var client = getSupabase();
+        var sessionRes = await client.auth.getSession();
+        if (!sessionRes.data || !sessionRes.data.session) return;
+        await client.from('profiles').update({ avatar_url: null }).eq('user_id', sessionRes.data.session.user.id);
+      })();
+    };
+
+    /* Patch saveProfile to also save animal_avatar field */
+    var _origSaveProfile = saveProfile;
+    saveProfile = async function() {
+      /* First run normal save */
+      await _origSaveProfile();
+      /* Then save animal selection */
+      if (_selectedAnimal !== null) {
+        var client = getSupabase();
+        var sessionRes = await client.auth.getSession();
+        if (sessionRes.data && sessionRes.data.session) {
+          await client.from('profiles').update({ animal_avatar: _selectedAnimal })
+            .eq('user_id', sessionRes.data.session.user.id);
+          /* Update nav avatar to show animal emoji */
+          _applyAnimalToNav(_selectedAnimal);
+        }
+      }
+    };
+
+    function _applyAnimalToNav(animal) {
+      /* Update desktop nav avatar */
+      var avEl = document.getElementById('userAv');
+      if (avEl) {
+        avEl.style.fontSize = '18px';
+        avEl.style.background = 'linear-gradient(135deg,#f0f4ff,#e8f0fe)';
+        avEl.innerHTML = animal;
+      }
+      /* Update mobile sidebar avatar */
+      var mobAv = document.getElementById('mobUserAv');
+      if (mobAv) {
+        mobAv.style.fontSize = '18px';
+        mobAv.style.background = 'linear-gradient(135deg,#f0f4ff,#e8f0fe)';
+        mobAv.innerHTML = animal;
+      }
+      try { localStorage.setItem('ig_animal', animal); } catch(e) {}
+    }
+
+    /* On page load: build grid, restore saved animal from profile */
+    document.addEventListener('DOMContentLoaded', function() {
+      _buildAnimalGrid();
+      /* loadProfile will call _refreshAvPreview() after it runs — handled below */
+    });
+
+    /* Patch loadProfile to restore animal selection from DB */
+    var _origLoadProfile = loadProfile;
+    loadProfile = function(user, client) {
+      if (!client) client = getSupabase();
+      client.from('profiles').select('*').eq('user_id', user.id).single()
+        .then(function(res) {
+          var p = res.data; if (!p) { _refreshAvPreview(); return; }
+          if (p.full_name) {
+            var pts = p.full_name.split(' ');
+            document.getElementById('s-first').value = pts[0] || '';
+            document.getElementById('s-last').value  = pts.slice(1).join(' ') || '';
+            setInitials(p.full_name);
+          }
+          if (p.role) {
+            document.getElementById('s-role').value = p.role;
+            document.getElementById('stat-role').textContent = p.role.charAt(0).toUpperCase() + p.role.slice(1);
+          }
+          if (p.bio)      document.getElementById('s-bio').value      = p.bio;
+          if (p.title)    document.getElementById('s-title').value    = p.title;
+          if (p.location) document.getElementById('s-location').value = p.location;
+          if (p.linkedin) document.getElementById('s-linkedin').value = p.linkedin;
+          if (p.website)  document.getElementById('s-website').value  = p.website;
+          /* Photo takes priority */
+          if (p.avatar_url) {
+            var img = document.getElementById('s-av-img');
+            if (img) { img.src = p.avatar_url; img.style.display = 'block'; }
+            try { localStorage.setItem('ig_avatar', p.avatar_url); } catch(e) {}
+            var clearBtn = document.getElementById('av-clear-btn');
+            if (clearBtn) clearBtn.style.display = '';
+          } else if (p.animal_avatar) {
+            /* No photo — use animal */
+            try { localStorage.setItem('ig_animal', p.animal_avatar); } catch(e) {}
+            _selectedAnimal = p.animal_avatar;
+            document.querySelectorAll('.animal-opt').forEach(function(el) {
+              el.classList.toggle('selected', el.dataset.animal === p.animal_avatar);
+            });
+            var anim   = document.getElementById('s-av-animal');
+            var init   = document.getElementById('s-av-init');
+            var imgEl  = document.getElementById('s-av-img');
+            var circle = document.getElementById('s-av');
+            if (anim)   { anim.style.display = ''; anim.textContent = p.animal_avatar; }
+            if (init)   { init.style.display = 'none'; }
+            if (imgEl)  { imgEl.style.display = 'none'; }
+            if (circle) { circle.classList.add('av-animal'); }
+            _applyAnimalToNav(p.animal_avatar);
+          } else {
+            _refreshAvPreview();
+          }
+        }).catch(function() { _refreshAvPreview(); });
+    };
+
+    /* ─── Helpers ─── */
+
+    /* ════════════════════════════════════════════════════════
+       PLAN & USAGE PANEL
+       Reads window.igUser (set by nav.js from ig-supabase).
+       Also reads localStorage as fallback (same keys nav.js writes).
+       No extra Supabase call needed — nav.js already did it.
+    ════════════════════════════════════════════════════════ */
+
+    /* Plan limits — read from plan-config.js (single source of truth).
+       Translate IG_PLAN_CONFIG keys to the shape renderPlanPanel() expects. */
+    function _buildPlanLimits(planKey) {
+      var cfg = (window.IG_PLAN_CONFIG && window.IG_PLAN_CONFIG[planKey]) || {};
+      return {
+        ai:          cfg.ai_uses          !== undefined ? cfg.ai_uses          : 3,
+        portfolios:  cfg.portfolios        !== undefined ? cfg.portfolios        : 0,
+        carousels:   cfg.carousels         !== undefined ? cfg.carousels         : 0,
+        adviser:     cfg.adviser           !== undefined ? cfg.adviser           : 0,
+        evaluator:   cfg.evaluator         !== undefined ? cfg.evaluator         : 3,
+        contentPlan: cfg.content_plan      !== undefined ? cfg.content_plan      : 3,
+        _retention:  cfg.data_retention_days !== null && cfg.data_retention_days !== undefined
+                       ? cfg.data_retention_days + ' days'
+                       : (planKey === 'enterprise' ? 'Forever' : 'While active'),
+      };
+    }
+    var PLAN_LIMITS = {
+      free:         _buildPlanLimits('free'),
+      professional: _buildPlanLimits('professional'),
+      enterprise:   _buildPlanLimits('enterprise'),
+      admin: {
+        ai:          Infinity,
+        portfolios:  Infinity,
+        carousels:   Infinity,
+        adviser:     Infinity,
+        evaluator:   Infinity,
+        contentPlan: Infinity,
+        _retention:  'Forever',
+        _support:    'Internal',
+      },
+    };
+
+    var PLAN_META = {
+      free:         { label: 'Free',         tagline: 'Try ImpactGrid — no card needed.',              badge: '✦ Free'         },
+      professional: { label: 'Professional', tagline: 'For solo creators and freelancers.',             badge: '⭐ Professional' },
+      enterprise:   { label: 'Enterprise',   tagline: 'For businesses, agencies & serious operators.', badge: '🏆 Enterprise'  },
+      admin:        { label: 'Admin',        tagline: 'Internal admin account — unlimited access.',    badge: '🛡️ Admin'       }
+    };
+
+    /* Tools available per plan */
+    var ALL_TOOLS = [
+      { icon:'📸', name:'Photo Events',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Browse events', professional:'Full access', enterprise:'Full access', admin:'Full access' } },
+      { icon:'💼', name:'My Portfolio',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3 portfolios (7-day)', professional:'3 portfolios (permanent)', enterprise:'Unlimited (permanent)', admin:'Unlimited' } },
+      { icon:'📊', name:'Dashboard',         href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Read-only', professional:'Full access', enterprise:'Full access', admin:'Full access' } },
+      { icon:'🤖', name:'AI Adviser',        href:'dashboard.html',             plans:['professional','enterprise','admin'],        limit:{ free:'Upgrade to Pro', professional:'10 msgs/mo', enterprise:'Unlimited', admin:'Unlimited' } },
+      { icon:'🔍', name:'AI Evaluator',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3/mo', professional:'10/mo', enterprise:'Unlimited', admin:'Unlimited' } },
+      { icon:'📅', name:'Content Calendar',  href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3/mo', professional:'Unlimited', enterprise:'Unlimited', admin:'Unlimited' } },
+      { icon:'📈', name:'Trend Feed',        href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Read-only', professional:'Full + personalised', enterprise:'Full + personalised', admin:'Full + personalised' } },
+    ];
+
+    /* Feature table rows */
+    var FEATURE_ROWS = [
+      { label:'Monthly AI uses',     key:'ai',          format: function(v) { return v === Infinity ? 'Unlimited' : v + '/mo'; } },
+      { label:'Portfolios',          key:'portfolios',  format: function(v) { return v === 0 ? 'Not included' : v === Infinity ? 'Unlimited' : v === 999 ? '3' : v + ' portfolio' + (v>1?'s':''); } },
+      { label:'AI Evaluator',        key:'evaluator',   format: function(v) { return v === Infinity || v >= 999 ? 'Unlimited' : v + '/mo'; } },
+      { label:'Content Calendar',    key:'contentPlan', format: function(v) { return v === Infinity || v >= 99 ? 'Unlimited' : v + '/mo'; } },
+      { label:'Data retention',      key:'_retention',  format: function(v) { return v; } },
+      { label:'Support',             key:'_support',    format: function(v) { return v; } },
+    ];
+
+    function _getPlanData() {
+      // Email is ground truth — admin email always forces 'admin' plan
+      var _ADMIN_EMAIL = 'admin@impactgridgroup.com';
+      var _igEmail = (window.igUser && window.igUser.email) || '';
+      var plan = (_igEmail === _ADMIN_EMAIL) ? 'admin' : ((window.igUser && window.igUser.plan) || '');
+      if (!plan) { try { plan = localStorage.getItem('ig_plan') || 'free'; } catch(e) { plan = 'free'; } }
+      // Always read aiUses from localStorage — it's updated immediately by every studio
+      // igUser.aiUses is only set once on page load and can be stale
+      var aiUses = 0;
+      try { aiUses = parseInt(localStorage.getItem('ig_ai_uses') || '0') || 0; } catch(e) {}
+      if (!aiUses && window.igUser && typeof window.igUser.aiUses === 'number') aiUses = window.igUser.aiUses;
+      // Portfolio count — written to localStorage by portfolio-studio after every save/delete
+      var pfCount = 0;
+      try { pfCount = parseInt(localStorage.getItem('ig_portfolio_count') || '0') || 0; } catch(e) {}
+      return { plan: plan, aiUses: aiUses, pfCount: pfCount };
+    }
+
+    function renderPlanPanel() {
+      var pd      = _getPlanData();
+      var plan    = pd.plan;
+      var aiUses  = pd.aiUses;
+      var pfCount = pd.pfCount;
+      var limits  = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+      var meta    = PLAN_META[plan]   || PLAN_META.free;
+
+      /* ── Hero ── */
+      var badgeEl   = document.getElementById('plan-badge-large');
+      var nameEl    = document.getElementById('plan-name-large');
+      var tagEl     = document.getElementById('plan-tagline');
+      var ctaEl     = document.getElementById('plan-upgrade-cta');
+      if (badgeEl) badgeEl.textContent = meta.badge;
+      if (nameEl)  nameEl.textContent  = meta.label + ' Plan';
+      if (tagEl)   tagEl.textContent   = meta.tagline;
+      /* Hide upgrade CTA for enterprise and admin */
+      if (ctaEl && (plan === 'enterprise' || plan === 'admin')) ctaEl.style.display = 'none';
+
+      /* ── stat-plan in Account tab ── */
+      var statPlan = document.getElementById('stat-plan');
+      if (statPlan) statPlan.textContent = meta.label;
+
+      /* ── Usage bars ── */
+      var grid = document.getElementById('usageGrid');
+      if (grid) {
+        var isAdmin = (plan === 'admin');
+        var aiLimit = isAdmin ? Infinity : limits.ai;
+        var aiPct   = aiLimit === Infinity ? 0 : Math.min(100, Math.round((aiUses / aiLimit) * 100));
+        var aiRemain = aiLimit === Infinity ? 'Unlimited' : Math.max(0, aiLimit - aiUses) + ' of ' + aiLimit + ' remaining';
+        var aiClass  = aiLimit === Infinity ? 'ok' : aiPct >= 100 ? 'full' : aiPct >= 75 ? 'warn' : 'ok';
+        var aiCountClass = aiLimit === Infinity ? 'ok' : aiPct >= 100 ? 'warn' : aiPct >= 75 ? 'warn' : 'ok';
+
+        /* Portfolio usage */
+        var pfLimit  = isAdmin ? Infinity : limits.portfolios;
+        var pfUsed   = Math.min(pfCount, pfLimit === Infinity ? pfCount : pfLimit);
+        var pfPct    = pfLimit === 0 || pfLimit === Infinity ? 0 : Math.min(100, Math.round((pfUsed / pfLimit) * 100));
+        var pfClass  = pfPct >= 100 ? 'full' : pfPct >= 75 ? 'warn' : 'ok';
+        var pfRetDays = (window.IG_PLAN_CONFIG && window.IG_PLAN_CONFIG.free && window.IG_PLAN_CONFIG.free.data_retention_days) || 7;
+        var pfNote   = isAdmin || pfLimit === Infinity
+          ? 'Unlimited portfolios'
+          : pfUsed + ' of ' + pfLimit + ' portfolio' + (pfLimit !== 1 ? 's' : '') + ' used';
+        var pfSub    = isAdmin
+          ? 'Admin — permanent, no limits'
+          : plan === 'free'
+            ? 'Saved items deleted after ' + pfRetDays + ' days · upgrade to keep them permanently'
+            : plan === 'professional'
+              ? (function() { var n = (window.IG_PLAN_CONFIG && window.IG_PLAN_CONFIG.professional ? window.IG_PLAN_CONFIG.professional.portfolios : 1); return n + ' live portfolio' + (n !== 1 ? 's' : '') + ' saved permanently'; })()
+              : 'Up to ' + (window.IG_PLAN_CONFIG && window.IG_PLAN_CONFIG.enterprise ? window.IG_PLAN_CONFIG.enterprise.portfolios : 3) + ' live portfolios saved permanently';
+
+        grid.innerHTML = [
+          _usageBar('AI Uses This Month',  isAdmin ? 'Unlimited' : aiUses + ' used',  aiPct,  aiClass,  aiCountClass, aiRemain,
+            aiLimit === Infinity ? '' : 'Resets on the 1st of each month'),
+          _usageBar('Portfolio Slots', pfNote, pfPct, pfClass, pfClass, pfSub, ''),
+        ].join('');
+
+        /* ── Usage exhausted: blur tools + show banner — never for admin ── */
+        var isExhausted = !isAdmin && (aiLimit !== Infinity) && (aiPct >= 100);
+        _applyTrialExhausted(isExhausted);
+      }
+
+      /* ── Tools grid ── */
+      var tg = document.getElementById('toolsGrid');
+      if (tg) {
+        tg.innerHTML = ALL_TOOLS.map(function(t) {
+          var hasAccess = t.plans.indexOf(plan) !== -1;
+          var limitText = t.limit[plan] || '';
+          return '<a href="' + (hasAccess ? t.href : '#') + '" class="tool-link' + (hasAccess ? '' : ' locked') + '">' +
+            '<span class="tool-icon">' + t.icon + '</span>' +
+            '<span class="tool-info">' +
+              '<span class="tool-name">' + t.name + '</span>' +
+              '<span class="tool-limit">' + limitText + '</span>' +
+            '</span>' +
+            (!hasAccess ? '<span class="tool-lock-badge">🔒 Upgrade</span>' : '') +
+          '</a>';
+        }).join('');
+      }
+
+      /* ── Feature table ── */
+      var tbody = document.getElementById('featureTableBody');
+      if (tbody) {
+        var extraRows = {
+          _retention: {
+            free:         (window.IG_PLAN_CONFIG && window.IG_PLAN_CONFIG.free         && window.IG_PLAN_CONFIG.free.data_retention_days)         ? window.IG_PLAN_CONFIG.free.data_retention_days + ' days'         : '7 days',
+            professional: (window.IG_PLAN_CONFIG && window.IG_PLAN_CONFIG.professional && window.IG_PLAN_CONFIG.professional.data_retention_days === null) ? 'While active' : 'While active',
+            enterprise:   'Forever'
+          },
+          _support: { free:'None', professional:'Email', enterprise:'Priority (24hr)' }
+        };
+        tbody.innerHTML = FEATURE_ROWS.map(function(row) {
+          var rawVal = row.key.startsWith('_')
+            ? extraRows[row.key][plan]
+            : limits[row.key];
+          var displayVal = row.format(rawVal);
+          var isLocked = (row.key === 'portfolios' && limits.portfolios === 0);
+          return '<tr>' +
+            '<td>' + row.label + '</td>' +
+            '<td class="feat-val' + (isLocked ? ' feat-locked' : '') + '">' + displayVal + '</td>' +
+            '<td>' + (isLocked ? '<span class="feat-cross">✗</span>' : '<span class="feat-check">✓</span>') + '</td>' +
+          '</tr>';
+        }).join('');
+      }
+
+      /* ── Plan cards: fill descriptions from IG_PLAN_CONFIG (single source of truth) ── */
+      (function() {
+        var cfg = window.IG_PLAN_CONFIG || {};
+        var descs = {
+          free: (function(c) {
+            if (!c) return '';
+            var ai  = c.ai_uses + ' AI uses/mo';
+            var ret = c.data_retention_days ? 'data deleted after ' + c.data_retention_days + ' days' : '';
+            return [ai, 'Browse events', ret].filter(Boolean).join(' · ');
+          })(cfg.free),
+          professional: (function(c) {
+            if (!c) return '';
+            var ai  = c.ai_uses + ' AI uses/mo';
+            var sup = c.support ? c.support + ' support' : '';
+            return [ai, 'Full dashboard access', sup].filter(Boolean).join(' · ');
+          })(cfg.professional),
+          enterprise: (function(c) {
+            if (!c) return '';
+            var sup = c.support ? c.support + ' support' : '';
+            return ['Unlimited AI', 'Full access', sup].filter(Boolean).join(' · ');
+          })(cfg.enterprise)
+        };
+        ['free','professional','enterprise'].forEach(function(p) {
+          var el = document.getElementById('pc-' + p + '-desc');
+          if (el && descs[p]) el.textContent = descs[p];
+        });
+      })();
+
+      /* ── Plan cards: mark current ── */
+      ['free','professional','enterprise'].forEach(function(p) {
+        var card = document.getElementById('pc-' + p);
+        var cta  = document.getElementById('pc-' + p + '-cta');
+        if (!card || !cta) return;
+        if (p === plan) {
+          card.classList.add('current');
+          cta.className = 'plan-card-cta current-label';
+          cta.textContent = 'Current plan';
+        } else {
+          card.classList.remove('current');
+        }
+      });
+
+      /* Hide upgrade section if enterprise or admin */
+      var upSec = document.getElementById('plan-upgrade-section');
+      if (upSec && (plan === 'enterprise' || plan === 'admin')) upSec.style.display = 'none';
+    }
+
+    function _usageBar(label, used, pct, fillClass, countClass, note, subNote) {
+      return '<div class="usage-item">' +
+        '<div class="usage-item-head">' +
+          '<span class="usage-item-label">' + label + '</span>' +
+          '<span class="usage-item-count ' + countClass + '">' + used + '</span>' +
+        '</div>' +
+        '<div class="usage-bar-track"><div class="usage-bar-fill ' + fillClass + '" style="width:' + pct + '%"></div></div>' +
+        (note    ? '<div class="usage-note">' + note    + '</div>' : '') +
+        (subNote ? '<div class="usage-note">' + subNote + '</div>' : '') +
+      '</div>';
+    }
+
+    function _applyTrialExhausted(exhausted) {
+      /* Banner */
+      var banner = document.getElementById('trialExhaustedBanner');
+      if (banner) {
+        banner.classList.toggle('show', exhausted);
+        if (exhausted) {
+          var _pd2 = _getPlanData();
+          var _isFree2 = (_pd2.plan === 'free');
+          var _headEl = document.getElementById('teb-heading');
+          var _bodyEl = document.getElementById('teb-body');
+          if (_headEl) _headEl.textContent = _isFree2
+            ? "You've used all your free AI credits this month"
+            : "You've used all your monthly AI credits";
+          if (_bodyEl) _bodyEl.textContent = _isFree2
+            ? "AI-powered tools are locked until you upgrade or your credits reset on the 1st."
+            : "AI-powered tools are locked until your credits reset on the 1st.";
+        }
+      }
+
+      /* Blur wrap */
+      var wrap    = document.getElementById('toolsBlurWrap');
+      var content = document.getElementById('toolsBlurContent');
+      if (!wrap || !content) return;
+
+      /* Remove any existing overlay */
+      var existing = wrap.querySelector('.trial-blur-overlay');
+      if (existing) existing.parentNode.removeChild(existing);
+
+      if (exhausted) {
+        content.classList.add('trial-blur-content');
+        /* Determine current plan for copy */
+        var _pd   = _getPlanData();
+        var _plan = _pd.plan;
+        var _cfg  = (window.IG_PLAN_CONFIG && window.IG_PLAN_CONFIG[_plan]) || {};
+        var _limit = _cfg.ai_uses || 0;
+        var _isFree = (_plan === 'free');
+        var _heading = _isFree ? 'Free Trial Limit Reached' : 'Monthly AI Limit Reached';
+        var _body    = _isFree
+          ? 'You\'ve used all ' + _limit + ' AI credits included in the Free plan this month. Upgrade to keep using AI-powered tools.'
+          : 'You\'ve used all ' + _limit + ' AI credits in your ' + (_plan.charAt(0).toUpperCase() + _plan.slice(1)) + ' plan this month. They reset on the 1st.';
+        var _cta     = _isFree ? '<a href="join.html">Upgrade Now →</a>' : '';
+        /* Build overlay */
+        var overlay = document.createElement('div');
+        overlay.className = 'trial-blur-overlay';
+        overlay.innerHTML =
+          '<div class="trial-blur-card">' +
+            '<div class="trial-blur-icon">🔒</div>' +
+            '<h4>' + _heading + '</h4>' +
+            '<p>' + _body + '</p>' +
+            _cta +
+            '<div class="trial-reset">Credits reset on the 1st of each month</div>' +
+          '</div>';
+        wrap.appendChild(overlay);
+      } else {
+        content.classList.remove('trial-blur-content');
+      }
+    }
+
+    /* Render plan panel — wait for igUser if possible, fall back to
+       localStorage so the panel is never blank. Handles three races:
+       1. DOMContentLoaded fires before ig-user-ready  (normal)
+       2. ig-user-ready fires before DOMContentLoaded  (fast nav.js)
+       3. igUser already set by the time this script runs (cached) */
+    function _initPlanPanel() {
+      if (window.igUser) {
+        // igUser already available — render immediately with real data
+        renderPlanPanel();
+        var notice = document.getElementById('guest-notice');
+        if (notice) notice.style.display = 'none';
+      } else {
+        // igUser not ready yet — render with localStorage fallback,
+        // will re-render with real data when ig-user-ready fires
+        renderPlanPanel();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', _initPlanPanel);
+
+    document.addEventListener('ig-user-ready', function() {
+      renderPlanPanel();
+      var notice = document.getElementById('guest-notice');
+      if (notice) notice.style.display = 'none';
+    });
+    document.addEventListener('ig-plan-ready', function() {
+      renderPlanPanel();
+    });
+
+    // Edge case: script runs after DOMContentLoaded already fired
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      _initPlanPanel();
+    }
+
+    function showAlert(id, msg) {
+      var el = document.getElementById(id); if (!el) return;
+      el.textContent = msg; el.classList.add('show');
+      setTimeout(function() { el.classList.remove('show'); }, 6000);
+    }
+    function hideAlert(id) { var el = document.getElementById(id); if (el) el.classList.remove('show'); }
+    function flashOk(id) {
+      var el = document.getElementById(id); if (!el) return;
+      el.classList.add('show');
+      setTimeout(function() { el.classList.remove('show'); }, 3500);
+    }
+  </script>
+</body>
+</html>
