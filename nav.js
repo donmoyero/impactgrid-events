@@ -127,6 +127,10 @@
 
       /* ── Right-side vertical nav ── */
       '<nav class="nav" id="mainNav" aria-label="Main navigation">' +
+        '<button class="nav-toggle" id="navToggle" onclick="toggleNavCollapse()" aria-label="Toggle sidebar">' +
+          '<span class="nav-toggle-icon">◀</span>' +
+          '<span class="nav-toggle-label">Collapse</span>' +
+        '</button>' +
         '<a href="index.html" class="logo" id="navLogo">' +
           '<img src="logo.png" class="logo-img" alt="ImpactGrid" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
           '<div class="logo-mark" style="display:none;">IG</div>' +
@@ -806,6 +810,38 @@
     }
 
     _doSubscribe();
+  })();
+
+  /* ─────────────────────────────────────────
+     COLLAPSIBLE SIDEBAR
+  ───────────────────────────────────────── */
+  window.toggleNavCollapse = function() {
+    var nav  = document.getElementById('mainNav');
+    var body = document.body;
+    var wrap = document.querySelector('.page-wrap');
+    if (!nav) return;
+    var collapsed = nav.classList.toggle('collapsed');
+    body.classList.toggle('nav-collapsed', collapsed);
+    if (wrap) wrap.classList.toggle('nav-collapsed', collapsed);
+    try { localStorage.setItem('ig_nav_collapsed', collapsed ? '1' : '0'); } catch(e) {}
+  };
+
+  /* Restore collapse state on load */
+  (function() {
+    function _restoreNav() {
+      try {
+        if (localStorage.getItem('ig_nav_collapsed') === '1') {
+          var nav  = document.getElementById('mainNav');
+          var body = document.body;
+          var wrap = document.querySelector('.page-wrap');
+          if (nav)  nav.classList.add('collapsed');
+          body.classList.add('nav-collapsed');
+          if (wrap) wrap.classList.add('nav-collapsed');
+        }
+      } catch(e) {}
+    }
+    /* Wait for nav to be rendered */
+    document.addEventListener('ig-nav-ready', _restoreNav);
   })();
 
   /* ─────────────────────────────────────────
