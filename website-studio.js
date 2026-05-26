@@ -18,7 +18,7 @@
    ═══════════════════════════════════════════════════════════ */
 
 /* ── CONFIG ─────────────────────────────────────────────── */
-const DIJO_SERVER           = "https://impactgrid-dijo.onrender.com";
+const DIJO_SERVER           = "https://impactgrid-events-api.onrender.com";
 const CLOUDINARY_CLOUD_NAME   = "dcw30ifa7";
 const CLOUDINARY_UPLOAD_PRESET = "impactgrid_portfolio";
 // ✅ FIX: portfolios table lives on the CONTENT project (exeiojgldxqaakkybdij),
@@ -233,7 +233,7 @@ async function psMarkExpiredPortfolios() {
   for (var i = 0; i < expired.length; i++) {
     var pf = expired[i];
     try {
-      var r = await fetch('https://impactgrid-dijo.onrender.com/portfolio/delete', {
+      var r = await fetch('https://impactgrid-events-api.onrender.com/portfolio/delete', {
         method:  'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ id: pf.id, session: userId })
@@ -819,7 +819,7 @@ async function savePortfolioToDB(pf){
     let res, text, data;
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
-        res  = await fetch("https://impactgrid-dijo.onrender.com/portfolio/save", {
+        res  = await fetch("https://impactgrid-events-api.onrender.com/portfolio/save", {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({ session: userId, portfolio: pfClean })
@@ -927,7 +927,7 @@ async function deletePortfolio(id) {
     || localStorage.getItem('ig_user_id');
 
   try {
-    const res  = await fetch('https://impactgrid-dijo.onrender.com/portfolio/delete', {
+    const res  = await fetch('https://impactgrid-events-api.onrender.com/portfolio/delete', {
       method:  'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ id, session: userId })
@@ -2507,7 +2507,7 @@ footer{border-top:1px solid var(--bd);padding:28px 60px;display:flex;align-items
         if(!name||!email||!message){status.style.color='#f87171';status.textContent='Please fill in all fields.';return;}
         btn.disabled=true;btn.textContent='Sending…';
         try{
-          var r=await fetch('https://impactgrid-dijo.onrender.com/contact/send',{
+          var r=await fetch('https://impactgrid-events-api.onrender.com/contact/send',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({name:name,email:email,message:message,creatorEmail:'${esc(pf.email)}'})
@@ -3089,7 +3089,7 @@ async function sendInquiry(){
   if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = "Sending…"; }
 
   try {
-    const res = await fetch("https://impactgrid-dijo.onrender.com/contact/send", {
+    const res = await fetch("https://impactgrid-events-api.onrender.com/contact/send", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, message, creatorEmail })
