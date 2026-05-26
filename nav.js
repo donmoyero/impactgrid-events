@@ -47,11 +47,10 @@
 
   /* ── Top-level nav links ── */
   var NAV_LINKS = [
-    { href: 'index.html',           label: 'Home' },
-    { href: 'event.html',           label: 'Events' },
-    { href: 'auth/join.html',       label: 'Pricing' },
-    { href: 'auth/login.html',      label: 'Login' },
-    { href: 'dashboard/admin.html', label: 'Dashboard', authOnly: true },
+    { href: 'index.html',        label: 'Home' },
+    { href: 'events-pages.html', label: 'Events' },
+    { href: 'join.html',         label: 'Pricing' },
+    { href: 'dashboard.html',    label: 'Dashboard', authOnly: true, id: 'navDashLink' },
   ];
 
   /* ─────────────────────────────────────────
@@ -61,18 +60,19 @@
 
     var desktopLinks = NAV_LINKS.map(function(l) {
       var cls = l.href === activePage ? ' class="active"' : '';
-      return '<li><a href="' + l.href + '"' + cls + '>' + l.label + '</a></li>';
+      var id  = l.id ? ' id="' + l.id + '"' : '';
+      return '<li><a href="' + l.href + '"' + cls + id + '>' + l.label + '</a></li>';
     }).join('');
 
     var mobileLinks = [
-      { href:'index.html',           label:'Home' },
-      { href:'event.html',           label:'Events' },
-      { href:'auth/join.html',       label:'Pricing' },
-      { href:'auth/login.html',      label:'Login' },
-      { href:'dashboard/admin.html', label:'Dashboard' },
+      { href:'index.html',        label:'Home' },
+      { href:'events-pages.html', label:'Events' },
+      { href:'join.html',         label:'Pricing' },
+      { href:'dashboard.html',    label:'Dashboard', id:'mobDashLink' },
     ].map(function(l) {
       var cls = l.href === activePage ? ' class="active"' : '';
-      return '<a href="' + l.href + '"' + cls + ' onclick="closeSidebar()">' + l.label + '</a>';
+      var id  = l.id ? ' id="' + l.id + '"' : '';
+      return '<a href="' + l.href + '"' + cls + id + ' onclick="closeSidebar()">' + l.label + '</a>';
     }).join('');
 
     var html =
@@ -133,8 +133,8 @@
               '<div class="u-drop" id="uDrop">' +
                 '<div class="dd-email" id="userEmail"></div>' +
                 '<div class="dd-div"></div>' +
-                '<a href="creator-studio.html">Creator Studio</a>' +
-                '<a href="settings.html">Account Settings</a>' +
+                '<a href="dashboard.html" id="ddDashLink">My Dashboard</a>' +
+                '<a href="owner.html">Account Settings</a>' +
                 '<div class="dd-div"></div>' +
                 '<button onclick="igSignOut()">Sign out</button>' +
               '</div>' +
@@ -175,7 +175,7 @@
           '</div>' +
           /* Logged-in state */
           '<div class="mob-in" id="mobIn">' +
-            '<a href="creator-studio.html" class="mob-adash" onclick="closeSidebar()">Creator Studio →</a>' +
+            '<a href="dashboard.html" id="mobDashCta" class="mob-adash" onclick="closeSidebar()">My Dashboard →</a>' +
             '<button class="mob-asignout" onclick="igSignOut()">Sign out</button>' +
           '</div>' +
         '</div>' +
@@ -495,6 +495,33 @@
   }
 
   /* ─────────────────────────────────────────
+     SET DASHBOARD LINKS BY ROLE
+     Called after profile loads — updates all Dashboard hrefs
+     so admins go to admin.html, everyone else to dashboard.html
+  ───────────────────────────────────────── */
+  function _setDashboardLinks(role) {
+    var isAdmin = (role === 'admin');
+    var href    = isAdmin ? 'admin.html' : 'dashboard.html';
+    var label   = isAdmin ? 'Admin Panel' : 'My Dashboard';
+
+    // Desktop nav link
+    var navLink = document.getElementById('navDashLink');
+    if (navLink) { navLink.href = href; }
+
+    // Desktop dropdown link
+    var ddLink = document.getElementById('ddDashLink');
+    if (ddLink) { ddLink.href = href; ddLink.textContent = label; }
+
+    // Mobile nav link
+    var mobLink = document.getElementById('mobDashLink');
+    if (mobLink) { mobLink.href = href; }
+
+    // Mobile CTA button
+    var mobCta = document.getElementById('mobDashCta');
+    if (mobCta) { mobCta.href = href; mobCta.textContent = label + ' →'; }
+  }
+
+  /* ─────────────────────────────────────────
      PROFILE LOADER
      After session is confirmed, fetches full_name + avatar_url
      from the 'profiles' table (auth project) so nav AND any page
@@ -503,18 +530,20 @@
   async function _loadProfile(authClient, userId, fallbackName, fallbackEmail, googleMeta) {
     var name      = fallbackName;
     var avatarUrl = '';
+    var role      = 'creator';
     googleMeta = googleMeta || {};
 
     // Try to fetch richer profile from DB — profiles table uses user_id not id
     try {
       var res = await authClient.from('profiles')
-        .select('full_name, avatar_url, animal_avatar, plan, ai_uses_month, ai_uses_reset')
+        .select('full_name, avatar_url, animal_avatar, plan, ai_uses_month, ai_uses_reset, role')
         .eq('user_id', userId)
         .single();
 
       if (res.data) {
         if (res.data.full_name)  name      = res.data.full_name;
         if (res.data.avatar_url) avatarUrl = res.data.avatar_url;
+        if (res.data.role)       role      = res.data.role;
         if (!res.data.avatar_url && res.data.animal_avatar) {
           try { localStorage.setItem('ig_animal', res.data.animal_avatar); } catch(e) {}
         }
@@ -573,8 +602,9 @@
       email:     fallbackEmail,
       avatarUrl: avatarUrl,
       firstName: name.split(' ')[0],
-      plan:      _cachedPlan,    // 'free' | 'professional' | 'enterprise'
-      aiUses:    _cachedAiUses   // shared cross-tool monthly counter
+      plan:      _cachedPlan,
+      aiUses:    _cachedAiUses,
+      role:      role
     };
 
     // Dispatch plan-ready event so tools can react immediately
@@ -582,6 +612,10 @@
 
     // ── Update nav display ──
     window.setNavUser({ email: fallbackEmail, user_metadata: { full_name: name, avatar_url: avatarUrl } });
+
+    // ── Update dashboard links based on role (admin email also gets admin panel) ──
+    var effectiveRole = (role === 'admin' || fallbackEmail === 'admin@impactgridgroup.com') ? 'admin' : role;
+    _setDashboardLinks(effectiveRole);
 
     // ── Update any element with data-ig-name (greeting, welcome text etc.) ──
     document.querySelectorAll('[data-ig-name]').forEach(function(el) {
