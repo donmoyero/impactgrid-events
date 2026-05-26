@@ -324,13 +324,11 @@
       display: flex;
       gap: 4px;
       height: 360px;
-      animation: drift 50s linear infinite;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
-    .gallery-row:nth-child(2) { animation-direction: reverse; animation-duration: 42s; margin-top: 4px; }
-    @keyframes drift {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-30%); }
-    }
+    .gallery-row::-webkit-scrollbar { display: none; }
+    .gallery-row:nth-child(2) { margin-top: 4px; }
     .gallery-img {
       height: 100%;
       width: auto;
@@ -1152,7 +1150,7 @@
       var row2 = list.slice(half);
       if(!row2.length) row2 = row1.slice();
       function makeImgs(arr){
-        return arr.concat(arr).map(function(url){
+        return arr.map(function(url){
           return '<img class="gallery-img" src="'+url+'" alt="ImpactGrid portfolio" loading="lazy"/>';
         }).join('');
       }
