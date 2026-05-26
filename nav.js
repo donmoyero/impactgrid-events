@@ -126,11 +126,11 @@
       '</style>' +
 
       /* ── Right-side vertical nav ── */
+      /* Pull-tab handle — sits on the left edge of the nav, always visible */
+      '<button class="nav-handle" id="navHandle" onclick="toggleNavCollapse()" aria-label="Toggle sidebar">' +
+        '<svg viewBox="0 0 8 12"><polyline points="6,1 1,6 6,11"/></svg>' +
+      '</button>' +
       '<nav class="nav" id="mainNav" aria-label="Main navigation">' +
-        '<button class="nav-toggle" id="navToggle" onclick="toggleNavCollapse()" aria-label="Toggle sidebar">' +
-          '<span class="nav-toggle-icon">◀</span>' +
-          '<span class="nav-toggle-label">Collapse</span>' +
-        '</button>' +
         '<a href="index.html" class="logo" id="navLogo">' +
           '<img src="logo.png" class="logo-img" alt="ImpactGrid" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
           '<div class="logo-mark" style="display:none;">IG</div>' +
@@ -816,9 +816,9 @@
      COLLAPSIBLE SIDEBAR
   ───────────────────────────────────────── */
   window.toggleNavCollapse = function() {
-    var nav  = document.getElementById('mainNav');
-    var body = document.body;
-    var wrap = document.querySelector('.page-wrap');
+    var nav    = document.getElementById('mainNav');
+    var body   = document.body;
+    var wrap   = document.querySelector('.page-wrap');
     if (!nav) return;
     var collapsed = nav.classList.toggle('collapsed');
     body.classList.toggle('nav-collapsed', collapsed);
@@ -832,15 +832,14 @@
       try {
         if (localStorage.getItem('ig_nav_collapsed') === '1') {
           var nav  = document.getElementById('mainNav');
-          var body = document.body;
+          if (!nav) return;
+          nav.classList.add('collapsed');
+          document.body.classList.add('nav-collapsed');
           var wrap = document.querySelector('.page-wrap');
-          if (nav)  nav.classList.add('collapsed');
-          body.classList.add('nav-collapsed');
           if (wrap) wrap.classList.add('nav-collapsed');
         }
       } catch(e) {}
     }
-    /* Wait for nav to be rendered */
     document.addEventListener('ig-nav-ready', _restoreNav);
   })();
 
