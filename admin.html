@@ -315,45 +315,7 @@ tr:hover td{background:var(--bg2);}
         <div class="page-sub">Drag &amp; drop images for every visual section of the homepage. Each section saves independently.</div>
       </div>
 
-      <!-- ── SECTION 1: HERO SLIDES ── -->
-      <div class="card" style="margin-bottom:18px;">
-        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-heroslides')">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;">🎞️</span>
-            <div>
-              <div style="font-size:14px;font-weight:800;">Hero Slideshow</div>
-              <div style="font-size:11px;color:var(--text3);margin-top:1px;">Full-screen slides that play at the very top of the homepage</div>
-            </div>
-          </div>
-          <span id="chev-heroslides" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
-        </div>
-        <div id="sec-heroslides" style="border-top:1px solid var(--border);">
-          <div style="padding:20px;">
-            <div class="upload-zone" id="heroDropZone" onclick="document.getElementById('heroFileIn').click()" ondragover="onDragOver(event,'heroDropZone')" ondragleave="onDragLeave(event,'heroDropZone')" ondrop="onDrop(event,'heroDropZone',uploadHeroFile)">
-              <div class="upload-zone-ico">🎞️</div>
-              <div class="upload-zone-title">Drop a photo or video here, or click to browse</div>
-              <div class="upload-zone-sub">JPG · PNG · WebP · MP4 · MOV · WebM · Max 200MB</div>
-              <input type="file" id="heroFileIn" accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp" onchange="handleHeroFile(event)"/>
-            </div>
-            <div class="upload-prog" id="heroUploadProg">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;"><span style="font-size:12px;font-weight:600;color:var(--gold);" id="heroUploadName">Uploading…</span><span style="font-size:11px;color:var(--text3);" id="heroUploadPct">0%</span></div>
-              <div class="prog-track"><div class="prog-fill" id="heroUploadBar" style="width:0%;"></div></div>
-            </div>
-            <div style="margin-top:16px;">
-              <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Click ✏️ to edit a slide's caption. Toggle the switch to show/hide.</div>
-              <div class="slide-list" id="heroSlideList"><div class="empty"><div class="empty-ico">🎞️</div><div class="empty-txt">Loading slides…</div></div></div>
-            </div>
-          </div>
-          <div style="padding:0 20px 20px;">
-            <div class="caption-editor" id="heroCaptionEditor">
-              <h3>✏️ Slide Caption</h3>
-              <div id="heroCaptionInner"><div style="text-align:center;padding:30px 20px;color:var(--text3);"><div style="font-size:24px;margin-bottom:8px;">👆</div><div style="font-size:12px;">Select a slide above to edit its caption.</div></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── SECTION 2: HERO BACKGROUND GRID ── -->
+      <!-- ── SECTION 1: HERO BACKGROUND GRID ── -->
       <div class="card" style="margin-bottom:18px;">
         <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-herogrid')">
           <div style="display:flex;align-items:center;gap:10px;">
