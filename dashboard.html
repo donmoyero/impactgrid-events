@@ -546,7 +546,8 @@ tr:hover td{background:var(--bg2);}
               <div class="form-grid" style="margin-bottom:12px;">
                 <div class="field-group">
                   <div class="field-label">Invoice Number</div>
-                  <input type="text" id="inv-number" placeholder="INV-000003" style="font-family:var(--fm);letter-spacing:.05em;"/>
+                  <input type="text" id="inv-number" placeholder="Auto-generating…" style="font-family:var(--fm);letter-spacing:.05em;" oninput="updateInvoicePreview()"/>
+                  <div class="field-hint">Auto-generated — edit freely</div>
                 </div>
                 <div class="field-group">
                   <div class="field-label">Invoice Date</div>
@@ -556,7 +557,7 @@ tr:hover td{background:var(--bg2);}
               <div class="form-grid" style="margin-bottom:12px;">
                 <div class="field-group">
                   <div class="field-label">Client Name *</div>
-                  <input type="text" id="inv-client-name" placeholder="e.g. Moji" oninput="updateInvoicePreview()"/>
+                  <input type="text" id="inv-client-name" placeholder="Client or company name" oninput="updateInvoicePreview()"/>
                 </div>
                 <div class="field-group">
                   <div class="field-label">Client Email *</div>
@@ -586,7 +587,7 @@ tr:hover td{background:var(--bg2);}
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="btn btn-gold" style="flex:1;justify-content:center;" onclick="saveAndSendInvoice()">📨 Save &amp; Send to Client</button>
                 <button class="btn btn-ghost" onclick="saveInvoiceOnly()">💾 Save Only</button>
-                <button class="btn btn-blue" onclick="previewInvoicePDF()">👁 Preview PDF</button>
+                <button class="btn btn-blue" onclick="downloadInvoicePDF()">⬇ Download PDF</button>
               </div>
             </div>
           </div>
@@ -596,11 +597,36 @@ tr:hover td{background:var(--bg2);}
             <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">👁 Live Preview</div>
             <div id="inv-preview-body"></div>
           </div>
-          <div class="hint-box" style="margin-top:12px;">
-            <strong>Payment details on invoice</strong><br><br>
-            Account Name: <code>Drussell Technical Services Ltd</code><br>
-            Account No: <code>10881117</code><br>
-            Sort Code: <code>23-14-70</code>
+          <div class="card" style="margin-top:12px;">
+            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">🏢 Your Business</div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="field-label">Business Name</div>
+                <input type="text" id="inv-biz-name" placeholder="Your business or trading name" oninput="updateInvoicePreview()"/>
+              </div>
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="field-label">Location</div>
+                <input type="text" id="inv-biz-location" placeholder="e.g. Manchester, United Kingdom" oninput="updateInvoicePreview()"/>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:12px;">
+            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">🏦 Payment Details</div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="field-label">Account Name</div>
+                <input type="text" id="inv-bank-name" placeholder="Name on your bank account" oninput="updateInvoicePreview()"/>
+              </div>
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="field-label">Account Number</div>
+                <input type="text" id="inv-bank-account" placeholder="Your account number" oninput="updateInvoicePreview()" style="font-family:var(--fm);letter-spacing:.05em;"/>
+              </div>
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="field-label">Sort Code / Routing <span style="font-family:var(--fm);font-size:9px;color:var(--text3);font-weight:400;">(optional)</span></div>
+                <input type="text" id="inv-bank-sort" placeholder="e.g. 23-14-70 or routing number" oninput="updateInvoicePreview()" style="font-family:var(--fm);letter-spacing:.05em;"/>
+                <div class="field-hint">Not all countries use a sort code — leave blank if not applicable.</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -961,8 +987,8 @@ function initInvoiceForm(){
   var today = new Date().toISOString().split('T')[0];
   var dateEl = document.getElementById('inv-date');
   if (dateEl && !dateEl.value) dateEl.value = today;
-  /* Auto-generate next invoice number */
-  autoInvoiceNumber();
+  /* Always auto-generate invoice number for a fresh form */
+  autoInvoiceNumber(true);
   /* Seed one line item if none */
   if (_invLines.length === 0) {
     _invLines = [];
@@ -971,7 +997,7 @@ function initInvoiceForm(){
   updateInvoicePreview();
 }
 
-async function autoInvoiceNumber(){
+async function autoInvoiceNumber(force){
   try {
     var { data } = await getSupabase().from('invoices').select('invoice_number').eq('owner_id', _currentUser.id).order('created_at', {ascending:false}).limit(1);
     var next = 'INV-000001';
@@ -981,10 +1007,12 @@ async function autoInvoiceNumber(){
       next = 'INV-' + String(num + 1).padStart(6, '0');
     }
     var el = document.getElementById('inv-number');
-    if (el && !el.value) el.value = next;
+    if (el && (force || !el.value)) el.value = next;
+    updateInvoicePreview();
   } catch(e) {
     var el2 = document.getElementById('inv-number');
-    if (el2 && !el2.value) el2.value = 'INV-000001';
+    if (el2 && (force || !el2.value)) el2.value = 'INV-000001';
+    updateInvoicePreview();
   }
 }
 
@@ -1028,6 +1056,11 @@ function getInvoiceData(){
     clientName: (document.getElementById('inv-client-name')||{}).value || '',
     clientEmail:(document.getElementById('inv-client-email')||{}).value || '',
     notes:      (document.getElementById('inv-notes')||{}).value || 'Thanks for your business.',
+    bizName:    (document.getElementById('inv-biz-name')||{}).value || '',
+    bizLocation:(document.getElementById('inv-biz-location')||{}).value || '',
+    bankName:   (document.getElementById('inv-bank-name')||{}).value || '',
+    bankAccount:(document.getElementById('inv-bank-account')||{}).value || '',
+    bankSort:   (document.getElementById('inv-bank-sort')||{}).value || '',
     lines:      lines,
     discount:   discount,
     subtotal:   subtotal,
@@ -1053,14 +1086,13 @@ function updateInvoicePreview(){
   el.innerHTML =
     '<div style="font-size:10px;background:#fff;color:#111;padding:16px;">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">' +
-      '<div><div style="font-size:9px;font-weight:700;color:#444;">Drussell Technical Services Ltd</div><div style="font-size:8px;color:#888;">(Impact Grid Events)</div><div style="font-size:8px;color:#888;">Manchester, United Kingdom</div></div>' +
+      '<div><div style="font-size:9px;font-weight:700;color:#444;">'+(d.bizName||'Your Business Name')+'</div>'+(d.bizLocation?'<div style="font-size:8px;color:#888;">'+esc(d.bizLocation)+'</div>':'')+'</div>' +
       '<div style="text-align:right;"><div style="font-size:18px;font-weight:900;letter-spacing:-.03em;color:#111;">INVOICE</div><div style="font-size:9px;font-family:monospace;color:#666;">'+esc(d.number)+'</div>' +
       '<div style="margin-top:6px;background:#f5f5f5;border-radius:4px;padding:4px 8px;font-size:9px;font-weight:700;">Balance Due<br><span style="font-size:14px;color:#111;">'+fmtGBP(d.total)+'</span></div></div>' +
     '</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:9px;background:#f9f9f9;border-radius:4px;padding:8px;margin-bottom:10px;">' +
       '<span style="color:#888;">Invoice Date:</span><span>'+dateStr+'</span>' +
       '<span style="color:#888;">Terms:</span><span>'+dueStr+'</span>' +
-      '<span style="color:#888;">Client:</span><span style="font-weight:700;">'+esc(d.clientName||'—')+'</span>' +
     '</div>' +
     '<table style="width:100%;border-collapse:collapse;margin-bottom:10px;">' +
       '<thead><tr style="background:#f0f0f0;"><th style="padding:5px 8px;font-size:9px;text-align:left;">#</th><th style="padding:5px 8px;font-size:9px;text-align:left;">Description</th><th style="padding:5px 8px;font-size:9px;text-align:right;">Qty</th><th style="padding:5px 8px;font-size:9px;text-align:right;">Rate</th><th style="padding:5px 8px;font-size:9px;text-align:right;">Amount</th></tr></thead>' +
@@ -1074,8 +1106,8 @@ function updateInvoicePreview(){
     '</div></div>' +
     '<div style="margin-top:10px;padding-top:8px;border-top:1px solid #eee;font-size:8px;color:#888;">' +
       '<div style="font-weight:700;margin-bottom:3px;">Payment Options — Bank Transfer</div>' +
-      '<div>Account Name: Drussell Technical Services Ltd</div>' +
-      '<div>Account Number: 10881117 &nbsp;|&nbsp; Sort Code: 23-14-70</div>' +
+      '<div>Account Name: '+(d.bankName||'—')+'</div>' +
+      '<div>Account Number: '+(d.bankAccount||'—')+(d.bankSort?' &nbsp;|&nbsp; Sort Code: '+d.bankSort:'')+'</div>' +
     '</div></div>';
 }
 
@@ -1086,7 +1118,7 @@ function buildInvoiceEmailBody(d){
   }).join('\n');
   return 'Hi '+d.clientName+',\n\nPlease find your invoice details below.\n\n' +
     '─────────────────────────\n' +
-    'IMPACT GRID INVOICE\n' +
+    (d.bizName||'IMPACT GRID') + ' INVOICE\n' +
     'Invoice No: '+d.number+'\n' +
     'Date: '+new Date(d.date).toLocaleDateString('en-GB')+'\n' +
     'Due: '+dueStr+'\n' +
@@ -1097,11 +1129,11 @@ function buildInvoiceEmailBody(d){
     'TOTAL: £'+d.total.toFixed(2)+'\n\n' +
     '─────────────────────────\n' +
     'Payment Options — Bank Transfer:\n' +
-    'Account Name: Drussell Technical Services Ltd\n' +
-    'Account Number: 10881117\n' +
-    'Sort Code: 23-14-70\n\n' +
-    (d.notes || 'Thanks for your business.') + '\n\n' +
-    'Impact Grid Events\nevents@impactgridgroup.com\n07469016509';
+    'Account Name: '+(d.bankName||'—')+'\n' +
+    'Account Number: '+(d.bankAccount||'—')+'\n' +
+    (d.bankSort ? 'Sort Code: '+d.bankSort+'\n' : '') +
+    '\n' + (d.notes || 'Thanks for your business.') + '\n\n' +
+    (d.bizName||'Impact Grid Events')+'\nevents@impactgridgroup.com';
 }
 
 async function saveInvoiceToDB(d, sent){
@@ -1117,6 +1149,11 @@ async function saveInvoiceToDB(d, sent){
     subtotal:       d.subtotal,
     total:          d.total,
     notes:          d.notes,
+    biz_name:       d.bizName || null,
+    biz_location:   d.bizLocation || null,
+    bank_name:      d.bankName || null,
+    bank_account:   d.bankAccount || null,
+    bank_sort:      d.bankSort || null,
     sent:           sent || false
   }).select().single();
   if (error) throw error;
@@ -1175,39 +1212,81 @@ async function saveInvoiceOnly(){
   }
 }
 
-function previewInvoicePDF(){
+function downloadInvoicePDF(){
   var d = getInvoiceData();
-  var body = buildInvoiceEmailBody(d);
-  var win = window.open('', '_blank', 'width=600,height=700');
-  if (!win) { toast('⚠️', 'Pop-up blocked', 'Allow pop-ups to preview'); return; }
+  var win = window.open('', '_blank', 'width=700,height=800');
+  if (!win) { toast('⚠️', 'Pop-up blocked', 'Allow pop-ups to download PDF'); return; }
   var dueStr = d.dueDate ? new Date(d.dueDate).toLocaleDateString('en-GB') : 'Due on Receipt';
+  var dateStr = d.date ? new Date(d.date).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
   var linesHtml = d.lines.map(function(l, i){
-    return '<tr><td>'+(i+1)+'</td><td>'+esc(l.desc)+'</td><td style="text-align:right">'+l.qty+'</td><td style="text-align:right">'+fmtGBP(l.rate)+'</td><td style="text-align:right">'+fmtGBP(l.amount)+'</td></tr>';
-  }).join('');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(d.number)+'</title>' +
-    '<style>body{font-family:sans-serif;color:#111;padding:40px;max-width:680px;margin:auto}h1{font-size:36px;font-weight:900;letter-spacing:-.04em}table{width:100%;border-collapse:collapse;margin:20px 0}th{background:#f0f0f0;padding:8px 10px;text-align:left;font-size:12px}td{padding:8px 10px;border-bottom:1px solid #eee;font-size:13px}.right{text-align:right}.total-row{font-weight:700}.footer{margin-top:30px;padding-top:16px;border-top:1px solid #ddd;font-size:12px;color:#666}@media print{body{padding:20px}button{display:none}}</style>' +
-    '</head><body>' +
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start"><div><strong>Drussell Technical Services Ltd</strong><br><small>(Impact Grid Events)</small><br><small>Manchester, United Kingdom</small><br><small>07469016509</small></div>' +
-    '<div style="text-align:right"><h1>INVOICE</h1><div style="font-size:13px;color:#666">'+esc(d.number)+'</div><div style="margin-top:8px;background:#f5f5f5;padding:8px 12px;border-radius:6px"><div style="font-size:11px;color:#888">Balance Due</div><div style="font-size:22px;font-weight:900">'+fmtGBP(d.total)+'</div></div></div></div>' +
-    '<table style="margin-top:20px;margin-bottom:0"><tr><td style="border:none;padding:4px 0;width:50%"><strong>'+esc(d.clientName)+'</strong></td><td style="border:none;padding:4px 0;text-align:right;font-size:12px;color:#888">Invoice Date: '+new Date(d.date).toLocaleDateString('en-GB')+'<br>Terms: '+dueStr+'</td></tr></table>' +
-    '<table><thead><tr><th>#</th><th>Description</th><th class="right">Qty</th><th class="right">Rate</th><th class="right">Amount</th></tr></thead><tbody>'+linesHtml+'</tbody></table>' +
-    '<div style="display:flex;justify-content:flex-end"><table style="width:200px"><tr><td>Sub Total</td><td class="right">'+fmtGBP(d.subtotal)+'</td></tr>'+(d.discount>0?'<tr><td>Discount</td><td class="right" style="color:#c00;">(-) '+fmtGBP(d.discount)+'</td></tr>':'')+'<tr class="total-row" style="border-top:2px solid #111"><td>Total</td><td class="right">'+fmtGBP(d.total)+'</td></tr><tr class="total-row"><td>Balance Due</td><td class="right">'+fmtGBP(d.total)+'</td></tr></table></div>' +
-    '<div class="footer"><strong>Payment Options — Bank Transfer</strong><br>Account Name: Drussell Technical Services Ltd<br>Account Number: 10881117 &nbsp;|&nbsp; Sort Code: 23-14-70<br><br>'+(d.notes?esc(d.notes):'Thanks for your business.')+'</div>' +
-    '<br><button onclick="window.print()" style="padding:10px 20px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">🖨 Print / Save as PDF</button>' +
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(l.desc)+'</td><td class="right">'+l.qty+'</td><td class="right">'+fmtGBP(l.rate)+'</td><td class="right">'+fmtGBP(l.amount)+'</td></tr>';
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">No line items</td></tr>';
+  var bizBlock = '<strong>'+(d.bizName ? esc(d.bizName) : 'Impact Grid Events')+'</strong>'+(d.bizLocation?'<br><span style="color:#666;font-size:12px;">'+esc(d.bizLocation)+'</span>':'');
+  var payBlock = '<strong>Payment — Bank Transfer</strong><br>Account Name: '+(d.bankName||'—')+'<br>Account Number: '+(d.bankAccount||'—')+(d.bankSort?'<br>Sort Code / Routing: '+esc(d.bankSort):'');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(d.number||'Invoice')+'</title>' +
+    '<style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:Georgia,serif;color:#111;background:#fff;padding:48px;max-width:720px;margin:auto}' +
+    'h1{font-size:42px;font-weight:900;letter-spacing:-.04em;font-family:sans-serif}' +
+    'table{width:100%;border-collapse:collapse;margin:24px 0}' +
+    'th{background:#f0f0f0;padding:9px 12px;text-align:left;font-size:12px;font-family:sans-serif;text-transform:uppercase;letter-spacing:.06em}' +
+    'td{padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}' +
+    '.right{text-align:right}' +
+    '.total-row td{font-weight:700;font-size:14px}' +
+    '.balance-row td{font-weight:900;font-size:15px;border-top:2px solid #111;padding-top:12px}' +
+    '.footer{margin-top:40px;padding-top:20px;border-top:1px solid #ddd;font-size:12px;color:#555;line-height:1.8}' +
+    '.inv-ref{font-family:monospace;font-size:13px;color:#555}' +
+    '.badge{display:inline-block;background:#f5f5f5;border-radius:6px;padding:8px 14px;text-align:center;margin-top:6px}' +
+    '.no-print{margin-top:32px;text-align:center}' +
+    'button{padding:12px 28px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-family:sans-serif;margin:0 6px}' +
+    '@media print{.no-print{display:none}body{padding:24px}}' +
+    '</style></head><body>' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">' +
+      '<div style="font-size:14px;line-height:1.7;">'+bizBlock+'</div>' +
+      '<div style="text-align:right;">' +
+        '<h1>INVOICE</h1>' +
+        '<div class="inv-ref">'+esc(d.number||'—')+'</div>' +
+        '<div class="badge"><div style="font-size:11px;color:#888;font-family:sans-serif;">Balance Due</div><div style="font-size:26px;font-weight:900;font-family:sans-serif;">'+fmtGBP(d.total)+'</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:13px;color:#555;margin-bottom:8px;">' +
+      '<div>Invoice Date: <strong style="color:#111;">'+dateStr+'</strong></div>' +
+      '<div>Terms: <strong style="color:#111;">'+dueStr+'</strong></div>' +
+    '</div>' +
+    '<table>' +
+      '<thead><tr><th>#</th><th>Description</th><th class="right">Qty</th><th class="right">Rate</th><th class="right">Amount</th></tr></thead>' +
+      '<tbody>'+linesHtml+'</tbody>' +
+      '<tfoot>' +
+        '<tr><td colspan="4" class="right" style="border:none;padding-top:12px;font-size:12px;color:#888;">Sub Total</td><td class="right" style="border:none;padding-top:12px;">'+fmtGBP(d.subtotal)+'</td></tr>' +
+        (d.discount>0?'<tr><td colspan="4" class="right" style="border:none;font-size:12px;color:#888;">Discount</td><td class="right" style="border:none;color:#c00;">(-) '+fmtGBP(d.discount)+'</td></tr>':'') +
+        '<tr class="total-row"><td colspan="4" class="right" style="border-top:1px solid #ddd;padding-top:10px;">Total</td><td class="right" style="border-top:1px solid #ddd;padding-top:10px;">'+fmtGBP(d.total)+'</td></tr>' +
+        '<tr class="balance-row"><td colspan="4" class="right">Balance Due</td><td class="right">'+fmtGBP(d.total)+'</td></tr>' +
+      '</tfoot>' +
+    '</table>' +
+    '<div class="footer">'+payBlock+(d.notes?'<br><br>'+esc(d.notes):'')+'</div>' +
+    '<div class="no-print">' +
+      '<button onclick="window.print()">🖨 Download / Print as PDF</button>' +
+      '<button onclick="window.close()" style="background:#eee;color:#111;">Close</button>' +
+    '</div>' +
     '</body></html>');
   win.document.close();
+  /* Auto-trigger print dialog after a short delay for rendering */
+  setTimeout(function(){ try { win.print(); } catch(e){} }, 600);
 }
 
 function resetInvoiceForm(){
   _invLines = [];
   _invCounter = 0;
-  ['inv-number','inv-date','inv-due-date','inv-client-name','inv-client-email','inv-discount'].forEach(function(id){
+  ['inv-number','inv-date','inv-due-date','inv-client-name','inv-client-email','inv-discount',
+   'inv-biz-name','inv-biz-location','inv-bank-name','inv-bank-account','inv-bank-sort'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value = '';
   });
   var notesEl = document.getElementById('inv-notes');
   if (notesEl) notesEl.value = 'Thanks for your business.';
   var wrap = document.getElementById('inv-line-items');
   if (wrap) wrap.innerHTML = '';
+  /* Re-generate number for next invoice */
+  autoInvoiceNumber(true);
   updateInvoicePreview();
 }
 
@@ -1255,7 +1334,9 @@ async function resendInvoice(id){
       dueDate: data.due_date, clientName: data.client_name,
       clientEmail: data.client_email, lines: lines,
       discount: data.discount || 0, subtotal: data.subtotal || 0,
-      total: data.total || 0, notes: data.notes
+      total: data.total || 0, notes: data.notes,
+      bizName: data.biz_name || '', bizLocation: data.biz_location || '',
+      bankName: data.bank_name || '', bankAccount: data.bank_account || '', bankSort: data.bank_sort || ''
     };
     if (!d.clientEmail) { toast('⚠️', 'No email on file', 'Edit the invoice to add an email'); return; }
     var res = await fetch(EVENTS_API + '/api/send-mail', {
