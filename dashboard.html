@@ -535,101 +535,191 @@ tr:hover td{background:var(--bg2);}
     <div class="page" id="page-createinvoice">
       <div class="page-header">
         <div class="page-title">New Invoice</div>
-        <div class="page-sub">Create and send a branded Impact Grid invoice.</div>
+        <div class="page-sub">Fill in the details below — your invoice preview updates live on the right.</div>
       </div>
-      <div class="ws-layout">
-        <div>
+
+      <div class="ws-layout" style="gap:20px;">
+
+        <!-- LEFT: FORM -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- STEP 1: YOUR BUSINESS -->
           <div class="card">
-            <div class="card-head"><h2>📋 Invoice Details</h2></div>
+            <div class="card-head" style="background:var(--gold-dim);border-bottom:1px solid var(--gold-glo);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">1</div>
+                <h2 style="color:var(--gold);">Your Business</h2>
+              </div>
+              <span style="font-size:11px;color:var(--gold);opacity:.7;">Appears at the top of your invoice</span>
+            </div>
             <div class="card-body">
-              <div id="inv-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
-              <div class="form-grid" style="margin-bottom:12px;">
-                <div class="field-group">
-                  <div class="field-label">Invoice Number</div>
-                  <input type="text" id="inv-number" placeholder="Auto-generating…" style="font-family:var(--fm);letter-spacing:.05em;" oninput="updateInvoicePreview()"/>
-                  <div class="field-hint">Auto-generated — edit freely</div>
+              <div class="form-grid">
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">Business / Trading Name</div>
+                  <input type="text" id="inv-biz-name" placeholder="Your business name" oninput="updateInvoicePreview()"/>
                 </div>
-                <div class="field-group">
-                  <div class="field-label">Invoice Date</div>
-                  <input type="date" id="inv-date"/>
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">Your Location</div>
+                  <input type="text" id="inv-biz-location" placeholder="City, Country" oninput="updateInvoicePreview()"/>
                 </div>
               </div>
-              <div class="form-grid" style="margin-bottom:12px;">
-                <div class="field-group">
+            </div>
+          </div>
+
+          <!-- STEP 2: INVOICE META -->
+          <div class="card">
+            <div class="card-head" style="background:var(--blue-dim);border-bottom:1px solid rgba(45,110,219,.18);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">2</div>
+                <h2 style="color:var(--blue);">Invoice Info</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="inv-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
+              <div class="form-grid" style="margin-bottom:14px;">
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">
+                    Invoice Number
+                    <span style="font-weight:400;color:var(--text3);font-size:9px;margin-left:4px;">AUTO-GENERATED</span>
+                  </div>
+                  <div style="position:relative;">
+                    <input type="text" id="inv-number" placeholder="Generating…" style="font-family:var(--fm);letter-spacing:.06em;padding-right:36px;" oninput="updateInvoicePreview()"/>
+                    <button onclick="autoInvoiceNumber(true)" title="Regenerate" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:4px;line-height:1;">↺</button>
+                  </div>
+                  <div class="field-hint">Editable — tap ↺ to regenerate</div>
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">Invoice Date</div>
+                  <input type="date" id="inv-date" oninput="updateInvoicePreview()"/>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">Due Date <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
+                  <input type="date" id="inv-due-date" oninput="updateInvoicePreview()"/>
+                  <div class="field-hint">Leave blank for "Due on Receipt"</div>
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">Discount (£) <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
+                  <input type="number" id="inv-discount" placeholder="0.00" min="0" step="0.01" oninput="updateInvoicePreview()"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: BILL TO -->
+          <div class="card">
+            <div class="card-head" style="background:var(--purple-dim);border-bottom:1px solid rgba(124,58,237,.18);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">3</div>
+                <h2 style="color:var(--purple);">Bill To</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field-group" style="margin-bottom:0;">
                   <div class="field-label">Client Name *</div>
                   <input type="text" id="inv-client-name" placeholder="Client or company name" oninput="updateInvoicePreview()"/>
                 </div>
-                <div class="field-group">
+                <div class="field-group" style="margin-bottom:0;">
                   <div class="field-label">Client Email *</div>
                   <input type="email" id="inv-client-email" placeholder="client@email.com"/>
+                  <div class="field-hint">Required to email the invoice</div>
                 </div>
-              </div>
-              <div style="margin-bottom:16px;">
-                <div class="field-label" style="margin-bottom:8px;">Line Items</div>
-                <div id="inv-line-items"></div>
-                <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="addLineItem()">+ Add Line</button>
-              </div>
-              <div class="form-grid" style="margin-bottom:16px;">
-                <div class="field-group">
-                  <div class="field-label">Discount (£)</div>
-                  <input type="number" id="inv-discount" placeholder="0.00" min="0" step="0.01" oninput="updateInvoicePreview()"/>
-                </div>
-                <div class="field-group">
-                  <div class="field-label">Due Date</div>
-                  <input type="date" id="inv-due-date"/>
-                  <div class="field-hint">Leave blank = Due on Receipt</div>
-                </div>
-              </div>
-              <div class="field-group" style="margin-bottom:16px;">
-                <div class="field-label">Notes</div>
-                <textarea id="inv-notes" rows="2" placeholder="Thanks for your business."></textarea>
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn btn-gold" style="flex:1;justify-content:center;" onclick="saveAndSendInvoice()">📨 Save &amp; Send to Client</button>
-                <button class="btn btn-ghost" onclick="saveInvoiceOnly()">💾 Save Only</button>
-                <button class="btn btn-blue" onclick="downloadInvoicePDF()">⬇ Download PDF</button>
               </div>
             </div>
           </div>
-        </div>
+
+          <!-- STEP 4: LINE ITEMS -->
+          <div class="card">
+            <div class="card-head" style="background:var(--green-dim);border-bottom:1px solid rgba(15,168,118,.18);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">4</div>
+                <h2 style="color:var(--green);">Services / Line Items</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Column headers -->
+              <div style="display:grid;grid-template-columns:1fr 72px 88px 28px;gap:6px;margin-bottom:6px;padding:0 2px;">
+                <div style="font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">Description</div>
+                <div style="font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);text-align:right;">Qty</div>
+                <div style="font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);text-align:right;">Rate £</div>
+                <div></div>
+              </div>
+              <div id="inv-line-items" style="display:flex;flex-direction:column;gap:6px;"></div>
+              <!-- Totals bar -->
+              <div id="inv-totals-bar" style="margin-top:14px;padding:12px 14px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem()">＋ Add Line</button>
+                <div style="display:flex;gap:18px;align-items:center;">
+                  <div style="text-align:right;">
+                    <div style="font-family:var(--fm);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Subtotal</div>
+                    <div id="inv-sub-display" style="font-size:14px;font-weight:700;">£0.00</div>
+                  </div>
+                  <div id="inv-discount-display" style="display:none;text-align:right;">
+                    <div style="font-family:var(--fm);font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.08em;">Discount</div>
+                    <div style="font-size:13px;font-weight:600;color:var(--red);" id="inv-disc-val">−£0.00</div>
+                  </div>
+                  <div style="text-align:right;padding:8px 14px;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);">
+                    <div style="font-family:var(--fm);font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;">Total Due</div>
+                    <div id="inv-total-display" style="font-size:18px;font-weight:900;color:var(--gold);letter-spacing:-.02em;">£0.00</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 5: PAYMENT DETAILS -->
+          <div class="card">
+            <div class="card-head" style="background:var(--bg2);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--text2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">5</div>
+                <h2>Payment Details</h2>
+              </div>
+              <span style="font-size:11px;color:var(--text3);">Shown at the bottom of the invoice</span>
+            </div>
+            <div class="card-body">
+              <div class="form-grid" style="margin-bottom:12px;">
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">Account Name</div>
+                  <input type="text" id="inv-bank-name" placeholder="Name on bank account" oninput="updateInvoicePreview()"/>
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                  <div class="field-label">Account Number</div>
+                  <input type="text" id="inv-bank-account" placeholder="Account number" oninput="updateInvoicePreview()" style="font-family:var(--fm);letter-spacing:.06em;"/>
+                </div>
+              </div>
+              <div class="field-group" style="margin-bottom:14px;">
+                <div class="field-label">Sort Code / Routing Number <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
+                <input type="text" id="inv-bank-sort" placeholder="e.g. 23-14-70  —  leave blank if not applicable" oninput="updateInvoicePreview()" style="font-family:var(--fm);letter-spacing:.06em;"/>
+              </div>
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="field-label">Notes to Client</div>
+                <textarea id="inv-notes" rows="2" placeholder="Thanks for your business." oninput="updateInvoicePreview()"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:8px;">
+            <button class="btn btn-gold" style="justify-content:center;padding:14px;" onclick="saveAndSendInvoice()">📨 Save &amp; Send to Client</button>
+            <button class="btn btn-blue" style="justify-content:center;padding:14px;" onclick="downloadInvoicePDF()">⬇ Download PDF</button>
+            <button class="btn btn-ghost" style="justify-content:center;grid-column:1/-1;" onclick="saveInvoiceOnly()">💾 Save as Draft (no email)</button>
+          </div>
+
+        </div><!-- /left -->
+
+        <!-- RIGHT: LIVE PREVIEW -->
         <div class="ws-sticky">
-          <div class="card" id="inv-preview-card">
-            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">👁 Live Preview</div>
-            <div id="inv-preview-body"></div>
-          </div>
-          <div class="card" style="margin-top:12px;">
-            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">🏢 Your Business</div>
-            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
-              <div class="field-group" style="margin-bottom:0;">
-                <div class="field-label">Business Name</div>
-                <input type="text" id="inv-biz-name" placeholder="Your business or trading name" oninput="updateInvoicePreview()"/>
-              </div>
-              <div class="field-group" style="margin-bottom:0;">
-                <div class="field-label">Location</div>
-                <input type="text" id="inv-biz-location" placeholder="e.g. Manchester, United Kingdom" oninput="updateInvoicePreview()"/>
-              </div>
+          <div class="card" style="overflow:hidden;">
+            <div style="padding:10px 16px;font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;">
+              <span>👁 Invoice Preview</span>
+              <span style="color:var(--green);font-size:9px;">● Live</span>
             </div>
-          </div>
-          <div class="card" style="margin-top:12px;">
-            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">🏦 Payment Details</div>
-            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
-              <div class="field-group" style="margin-bottom:0;">
-                <div class="field-label">Account Name</div>
-                <input type="text" id="inv-bank-name" placeholder="Name on your bank account" oninput="updateInvoicePreview()"/>
-              </div>
-              <div class="field-group" style="margin-bottom:0;">
-                <div class="field-label">Account Number</div>
-                <input type="text" id="inv-bank-account" placeholder="Your account number" oninput="updateInvoicePreview()" style="font-family:var(--fm);letter-spacing:.05em;"/>
-              </div>
-              <div class="field-group" style="margin-bottom:0;">
-                <div class="field-label">Sort Code / Routing <span style="font-family:var(--fm);font-size:9px;color:var(--text3);font-weight:400;">(optional)</span></div>
-                <input type="text" id="inv-bank-sort" placeholder="e.g. 23-14-70 or routing number" oninput="updateInvoicePreview()" style="font-family:var(--fm);letter-spacing:.05em;"/>
-                <div class="field-hint">Not all countries use a sort code — leave blank if not applicable.</div>
-              </div>
-            </div>
+            <div id="inv-preview-body" style="overflow:hidden;"></div>
           </div>
         </div>
-      </div>
+
+      </div><!-- /ws-layout -->
     </div>
 
   </div><!-- /.main -->
