@@ -159,90 +159,75 @@ body::after {
 [data-theme="dark"] body::after { opacity: 0.35; }
 
 /* ════════════════════════════════════════════════════
-   NAVIGATION — Right-side vertical rail
-   Fixed: -webkit-backdrop-filter for Mobile Safari
-   Fixed: transform:translateZ(0) for GPU compositing
+   NAVIGATION — Left-side vertical rail
+   Collapsed : logo strip only (--nav-w-collapsed wide)
+   Expanded  : full panel overlays content (no push)
+   Toggle    : click the logo mark
 ════════════════════════════════════════════════════ */
 
 /* ── Layout tokens ── */
 :root {
-  --nav-w:           220px;  /* expanded */
-  --nav-w-collapsed: 0px;    /* fully hidden when collapsed */
+  --nav-w:           220px;  /* expanded overlay width  */
+  --nav-w-collapsed: 52px;   /* logo-strip visible width */
 }
 
-/* ── Right-side collapsible nav ── */
+/* ── Left-side nav rail ── */
 .nav {
-  position: fixed; top: 0; right: 0; bottom: 0; left: auto;
-  width: var(--nav-w); height: 100vh;
+  position: fixed; top: 0; left: 0; bottom: 0; right: auto;
+  width: var(--nav-w-collapsed); height: 100vh;
   display: flex; flex-direction: column;
-  padding: 32px 16px 24px;
+  padding: 20px 0 24px;
   background: var(--card);
-  border-left: 1px solid var(--border2);
+  border-right: 1px solid var(--border2);
   z-index: 1000;
   overflow: hidden;
-  transition: width 0.3s cubic-bezier(0.4,0,0.2,1),
-              opacity 0.3s ease,
-              background 0.3s;
-  box-shadow: -4px 0 24px rgba(0,0,0,0.06);
-}
-[data-theme="dark"] .nav {
-  background: #111008;
-  box-shadow: -4px 0 32px rgba(0,0,0,0.4);
-}
-
-/* Collapsed — fully hidden, only the tab handle is visible */
-.nav.collapsed {
-  width: 0;
-  padding-left: 0;
-  padding-right: 0;
-  border-left: none;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s;
   box-shadow: none;
 }
-.nav.collapsed * { opacity: 0; pointer-events: none; }
+[data-theme="dark"] .nav { background: #111008; }
 
-/* ── Pull-tab handle — always visible on right edge ── */
-.nav-handle {
-  position: fixed;
-  top: 50%;
-  right: var(--nav-w);
-  transform: translateY(-50%);
-  z-index: 1001;
-  width: 20px; height: 52px;
-  background: var(--card);
-  border: 1px solid var(--border2);
-  border-right: none;
-  border-radius: 8px 0 0 8px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: right 0.3s cubic-bezier(0.4,0,0.2,1),
-              background 0.2s, box-shadow 0.2s;
-  box-shadow: -3px 0 12px rgba(0,0,0,0.07);
+/* Expanded — overlays content, shows full panel + backdrop */
+.nav.expanded {
+  width: var(--nav-w);
+  box-shadow: 4px 0 32px rgba(0,0,0,0.14);
 }
-[data-theme="dark"] .nav-handle {
-  background: #111008;
-  box-shadow: -3px 0 16px rgba(0,0,0,0.4);
+[data-theme="dark"] .nav.expanded { box-shadow: 4px 0 48px rgba(0,0,0,0.55); }
+
+/* Nav backdrop — sits between nav and page, click to collapse */
+.nav-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 999;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
-.nav-handle:hover { background: var(--bg2); }
-.nav-handle svg {
-  width: 10px; height: 10px;
-  stroke: var(--text3); stroke-width: 2;
-  fill: none; stroke-linecap: round; stroke-linejoin: round;
-  transition: transform 0.3s;
-  flex-shrink: 0;
-}
-/* When collapsed the handle moves to the screen edge and arrow flips */
-body.nav-collapsed .nav-handle { right: 0; }
-body.nav-collapsed .nav-handle svg { transform: rotate(180deg); }
+.nav-backdrop.open { display: block; }
+
+/* No handle tab needed — logo IS the toggle */
+.nav-handle { display: none; }
 
 /* .nav-in not used in side-rail layout */
 .nav-in { display: none; }
 
-/* Logo */
+/* Logo — acts as the nav toggle */
 .logo {
   display: flex; align-items: center; gap: 9px;
   font-family: var(--fd); font-weight: 900; font-size: 15px;
   letter-spacing: -0.03em; flex-shrink: 0;
   margin-bottom: 32px; text-decoration: none; white-space: nowrap;
+  padding: 0 11px;
+  cursor: pointer;
+  /* logo-text hidden until expanded */
+}
+.logo .logo-text {
+  opacity: 0;
+  transition: opacity 0.2s ease 0.05s;
+  pointer-events: none;
+}
+.nav.expanded .logo .logo-text {
+  opacity: 1;
+  pointer-events: auto;
 }
 .logo-mark {
   width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
@@ -258,13 +243,15 @@ body.nav-collapsed .nav-handle svg { transform: rotate(180deg); }
 .nav-links {
   display: flex; flex-direction: column;
   list-style: none; gap: 2px; flex: 1;
+  padding: 0 8px;
 }
 .nav-links li { width: 100%; }
 .nav-links a {
   display: flex; align-items: center; gap: 9px;
-  padding: 9px 12px; border-radius: 9px;
+  padding: 9px 11px; border-radius: 9px;
   font-size: 13.5px; font-weight: 500; width: 100%;
   color: var(--text2); transition: all 0.18s; white-space: nowrap;
+  overflow: hidden;
 }
 .nav-links a:hover {
   color: var(--text); background: var(--bg2);
@@ -275,11 +262,42 @@ body.nav-collapsed .nav-handle svg { transform: rotate(180deg); }
 }
 [data-theme="dark"] .nav-links a:hover { background: rgba(255,255,255,0.05); }
 
+/* Link labels hidden in collapsed state */
+.nav-links a .nav-label {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.nav.expanded .nav-links a .nav-label {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Link icons — always visible */
+.nav-links a .nav-icon {
+  font-size: 17px;
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
 /* Bottom section */
 .nav-bottom {
   display: flex; flex-direction: column; gap: 8px;
-  padding-top: 16px; margin-top: auto;
+  padding: 16px 8px 0;
+  margin-top: auto;
   border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+/* Hide bottom content in collapsed state — only show when expanded */
+.nav-bottom > * {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.nav.expanded .nav-bottom > * {
+  opacity: 1;
+  pointer-events: auto;
 }
 .nav-guest { display: flex; flex-direction: column; gap: 7px; }
 .nav-guest .btn-ghost-sm,
@@ -469,7 +487,12 @@ body.nav-collapsed .nav-handle svg { transform: rotate(180deg); }
 /* ════════════════════════════════════════════════════
    PAGE WRAPPER
 ════════════════════════════════════════════════════ */
-.page-wrap { padding-right: var(--nav-w); padding-top: 0; transition: padding-right 0.3s cubic-bezier(0.4,0,0.2,1); }
+.page-wrap {
+  padding-left: var(--nav-w-collapsed);
+  padding-right: 0;
+  padding-top: 0;
+  transition: padding-left 0.3s cubic-bezier(0.4,0,0.2,1);
+}
 
 /* ════════════════════════════════════════════════════
    SECTIONS
@@ -853,14 +876,12 @@ body.nav-collapsed .nav-handle svg { transform: rotate(180deg); }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
 }
 
-/* ── Mobile: nav auto-collapses, handle stays visible ── */
+/* ── Mobile: nav collapses to icon-only strip; hamburger opens mob sidebar ── */
 @media (max-width: 768px) {
-  body { padding-right: 0 !important; }
-  .page-wrap { padding-right: 0 !important; }
-  .nav { width: 0 !important; padding: 0 !important; border-left: none !important; box-shadow: none !important; }
+  body { padding-left: 0 !important; }
+  .page-wrap { padding-left: 0 !important; }
+  .nav { width: 0 !important; padding: 0 !important; border-right: none !important; box-shadow: none !important; }
   .nav * { opacity: 0 !important; pointer-events: none !important; }
-  .nav-handle { right: 0; }
-  .nav-handle svg { transform: rotate(180deg); }
   .section, .section-full { padding: 56px 16px; }
   .section-sm { padding: 40px 16px; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
