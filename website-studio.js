@@ -379,6 +379,46 @@ function showScreen(id) {
   }
 }
 
+/* ══════════════════════════════════════════════════════════
+   STYLE SHOWCASE — wssSelectStyle
+   Called by onclick="wssSelectStyle('style-id')" on every
+   .wss-card in the dashboard showcase grid.
+   Stores the chosen style then runs the same gated-create
+   flow as psHandleCreate (auth + plan checks).
+══════════════════════════════════════════════════════════ */
+function wssSelectStyle(styleId) {
+  if (!styleId) return;
+
+  // Visual feedback — mark selected card immediately
+  document.querySelectorAll('.wss-card').forEach(function(card) {
+    var isThis = card.dataset.styleId === styleId;
+    card.classList.toggle('wss-selected', isThis);
+    card.setAttribute('data-selected', isThis ? 'true' : 'false');
+  });
+
+  // Persist so screenOnboard / psHandleCreate can read it
+  window.psSelectedStyle     = styleId;
+  window.psSelectedStyleName = styleId; // overwritten below if a name is found
+
+  // Try to resolve a friendly name from WEBSITE_STYLES (defined inline in HTML)
+  if (Array.isArray(window.WEBSITE_STYLES)) {
+    var found = window.WEBSITE_STYLES.find(function(s) { return s.id === styleId; });
+    if (found) window.psSelectedStyleName = found.name;
+  }
+
+  // Toast confirmation (defined in nav.js / shared utilities)
+  if (typeof showToast === 'function') {
+    showToast('✦ Style selected: ' + window.psSelectedStyleName);
+  }
+
+  // Run the gated create flow (auth + plan limits)
+  if (typeof psHandleCreate === 'function') {
+    psHandleCreate();
+  } else {
+    showScreen('screenOnboard');
+  }
+}
+
 /* ── Mobile builder panel ─────────────────────────────────────
    New layout: preview always visible (top 45%), editor is a
    bottom sheet. Expand button slides it up to 88% to give more
