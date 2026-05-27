@@ -419,6 +419,72 @@ function wssSelectStyle(styleId) {
   }
 }
 
+/* ══════════════════════════════════════════════════════════
+   AI PROMPT HERO — wssStartAI / wssAiFill
+   Called from the AI prompt box at the top of the showcase.
+   Stores the user's description, then runs the gated create
+   flow. The description pre-fills the onboarding textarea.
+══════════════════════════════════════════════════════════ */
+function wssAiFill(text) {
+  var input = document.getElementById('wssAiPrompt');
+  if (input) {
+    input.value = text;
+    input.focus();
+  }
+}
+
+function wssStartAI() {
+  var input   = document.getElementById('wssAiPrompt');
+  var prompt  = input ? input.value.trim() : '';
+
+  if (!prompt) {
+    if (input) {
+      input.focus();
+      input.style.borderColor = 'var(--gold)';
+      setTimeout(function() { input.style.borderColor = ''; }, 1200);
+    }
+    return;
+  }
+
+  // Store the AI prompt so onboarding can pre-fill fields
+  window.wssAiPromptText = prompt;
+
+  // No style selected yet — AI flow auto-picks from onboarding
+  // (the builder server uses the description to infer a style)
+  window.psSelectedStyle     = window.psSelectedStyle || 'auto';
+  window.psSelectedStyleName = window.psSelectedStyleName || 'AI-matched';
+
+  if (typeof showToast === 'function') {
+    showToast('✦ Dijo is ready — let\'s build your site');
+  }
+
+  // Run the gated create flow (auth + plan limits)
+  if (typeof psHandleCreate === 'function') {
+    psHandleCreate();
+  } else {
+    showScreen('screenOnboard');
+  }
+}
+
+/* Pre-fill onboarding textarea with AI prompt text after screen shows */
+document.addEventListener('DOMContentLoaded', function() {
+  var _origShow2 = window.showScreen;
+  if (typeof _origShow2 === 'function') {
+    window.showScreen = function(id) {
+      _origShow2(id);
+      if (id === 'screenOnboard' && window.wssAiPromptText) {
+        setTimeout(function() {
+          var ta = document.getElementById('obAbout');
+          if (ta && !ta.value) {
+            ta.value = window.wssAiPromptText;
+            ta.dispatchEvent(new Event('input'));
+          }
+        }, 150);
+      }
+    };
+  }
+});
+
 /* ── Mobile builder panel ─────────────────────────────────────
    New layout: preview always visible (top 45%), editor is a
    bottom sheet. Expand button slides it up to 88% to give more
