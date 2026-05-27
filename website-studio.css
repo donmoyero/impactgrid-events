@@ -2187,3 +2187,347 @@ button:focus-visible,
 .sty-continue-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
 .sty-continue-btn:not(:disabled):hover { opacity: .88; transform: translateY(-2px); }
 .sty-footer-note { font-size: 11px; color: var(--text3); font-family: var(--fm); }
+
+/* ══════════════════════════════════════════════════════════
+   STYLE SHOWCASE — .wss-* classes (Dashboard)
+   These classes are used by the style-picker cards in
+   #screenDash / .ws-style-showcase. They were missing from
+   this file, causing the "scattered / broken layout" issue.
+══════════════════════════════════════════════════════════ */
+
+/* ── Showcase wrapper ── */
+.ws-style-showcase {
+  padding: 0 0 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Header block ── */
+.wss-header {
+  text-align: center;
+  padding: 56px 20px 40px;
+}
+.wss-eyebrow {
+  font-size: 10px;
+  font-family: var(--fm);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.wss-title {
+  font-family: var(--fd);
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  color: var(--text);
+  margin: 0 0 12px;
+  line-height: 1.15;
+}
+.wss-title em { color: var(--gold); font-style: italic; }
+.wss-sub {
+  font-size: 15px;
+  color: var(--text2);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+/* ── Card grid ── */
+.wss-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 0 24px;
+}
+@media (max-width: 1024px) {
+  .wss-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .wss-grid { grid-template-columns: 1fr; padding: 0 16px; gap: 16px; }
+}
+
+/* Featured cards span 2 columns on wider screens */
+.wss-featured {
+  grid-column: span 2;
+}
+@media (max-width: 1024px) {
+  .wss-featured { grid-column: span 2; }
+}
+@media (max-width: 600px) {
+  .wss-featured { grid-column: span 1; }
+}
+
+/* ── Individual card ── */
+.wss-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: transform .22s ease, border-color .2s ease, box-shadow .22s ease;
+  background: var(--card);
+  box-shadow: 0 2px 16px rgba(0,0,0,.18);
+}
+.wss-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.32);
+}
+.wss-card.wss-selected,
+.wss-card[data-selected="true"] {
+  border-color: var(--gold);
+}
+
+/* ── Card background layer (fills card, holds preview content) ── */
+.wss-card-bg {
+  position: relative;
+  width: 100%;
+  min-height: 260px;
+  overflow: hidden;
+}
+.wss-featured .wss-card-bg {
+  min-height: 320px;
+}
+
+/* ── Inner content (nav + photo + stats stacked) ── */
+.wss-card-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── Mini nav bar inside card preview ── */
+.wss-mini-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,.04);
+  flex-shrink: 0;
+}
+.wss-mini-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.wss-mini-links {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+.wss-mini-links span {
+  display: block;
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,.2);
+}
+.wss-mini-links.dark span {
+  background: rgba(0,0,0,.15);
+}
+.wss-mini-cta {
+  width: 40px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Photo / hero area ── */
+.wss-card-photo {
+  position: relative;
+  flex: 1;
+  min-height: 160px;
+  overflow: hidden;
+}
+.wss-featured .wss-card-photo {
+  min-height: 200px;
+}
+.wss-card-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Hero text overlay ── */
+.wss-hero-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px;
+  z-index: 2;
+}
+.wss-eyebrow-sm {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.65);
+  margin-bottom: 3px;
+}
+.wss-h1 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.wss-featured .wss-h1 {
+  font-size: 22px;
+}
+.wss-meta {
+  font-size: 9px;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 8px;
+}
+.wss-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wss-btn-p,
+.wss-btn-s {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1.5px solid transparent;
+  letter-spacing: .02em;
+  cursor: default;
+  white-space: nowrap;
+}
+.wss-btn-p {
+  background: rgba(255,255,255,.9);
+  color: #111;
+}
+.wss-btn-s {
+  background: transparent;
+  border-color: rgba(255,255,255,.35);
+  color: rgba(255,255,255,.85);
+}
+
+/* ── Stats bar ── */
+.wss-stats {
+  display: flex;
+  gap: 0;
+  background: rgba(0,0,0,.25);
+  flex-shrink: 0;
+}
+.wss-stat {
+  flex: 1;
+  padding: 8px 10px;
+  text-align: center;
+}
+.wss-stat + .wss-stat {
+  border-left: 1px solid rgba(255,255,255,.06);
+}
+.wss-stat-v {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.wss-stat-l {
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+}
+
+/* ── Card label (below card-bg) ── */
+.wss-card-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.wss-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.15);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.wss-card-tags {
+  font-size: 10px;
+  color: var(--text3);
+  font-style: italic;
+}
+
+/* ── Selection ring (shown on hover / selected) ── */
+.wss-select-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: 15px;
+  border: 2px solid var(--gold);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.wss-card:hover .wss-select-ring,
+.wss-card.wss-selected .wss-select-ring,
+.wss-card[data-selected="true"] .wss-select-ring {
+  opacity: 1;
+}
+
+/* ── "Build with this style" hover CTA ── */
+.wss-hover-cta {
+  position: absolute;
+  bottom: 44px; /* sits above the label row */
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: var(--gold);
+  color: #07090f;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 7px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 10;
+  box-shadow: 0 4px 16px rgba(0,0,0,.35);
+}
+.wss-card:hover .wss-hover-cta {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Footer note under grid ── */
+.wss-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 32px auto 0;
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--fm);
+}
+
+/* ── Mobile tweaks ── */
+@media (max-width: 600px) {
+  .wss-header { padding: 36px 20px 28px; }
+  .wss-card-bg { min-height: 220px; }
+  .wss-featured .wss-card-bg { min-height: 240px; }
+}
