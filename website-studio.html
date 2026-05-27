@@ -79,378 +79,418 @@
     <!-- ══ STYLE SHOWCASE — the whole page ══ -->
     <div class="ws-style-showcase" id="wsStyleShowcase">
 
-      <div class="wss-header">
-        <div class="wss-eyebrow">✦ Built by Dijo</div>
-        <h2 class="wss-title">Pick your style.<br/><em>Your website builds itself.</em></h2>
-        <p class="wss-sub">Click any style below — Dijo builds your entire website around it. No code. Live in 5 minutes.</p>
+      <!-- ══ AI PROMPT HERO ══ -->
+      <div class="wss-ai-hero">
+        <div class="wss-ai-hero-inner">
+          <div class="wss-ai-eyebrow">
+            <span class="wss-ai-dot"></span>
+            Powered by Dijo AI
+          </div>
+          <h1 class="wss-ai-title">Create a personalised website<br/><em>in minutes with AI</em></h1>
+          <p class="wss-ai-sub">Describe yourself — Dijo asks a few questions, then builds your entire site. No code, no templates, no guessing.</p>
+          <div class="wss-ai-box">
+            <div class="wss-ai-input-wrap">
+              <div class="wss-ai-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              </div>
+              <input
+                type="text"
+                id="wssAiPrompt"
+                class="wss-ai-input"
+                placeholder="e.g. I'm a wedding photographer based in Manchester…"
+                autocomplete="off"
+                onkeydown="if(event.key==='Enter')wssStartAI()"
+              />
+              <button class="wss-ai-btn" onclick="wssStartAI()">
+                Build my site
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="wss-ai-suggestions">
+              <span class="wss-ai-chip" onclick="wssAiFill('Fitness coach specialising in women\'s strength training')">Fitness coach</span>
+              <span class="wss-ai-chip" onclick="wssAiFill('Travel content creator and photographer')">Travel creator</span>
+              <span class="wss-ai-chip" onclick="wssAiFill('Fashion influencer and stylist')">Fashion stylist</span>
+              <span class="wss-ai-chip" onclick="wssAiFill('Tech reviewer and YouTuber')">Tech reviewer</span>
+              <span class="wss-ai-chip" onclick="wssAiFill('Food blogger and recipe developer')">Food blogger</span>
+            </div>
+          </div>
+          <div class="wss-ai-divider"><span>or browse styles below</span></div>
+        </div>
       </div>
 
-      <!-- ═══ STYLE GRID ═══ -->
+      <div class="wss-header">
+        <div class="wss-eyebrow">✦ 10 handcrafted styles</div>
+        <h2 class="wss-title">Pick your style.<br/><em>Your website builds itself.</em></h2>
+        <p class="wss-sub">Click any style — Dijo builds your entire website around it. No code. Live in 5 minutes.</p>
+      </div>
+
+      <!-- ═══ STYLE GRID — full-bleed cinematic cards ═══ -->
       <div class="wss-grid" id="wssGrid">
 
-        <!-- 1 — DARK GOLD (large featured) -->
+        <!-- 1 — DARK GOLD (featured wide) -->
         <div class="wss-card wss-featured" data-style-id="dark-gold" onclick="wssSelectStyle('dark-gold')">
-          <div class="wss-card-bg" style="background:linear-gradient(160deg,#07060a 0%,#130f04 100%)">
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(201,168,76,.18) 0%,transparent 55%)"></div>
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:1px solid rgba(201,168,76,.15)">
-                <div class="wss-mini-logo" style="background:rgba(201,168,76,.8)"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:#c9a84c"></div>
+          <div class="wss-full-preview" style="background:#07060a">
+            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=680&fit=crop&q=85&sat=-10" alt="" loading="eager"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(135deg,rgba(7,6,10,.92) 0%,rgba(7,6,10,.4) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(201,168,76,.2)">
+                <span class="wss-full-logo" style="font-family:Georgia,serif;letter-spacing:3px;color:#c9a84c;font-size:10px">SARAH JOHNSON</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(245,234,213,.6)">Portfolio</span>
+                  <span style="color:rgba(245,234,213,.6)">About</span>
+                  <span style="color:#c9a84c;text-decoration:underline">Rates</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:#c9a84c;color:#07060a;border-radius:0">Hire Me</div>
               </div>
-              <div class="wss-card-photo">
-                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&h=500&fit=crop&q=80" alt="Dark Gold fitness creator" loading="eager"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(7,6,10,.15) 0%,rgba(7,6,10,.75) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#c9a84c;font-family:Georgia,serif;font-style:italic">Fitness Creator</div>
-                  <div class="wss-h1" style="font-family:Georgia,serif;font-style:italic">Sarah Johnson</div>
-                  <div class="wss-meta">285K followers · 4.7% engagement</div>
-                  <div class="wss-btns">
-                    <div class="wss-btn-p" style="background:#c9a84c;color:#07060a;border-radius:0">Work With Me</div>
-                    <div class="wss-btn-s" style="border-color:rgba(201,168,76,.4);color:#f5ead5;border-radius:0">View Rates</div>
-                  </div>
+              <div class="wss-full-body">
+                <div class="wss-full-tag" style="color:#c9a84c;font-family:Georgia,serif;font-style:italic">Fitness Creator · 285K</div>
+                <div class="wss-full-headline" style="font-family:Georgia,serif;font-style:italic;color:#f5ead5">Transform<br/>Your Body.</div>
+                <div class="wss-full-sub" style="color:rgba(245,234,213,.55)">Online coaching · Brand deals · Collaborations</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#c9a84c;color:#07060a;border-radius:0">Work With Me</div>
+                  <div class="wss-full-btn-s" style="border-color:rgba(201,168,76,.4);color:#f5ead5;border-radius:0">View Rates →</div>
                 </div>
               </div>
-              <div class="wss-stats" style="border-top:1px solid rgba(201,168,76,.12)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#c9a84c">285K</div><div class="wss-stat-l">Followers</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#c9a84c">4.7%</div><div class="wss-stat-l">Engagement</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#c9a84c">2.1M</div><div class="wss-stat-l">Monthly Views</div></div>
+              <div class="wss-full-stats" style="border-top:1px solid rgba(201,168,76,.15)">
+                <div class="wss-full-stat"><strong style="color:#c9a84c">285K</strong><span>Followers</span></div>
+                <div class="wss-full-stat"><strong style="color:#c9a84c">4.7%</strong><span>Engagement</span></div>
+                <div class="wss-full-stat"><strong style="color:#c9a84c">2.1M</strong><span>Monthly Views</span></div>
+                <div class="wss-full-stat"><strong style="color:#c9a84c">£4.2K</strong><span>Avg Campaign</span></div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(201,168,76,.15);color:#c9a84c;border-color:rgba(201,168,76,.25)">Dark Gold</span>
-            <span class="wss-card-tags">Luxury · Editorial · Cinematic</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(201,168,76,.12);color:#c9a84c;border-color:rgba(201,168,76,.3)">Dark Gold</span>
+              <span class="wss-card-tags">Luxury · Editorial · Cinematic</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 2 — CLEAN LIGHT -->
         <div class="wss-card" data-style-id="clean-light" onclick="wssSelectStyle('clean-light')">
-          <div class="wss-card-bg" style="background:#f0f2f5">
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="background:#fff;border-bottom:1px solid rgba(0,0,0,.08)">
-                <div class="wss-mini-logo" style="background:#1d4ed8"></div>
-                <div class="wss-mini-links dark"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:#1d4ed8"></div>
-              </div>
-              <div class="wss-card-photo" style="height:140px">
-                <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=700&h=300&fit=crop&q=80" alt="Clean light food creator" loading="lazy" style="object-position:center 30%"/>
-                <div style="position:absolute;inset:0;background:rgba(0,0,0,.25)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#93c5fd">FOOD &amp; TRAVEL</div>
-                  <div class="wss-h1" style="color:#fff;font-size:16px">Marcus Creates</div>
-                  <div class="wss-btns" style="margin-top:8px">
-                    <div class="wss-btn-p" style="background:#1d4ed8;border-radius:4px;font-size:9px;padding:4px 10px">Book Collab</div>
-                  </div>
+          <div class="wss-full-preview" style="background:#f8f9fb">
+            <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(248,249,251,.97) 0%,rgba(248,249,251,.5) 55%,rgba(248,249,251,.1) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav light" style="border-bottom:1px solid rgba(0,0,0,.07)">
+                <span class="wss-full-logo" style="color:#0f172a;font-weight:900;letter-spacing:-0.5px;font-size:12px">Marcus Creates</span>
+                <div class="wss-full-nav-links dark">
+                  <span>Food</span><span>Travel</span><span style="font-weight:700;border-bottom:2px solid #1d4ed8">Work With Me</span>
                 </div>
+                <div class="wss-full-nav-cta" style="background:#1d4ed8;border-radius:5px;color:#fff">Enquire</div>
               </div>
-              <div class="wss-stats" style="background:#fff;border-top:1px solid rgba(0,0,0,.06)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#1d4ed8">229K</div><div class="wss-stat-l" style="color:#6b7280">Following</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#1d4ed8">38</div><div class="wss-stat-l" style="color:#6b7280">Collabs</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#1d4ed8">£1.2K</div><div class="wss-stat-l" style="color:#6b7280">Avg Rate</div></div>
+              <div class="wss-full-body" style="padding-top:20px">
+                <div class="wss-full-tag" style="color:#1d4ed8;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:700">Food &amp; Travel Creator</div>
+                <div class="wss-full-headline" style="color:#0f172a;font-size:28px;font-weight:900;letter-spacing:-1.5px;line-height:1.05">Making the<br/>world<br/>delicious.</div>
+                <div class="wss-full-sub" style="color:#64748b">229K followers across Instagram &amp; YouTube</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#1d4ed8;border-radius:5px;color:#fff">Book a Collab</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(29,78,216,.1);color:#1d4ed8;border-color:rgba(29,78,216,.2)">Clean Light</span>
-            <span class="wss-card-tags">Swiss · Minimal · Precision</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(29,78,216,.08);color:#1d4ed8;border-color:rgba(29,78,216,.2)">Clean Light</span>
+              <span class="wss-card-tags">Swiss · Minimal · Precision</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 3 — ROSE EDITORIAL -->
         <div class="wss-card" data-style-id="rose-editorial" onclick="wssSelectStyle('rose-editorial')">
-          <div class="wss-card-bg" style="background:linear-gradient(160deg,#0e0008 0%,#1a0012 100%)">
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(244,63,128,.14) 0%,transparent 60%)"></div>
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:1px solid rgba(244,63,128,.12)">
-                <div class="wss-mini-logo" style="background:rgba(244,63,128,.7);border-radius:50%"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:#f43f80;border-radius:999px"></div>
-              </div>
-              <div class="wss-card-photo" style="height:140px">
-                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700&h=300&fit=crop&q=80" alt="Rose editorial fashion creator" loading="lazy"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(14,0,8,.2) 0%,rgba(14,0,8,.7) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#f43f80;font-family:Georgia,serif;font-style:italic">Fashion Editor</div>
-                  <div class="wss-h1" style="font-family:Georgia,serif;font-style:italic;font-size:16px">Ella Moreau</div>
-                  <div class="wss-btns" style="margin-top:8px">
-                    <div class="wss-btn-p" style="background:#f43f80;border-radius:999px;font-size:9px;padding:4px 12px">Enquire Now</div>
-                  </div>
+          <div class="wss-full-preview" style="background:#0e0008">
+            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(14,0,8,.95) 0%,rgba(14,0,8,.6) 60%,rgba(14,0,8,.2) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(244,63,128,.12)">
+                <span class="wss-full-logo" style="font-family:Georgia,serif;font-style:italic;color:#fff;letter-spacing:1px;font-size:11px">Ella Moreau</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(255,255,255,.5)">Portfolio</span><span style="color:rgba(255,255,255,.5)">Press</span><span style="color:#f43f80">Contact</span>
                 </div>
+                <div class="wss-full-nav-cta" style="background:#f43f80;border-radius:999px;color:#fff">Enquire</div>
               </div>
-              <div class="wss-stats" style="border-top:1px solid rgba(244,63,128,.1)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#f43f80">512K</div><div class="wss-stat-l">Followers</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#f43f80">6.2%</div><div class="wss-stat-l">Engagement</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#f43f80">€3.5K</div><div class="wss-stat-l">Campaign</div></div>
+              <div class="wss-full-body" style="padding-top:18px">
+                <div class="wss-full-tag" style="color:#f43f80;font-family:Georgia,serif;font-style:italic">Fashion Editor · 512K</div>
+                <div class="wss-full-headline" style="font-family:Georgia,serif;font-style:italic;color:#fff;font-size:26px">Where fashion<br/>meets art.</div>
+                <div class="wss-full-sub" style="color:rgba(255,255,255,.45)">Brand partnerships · Editorial · Campaigns</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#f43f80;border-radius:999px;color:#fff">Book Campaign</div>
+                  <div class="wss-full-btn-s" style="border-color:rgba(244,63,128,.35);color:rgba(255,255,255,.8);border-radius:999px">View Rates</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(244,63,128,.12);color:#f43f80;border-color:rgba(244,63,128,.25)">Rose Editorial</span>
-            <span class="wss-card-tags">Fashion · Magazine · Italic</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(244,63,128,.1);color:#f43f80;border-color:rgba(244,63,128,.25)">Rose Editorial</span>
+              <span class="wss-card-tags">Fashion · Magazine · Italic</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
-        <!-- 4 — MIDNIGHT TECH (large featured) -->
+        <!-- 4 — MIDNIGHT TECH (featured wide) -->
         <div class="wss-card wss-featured" data-style-id="midnight-tech" onclick="wssSelectStyle('midnight-tech')">
-          <div class="wss-card-bg" style="background:#020b14">
-            <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(6,182,212,.025) 2px,rgba(6,182,212,.025) 4px)"></div>
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 30%,rgba(6,182,212,.12) 0%,transparent 60%)"></div>
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:1px solid rgba(6,182,212,.2);font-family:monospace">
-                <div class="wss-mini-logo" style="background:rgba(6,182,212,.6);border-radius:0"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:transparent;border:1px solid #06b6d4;border-radius:0"></div>
+          <div class="wss-full-preview" style="background:#020b14">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=680&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(135deg,rgba(2,11,20,.95) 0%,rgba(2,11,20,.55) 100%)"></div>
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(6,182,212,.03) 28px,rgba(6,182,212,.03) 29px);pointer-events:none"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(6,182,212,.18);font-family:monospace">
+                <span class="wss-full-logo" style="font-family:monospace;color:#06b6d4;font-size:11px;letter-spacing:2px">// ALEX CHEN</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(6,182,212,.5);font-family:monospace;font-size:9px">Projects</span>
+                  <span style="color:rgba(6,182,212,.5);font-family:monospace;font-size:9px">Videos</span>
+                  <span style="color:#06b6d4;font-family:monospace;font-size:9px">Sponsors</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:transparent;border:1px solid #06b6d4;color:#06b6d4;border-radius:0;font-family:monospace;font-size:9px">[ Hire ]</div>
               </div>
-              <div class="wss-card-photo">
-                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&h=500&fit=crop&q=80" alt="Midnight tech creator" loading="lazy"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,11,20,.3) 0%,rgba(2,11,20,.8) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#06b6d4;font-family:monospace;letter-spacing:3px">&gt; TECH.CREATOR</div>
-                  <div class="wss-h1" style="font-family:monospace;letter-spacing:-1px">// Alex Chen</div>
-                  <div class="wss-meta" style="font-family:monospace;font-size:9px;color:rgba(206,245,255,.5)">340K · 5.1% engagement</div>
-                  <div class="wss-btns">
-                    <div class="wss-btn-p" style="background:transparent;border:1px solid #06b6d4;color:#06b6d4;border-radius:0;font-family:monospace;font-size:9px">[ Sponsor Me ]</div>
-                  </div>
+              <div class="wss-full-body">
+                <div class="wss-full-tag" style="color:rgba(6,182,212,.7);font-family:monospace;font-size:8px;letter-spacing:4px">&gt; TECH CREATOR · 340K</div>
+                <div class="wss-full-headline" style="font-family:monospace;color:#e0f7ff;letter-spacing:-1px;font-size:30px;line-height:1.1">Building<br/>the future.<br/><span style="color:#06b6d4">On camera.</span></div>
+                <div class="wss-full-sub" style="color:rgba(206,245,255,.35);font-family:monospace;font-size:10px">Sponsor deals · Reviews · Brand integrations</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:transparent;border:1.5px solid #06b6d4;color:#06b6d4;border-radius:0;font-family:monospace;font-size:10px">[ Sponsor Me ]</div>
+                  <div class="wss-full-btn-s" style="border-color:rgba(6,182,212,.2);color:rgba(6,182,212,.6);border-radius:0;font-family:monospace;font-size:10px">[ Media Kit ]</div>
                 </div>
               </div>
-              <div class="wss-stats" style="border-top:1px solid rgba(6,182,212,.15)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#06b6d4;font-family:monospace">340K</div><div class="wss-stat-l" style="font-family:monospace;font-size:8px">SUBS</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#06b6d4;font-family:monospace">5.1%</div><div class="wss-stat-l" style="font-family:monospace;font-size:8px">ENGMT</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#06b6d4;font-family:monospace">8.4M</div><div class="wss-stat-l" style="font-family:monospace;font-size:8px">VIEWS</div></div>
+              <div class="wss-full-stats" style="border-top:1px solid rgba(6,182,212,.12)">
+                <div class="wss-full-stat"><strong style="color:#06b6d4;font-family:monospace">340K</strong><span style="font-family:monospace;font-size:7px">SUBS</span></div>
+                <div class="wss-full-stat"><strong style="color:#06b6d4;font-family:monospace">5.1%</strong><span style="font-family:monospace;font-size:7px">ENGMT</span></div>
+                <div class="wss-full-stat"><strong style="color:#06b6d4;font-family:monospace">8.4M</strong><span style="font-family:monospace;font-size:7px">VIEWS</span></div>
+                <div class="wss-full-stat"><strong style="color:#06b6d4;font-family:monospace">$12K</strong><span style="font-family:monospace;font-size:7px">AVG DEAL</span></div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(6,182,212,.1);color:#06b6d4;border-color:rgba(6,182,212,.2)">Midnight Tech</span>
-            <span class="wss-card-tags">Cyberpunk · Terminal · Glow</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(6,182,212,.08);color:#06b6d4;border-color:rgba(6,182,212,.2)">Midnight Tech</span>
+              <span class="wss-card-tags">Cyberpunk · Terminal · Glow</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 5 — FOREST ORGANIC -->
         <div class="wss-card" data-style-id="forest-organic" onclick="wssSelectStyle('forest-organic')">
-          <div class="wss-card-bg" style="background:linear-gradient(160deg,#0d1f12 0%,#162a1c 100%)">
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:1px solid rgba(255,255,255,.07)">
-                <div class="wss-mini-logo" style="background:#4ade80;border-radius:999px"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:#4ade80;border-radius:999px"></div>
-              </div>
-              <div class="wss-card-photo" style="height:140px">
-                <img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=700&h=300&fit=crop&q=80" alt="Forest organic fitness creator" loading="lazy"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,31,18,.25) 0%,rgba(13,31,18,.75) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#4ade80">Wellness · Fitness</div>
-                  <div class="wss-h1" style="font-size:16px">Mia Torres</div>
-                  <div class="wss-btns" style="margin-top:8px">
-                    <div class="wss-btn-p" style="background:#4ade80;color:#0d1f12;border-radius:999px;font-size:9px;padding:4px 12px">Work Together</div>
-                  </div>
+          <div class="wss-full-preview" style="background:#0d1f12">
+            <img src="https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(13,31,18,.96) 0%,rgba(13,31,18,.5) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(255,255,255,.06)">
+                <span class="wss-full-logo" style="color:#4ade80;font-weight:700;font-size:11px;letter-spacing:1px">Mia Torres</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(255,255,255,.45)">Programmes</span><span style="color:rgba(255,255,255,.45)">Recipes</span><span style="color:#4ade80">Work With Me</span>
                 </div>
+                <div class="wss-full-nav-cta" style="background:#4ade80;color:#0d1f12;border-radius:999px">Book</div>
               </div>
-              <div class="wss-stats" style="border-top:1px solid rgba(255,255,255,.06)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#4ade80">198K</div><div class="wss-stat-l">Followers</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#4ade80">7.3%</div><div class="wss-stat-l">Engagement</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#4ade80">3.2M</div><div class="wss-stat-l">Views</div></div>
+              <div class="wss-full-body" style="padding-top:18px">
+                <div class="wss-full-tag" style="color:#4ade80">Wellness · Fitness · 178K</div>
+                <div class="wss-full-headline" style="color:#fff;font-size:26px;font-weight:800;letter-spacing:-1px">Feel strong.<br/>Feel alive.</div>
+                <div class="wss-full-sub" style="color:rgba(255,255,255,.4)">Online coaching · Nutrition plans · Retreats</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#4ade80;color:#0d1f12;border-radius:999px">Start Journey</div>
+                  <div class="wss-full-btn-s" style="border-color:rgba(74,222,128,.3);color:rgba(255,255,255,.7);border-radius:999px">See Results</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.2)">Forest Organic</span>
-            <span class="wss-card-tags">Nature · Rounded · Earthy</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.25)">Forest Organic</span>
+              <span class="wss-card-tags">Wellness · Nature · Rounded</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 6 — NAVY CLASSIC -->
         <div class="wss-card" data-style-id="navy-classic" onclick="wssSelectStyle('navy-classic')">
-          <div class="wss-card-bg" style="background:linear-gradient(160deg,#03071a 0%,#08102a 100%)">
-            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4a7ddb,transparent)"></div>
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:2px solid rgba(74,125,219,.15)">
-                <div class="wss-mini-logo" style="background:#4a7ddb;border-radius:0;width:28px;height:8px"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:#4a7ddb;border-radius:6px"></div>
-              </div>
-              <div class="wss-card-photo" style="height:140px">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700&h=300&fit=crop&q=80" alt="Navy classic business creator" loading="lazy"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(3,7,26,.25) 0%,rgba(3,7,26,.8) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#4a7ddb;letter-spacing:4px;font-size:8px">BUSINESS · FINANCE</div>
-                  <div class="wss-h1" style="font-size:16px;letter-spacing:-0.5px">James Okafor</div>
-                  <div class="wss-btns" style="margin-top:8px">
-                    <div class="wss-btn-p" style="background:#4a7ddb;border-radius:6px;font-size:9px;padding:4px 10px">Connect</div>
-                  </div>
+          <div class="wss-full-preview" style="background:#0a1628">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(150deg,rgba(10,22,40,.97) 0%,rgba(10,22,40,.55) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(255,255,255,.08)">
+                <span class="wss-full-logo" style="color:#fff;font-weight:900;letter-spacing:3px;font-size:9px;text-transform:uppercase">James Laurent</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(255,255,255,.45)">About</span><span style="color:rgba(255,255,255,.45)">Speaking</span><span style="color:#93c5fd">Consulting</span>
                 </div>
+                <div class="wss-full-nav-cta" style="background:#1d4ed8;border-radius:4px;color:#fff">Connect</div>
               </div>
-              <div class="wss-stats" style="border-top:1px solid rgba(74,125,219,.1)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#4a7ddb">122K</div><div class="wss-stat-l">LinkedIn</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#4a7ddb">4.2%</div><div class="wss-stat-l">Rate</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#4a7ddb">52</div><div class="wss-stat-l">Clients</div></div>
+              <div class="wss-full-body" style="padding-top:18px">
+                <div class="wss-full-tag" style="color:#93c5fd;font-size:9px;letter-spacing:3px;text-transform:uppercase">Business & Finance · 95K</div>
+                <div class="wss-full-headline" style="color:#fff;font-size:26px;font-weight:900;letter-spacing:-1px;line-height:1.1">Build wealth.<br/>Build legacy.</div>
+                <div class="wss-full-sub" style="color:rgba(255,255,255,.4)">Keynotes · 1-on-1 consulting · Masterclasses</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#1d4ed8;border-radius:4px;color:#fff">Book a Session</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(74,125,219,.12);color:#4a7ddb;border-color:rgba(74,125,219,.25)">Navy Classic</span>
-            <span class="wss-card-tags">Executive · Corporate · Sharp</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(29,78,216,.1);color:#93c5fd;border-color:rgba(29,78,216,.25)">Navy Classic</span>
+              <span class="wss-card-tags">Authority · Corporate · Trust</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
-        <!-- 7 — SUNSET BRUTAL (large) -->
+        <!-- 7 — SUNSET BRUTAL (featured wide) -->
         <div class="wss-card wss-featured" data-style-id="sunset-brutal" onclick="wssSelectStyle('sunset-brutal')">
-          <div class="wss-card-bg" style="background:#fff8f0">
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="background:#fff;border-bottom:3px solid #0a0500">
-                <div class="wss-mini-logo" style="background:#ff5500;border-radius:0;width:28px;height:8px"></div>
-                <div class="wss-mini-links dark"><span style="background:#0a0500"></span><span style="background:#0a0500"></span><span style="background:#0a0500"></span></div>
-                <div class="wss-mini-cta" style="background:#ff5500;border:2px solid #0a0500;border-radius:0;box-shadow:2px 2px 0 #0a0500"></div>
+          <div class="wss-full-preview" style="background:#ff4d00">
+            <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1200&h=680&fit=crop&q=85&sat=30" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(135deg,rgba(255,77,0,.97) 0%,rgba(220,50,0,.7) 50%,rgba(255,77,0,.2) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:2px solid rgba(0,0,0,.15)">
+                <span class="wss-full-logo" style="color:#000;font-weight:900;font-size:13px;letter-spacing:-0.5px;text-transform:uppercase">DANNY RAW</span>
+                <div class="wss-full-nav-links" style="color:#000">
+                  <span style="color:rgba(0,0,0,.6)">Content</span><span style="color:rgba(0,0,0,.6)">Events</span><span style="color:#000;font-weight:800;text-decoration:underline">Collabs</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:#000;color:#ff4d00;border-radius:0;font-weight:900">LET'S GO</div>
               </div>
-              <div class="wss-card-photo">
-                <img src="https://images.unsplash.com/photo-1512314889357-e157c22f938d?w=900&h=500&fit=crop&q=80" alt="Sunset brutal bold creator" loading="lazy"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,248,240,.1) 0%,rgba(255,248,240,.65) 100%)"></div>
-                <div class="wss-hero-text" style="border-left:5px solid #ff5500;padding-left:12px">
-                  <div class="wss-eyebrow-sm" style="color:#ff5500;font-weight:900;letter-spacing:3px">CREATOR · BOLD</div>
-                  <div class="wss-h1" style="color:#0a0500;font-size:20px;font-weight:900;letter-spacing:-1px;text-shadow:none">Jordan Blake</div>
-                  <div class="wss-meta" style="color:rgba(10,5,0,.6)">150K · Streetwear &amp; Culture</div>
-                  <div class="wss-btns">
-                    <div class="wss-btn-p" style="background:#ff5500;color:#fff;border:2px solid #0a0500;border-radius:0;box-shadow:3px 3px 0 #0a0500;font-size:9px">Collab Now</div>
-                  </div>
+              <div class="wss-full-body">
+                <div class="wss-full-tag" style="color:rgba(0,0,0,.55);font-weight:900;font-size:9px;letter-spacing:4px;text-transform:uppercase">Music / DJ / Lifestyle</div>
+                <div class="wss-full-headline" style="color:#000;font-size:52px;font-weight:900;letter-spacing:-3px;line-height:.92;text-transform:uppercase">LOUD<br/>LIFE.</div>
+                <div class="wss-full-sub" style="color:rgba(0,0,0,.55);font-weight:700">Bookings · Brand deals · Collabs</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#000;color:#ff4d00;border-radius:0;font-weight:900;letter-spacing:1px;text-transform:uppercase">Book a Show</div>
+                  <div class="wss-full-btn-s" style="border-color:rgba(0,0,0,.3);color:#000;border-radius:0;font-weight:800">Rates</div>
                 </div>
               </div>
-              <div class="wss-stats" style="background:#fff;border-top:3px solid #0a0500">
-                <div class="wss-stat" style="border-right:2px solid #0a0500"><div class="wss-stat-v" style="color:#ff5500">150K</div><div class="wss-stat-l" style="color:#0a0500;font-weight:700">FOLLOWERS</div></div>
-                <div class="wss-stat" style="border-right:2px solid #0a0500"><div class="wss-stat-v" style="color:#ff5500">8.1%</div><div class="wss-stat-l" style="color:#0a0500;font-weight:700">RATE</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#ff5500">47</div><div class="wss-stat-l" style="color:#0a0500;font-weight:700">BRANDS</div></div>
+              <div class="wss-full-stats" style="border-top:2px solid rgba(0,0,0,.15)">
+                <div class="wss-full-stat"><strong style="color:#000">1.2M</strong><span style="color:rgba(0,0,0,.55)">Followers</span></div>
+                <div class="wss-full-stat"><strong style="color:#000">8.4%</strong><span style="color:rgba(0,0,0,.55)">Engagement</span></div>
+                <div class="wss-full-stat"><strong style="color:#000">48</strong><span style="color:rgba(0,0,0,.55)">Gigs/Yr</span></div>
+                <div class="wss-full-stat"><strong style="color:#000">£8K</strong><span style="color:rgba(0,0,0,.55)">Avg Booking</span></div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(255,85,0,.1);color:#ff5500;border-color:rgba(255,85,0,.3)">Sunset Brutal</span>
-            <span class="wss-card-tags">Neobrutalism · Bold · Raw</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(255,77,0,.12);color:#ff4d00;border-color:rgba(255,77,0,.3)">Sunset Brutal</span>
+              <span class="wss-card-tags">Bold · Energetic · Statement</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 8 — VIOLET DREAMY -->
         <div class="wss-card" data-style-id="violet-dreamy" onclick="wssSelectStyle('violet-dreamy')">
-          <div class="wss-card-bg" style="background:linear-gradient(160deg,#0a0514 0%,#120b24 100%)">
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(167,139,250,.18) 0%,transparent 65%)"></div>
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:1px solid rgba(167,139,250,.15)">
-                <div class="wss-mini-logo" style="background:rgba(167,139,250,.7);border-radius:10px"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:rgba(167,139,250,.25);border:1px solid rgba(167,139,250,.4);border-radius:12px"></div>
-              </div>
-              <div class="wss-card-photo" style="height:140px">
-                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=700&h=300&fit=crop&q=80" alt="Violet dreamy gaming creator" loading="lazy"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,5,20,.3) 0%,rgba(10,5,20,.75) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#a78bfa">Gaming · Streaming</div>
-                  <div class="wss-h1" style="font-size:16px;text-shadow:0 0 20px rgba(167,139,250,.5)">Luna Stream</div>
-                  <div class="wss-btns" style="margin-top:8px">
-                    <div class="wss-btn-p" style="background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);border-radius:12px;font-size:9px;padding:4px 12px;box-shadow:0 0 12px rgba(167,139,250,.2)">Sponsor Me</div>
-                  </div>
+          <div class="wss-full-preview" style="background:#0a0514">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(10,5,20,.97) 0%,rgba(10,5,20,.5) 100%)"></div>
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(167,139,250,.15) 0%,transparent 60%);pointer-events:none"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(167,139,250,.1)">
+                <span class="wss-full-logo" style="color:#a78bfa;font-style:italic;font-size:12px;letter-spacing:1px">Luna.stream</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(255,255,255,.35)">Schedule</span><span style="color:rgba(255,255,255,.35)">Merch</span><span style="color:#a78bfa">Sponsor</span>
                 </div>
+                <div class="wss-full-nav-cta" style="background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px">Support</div>
               </div>
-              <div class="wss-stats" style="border-top:1px solid rgba(167,139,250,.1)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#a78bfa;text-shadow:0 0 10px rgba(167,139,250,.4)">420K</div><div class="wss-stat-l">Subs</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#a78bfa;text-shadow:0 0 10px rgba(167,139,250,.4)">11K</div><div class="wss-stat-l">Avg Live</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#a78bfa;text-shadow:0 0 10px rgba(167,139,250,.4)">6.4M</div><div class="wss-stat-l">Views</div></div>
+              <div class="wss-full-body" style="padding-top:16px">
+                <div class="wss-full-tag" style="color:#a78bfa">Gaming · Streaming · 420K</div>
+                <div class="wss-full-headline" style="color:#fff;font-size:24px;font-weight:800;text-shadow:0 0 30px rgba(167,139,250,.4)">Play loud.<br/>Dream bigger.</div>
+                <div class="wss-full-sub" style="color:rgba(255,255,255,.35)">Sponsorships · Merch · Brand collabs</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:#a78bfa;border-radius:12px;box-shadow:0 0 20px rgba(167,139,250,.15)">Sponsor Me</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.2)">Violet Dreamy</span>
-            <span class="wss-card-tags">Lo-fi · Glow · Dreamy</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.2)">Violet Dreamy</span>
+              <span class="wss-card-tags">Lo-fi · Glow · Dreamy</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 9 — COPPER RETRO -->
         <div class="wss-card" data-style-id="copper-retro" onclick="wssSelectStyle('copper-retro')">
-          <div class="wss-card-bg" style="background:linear-gradient(160deg,#1a0f00 0%,#2a1a00 100%)">
+          <div class="wss-full-preview" style="background:#1a0f00">
+            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(26,15,0,.96) 0%,rgba(26,15,0,.5) 100%)"></div>
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#c87533,#f0a060,#c87533)"></div>
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:2px solid rgba(200,117,51,.2)">
-                <div class="wss-mini-logo" style="background:#c87533;border-radius:0;letter-spacing:3px;width:32px;height:8px"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:#c87533;border-radius:0"></div>
-              </div>
-              <div class="wss-card-photo" style="height:140px">
-                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&h=300&fit=crop&q=80" alt="Copper retro travel creator" loading="lazy"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(26,15,0,.3) 0%,rgba(26,15,0,.75) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:#c87533;letter-spacing:6px;font-size:7px">TRAVEL · FILM</div>
-                  <div class="wss-h1" style="font-size:16px;letter-spacing:-0.5px;color:#f5e6c8">Marco Vista</div>
-                  <div class="wss-btns" style="margin-top:8px">
-                    <div class="wss-btn-p" style="background:#c87533;border-radius:0;font-size:9px;padding:4px 10px;letter-spacing:2px;text-transform:uppercase">Partner</div>
-                  </div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1.5px solid rgba(200,117,51,.2)">
+                <span class="wss-full-logo" style="color:#c87533;font-weight:900;letter-spacing:4px;font-size:9px;text-transform:uppercase">Marco Vista</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(245,230,200,.4);letter-spacing:2px;font-size:8px">Journal</span>
+                  <span style="color:rgba(245,230,200,.4);letter-spacing:2px;font-size:8px">Films</span>
+                  <span style="color:#c87533;letter-spacing:2px;font-size:8px">Partner</span>
                 </div>
+                <div class="wss-full-nav-cta" style="background:#c87533;color:#1a0f00;border-radius:0;letter-spacing:2px;font-size:9px">HIRE</div>
               </div>
-              <div class="wss-stats" style="border-top:2px solid rgba(200,117,51,.15)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#c87533">88K</div><div class="wss-stat-l" style="color:rgba(245,230,200,.5)">Subs</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#c87533">5.8%</div><div class="wss-stat-l" style="color:rgba(245,230,200,.5)">Rate</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#c87533">1.9M</div><div class="wss-stat-l" style="color:rgba(245,230,200,.5)">Views</div></div>
+              <div class="wss-full-body" style="padding-top:18px">
+                <div class="wss-full-tag" style="color:#c87533;letter-spacing:6px;font-size:8px;text-transform:uppercase">Travel · Film · 88K</div>
+                <div class="wss-full-headline" style="color:#f5e6c8;font-size:26px;font-weight:900;letter-spacing:-1px;line-height:1.05">Capture the<br/>world raw.</div>
+                <div class="wss-full-sub" style="color:rgba(245,230,200,.4)">Brand journeys · Film campaigns · Partnerships</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#c87533;color:#1a0f00;border-radius:0;letter-spacing:2px;text-transform:uppercase;font-size:10px">Partner With Me</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(200,117,51,.12);color:#c87533;border-color:rgba(200,117,51,.25)">Copper Retro</span>
-            <span class="wss-card-tags">70s · Warm · Geometric</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(200,117,51,.12);color:#c87533;border-color:rgba(200,117,51,.25)">Copper Retro</span>
+              <span class="wss-card-tags">70s · Warm · Geometric</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 10 — SMOKE MONO -->
         <div class="wss-card" data-style-id="smoke-mono" onclick="wssSelectStyle('smoke-mono')">
-          <div class="wss-card-bg" style="background:#111113">
-            <div class="wss-card-inner">
-              <div class="wss-mini-nav" style="border-bottom:1px solid rgba(255,255,255,.07)">
-                <div class="wss-mini-logo" style="background:rgba(240,240,242,.7);border-radius:0;width:24px;height:8px"></div>
-                <div class="wss-mini-links"><span></span><span></span><span></span></div>
-                <div class="wss-mini-cta" style="background:#f0f0f2;border-radius:6px;width:36px;height:16px"></div>
-              </div>
-              <div class="wss-card-photo" style="height:140px">
-                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&h=300&fit=crop&q=80" alt="Smoke mono artist creator" loading="lazy" style="filter:grayscale(100%)"/>
-                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(17,17,19,.2) 0%,rgba(17,17,19,.75) 100%)"></div>
-                <div class="wss-hero-text">
-                  <div class="wss-eyebrow-sm" style="color:rgba(240,240,242,.45);letter-spacing:4px;font-size:7px">ART DIRECTION</div>
-                  <div class="wss-h1" style="font-size:17px;letter-spacing:-2px;color:#f0f0f2">Kai Nōrd</div>
-                  <div class="wss-btns" style="margin-top:8px">
-                    <div class="wss-btn-p" style="background:#f0f0f2;color:#111113;border-radius:6px;font-size:9px;padding:4px 10px">Inquire</div>
-                  </div>
+          <div class="wss-full-preview" style="background:#111113">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=560&fit=crop&q=85&sat=-100" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(17,17,19,.97) 0%,rgba(17,17,19,.5) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(255,255,255,.05)">
+                <span class="wss-full-logo" style="color:#f0f0f2;font-weight:900;letter-spacing:-1px;font-size:13px">Kai Nōrd</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(255,255,255,.3)">Work</span><span style="color:rgba(255,255,255,.3)">About</span><span style="color:rgba(255,255,255,.7)">Inquire</span>
                 </div>
+                <div class="wss-full-nav-cta" style="background:#f0f0f2;color:#111113;border-radius:6px">Contact</div>
               </div>
-              <div class="wss-stats" style="border-top:1px solid rgba(255,255,255,.07)">
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#a0a0a8">76K</div><div class="wss-stat-l">Following</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#a0a0a8">9.2%</div><div class="wss-stat-l">Rate</div></div>
-                <div class="wss-stat"><div class="wss-stat-v" style="color:#a0a0a8">1.1M</div><div class="wss-stat-l">Views</div></div>
+              <div class="wss-full-body" style="padding-top:18px">
+                <div class="wss-full-tag" style="color:rgba(240,240,242,.35);letter-spacing:5px;font-size:8px;text-transform:uppercase">Art Direction · 76K</div>
+                <div class="wss-full-headline" style="color:#f0f0f2;font-size:28px;font-weight:900;letter-spacing:-2px;line-height:1">Quiet.<br/>Powerful.</div>
+                <div class="wss-full-sub" style="color:rgba(255,255,255,.3)">Brand identity · Campaign art direction</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#f0f0f2;color:#111113;border-radius:6px">Inquire</div>
+                  <div class="wss-full-btn-s" style="border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.55);border-radius:6px">View Work</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="wss-card-label">
-            <span class="wss-pill" style="background:rgba(160,160,168,.1);color:#a0a0a8;border-color:rgba(160,160,168,.2)">Smoke Mono</span>
-            <span class="wss-card-tags">Monochrome · Pure · Minimal</span>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(160,160,168,.1);color:#a0a0a8;border-color:rgba(160,160,168,.2)">Smoke Mono</span>
+              <span class="wss-card-tags">Monochrome · Pure · Minimal</span>
+            </div>
+            <div class="wss-card-footer-cta">Select →</div>
           </div>
-          <div class="wss-select-ring"></div>
-          <div class="wss-hover-cta">Build with this style →</div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
       </div><!-- /wss-grid -->
-
       <div class="wss-footer-note">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Free to start · No credit card · Live in 5 minutes · You can switch styles anytime
