@@ -119,16 +119,27 @@
       </div>
 
       <div class="wss-header">
-        <div class="wss-eyebrow">✦ 10 handcrafted styles</div>
+        <div class="wss-eyebrow">✦ 16 handcrafted styles</div>
         <h2 class="wss-title">Pick your style.<br/><em>Your website builds itself.</em></h2>
         <p class="wss-sub">Click any style — Dijo builds your entire website around it. No code. Live in 5 minutes.</p>
+      </div>
+
+      <!-- ═══ FILTER CHIPS ═══ -->
+      <div class="wss-filters" id="wssFilters">
+        <button class="wss-filter-chip active" data-filter="all" onclick="wssFilter(this,'all')">All styles</button>
+        <button class="wss-filter-chip" data-filter="dark" onclick="wssFilter(this,'dark')">Dark &amp; Moody</button>
+        <button class="wss-filter-chip" data-filter="light" onclick="wssFilter(this,'light')">Clean &amp; Light</button>
+        <button class="wss-filter-chip" data-filter="luxury" onclick="wssFilter(this,'luxury')">Luxury</button>
+        <button class="wss-filter-chip" data-filter="bold" onclick="wssFilter(this,'bold')">Bold &amp; Energetic</button>
+        <button class="wss-filter-chip" data-filter="editorial" onclick="wssFilter(this,'editorial')">Editorial</button>
+        <button class="wss-filter-chip" data-filter="tech" onclick="wssFilter(this,'tech')">Tech &amp; Gaming</button>
       </div>
 
       <!-- ═══ STYLE GRID — full-bleed cinematic cards ═══ -->
       <div class="wss-grid" id="wssGrid">
 
         <!-- 1 — DARK GOLD (featured wide) -->
-        <div class="wss-card wss-featured" data-style-id="dark-gold" onclick="wssSelectStyle('dark-gold')">
+        <div class="wss-card wss-featured" data-style-id="dark-gold" data-filter="luxury dark" onclick="wssSelectStyle('dark-gold')">
           <div class="wss-full-preview" style="background:#07060a">
             <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=680&fit=crop&q=85&sat=-10" alt="" loading="eager"/>
             <div class="wss-full-overlay" style="background:linear-gradient(135deg,rgba(7,6,10,.92) 0%,rgba(7,6,10,.4) 100%)"></div>
@@ -164,13 +175,16 @@
               <span class="wss-pill" style="background:rgba(201,168,76,.12);color:#c9a84c;border-color:rgba(201,168,76,.3)">Dark Gold</span>
               <span class="wss-card-tags">Luxury · Editorial · Cinematic</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('dark-gold')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 2 — CLEAN LIGHT -->
-        <div class="wss-card" data-style-id="clean-light" onclick="wssSelectStyle('clean-light')">
+        <div class="wss-card" data-style-id="clean-light" data-filter="light" onclick="wssSelectStyle('clean-light')">
           <div class="wss-full-preview" style="background:#f8f9fb">
             <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(248,249,251,.97) 0%,rgba(248,249,251,.5) 55%,rgba(248,249,251,.1) 100%)"></div>
@@ -197,13 +211,16 @@
               <span class="wss-pill" style="background:rgba(29,78,216,.08);color:#1d4ed8;border-color:rgba(29,78,216,.2)">Clean Light</span>
               <span class="wss-card-tags">Swiss · Minimal · Precision</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('clean-light')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 3 — ROSE EDITORIAL -->
-        <div class="wss-card" data-style-id="rose-editorial" onclick="wssSelectStyle('rose-editorial')">
+        <div class="wss-card" data-style-id="rose-editorial" data-filter="editorial dark luxury" onclick="wssSelectStyle('rose-editorial')">
           <div class="wss-full-preview" style="background:#0e0008">
             <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(14,0,8,.95) 0%,rgba(14,0,8,.6) 60%,rgba(14,0,8,.2) 100%)"></div>
@@ -231,13 +248,16 @@
               <span class="wss-pill" style="background:rgba(244,63,128,.1);color:#f43f80;border-color:rgba(244,63,128,.25)">Rose Editorial</span>
               <span class="wss-card-tags">Fashion · Magazine · Italic</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('rose-editorial')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 4 — MIDNIGHT TECH (featured wide) -->
-        <div class="wss-card wss-featured" data-style-id="midnight-tech" onclick="wssSelectStyle('midnight-tech')">
+        <div class="wss-card wss-featured" data-style-id="midnight-tech" data-filter="tech dark" onclick="wssSelectStyle('midnight-tech')">
           <div class="wss-full-preview" style="background:#020b14">
             <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=680&fit=crop&q=85" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(135deg,rgba(2,11,20,.95) 0%,rgba(2,11,20,.55) 100%)"></div>
@@ -274,13 +294,16 @@
               <span class="wss-pill" style="background:rgba(6,182,212,.08);color:#06b6d4;border-color:rgba(6,182,212,.2)">Midnight Tech</span>
               <span class="wss-card-tags">Cyberpunk · Terminal · Glow</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('midnight-tech')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 5 — FOREST ORGANIC -->
-        <div class="wss-card" data-style-id="forest-organic" onclick="wssSelectStyle('forest-organic')">
+        <div class="wss-card" data-style-id="forest-organic" data-filter="dark" onclick="wssSelectStyle('forest-organic')">
           <div class="wss-full-preview" style="background:#0d1f12">
             <img src="https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(13,31,18,.96) 0%,rgba(13,31,18,.5) 100%)"></div>
@@ -308,13 +331,16 @@
               <span class="wss-pill" style="background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.25)">Forest Organic</span>
               <span class="wss-card-tags">Wellness · Nature · Rounded</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('forest-organic')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 6 — NAVY CLASSIC -->
-        <div class="wss-card" data-style-id="navy-classic" onclick="wssSelectStyle('navy-classic')">
+        <div class="wss-card" data-style-id="navy-classic" data-filter="dark" onclick="wssSelectStyle('navy-classic')">
           <div class="wss-full-preview" style="background:#0a1628">
             <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(150deg,rgba(10,22,40,.97) 0%,rgba(10,22,40,.55) 100%)"></div>
@@ -341,13 +367,16 @@
               <span class="wss-pill" style="background:rgba(29,78,216,.1);color:#93c5fd;border-color:rgba(29,78,216,.25)">Navy Classic</span>
               <span class="wss-card-tags">Authority · Corporate · Trust</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('navy-classic')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 7 — SUNSET BRUTAL (featured wide) -->
-        <div class="wss-card wss-featured" data-style-id="sunset-brutal" onclick="wssSelectStyle('sunset-brutal')">
+        <div class="wss-card wss-featured" data-style-id="sunset-brutal" data-filter="bold" onclick="wssSelectStyle('sunset-brutal')">
           <div class="wss-full-preview" style="background:#ff4d00">
             <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1200&h=680&fit=crop&q=85&sat=30" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(135deg,rgba(255,77,0,.97) 0%,rgba(220,50,0,.7) 50%,rgba(255,77,0,.2) 100%)"></div>
@@ -381,13 +410,16 @@
               <span class="wss-pill" style="background:rgba(255,77,0,.12);color:#ff4d00;border-color:rgba(255,77,0,.3)">Sunset Brutal</span>
               <span class="wss-card-tags">Bold · Energetic · Statement</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('sunset-brutal')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 8 — VIOLET DREAMY -->
-        <div class="wss-card" data-style-id="violet-dreamy" onclick="wssSelectStyle('violet-dreamy')">
+        <div class="wss-card" data-style-id="violet-dreamy" data-filter="tech dark" onclick="wssSelectStyle('violet-dreamy')">
           <div class="wss-full-preview" style="background:#0a0514">
             <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(10,5,20,.97) 0%,rgba(10,5,20,.5) 100%)"></div>
@@ -415,13 +447,16 @@
               <span class="wss-pill" style="background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.2)">Violet Dreamy</span>
               <span class="wss-card-tags">Lo-fi · Glow · Dreamy</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('violet-dreamy')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 9 — COPPER RETRO -->
-        <div class="wss-card" data-style-id="copper-retro" onclick="wssSelectStyle('copper-retro')">
+        <div class="wss-card" data-style-id="copper-retro" data-filter="editorial dark" onclick="wssSelectStyle('copper-retro')">
           <div class="wss-full-preview" style="background:#1a0f00">
             <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(26,15,0,.96) 0%,rgba(26,15,0,.5) 100%)"></div>
@@ -451,13 +486,16 @@
               <span class="wss-pill" style="background:rgba(200,117,51,.12);color:#c87533;border-color:rgba(200,117,51,.25)">Copper Retro</span>
               <span class="wss-card-tags">70s · Warm · Geometric</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('copper-retro')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
 
         <!-- 10 — SMOKE MONO -->
-        <div class="wss-card" data-style-id="smoke-mono" onclick="wssSelectStyle('smoke-mono')">
+        <div class="wss-card" data-style-id="smoke-mono" data-filter="dark" onclick="wssSelectStyle('smoke-mono')">
           <div class="wss-full-preview" style="background:#111113">
             <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=560&fit=crop&q=85&sat=-100" alt="" loading="lazy"/>
             <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(17,17,19,.97) 0%,rgba(17,17,19,.5) 100%)"></div>
@@ -485,7 +523,254 @@
               <span class="wss-pill" style="background:rgba(160,160,168,.1);color:#a0a0a8;border-color:rgba(160,160,168,.2)">Smoke Mono</span>
               <span class="wss-card-tags">Monochrome · Pure · Minimal</span>
             </div>
-            <div class="wss-card-footer-cta">Select →</div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('smoke-mono')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
+          </div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
+        </div>
+
+
+        <!-- 11 — OBSIDIAN LUXE (featured wide) -->
+        <div class="wss-card wss-featured" data-style-id="obsidian-luxe" data-filter="luxury dark editorial" onclick="wssSelectStyle('obsidian-luxe')">
+          <div class="wss-full-preview" style="background:#0a090c">
+            <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=680&fit=crop&q=85&sat=-30" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(135deg,rgba(10,9,12,.96) 0%,rgba(10,9,12,.35) 100%)"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(45deg,transparent 60%,rgba(212,180,140,.06) 100%);pointer-events:none"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(212,180,140,.15);letter-spacing:4px">
+                <span class="wss-full-logo" style="font-family:Georgia,serif;color:#d4b48c;letter-spacing:5px;font-size:9px;text-transform:uppercase">MAISON · NOIR</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(212,180,140,.4);letter-spacing:2px;font-size:8px">WORK</span>
+                  <span style="color:rgba(212,180,140,.4);letter-spacing:2px;font-size:8px">PRESS</span>
+                  <span style="color:#d4b48c;letter-spacing:2px;font-size:8px">CONTACT</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:transparent;border:1px solid rgba(212,180,140,.5);color:#d4b48c;border-radius:0;letter-spacing:3px;font-size:8px">ENQUIRE</div>
+              </div>
+              <div class="wss-full-body" style="padding-top:24px">
+                <div class="wss-full-tag" style="color:rgba(212,180,140,.5);letter-spacing:8px;font-size:7px;text-transform:uppercase">Fashion · Creative Director</div>
+                <div class="wss-full-headline" style="font-family:Georgia,serif;font-style:italic;color:#f0e8dc;font-size:38px;letter-spacing:-1px;line-height:.95">Elegance<br/>is silence.</div>
+                <div class="wss-full-sub" style="color:rgba(240,232,220,.3);letter-spacing:2px;font-size:8px;text-transform:uppercase">Editorial campaigns · Brand identity · Art direction</div>
+                <div class="wss-full-actions" style="margin-top:12px">
+                  <div class="wss-full-btn-p" style="background:#d4b48c;color:#0a090c;border-radius:0;letter-spacing:3px;font-size:8px;text-transform:uppercase">View Portfolio</div>
+                </div>
+              </div>
+              <div class="wss-full-stats" style="border-top:1px solid rgba(212,180,140,.08)">
+                <div class="wss-full-stat"><strong style="color:#d4b48c">128K</strong><span>Instagram</span></div>
+                <div class="wss-full-stat"><strong style="color:#d4b48c">Vogue</strong><span>Featured in</span></div>
+                <div class="wss-full-stat"><strong style="color:#d4b48c">42</strong><span>Campaigns</span></div>
+                <div class="wss-full-stat"><strong style="color:#d4b48c">£8K+</strong><span>Day Rate</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(212,180,140,.1);color:#d4b48c;border-color:rgba(212,180,140,.25)">Obsidian Luxe</span>
+              <span class="wss-card-tags">Fashion · Haute · Silence</span>
+            </div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('obsidian-luxe')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
+          </div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
+        </div>
+
+        <!-- 12 — BRUTALIST INK -->
+        <div class="wss-card" data-style-id="brutalist-ink" data-filter="bold editorial" onclick="wssSelectStyle('brutalist-ink')">
+          <div class="wss-full-preview" style="background:#f2ede6">
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=560&fit=crop&q=85&sat=-80" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(242,237,230,.98) 0%,rgba(242,237,230,.7) 60%,rgba(242,237,230,.1) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav light" style="border-bottom:3px solid #0d0d0d">
+                <span class="wss-full-logo" style="color:#0d0d0d;font-weight:900;font-size:13px;letter-spacing:-1px;text-transform:uppercase">WOLFE</span>
+                <div class="wss-full-nav-links dark">
+                  <span style="font-weight:900;text-decoration:line-through;color:#0d0d0d">Work</span>
+                  <span style="font-weight:900;color:rgba(0,0,0,.4)">About</span>
+                  <span style="font-weight:900;color:#0d0d0d">Hire</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:#0d0d0d;color:#f2ede6;border-radius:0;font-weight:900;letter-spacing:1px">→</div>
+              </div>
+              <div class="wss-full-body" style="padding-top:14px">
+                <div class="wss-full-tag" style="color:#0d0d0d;font-weight:900;font-size:9px;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid #0d0d0d;display:inline-block;padding-bottom:2px">Art Director / 89K</div>
+                <div class="wss-full-headline" style="color:#0d0d0d;font-size:36px;font-weight:900;letter-spacing:-3px;line-height:.88;text-transform:uppercase">IDEAS<br/>MADE<br/>BRUTAL.</div>
+                <div class="wss-full-actions" style="margin-top:10px">
+                  <div class="wss-full-btn-p" style="background:#0d0d0d;color:#f2ede6;border-radius:0;font-weight:900;letter-spacing:2px;text-transform:uppercase">OPEN WORK</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(13,13,13,.08);color:#0d0d0d;border-color:rgba(13,13,13,.3)">Brutalist Ink</span>
+              <span class="wss-card-tags">Raw · Print · Confrontational</span>
+            </div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('brutalist-ink')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
+          </div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
+        </div>
+
+        <!-- 13 — CHROME FUTURE -->
+        <div class="wss-card" data-style-id="chrome-future" data-filter="tech dark">
+          <div class="wss-full-preview" style="background:#03060f" onclick="wssSelectStyle('chrome-future')">
+            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(3,6,15,.97) 0%,rgba(3,6,15,.55) 100%)"></div>
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(99,102,241,.03) 40px,rgba(99,102,241,.03) 41px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(99,102,241,.03) 40px,rgba(99,102,241,.03) 41px);pointer-events:none"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(99,102,241,.2)">
+                <span class="wss-full-logo" style="color:#6366f1;font-weight:900;font-size:10px;letter-spacing:2px">⬡ AXIOM</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(99,102,241,.5);font-size:9px">Product</span>
+                  <span style="color:rgba(99,102,241,.5);font-size:9px">Insights</span>
+                  <span style="color:#6366f1;font-size:9px">Invest</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:4px;font-size:9px">Join</div>
+              </div>
+              <div class="wss-full-body" style="padding-top:16px">
+                <div class="wss-full-tag" style="color:#6366f1;letter-spacing:4px;font-size:7px;text-transform:uppercase">Founder · Builder · 54K</div>
+                <div class="wss-full-headline" style="color:#e0e7ff;font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1.05">Building<br/><span style="color:#6366f1">tomorrow's</span><br/>defaults.</div>
+                <div class="wss-full-sub" style="color:rgba(224,231,255,.3)">Angel investing · Advisory · Keynotes</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:4px">Work Together</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wss-card-footer" onclick="wssSelectStyle('chrome-future')">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(99,102,241,.1);color:#6366f1;border-color:rgba(99,102,241,.25)">Chrome Future</span>
+              <span class="wss-card-tags">Startup · Founder · Grid</span>
+            </div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('chrome-future')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
+          </div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
+        </div>
+
+        <!-- 14 — CREAM EDITORIAL (featured wide) -->
+        <div class="wss-card wss-featured" data-style-id="cream-editorial" data-filter="light editorial luxury" onclick="wssSelectStyle('cream-editorial')">
+          <div class="wss-full-preview" style="background:#f9f5ef">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=680&fit=crop&q=85&sat=-40" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(249,245,239,.98) 0%,rgba(249,245,239,.6) 55%,rgba(249,245,239,.05) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav light" style="border-bottom:1px solid rgba(0,0,0,.08)">
+                <span class="wss-full-logo" style="font-family:Georgia,serif;font-style:italic;color:#1a1510;font-size:13px;letter-spacing:.5px">Cecile Moreau</span>
+                <div class="wss-full-nav-links dark">
+                  <span style="color:rgba(0,0,0,.35)">Stories</span>
+                  <span style="color:rgba(0,0,0,.35)">Studio</span>
+                  <span style="color:#1a1510;font-weight:700">Collaborate</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:#1a1510;color:#f9f5ef;border-radius:999px">Book</div>
+              </div>
+              <div class="wss-full-body" style="padding-top:22px">
+                <div class="wss-full-tag" style="color:rgba(26,21,16,.4);letter-spacing:6px;font-size:7px;text-transform:uppercase">Photography · Lifestyle · 211K</div>
+                <div class="wss-full-headline" style="font-family:Georgia,serif;color:#1a1510;font-size:34px;letter-spacing:-1px;line-height:.96;font-style:italic">Light finds<br/>beauty<br/>everywhere.</div>
+                <div class="wss-full-sub" style="color:rgba(26,21,16,.45)">Commercial shoots · Brand stories · Studio hire</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:#1a1510;color:#f9f5ef;border-radius:999px">Enquire</div>
+                  <div class="wss-full-btn-s" style="border-color:rgba(0,0,0,.2);color:rgba(26,21,16,.7);border-radius:999px">See Work</div>
+                </div>
+              </div>
+              <div class="wss-full-stats" style="border-top:1px solid rgba(0,0,0,.07);background:rgba(249,245,239,.9)">
+                <div class="wss-full-stat"><strong style="color:#1a1510">211K</strong><span style="color:rgba(0,0,0,.35)">Followers</span></div>
+                <div class="wss-full-stat"><strong style="color:#1a1510">3.8%</strong><span style="color:rgba(0,0,0,.35)">Engagement</span></div>
+                <div class="wss-full-stat"><strong style="color:#1a1510">Elle</strong><span style="color:rgba(0,0,0,.35)">Published In</span></div>
+                <div class="wss-full-stat"><strong style="color:#1a1510">£3K</strong><span style="color:rgba(0,0,0,.35)">Day Rate</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(26,21,16,.06);color:#1a1510;border-color:rgba(26,21,16,.2)">Cream Editorial</span>
+              <span class="wss-card-tags">Magazine · Soft · Organic</span>
+            </div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('cream-editorial')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
+          </div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
+        </div>
+
+        <!-- 15 — CORAL BOLD -->
+        <div class="wss-card" data-style-id="coral-bold" data-filter="bold" onclick="wssSelectStyle('coral-bold')">
+          <div class="wss-full-preview" style="background:#fff">
+            <img src="https://images.unsplash.com/photo-1540206395-68808572332f?w=800&h=560&fit=crop&q=85" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,#fff 0%,rgba(255,255,255,.8) 40%,rgba(255,255,255,.05) 100%)"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav light" style="border-bottom:2px solid #111">
+                <span class="wss-full-logo" style="color:#111;font-weight:900;font-size:13px;letter-spacing:-1px">NAOMI.CO</span>
+                <div class="wss-full-nav-links dark">
+                  <span style="color:rgba(0,0,0,.4)">Reels</span>
+                  <span style="color:rgba(0,0,0,.4)">Rates</span>
+                  <span style="color:#ff4d4d;font-weight:900">Let's Talk</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:#ff4d4d;color:#fff;border-radius:0;font-weight:900">Go →</div>
+              </div>
+              <div class="wss-full-body" style="padding-top:12px">
+                <div class="wss-full-tag" style="color:#ff4d4d;font-weight:900;font-size:9px;letter-spacing:2px;text-transform:uppercase">Lifestyle Creator · 340K</div>
+                <div class="wss-full-headline" style="color:#111;font-size:32px;font-weight:900;letter-spacing:-2px;line-height:.9;text-transform:uppercase">BOLD.<br/>REAL.<br/>YOU.</div>
+                <div class="wss-full-actions" style="margin-top:10px">
+                  <div class="wss-full-btn-p" style="background:#ff4d4d;color:#fff;border-radius:0;font-weight:900;font-size:10px;text-transform:uppercase;letter-spacing:1px">Collab Now</div>
+                  <div class="wss-full-btn-s" style="border-color:#111;border-width:2px;color:#111;border-radius:0;font-weight:900">Media Kit</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(255,77,77,.1);color:#ff4d4d;border-color:rgba(255,77,77,.25)">Coral Bold</span>
+              <span class="wss-card-tags">Energetic · Neobrutalist · Pop</span>
+            </div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('coral-bold')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
+          </div>
+          <div class="wss-hover-overlay"><span>Build with this style →</span></div>
+        </div>
+
+        <!-- 16 — ARCTIC GLASS -->
+        <div class="wss-card" data-style-id="arctic-glass" data-filter="dark light" onclick="wssSelectStyle('arctic-glass')">
+          <div class="wss-full-preview" style="background:#060b14">
+            <img src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=800&h=560&fit=crop&q=85&sat=-50" alt="" loading="lazy"/>
+            <div class="wss-full-overlay" style="background:linear-gradient(160deg,rgba(6,11,20,.97) 0%,rgba(6,11,20,.45) 100%)"></div>
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(147,197,253,.08) 0%,transparent 55%);pointer-events:none"></div>
+            <div class="wss-full-ui">
+              <div class="wss-full-nav" style="border-bottom:1px solid rgba(147,197,253,.1);background:rgba(255,255,255,.04);backdrop-filter:blur(12px)">
+                <span class="wss-full-logo" style="color:#e0f0ff;font-weight:800;font-size:11px;letter-spacing:.5px">Lyra Studio</span>
+                <div class="wss-full-nav-links">
+                  <span style="color:rgba(224,240,255,.35)">Portfolio</span>
+                  <span style="color:rgba(224,240,255,.35)">Services</span>
+                  <span style="color:#93c5fd">Contact</span>
+                </div>
+                <div class="wss-full-nav-cta" style="background:rgba(147,197,253,.15);border:1px solid rgba(147,197,253,.3);color:#93c5fd;border-radius:8px;backdrop-filter:blur(8px)">Hire</div>
+              </div>
+              <div class="wss-full-body" style="padding-top:18px">
+                <div class="wss-full-tag" style="color:rgba(147,197,253,.5);letter-spacing:4px;font-size:7px;text-transform:uppercase">Design · Motion · 67K</div>
+                <div class="wss-full-headline" style="color:#e0f0ff;font-size:26px;font-weight:800;letter-spacing:-1.5px;line-height:1.05">Where design<br/>meets cold clarity.</div>
+                <div class="wss-full-sub" style="color:rgba(224,240,255,.3)">Brand systems · Motion graphics · Direction</div>
+                <div class="wss-full-actions">
+                  <div class="wss-full-btn-p" style="background:rgba(147,197,253,.12);border:1.5px solid rgba(147,197,253,.3);color:#93c5fd;border-radius:8px;backdrop-filter:blur(8px)">View Work</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wss-card-footer">
+            <div class="wss-card-footer-left">
+              <span class="wss-pill" style="background:rgba(147,197,253,.08);color:#93c5fd;border-color:rgba(147,197,253,.2)">Arctic Glass</span>
+              <span class="wss-card-tags">Glassmorphism · Frost · Blue</span>
+            </div>
+            <div class="wss-card-footer-right">
+              <button class="wss-preview-btn" onclick="event.stopPropagation();wssOpenDemo('arctic-glass')">Preview</button>
+              <div class="wss-card-footer-cta">Select →</div>
+            </div>
           </div>
           <div class="wss-hover-overlay"><span>Build with this style →</span></div>
         </div>
@@ -497,6 +782,42 @@
       </div>
 
     </div><!-- /ws-style-showcase -->
+
+    <!-- ══ DEMO PREVIEW MODAL ══ -->
+    <div class="wss-demo-modal" id="wssDemoModal" role="dialog" aria-modal="true" aria-label="Style preview">
+      <div class="wss-demo-backdrop" onclick="wssCloseDemo()"></div>
+      <div class="wss-demo-inner">
+        <div class="wss-demo-toolbar">
+          <div class="wss-demo-toolbar-left">
+            <div class="wss-demo-dots">
+              <span style="background:#ff5f57"></span>
+              <span style="background:#febc2e"></span>
+              <span style="background:#28c840"></span>
+            </div>
+            <div class="wss-demo-url-bar">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span id="wssDemoUrlLabel">impactgrid.com/preview</span>
+            </div>
+          </div>
+          <div class="wss-demo-toolbar-right">
+            <span class="wss-demo-style-name" id="wssDemoStyleName">Dark Gold</span>
+            <button class="wss-demo-build-btn" id="wssDemoBuildBtn" onclick="wssCloseDemoAndBuild()">
+              Build with this →
+            </button>
+            <button class="wss-demo-close" onclick="wssCloseDemo()" aria-label="Close preview">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="wss-demo-frame-wrap">
+          <div class="wss-demo-loading" id="wssDemoLoading">
+            <div class="wss-demo-spinner"></div>
+            <span>Loading preview…</span>
+          </div>
+          <iframe id="wssDemoFrame" class="wss-demo-frame" src="" title="Style preview" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
 
 </div><!-- /screenDash -->
 
@@ -1753,6 +2074,259 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 });
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DEMO PREVIEW MODAL — wssOpenDemo / wssCloseDemo
+   Builds a self-contained demo HTML for each style and loads
+   it into the lightbox iframe via srcdoc (no server needed).
+═══════════════════════════════════════════════════════════ */
+
+/* Style metadata for demo names */
+var WSS_DEMO_META = {
+  'dark-gold':       { name: 'Dark Gold',       accent: '#c9a84c', bg: '#07060a', text: '#f5ead5', nav: 'dark' },
+  'clean-light':     { name: 'Clean Light',     accent: '#1d4ed8', bg: '#f8f9fb', text: '#0f172a', nav: 'light' },
+  'rose-editorial':  { name: 'Rose Editorial',  accent: '#f43f80', bg: '#0e0008', text: '#fff',    nav: 'dark' },
+  'midnight-tech':   { name: 'Midnight Tech',   accent: '#06b6d4', bg: '#020b14', text: '#e0f7ff', nav: 'dark' },
+  'forest-organic':  { name: 'Forest Organic',  accent: '#4ade80', bg: '#0d1f12', text: '#f0fdf4', nav: 'dark' },
+  'navy-classic':    { name: 'Navy Classic',    accent: '#93c5fd', bg: '#0a1628', text: '#fff',    nav: 'dark' },
+  'sunset-brutal':   { name: 'Sunset Brutal',   accent: '#ff4d00', bg: '#ff4d00', text: '#000',    nav: 'orange' },
+  'violet-dreamy':   { name: 'Violet Dreamy',   accent: '#a78bfa', bg: '#0a0514', text: '#fff',    nav: 'dark' },
+  'copper-retro':    { name: 'Copper Retro',    accent: '#c87533', bg: '#1a0f00', text: '#f5e6c8', nav: 'dark' },
+  'smoke-mono':      { name: 'Smoke Mono',      accent: '#f0f0f2', bg: '#111113', text: '#f0f0f2', nav: 'dark' },
+  'obsidian-luxe':   { name: 'Obsidian Luxe',   accent: '#d4b48c', bg: '#0a090c', text: '#f0e8dc', nav: 'dark' },
+  'brutalist-ink':   { name: 'Brutalist Ink',   accent: '#0d0d0d', bg: '#f2ede6', text: '#0d0d0d', nav: 'light' },
+  'chrome-future':   { name: 'Chrome Future',   accent: '#6366f1', bg: '#03060f', text: '#e0e7ff', nav: 'dark' },
+  'cream-editorial': { name: 'Cream Editorial', accent: '#1a1510', bg: '#f9f5ef', text: '#1a1510', nav: 'light' },
+  'coral-bold':      { name: 'Coral Bold',      accent: '#ff4d4d', bg: '#fff',    text: '#111',    nav: 'light' },
+  'arctic-glass':    { name: 'Arctic Glass',    accent: '#93c5fd', bg: '#060b14', text: '#e0f0ff', nav: 'dark' },
+};
+
+var _wssCurrentDemoStyle = null;
+
+function wssOpenDemo(styleId) {
+  var meta = WSS_DEMO_META[styleId];
+  if (!meta) return;
+  _wssCurrentDemoStyle = styleId;
+
+  var modal   = document.getElementById('wssDemoModal');
+  var frame   = document.getElementById('wssDemoFrame');
+  var loading = document.getElementById('wssDemoLoading');
+  var nameEl  = document.getElementById('wssDemoStyleName');
+  var urlEl   = document.getElementById('wssDemoUrlLabel');
+
+  if (!modal || !frame) return;
+
+  // Update labels
+  if (nameEl) nameEl.textContent = meta.name;
+  if (urlEl)  urlEl.textContent  = 'impactgrid.com/preview/' + styleId;
+
+  // Show loading
+  if (loading) loading.style.display = 'flex';
+  frame.style.opacity = '0';
+
+  // Build demo
+  frame.srcdoc = buildDemoHTML(styleId, meta);
+
+  // Show modal
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // Hide loading once iframe loads
+  frame.onload = function() {
+    if (loading) loading.style.display = 'none';
+    frame.style.opacity = '1';
+  };
+}
+
+function wssCloseDemo() {
+  var modal = document.getElementById('wssDemoModal');
+  var frame = document.getElementById('wssDemoFrame');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+  setTimeout(function() { if (frame) frame.srcdoc = ''; }, 350);
+  _wssCurrentDemoStyle = null;
+}
+
+function wssCloseDemoAndBuild() {
+  var style = _wssCurrentDemoStyle;
+  wssCloseDemo();
+  if (style) setTimeout(function() { wssSelectStyle(style); }, 200);
+}
+
+/* Keyboard close */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') wssCloseDemo();
+});
+
+/* ── DEMO HTML GENERATOR ──────────────────────────────────── */
+function buildDemoHTML(styleId, m) {
+  var isLight = (m.nav === 'light');
+  var navBg   = isLight ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.3)';
+  var navBdr  = isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.08)';
+  var logoC   = isLight ? m.text : m.accent;
+  var linkC   = isLight ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)';
+  var linkAC  = isLight ? m.text : 'rgba(255,255,255,0.9)';
+  var heroFG  = isLight ? m.text : '#fff';
+  var subC    = isLight ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)';
+  var cardBg  = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)';
+  var cardBdr = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
+
+  /* Per-style content */
+  var styles = {
+    'dark-gold':      { creator:'Sarah Johnson', niche:'Fitness Creator · 285K', headline:'Transform Your Body.', sub:'Online coaching · Brand deals · Collaborations', cta:'Work With Me', cta2:'View Rates', img:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1400&h=800&fit=crop&q=85&sat=-10', stat1:['285K','Followers'], stat2:['4.7%','Engagement'], stat3:['2.1M','Monthly Views'], stat4:['£4.2K','Avg Campaign'], tagline:'Premium fitness coaching', section1:'My Approach', section2:'Recent Work', section3:'Let\'s Collaborate' },
+    'clean-light':    { creator:'Marcus Creates', niche:'Food & Travel Creator · 229K', headline:'Making the world delicious.', sub:'229K followers across Instagram & YouTube', cta:'Book a Collab', cta2:'Media Kit', img:'https://images.unsplash.com/photo-1547592180-85f173990554?w=1400&h=800&fit=crop&q=85', stat1:['229K','Followers'], stat2:['5.2%','Engagement'], stat3:['1.8M','Monthly Views'], stat4:['£2.5K','Avg Campaign'], tagline:'Food & travel storytelling', section1:'My Content', section2:'Campaigns', section3:'Get In Touch' },
+    'rose-editorial': { creator:'Ella Moreau', niche:'Fashion Editor · 512K', headline:'Where fashion meets art.', sub:'Brand partnerships · Editorial · Campaigns', cta:'Book Campaign', cta2:'View Rates', img:'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1400&h=800&fit=crop&q=85', stat1:['512K','Followers'], stat2:['3.9%','Engagement'], stat3:['4.2M','Monthly Views'], stat4:['£6K','Avg Campaign'], tagline:'Fashion editorial & art direction', section1:'Portfolio', section2:'Press', section3:'Contact' },
+    'midnight-tech':  { creator:'Alex Chen', niche:'Tech Creator · 340K', headline:'Building the future. On camera.', sub:'Sponsor deals · Reviews · Brand integrations', cta:'Sponsor Me', cta2:'Media Kit', img:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1400&h=800&fit=crop&q=85', stat1:['340K','Subscribers'], stat2:['5.1%','Engagement'], stat3:['8.4M','Monthly Views'], stat4:['$12K','Avg Deal'], tagline:'Tech reviews & tutorials', section1:'Projects', section2:'Videos', section3:'Sponsors' },
+    'forest-organic': { creator:'Mia Torres', niche:'Wellness · Fitness · 178K', headline:'Feel strong. Feel alive.', sub:'Online coaching · Nutrition plans · Retreats', cta:'Start Journey', cta2:'See Results', img:'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=1400&h=800&fit=crop&q=85', stat1:['178K','Community'], stat2:['6.1%','Engagement'], stat3:['1.2M','Monthly Views'], stat4:['£1.8K','Avg Campaign'], tagline:'Holistic fitness coaching', section1:'Programmes', section2:'Recipes', section3:'Work With Me' },
+    'navy-classic':   { creator:'James Laurent', niche:'Business & Finance · 95K', headline:'Build wealth. Build legacy.', sub:'Keynotes · 1-on-1 consulting · Masterclasses', cta:'Book a Session', cta2:'Speaking', img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1400&h=800&fit=crop&q=85', stat1:['95K','Followers'], stat2:['4.3%','Engagement'], stat3:['820K','Monthly Views'], stat4:['£5K','Day Rate'], tagline:'Finance & business authority', section1:'About', section2:'Speaking', section3:'Consulting' },
+    'sunset-brutal':  { creator:'Danny Raw', niche:'Music / DJ / Lifestyle', headline:'LOUD LIFE.', sub:'Music drops · Events · Brand collabs', cta:"LET'S GO", cta2:'Event Booking', img:'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1400&h=800&fit=crop&q=85&sat=30', stat1:['510K','Followers'], stat2:['7.2%','Engagement'], stat3:['5.1M','Monthly Plays'], stat4:['£8K','Avg Show'], tagline:'DJ · Music · Raw energy', section1:'Releases', section2:'Events', section3:'Collabs' },
+    'violet-dreamy':  { creator:'Luna.stream', niche:'Gaming · Streaming · 420K', headline:'Play loud. Dream bigger.', sub:'Sponsorships · Merch · Brand collabs', cta:'Sponsor Me', cta2:'Support', img:'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1400&h=800&fit=crop&q=85', stat1:['420K','Community'], stat2:['8.3%','Engagement'], stat3:['6.7M','Monthly Views'], stat4:['$9K','Avg Deal'], tagline:'Gaming & streaming', section1:'Schedule', section2:'Merch', section3:'Sponsor' },
+    'copper-retro':   { creator:'Marco Vista', niche:'Travel · Film · 88K', headline:'Capture the world raw.', sub:'Brand journeys · Film campaigns · Partnerships', cta:'Partner With Me', cta2:'View Films', img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&h=800&fit=crop&q=85', stat1:['88K','Followers'], stat2:['5.5%','Engagement'], stat3:['720K','Monthly Views'], stat4:['£3.5K','Avg Campaign'], tagline:'Travel & film storytelling', section1:'Journal', section2:'Films', section3:'Partner' },
+    'smoke-mono':     { creator:'Kai Nōrd', niche:'Art Direction · 76K', headline:'Quiet. Powerful.', sub:'Brand identity · Campaign art direction', cta:'Inquire', cta2:'View Work', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&h=800&fit=crop&q=85&sat=-100', stat1:['76K','Followers'], stat2:['4.9%','Engagement'], stat3:['600K','Monthly Views'], stat4:['£4K','Day Rate'], tagline:'Art direction & brand identity', section1:'Work', section2:'About', section3:'Inquire' },
+    'obsidian-luxe':  { creator:'Maison Noir', niche:'Fashion · Creative Director', headline:'Elegance is silence.', sub:'Editorial campaigns · Brand identity · Art direction', cta:'View Portfolio', cta2:'Enquire', img:'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1400&h=800&fit=crop&q=85&sat=-30', stat1:['128K','Instagram'], stat2:['Vogue','Featured in'], stat3:['42','Campaigns'], stat4:['£8K+','Day Rate'], tagline:'Luxury fashion & editorial', section1:'Portfolio', section2:'Press', section3:'Contact' },
+    'brutalist-ink':  { creator:'Wolfe', niche:'Art Director / 89K', headline:'Ideas made brutal.', sub:'Brand campaigns · Identity · Print', cta:'Open Work', cta2:'Contact', img:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1400&h=800&fit=crop&q=85&sat=-80', stat1:['89K','Followers'], stat2:['6.1%','Engagement'], stat3:['1.1M','Monthly Views'], stat4:['£3K','Day Rate'], tagline:'Raw art direction & print', section1:'Work', section2:'Process', section3:'Hire' },
+    'chrome-future':  { creator:'Axiom', niche:'Founder · Builder · 54K', headline:"Building tomorrow's defaults.", sub:'Angel investing · Advisory · Keynotes', cta:'Work Together', cta2:'Newsletter', img:'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1400&h=800&fit=crop&q=85', stat1:['54K','Followers'], stat2:['3 exits','Track record'], stat3:['$40M','Portfolio value'], stat4:['12','Startups backed'], tagline:'Tech founder & investor', section1:'Product', section2:'Insights', section3:'Invest' },
+    'cream-editorial':{ creator:'Cecile Moreau', niche:'Photography · Lifestyle · 211K', headline:'Light finds beauty everywhere.', sub:'Commercial shoots · Brand stories · Studio hire', cta:'Enquire', cta2:'See Work', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&h=800&fit=crop&q=85&sat=-40', stat1:['211K','Followers'], stat2:['3.8%','Engagement'], stat3:['Elle','Published in'], stat4:['£3K','Day Rate'], tagline:'Photography & lifestyle', section1:'Stories', section2:'Studio', section3:'Collaborate' },
+    'coral-bold':     { creator:'Naomi.co', niche:'Lifestyle Creator · 340K', headline:'Bold. Real. You.', sub:'Brand collabs · Reels · Speaking', cta:'Collab Now', cta2:'Media Kit', img:'https://images.unsplash.com/photo-1540206395-68808572332f?w=1400&h=800&fit=crop&q=85', stat1:['340K','Followers'], stat2:['7.8%','Engagement'], stat3:['3.2M','Monthly Views'], stat4:['£3.5K','Avg Campaign'], tagline:'Lifestyle & energy', section1:'Reels', section2:'Rates', section3:"Let's Talk" },
+    'arctic-glass':   { creator:'Lyra Studio', niche:'Design · Motion · 67K', headline:'Where design meets cold clarity.', sub:'Brand systems · Motion graphics · Direction', cta:'View Work', cta2:'Hire Me', img:'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1400&h=800&fit=crop&q=85&sat=-50', stat1:['67K','Followers'], stat2:['5.3%','Engagement'], stat3:['540K','Monthly Views'], stat4:['£2.8K','Day Rate'], tagline:'Design & motion studio', section1:'Portfolio', section2:'Services', section3:'Contact' },
+  };
+
+  var s = styles[styleId] || styles['dark-gold'];
+
+  // Special overrides per style
+  var extraCSS = '';
+  if (styleId === 'brutalist-ink') {
+    extraCSS = 'body{font-family:\'Arial Black\',Arial,sans-serif}.hero-headline{text-transform:uppercase;letter-spacing:-4px}.nav-link.active{text-decoration:line-through}.cta-btn{border-radius:0!important;font-weight:900;letter-spacing:2px;text-transform:uppercase}';
+  } else if (styleId === 'midnight-tech') {
+    extraCSS = 'body{font-family:\'Courier New\',monospace}.hero-headline{letter-spacing:-1px}.cta-btn{border-radius:0;letter-spacing:2px;text-transform:uppercase}.stat-val{font-family:monospace}';
+  } else if (styleId === 'obsidian-luxe') {
+    extraCSS = 'body{font-family:Georgia,serif}.hero-headline{font-style:italic;letter-spacing:-1px}.cta-btn{border-radius:0;letter-spacing:4px;text-transform:uppercase;font-size:11px}.eyebrow{letter-spacing:8px;text-transform:uppercase}';
+  } else if (styleId === 'cream-editorial') {
+    extraCSS = 'body{font-family:Georgia,serif}.hero-headline{font-style:italic;letter-spacing:-1px}';
+  } else if (styleId === 'rose-editorial') {
+    extraCSS = 'body{font-family:Georgia,serif}.hero-headline{font-style:italic}.cta-btn{border-radius:999px}';
+  } else if (styleId === 'arctic-glass') {
+    extraCSS = '.nav{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}.cta-btn{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:8px}';
+  }
+
+  var btnRadius = ['forest-organic','navy-classic','violet-dreamy','rose-editorial','clean-light','cream-editorial','coral-bold'].includes(styleId) ? '999px' : (styleId === 'midnight-tech' || styleId === 'brutalist-ink' || styleId === 'obsidian-luxe' || styleId === 'sunset-brutal' || styleId === 'copper-retro' ? '0px' : '6px');
+
+  var heroImg = s.img;
+  var overlayCSS = isLight
+    ? 'linear-gradient(160deg,' + m.bg + ' 0%,' + m.bg.replace(')',',0.85)').replace('rgb','rgba') + ' 30%,rgba(0,0,0,0) 70%)'
+    : 'linear-gradient(160deg,' + m.bg + ' 0%,' + m.bg + 'cc 30%,rgba(0,0,0,0.2) 100%)';
+
+  // For styles with bg that aren't CSS-parseable hex, just use a gradient
+  overlayCSS = 'linear-gradient(160deg,' + m.bg + ' 0%,' + m.bg + 'ee 25%,rgba(0,0,0,0.1) 100%)';
+
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>' +
+    '<style>' +
+    '*{margin:0;padding:0;box-sizing:border-box}' +
+    'html{scroll-behavior:smooth}' +
+    'body{background:' + m.bg + ';color:' + heroFG + ';font-family:\'DM Sans\',sans-serif;min-height:100vh;overflow-x:hidden}' +
+    /* NAV */
+    '.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:16px;padding:16px 40px;background:' + navBg + ';border-bottom:1px solid ' + navBdr + ';backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
+    '.nav-logo{font-family:\'Syne\',sans-serif;font-weight:800;font-size:16px;color:' + logoC + ';letter-spacing:-0.3px;flex-shrink:0;white-space:nowrap}' +
+    '.nav-links{display:flex;gap:24px;flex:1;justify-content:center}' +
+    '.nav-link{font-size:13px;font-weight:600;color:' + linkC + ';cursor:default;transition:.15s}' +
+    '.nav-link.active{color:' + linkAC + '}' +
+    '.nav-cta{padding:9px 20px;background:' + m.accent + ';color:' + (isLight ? '#fff' : m.bg) + ';font-size:12px;font-weight:800;border-radius:' + btnRadius + ';white-space:nowrap;flex-shrink:0;font-family:\'Syne\',sans-serif}' +
+    /* HERO */
+    '.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:80px 40px 60px;overflow:hidden}' +
+    '.hero-bg{position:absolute;inset:0;background:url(' + heroImg + ') center/cover no-repeat}' +
+    '.hero-overlay{position:absolute;inset:0;background:' + overlayCSS + '}' +
+    '.hero-inner{position:relative;z-index:2;max-width:700px}' +
+    '.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:' + m.accent + ';margin-bottom:16px;font-family:\'Syne\',sans-serif}' +
+    '.hero-headline{font-family:\'Syne\',sans-serif;font-size:clamp(40px,6vw,80px);font-weight:900;color:' + heroFG + ';line-height:.95;letter-spacing:-2px;margin-bottom:20px}' +
+    '.hero-sub{font-size:16px;color:' + subC + ';line-height:1.65;max-width:480px;margin-bottom:32px}' +
+    '.hero-actions{display:flex;gap:12px;flex-wrap:wrap}' +
+    '.cta-btn{display:inline-flex;align-items:center;padding:14px 28px;font-size:14px;font-weight:800;border-radius:' + btnRadius + ';white-space:nowrap;font-family:\'Syne\',sans-serif;cursor:default}' +
+    '.cta-primary{background:' + m.accent + ';color:' + (isLight ? '#fff' : m.bg) + '}' +
+    '.cta-secondary{background:transparent;border:2px solid rgba(255,255,255,' + (isLight ? '0.2' : '0.25') + ');color:' + heroFG + '}' +
+    '.cta-secondary.light-variant{border-color:rgba(0,0,0,0.2);color:' + m.text + '}' +
+    /* STATS BAR */
+    '.stats{display:flex;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px)}' +
+    '.stat{flex:1;padding:20px;text-align:center;border-right:1px solid rgba(255,255,255,0.06)}' +
+    '.stat:last-child{border-right:none}' +
+    '.stat-val{font-family:\'Syne\',sans-serif;font-size:22px;font-weight:900;color:' + m.accent + ';line-height:1;margin-bottom:4px}' +
+    '.stat-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.4)}' +
+    /* SECTIONS */
+    '.section{padding:80px 40px}' +
+    '.section-alt{background:' + cardBg + '}' +
+    '.section-inner{max-width:1100px;margin:0 auto}' +
+    '.section-tag{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:' + m.accent + ';font-family:\'Syne\',sans-serif;margin-bottom:12px}' +
+    '.section-title{font-family:\'Syne\',sans-serif;font-size:clamp(26px,4vw,42px);font-weight:900;color:' + heroFG + ';letter-spacing:-1px;line-height:1.1;margin-bottom:16px}' +
+    '.section-sub{font-size:15px;color:' + subC + ';line-height:1.7;max-width:540px;margin-bottom:40px}' +
+    '.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}' +
+    '.grid-card{background:' + cardBg + ';border:1px solid ' + cardBdr + ';border-radius:12px;overflow:hidden}' +
+    '.grid-card-img{height:180px;background:url(https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop&q=70) center/cover;opacity:.7}' +
+    '.grid-card-body{padding:20px}' +
+    '.grid-card-title{font-family:\'Syne\',sans-serif;font-size:16px;font-weight:800;color:' + heroFG + ';margin-bottom:8px}' +
+    '.grid-card-sub{font-size:13px;color:' + subC + ';line-height:1.55}' +
+    /* TESTIMONIAL */
+    '.testimonial{padding:80px 40px;text-align:center}' +
+    '.testimonial-inner{max-width:640px;margin:0 auto}' +
+    '.quote{font-family:\'Syne\',sans-serif;font-size:clamp(20px,3.5vw,28px);font-weight:800;color:' + heroFG + ';line-height:1.3;margin-bottom:20px;font-style:italic}' +
+    '.quote-author{font-size:13px;color:' + m.accent + ';font-weight:700;letter-spacing:.06em}' +
+    /* CONTACT */
+    '.contact{padding:80px 40px}' +
+    '.contact-inner{max-width:500px;margin:0 auto;text-align:center}' +
+    '.contact-form{display:flex;flex-direction:column;gap:12px;margin-top:32px}' +
+    '.form-input{background:' + cardBg + ';border:1.5px solid ' + cardBdr + ';border-radius:8px;padding:14px 16px;font-size:14px;color:' + heroFG + ';font-family:\'DM Sans\',sans-serif;width:100%}' +
+    '.form-input::placeholder{color:' + subC + '}' +
+    '.form-submit{padding:14px;background:' + m.accent + ';color:' + (isLight ? '#fff' : m.bg) + ';font-family:\'Syne\',sans-serif;font-size:14px;font-weight:800;border-radius:' + btnRadius + ';border:none;cursor:default}' +
+    /* FOOTER */
+    '.footer{padding:40px;border-top:1px solid ' + cardBdr + ';display:flex;align-items:center;justify-content:space-between}' +
+    '.footer-brand{font-family:\'Syne\',sans-serif;font-weight:800;font-size:14px;color:' + m.accent + '}' +
+    '.footer-links{display:flex;gap:20px}' +
+    '.footer-link{font-size:12px;color:' + subC + '}' +
+    '.ig-badge{font-size:10px;color:' + subC + ';font-family:monospace}' +
+    extraCSS +
+    '</style></head><body>' +
+    /* NAV */
+    '<nav class="nav"><div class="nav-logo">' + s.creator + '</div><div class="nav-links"><span class="nav-link active">' + s.section1 + '</span><span class="nav-link">' + s.section2 + '</span><span class="nav-link">' + s.section3 + '</span></div><div class="nav-cta">' + s.cta + '</div></nav>' +
+    /* HERO */
+    '<section class="hero"><div class="hero-bg"></div><div class="hero-overlay"></div><div class="hero-inner"><div class="eyebrow">' + s.niche + '</div><h1 class="hero-headline">' + s.headline.replace(/\n/g,'<br/>') + '</h1><p class="hero-sub">' + s.sub + '</p><div class="hero-actions"><div class="cta-btn cta-primary">' + s.cta + '</div><div class="cta-btn cta-secondary' + (isLight ? ' light-variant' : '') + '">' + s.cta2 + '</div></div></div></section>' +
+    /* STATS */
+    '<div class="stats"><div class="stat"><div class="stat-val">' + s.stat1[0] + '</div><div class="stat-lbl">' + s.stat1[1] + '</div></div><div class="stat"><div class="stat-val">' + s.stat2[0] + '</div><div class="stat-lbl">' + s.stat2[1] + '</div></div><div class="stat"><div class="stat-val">' + s.stat3[0] + '</div><div class="stat-lbl">' + s.stat3[1] + '</div></div><div class="stat"><div class="stat-val">' + s.stat4[0] + '</div><div class="stat-lbl">' + s.stat4[1] + '</div></div></div>' +
+    /* SECTION 1 */
+    '<section class="section"><div class="section-inner"><div class="section-tag">About</div><h2 class="section-title">' + s.section1 + '</h2><p class="section-sub">I\'ve been creating content for over three years, building a highly engaged community around ' + s.tagline + '. Every brand I work with gets full creative direction, authentic integration, and a dedicated audience that trusts my recommendations.</p><div class="grid-3">' +
+    '<div class="grid-card"><div class="grid-card-img"></div><div class="grid-card-body"><div class="grid-card-title">Campaign 01</div><div class="grid-card-sub">A long-term brand partnership that drove 40% lift in awareness.</div></div></div>' +
+    '<div class="grid-card"><div class="grid-card-img" style="background-image:url(https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop&q=70)"></div><div class="grid-card-body"><div class="grid-card-title">Campaign 02</div><div class="grid-card-sub">Reaching 1.2M unique views in 72 hours for a product launch.</div></div></div>' +
+    '<div class="grid-card"><div class="grid-card-img" style="background-image:url(https://images.unsplash.com/photo-1547592180-85f173990554?w=600&h=400&fit=crop&q=70)"></div><div class="grid-card-body"><div class="grid-card-title">Campaign 03</div><div class="grid-card-sub">Six-part content series built around an audience challenge.</div></div></div>' +
+    '</div></div></section>' +
+    /* TESTIMONIAL */
+    '<section class="testimonial section-alt"><div class="testimonial-inner"><div class="quote">"Working with ' + s.creator.split(' ')[0] + ' was the single highest-ROI creator campaign we\'ve run. Authentic, professional, and the community engagement was unlike anything we\'d seen."</div><div class="quote-author">— Marketing Director, Brand Partner</div></div></section>' +
+    /* CONTACT */
+    '<section class="contact"><div class="contact-inner"><div class="section-tag">Get In Touch</div><h2 class="section-title">' + s.section3 + '</h2><p class="section-sub">Interested in working together? Fill in your details and I\'ll get back to you within 24 hours.</p><div class="contact-form"><input class="form-input" placeholder="Your name" disabled/><input class="form-input" placeholder="Your email" disabled/><input class="form-input" placeholder="Tell me about your brand" disabled/><button class="form-submit" disabled>Send Message</button></div></div></section>' +
+    /* FOOTER */
+    '<footer class="footer"><div class="footer-brand">' + s.creator + '</div><div class="footer-links"><span class="footer-link">' + s.section1 + '</span><span class="footer-link">' + s.section2 + '</span><span class="footer-link">' + s.section3 + '</span></div><div class="ig-badge">Built with ImpactGrid</div></footer>' +
+    '</body></html>';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FILTER CHIPS — wssFilter
+   Hides/shows cards based on data-filter attribute.
+═══════════════════════════════════════════════════════════ */
+function wssFilter(btn, filter) {
+  /* Update chip active state */
+  document.querySelectorAll('.wss-filter-chip').forEach(function(c) {
+    c.classList.toggle('active', c === btn);
+  });
+
+  /* Show/hide cards */
+  document.querySelectorAll('#wssGrid .wss-card').forEach(function(card) {
+    if (filter === 'all') {
+      card.style.display = '';
+    } else {
+      var cardFilters = (card.getAttribute('data-filter') || '').split(' ');
+      card.style.display = cardFilters.includes(filter) ? '' : 'none';
+    }
+  });
+}
 </script>
 
 <div id="ig-footer"></div>
