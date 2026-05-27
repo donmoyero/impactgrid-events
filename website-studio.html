@@ -122,9 +122,9 @@
         <h1 class="ps-showcase-title" style="font-size:clamp(28px,4.5vw,52px);margin-bottom:16px">We build your entire<br/><em style="color:var(--gold,#c9a84c);font-style:italic">website</em></h1>
         <p class="ps-showcase-sub" style="margin-bottom:28px;max-width:420px">From hero to contact form — your website is complete and live. One click. No code.</p>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-          <button class="dash-create-btn" id="dashCreateBtn" onclick="psHandleCreate()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Build My Website
+          <button class="dash-create-btn" id="dashCreateBtn" onclick="showScreen('screenStylePicker')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Pick a Style
           </button>
           <span style="font-size:11px;color:#7a8199">Free to start · No credit card · Live in 5 min</span>
         </div>
@@ -1242,9 +1242,428 @@
     </div>
   </div>
 
+  <!-- ══ SCREEN 5: STYLE PICKER ══ -->
+  <div class="ps-screen" id="screenStylePicker">
+    <div class="sty-wrap">
+      <button class="ps-back-btn" onclick="showScreen('screenDash')" style="margin:28px 32px 0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Back
+      </button>
+      <div class="sty-header">
+        <div class="ps-showcase-eyebrow">✦ Step 1 of 5</div>
+        <h2 class="sty-title">Choose your website style</h2>
+        <p class="sty-sub">Pick the vibe that fits your brand — Dijo will build everything around it.</p>
+      </div>
+      <div class="sty-grid" id="styGrid">
+        <!-- Populated by JS below -->
+      </div>
+      <div class="sty-footer">
+        <button class="sty-continue-btn" id="styContinueBtn" onclick="confirmStyleAndProceed()" disabled>
+          Continue with this style →
+        </button>
+        <p class="sty-footer-note">You can always switch styles later from the builder</p>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /ps-shell -->
 
+<!-- ══════════════ WEBSITE SECONDARY PANEL ══════════════
+     Slides out to the right of the existing .nav rail.
+     Left is pinned to var(--nav-w-collapsed) = 52px.
+     When open, body gets class .ws-panel-open which shifts
+     page content right by the panel width (220px).
+══════════════════════════════════════════════════════ -->
+<div class="ws-panel" id="wsPanel" role="dialog" aria-label="Website panel" aria-hidden="true">
+  <div class="ws-panel-header">
+    <div class="ws-panel-title">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Website
+    </div>
+    <button class="ws-panel-close" onclick="closeWsPanel()" aria-label="Close website panel">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <button class="ws-panel-new-btn" onclick="closeWsPanel(); showScreen('screenStylePicker');">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New Website
+  </button>
+
+  <div class="ws-panel-section-label">My Websites</div>
+
+  <div class="ws-panel-sites" id="wsPanelSites">
+    <div class="ws-panel-empty" id="wsPanelEmpty">
+      <div class="ws-panel-empty-icon">✦</div>
+      <p>No websites yet.<br/>Pick a style to get started.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop — closes panel on click, sits above page but below nav -->
+<div class="ws-panel-backdrop" id="wsPanelBackdrop" onclick="closeWsPanel()"></div>
+
+<style>
+/* ═══════════════════════════════════════════════════
+   WEBSITE SECONDARY PANEL
+   Anchored to the right edge of the nav rail (52px).
+   Uses the real design-system tokens from shared.css.
+═══════════════════════════════════════════════════ */
+:root {
+  --ws-panel-w: 220px;
+}
+
+.ws-panel {
+  position: fixed;
+  top: 0; bottom: 0;
+  left: var(--nav-w-collapsed); /* sits flush against the nav rail */
+  width: var(--ws-panel-w);
+  background: var(--card);
+  border-right: 1px solid var(--border2);
+  z-index: 1050; /* above page, below nav (z:1100) */
+  display: flex;
+  flex-direction: column;
+  transform: translateX(calc(-100% - 1px)); /* hidden: slide left behind nav */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+[data-theme="dark"] .ws-panel { background: #111008; }
+
+.ws-panel.open {
+  transform: translateX(0);
+}
+
+/* Backdrop */
+.ws-panel-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1049;
+  background: rgba(0,0,0,0.28);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+.ws-panel-backdrop.open { display: block; }
+
+/* Push page content right when panel is open (desktop only) */
+@media (min-width: 769px) {
+  body.ws-panel-open {
+    padding-left: calc(var(--nav-w-collapsed) + var(--ws-panel-w)) !important;
+    transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Header */
+.ws-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  height: var(--nav-h); /* 64px — aligns with nav logo row */
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ws-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.ws-panel-close {
+  color: var(--text3);
+  padding: 5px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 0;
+}
+.ws-panel-close:hover {
+  color: var(--text);
+  background: var(--bg2);
+}
+
+/* New Website button */
+.ws-panel-new-btn {
+  margin: 14px 12px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: var(--r);
+  border: 1px solid var(--gold-glo);
+  background: var(--gold-dim);
+  color: var(--gold);
+  font-family: var(--fb);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+  letter-spacing: 0.01em;
+}
+.ws-panel-new-btn:hover {
+  background: rgba(201,126,8,0.15);
+  border-color: var(--gold);
+}
+[data-theme="dark"] .ws-panel-new-btn:hover {
+  background: rgba(240,180,41,0.18);
+}
+
+/* Section label */
+.ws-panel-section-label {
+  font-family: var(--fm);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 8px 14px 6px;
+}
+
+/* Sites list */
+.ws-panel-sites {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px 16px;
+}
+
+.ws-panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 16px;
+  text-align: center;
+}
+.ws-panel-empty-icon {
+  font-size: 22px;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.ws-panel-empty p {
+  font-size: 12px;
+  color: var(--text3);
+  line-height: 1.6;
+}
+
+/* Individual site row */
+.ws-panel-site {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--r);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--fb);
+  text-align: left;
+  transition: background 0.15s;
+}
+.ws-panel-site:hover { background: var(--bg2); }
+.ws-panel-site.active { background: var(--gold-dim); }
+
+.ws-site-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ws-site-dot.live  { background: var(--green); }
+.ws-site-dot.draft { background: var(--text3); }
+
+.ws-site-info { flex: 1; overflow: hidden; }
+.ws-site-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ws-site-meta {
+  font-size: 10.5px;
+  color: var(--text3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.ws-site-badge {
+  font-family: var(--fm);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+.ws-site-badge.live  { background: var(--green-dim); color: var(--green); }
+.ws-site-badge.draft {
+  background: var(--bg3);
+  color: var(--text3);
+  border: 1px solid var(--border);
+}
+
+/* Mobile: panel overlays instead of pushing content */
+@media (max-width: 768px) {
+  .ws-panel {
+    left: 0;
+    width: 260px;
+    z-index: 1150; /* above nav on mobile */
+    transform: translateX(-100%);
+  }
+  .ws-panel.open { transform: translateX(0); }
+  body.ws-panel-open { padding-left: 0 !important; }
+  .ws-panel-backdrop { z-index: 1149; }
+}
+</style>
+
+<script>
+/* ═══════════════════════════════════════════
+   WEBSITE PANEL — open / close
+   Hooks into the existing nav "Website" link:
+   nav.js renders <a href="website-studio.html" class="active">
+   We intercept that click to toggle the panel instead.
+═══════════════════════════════════════════ */
+
+function openWsPanel() {
+  var panel    = document.getElementById('wsPanel');
+  var backdrop = document.getElementById('wsPanelBackdrop');
+  if (!panel) return;
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden', 'false');
+  if (backdrop) backdrop.classList.add('open');
+  if (window.innerWidth > 768) {
+    document.body.classList.add('ws-panel-open');
+  } else {
+    backdrop.classList.add('open');
+  }
+  // Mark the nav "Website" link as having its sub-panel open
+  var navWebsite = document.querySelector('.nav-links a[href="website-studio.html"]');
+  if (navWebsite) navWebsite.classList.add('ws-sub-open');
+  refreshWsPanelSites();
+}
+
+function closeWsPanel() {
+  var panel    = document.getElementById('wsPanel');
+  var backdrop = document.getElementById('wsPanelBackdrop');
+  if (!panel) return;
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
+  if (backdrop) backdrop.classList.remove('open');
+  document.body.classList.remove('ws-panel-open');
+  var navWebsite = document.querySelector('.nav-links a[href="website-studio.html"]');
+  if (navWebsite) navWebsite.classList.remove('ws-sub-open');
+}
+
+function toggleWsPanel() {
+  var panel = document.getElementById('wsPanel');
+  if (!panel) return;
+  panel.classList.contains('open') ? closeWsPanel() : openWsPanel();
+}
+
+/* Populate the sites list from psState */
+function refreshWsPanelSites() {
+  var list  = document.getElementById('wsPanelSites');
+  var empty = document.getElementById('wsPanelEmpty');
+  if (!list) return;
+
+  var sites = (window.psState && window.psState.portfolios) ? window.psState.portfolios : [];
+  // Remove old dynamic rows
+  list.querySelectorAll('.ws-panel-site').forEach(function(el) { el.remove(); });
+
+  if (!sites.length) {
+    if (empty) empty.style.display = 'flex';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  sites.forEach(function(site) {
+    var isLive = !!site.published_at;
+    var btn = document.createElement('button');
+    btn.className = 'ws-panel-site';
+    btn.innerHTML =
+      '<div class="ws-site-dot ' + (isLive ? 'live' : 'draft') + '"></div>' +
+      '<div class="ws-site-info">' +
+        '<div class="ws-site-name">' + (site.name || 'Untitled') + '</div>' +
+        '<div class="ws-site-meta">' + (site.style_name || site.theme || 'Custom') + '</div>' +
+      '</div>' +
+      '<span class="ws-site-badge ' + (isLive ? 'live' : 'draft') + '">' + (isLive ? 'Live' : 'Draft') + '</span>';
+    btn.addEventListener('click', function() {
+      closeWsPanel();
+      if (typeof psOpenPortfolio === 'function') psOpenPortfolio(site);
+    });
+    list.appendChild(btn);
+  });
+}
+
+/* Intercept the nav "Website" link to open panel instead of navigating */
+function _initWsPanelNavHook() {
+  /* nav.js fires ig-nav-ready when it's rendered */
+  document.addEventListener('ig-nav-ready', function() {
+    var link = document.querySelector('.nav-links a[href="website-studio.html"]');
+    if (link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleWsPanel();
+        /* Also collapse the nav overlay if it's expanded */
+        var nav = document.getElementById('mainNav');
+        if (nav && nav.classList.contains('expanded') && window.innerWidth > 768) {
+          window.toggleNavExpand && window.toggleNavExpand();
+        }
+      });
+
+      /* Style: show a chevron indicator on the Website link */
+      var chev = document.createElement('span');
+      chev.className = 'ws-nav-chev';
+      chev.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>';
+      link.appendChild(chev);
+    }
+  });
+}
+_initWsPanelNavHook();
+
+/* Also open panel when landing on this page (we're already on website-studio.html) */
+document.addEventListener('DOMContentLoaded', function() {
+  /* Small delay so nav.js has time to render and psState to load */
+  setTimeout(openWsPanel, 200);
+});
+
+/* Escape key closes panel */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeWsPanel();
+});
+</script>
+
+<style>
+/* Nav "Website" link indicator — shows it has a sub-panel */
+.nav-links a[href="website-studio.html"] {
+  position: relative;
+}
+.ws-nav-chev {
+  margin-left: auto;
+  opacity: 0.4;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s, opacity 0.2s;
+  flex-shrink: 0;
+}
+.nav-links a[href="website-studio.html"].ws-sub-open .ws-nav-chev {
+  transform: rotate(90deg);
+  opacity: 0.9;
+  color: var(--gold);
+}
+/* Only visible when nav is expanded */
+.nav:not(.expanded) .ws-nav-chev { display: none; }
+</style>
+
+<!-- Placeholder that was before Toast shelf -->
+
 <!-- Toast shelf -->
+
 <div class="ps-toast-shelf" id="psToastShelf"></div>
 
 <!-- Contact Modal -->
@@ -1419,5 +1838,429 @@ async function beHandleLogoUpload(input) {
 </script>
 <script src="plan-gate.js"></script>
 <script src="website-studio.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   STYLE PICKER — 10 styles
+   Renders cards into #styGrid on screenStylePicker.
+   Stores choice in window.psSelectedStyle before
+   handing off to the onboarding flow.
+═══════════════════════════════════════════════════ */
+
+var WEBSITE_STYLES = [
+  {
+    id: 'dark-gold',
+    name: 'Dark Gold',
+    desc: 'Luxury dark theme with gold accents. Perfect for high-ticket creators and premium brands.',
+    tags: ['Luxury', 'Dark', 'Premium'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #0a0905 0%, #1a1508 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:18px">' +
+          '<div style="font-size:7px;letter-spacing:.14em;color:var(--gold);font-weight:800;text-transform:uppercase;margin-bottom:6px">FITNESS CREATOR</div>' +
+          '<div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.1;margin-bottom:8px">Dark Gold<br/>Studio</div>' +
+          '<div style="display:flex;gap:6px">' +
+            '<div style="padding:5px 12px;border-radius:4px;background:var(--gold);font-size:8px;font-weight:700;color:#07090f">Work With Me</div>' +
+            '<div style="padding:5px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.3);font-size:8px;font-weight:700;color:rgba(255,255,255,.8)">View Rates</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="position:absolute;top:12px;right:14px;font-size:9px;color:rgba(255,255,255,.2);font-family:monospace">impactgrid.app/p/you</div>';
+    }
+  },
+  {
+    id: 'clean-light',
+    name: 'Clean Light',
+    desc: 'Crisp white layout with bold typography. Ideal for lifestyle, food and professional creators.',
+    tags: ['Minimal', 'Light', 'Professional'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;top:0;left:0;right:0;height:32px;background:rgba(255,255,255,.9);display:flex;align-items:center;padding:0 14px;gap:8px;border-bottom:1px solid rgba(0,0,0,.06)">' +
+          '<div style="width:32px;height:8px;background:rgba(0,0,0,.15);border-radius:3px"></div>' +
+          '<div style="flex:1"></div>' +
+          '<div style="width:28px;height:11px;background:var(--blue);border-radius:3px"></div>' +
+        '</div>' +
+        '<div style="position:absolute;bottom:0;left:0;right:0;top:32px;display:flex;flex-direction:column;justify-content:flex-end;padding:14px">' +
+          '<div style="font-size:7px;letter-spacing:.14em;color:var(--blue);font-weight:800;text-transform:uppercase;margin-bottom:4px">FOOD & TRAVEL</div>' +
+          '<div style="font-size:18px;font-weight:900;color:#111;letter-spacing:-.03em;line-height:1.1;margin-bottom:6px">Clean Light<br/>Editorial</div>' +
+          '<div style="display:flex;gap:6px">' +
+            '<div style="padding:5px 12px;border-radius:4px;background:var(--blue);font-size:8px;font-weight:700;color:#fff">Book Collab</div>' +
+          '</div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'rose-editorial',
+    name: 'Rose Editorial',
+    desc: 'Moody rose tones with editorial elegance. Built for fashion, beauty and lifestyle creators.',
+    tags: ['Fashion', 'Beauty', 'Editorial'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #140008 0%, #2a0814 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.14em;color:#d4696f;font-weight:800;text-transform:uppercase;margin-bottom:4px">FASHION EDITOR</div>' +
+            '<div style="font-size:19px;font-weight:900;color:#fff;letter-spacing:-.03em;margin-bottom:8px">Rose<br/>Editorial</div>' +
+            '<div style="padding:5px 12px;border-radius:4px;background:#d4696f;font-size:8px;font-weight:700;color:#fff;display:inline-block">Enquire Now</div>' +
+          '</div>' +
+          '<div style="position:absolute;right:0;top:0;bottom:0;width:45%;background:linear-gradient(to left, rgba(212,105,111,.18) 0%, transparent 100%)"></div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'midnight-tech',
+    name: 'Midnight Tech',
+    desc: 'Sleek dark interface with cyan highlights. For tech creators, developers and digital educators.',
+    tags: ['Tech', 'Developer', 'Dark'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #030712 0%, #0c1220 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;top:14px;left:14px;font-size:8px;font-family:monospace;color:rgba(6,182,212,.6)">~/portfolio.sh _</div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.14em;color:#06b6d4;font-weight:800;text-transform:uppercase;margin-bottom:4px">TECH CREATOR</div>' +
+            '<div style="font-size:19px;font-weight:900;color:#fff;letter-spacing:-.03em;margin-bottom:8px">Midnight<br/><span style="color:#06b6d4">Tech</span></div>' +
+            '<div style="display:flex;gap:6px">' +
+              '<div style="padding:5px 12px;border-radius:4px;background:#06b6d4;font-size:8px;font-weight:700;color:#030712">Hire Me</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'forest-organic',
+    name: 'Forest Organic',
+    desc: 'Earthy greens and warm neutrals. Perfect for wellness, fitness, food and sustainability creators.',
+    tags: ['Wellness', 'Organic', 'Nature'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #0b150d 0%, #111f13 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;inset:0;background:radial-gradient(circle at 80% 30%, rgba(74,222,128,.14) 0%, transparent 65%)"></div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.14em;color:#4ade80;font-weight:800;text-transform:uppercase;margin-bottom:4px">WELLNESS CREATOR</div>' +
+            '<div style="font-size:19px;font-weight:900;color:#e8f5e9;letter-spacing:-.03em;margin-bottom:8px">Forest<br/>Organic</div>' +
+            '<div style="padding:5px 12px;border-radius:4px;background:#4ade80;font-size:8px;font-weight:700;color:#0b150d;display:inline-block">Work Together</div>' +
+          '</div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'bold-urban',
+    name: 'Bold Urban',
+    desc: 'High contrast black and white with impact typography. For streetwear, music and culture creators.',
+    tags: ['Urban', 'Bold', 'Music'],
+    preview: function(el) {
+      el.style.background = '#050505';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.2em;color:rgba(255,255,255,.4);font-weight:800;text-transform:uppercase;margin-bottom:4px">MUSIC · CULTURE</div>' +
+            '<div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:-.04em;line-height:.95;margin-bottom:10px;text-transform:uppercase">BOLD<br/>URBAN</div>' +
+            '<div style="padding:5px 12px;border-radius:0;background:#fff;font-size:8px;font-weight:900;color:#000;letter-spacing:.1em;text-transform:uppercase;display:inline-block">Book Now</div>' +
+          '</div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'sunset-warm',
+    name: 'Sunset Warm',
+    desc: 'Rich oranges, ambers and terracotta. Ideal for travel, food and photography creators.',
+    tags: ['Travel', 'Food', 'Photography'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #140c04 0%, #1e1005 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;background:radial-gradient(circle, rgba(249,115,22,.5) 0%, rgba(249,115,22,.08) 70%)"></div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.14em;color:#f97316;font-weight:800;text-transform:uppercase;margin-bottom:4px">TRAVEL & FOOD</div>' +
+            '<div style="font-size:19px;font-weight:900;color:#fef3e2;letter-spacing:-.03em;margin-bottom:8px">Sunset<br/>Warm</div>' +
+            '<div style="display:flex;gap:6px">' +
+              '<div style="padding:5px 12px;border-radius:6px;background:linear-gradient(90deg,#f97316,#ea580c);font-size:8px;font-weight:700;color:#fff">Collab</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'purple-vibe',
+    name: 'Purple Vibe',
+    desc: 'Deep purples and electric violet. Built for gaming, entertainment and streaming creators.',
+    tags: ['Gaming', 'Streaming', 'Entertainment'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #09050f 0%, #120820 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 20%, rgba(168,85,247,.22) 0%, transparent 60%)"></div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.14em;color:#a855f7;font-weight:800;text-transform:uppercase;margin-bottom:4px">GAMING · STREAMING</div>' +
+            '<div style="font-size:19px;font-weight:900;color:#fff;letter-spacing:-.03em;margin-bottom:8px">Purple<br/><span style="color:#a855f7">Vibe</span></div>' +
+            '<div style="padding:5px 12px;border-radius:6px;background:linear-gradient(90deg,#a855f7,#7c3aed);font-size:8px;font-weight:700;color:#fff;display:inline-block">Sponsor Me</div>' +
+          '</div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'slate-modern',
+    name: 'Slate Modern',
+    desc: 'Sophisticated slate greys with sharp layout. Perfect for business, finance and thought leaders.',
+    tags: ['Business', 'Finance', 'Corporate'],
+    preview: function(el) {
+      el.style.background = 'linear-gradient(135deg, #0f1117 0%, #161b26 100%)';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#475569,#64748b,#475569)"></div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.14em;color:#94a3b8;font-weight:800;text-transform:uppercase;margin-bottom:4px">BUSINESS · FINANCE</div>' +
+            '<div style="font-size:18px;font-weight:900;color:#e2e8f0;letter-spacing:-.03em;margin-bottom:8px">Slate<br/>Modern</div>' +
+            '<div style="padding:5px 12px;border-radius:4px;background:rgba(100,116,139,.8);font-size:8px;font-weight:700;color:#fff;display:inline-block">Connect</div>' +
+          '</div>' +
+        '</div>';
+    }
+  },
+  {
+    id: 'neon-night',
+    name: 'Neon Night',
+    desc: 'Electric neons on deep black. For nightlife, DJ, artist and club-culture creators.',
+    tags: ['DJ', 'Artist', 'Nightlife'],
+    preview: function(el) {
+      el.style.background = '#020202';
+      el.innerHTML =
+        '<div style="position:absolute;inset:0">' +
+          '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%, rgba(57,255,20,.1) 0%, transparent 55%)"></div>' +
+          '<div style="position:absolute;top:12px;left:14px;font-size:9px;font-weight:900;color:#39ff14;letter-spacing:.1em;text-shadow:0 0 10px rgba(57,255,20,.7)">✦ NEON</div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px">' +
+            '<div style="font-size:7px;letter-spacing:.14em;color:rgba(57,255,20,.7);font-weight:800;text-transform:uppercase;margin-bottom:4px">DJ · ARTIST</div>' +
+            '<div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-.03em;margin-bottom:10px">Neon<br/><span style="color:#39ff14;text-shadow:0 0 14px rgba(57,255,20,.8)">Night</span></div>' +
+            '<div style="padding:5px 12px;border-radius:4px;border:1.5px solid #39ff14;font-size:8px;font-weight:700;color:#39ff14;display:inline-block">Book a Set</div>' +
+          '</div>' +
+        '</div>';
+    }
+  }
+];
+
+var _selectedStyle = null;
+
+function renderStylePicker() {
+  var grid = document.getElementById('styGrid');
+  if (!grid || grid.children.length > 0) return; /* already rendered */
+  WEBSITE_STYLES.forEach(function(style) {
+    var card = document.createElement('div');
+    card.className = 'sty-card';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'radio');
+    card.setAttribute('aria-checked', 'false');
+    card.setAttribute('aria-label', style.name + ' — ' + style.desc);
+    card.dataset.styleId = style.id;
+
+    card.innerHTML =
+      '<div class="sty-card-check">✓</div>' +
+      '<div class="sty-card-preview" id="sty-prev-' + style.id + '"></div>' +
+      '<div class="sty-card-info">' +
+        '<div class="sty-card-name">' + style.name + '</div>' +
+        '<div class="sty-card-desc">' + style.desc + '</div>' +
+        '<div class="sty-card-tags">' +
+          style.tags.map(function(t) { return '<span class="sty-tag">' + t + '</span>'; }).join('') +
+        '</div>' +
+      '</div>';
+
+    var prevEl = card.querySelector('.sty-card-preview');
+    style.preview(prevEl);
+
+    card.addEventListener('click', function() { selectStyle(style.id); });
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectStyle(style.id); }
+    });
+    grid.appendChild(card);
+  });
+}
+
+function selectStyle(id) {
+  _selectedStyle = id;
+  document.querySelectorAll('.sty-card').forEach(function(c) {
+    var isThis = c.dataset.styleId === id;
+    c.classList.toggle('selected', isThis);
+    c.setAttribute('aria-checked', isThis ? 'true' : 'false');
+  });
+  var btn = document.getElementById('styContinueBtn');
+  if (btn) btn.disabled = false;
+}
+
+function confirmStyleAndProceed() {
+  if (!_selectedStyle) return;
+  window.psSelectedStyle = _selectedStyle;
+  var found = WEBSITE_STYLES.find(function(s) { return s.id === _selectedStyle; });
+  window.psSelectedStyleName = found ? found.name : _selectedStyle;
+  if (typeof showToast === 'function') {
+    showToast('✦ Style: ' + (found ? found.name : _selectedStyle));
+  }
+  /* Hand off to psHandleCreate (defined in website-studio.js) or fall back */
+  if (typeof psHandleCreate === 'function') {
+    psHandleCreate();
+  } else {
+    showScreen('screenOnboard');
+  }
+}
+
+/* Patch showScreen so picker renders lazily when first opened */
+document.addEventListener('DOMContentLoaded', function() {
+  var _origShow = window.showScreen;
+  if (typeof _origShow === 'function') {
+    window.showScreen = function(id) {
+      _origShow(id);
+      if (id === 'screenStylePicker') renderStylePicker();
+    };
+  }
+});
+</script>
+
+<style>
+/* ═══════════════════════════════════════════
+   STYLE PICKER — cards use design system tokens
+═══════════════════════════════════════════ */
+.sty-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+.sty-header {
+  text-align: center;
+  padding: 36px 20px 32px;
+}
+.sty-title {
+  font-family: var(--fd);
+  font-size: clamp(24px, 3.5vw, 38px);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  color: var(--text);
+  margin: 10px 0 10px;
+}
+.sty-sub {
+  font-size: 14px;
+  color: var(--text2);
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+.sty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+  padding: 0 24px;
+}
+@media (max-width: 640px) { .sty-grid { grid-template-columns: 1fr; padding: 0 16px; } }
+
+.sty-card {
+  border-radius: var(--r2);
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+  position: relative;
+  outline: none;
+}
+.sty-card:hover {
+  border-color: var(--gold-glo);
+  transform: translateY(-3px);
+  box-shadow: var(--sh2);
+}
+.sty-card.selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-dim), var(--sh2);
+}
+.sty-card-check {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #07090f;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.sty-card.selected .sty-card-check { display: flex; }
+
+.sty-card-preview {
+  height: 170px;
+  position: relative;
+  overflow: hidden;
+}
+.sty-card-info {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sty-card-name {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+.sty-card-desc {
+  font-size: 11.5px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.sty-card-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+.sty-tag {
+  font-family: var(--fm);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: var(--bg2);
+  color: var(--text3);
+  border: 1px solid var(--border);
+}
+
+.sty-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px 0;
+}
+.sty-continue-btn {
+  padding: 14px 36px;
+  border-radius: var(--r);
+  border: none;
+  background: var(--gold);
+  color: #fff;
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity .2s, transform .2s, box-shadow .2s;
+  letter-spacing: -.01em;
+  box-shadow: var(--sh-gold);
+}
+[data-theme="dark"] .sty-continue-btn { color: #07090f; }
+.sty-continue-btn:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.sty-continue-btn:not(:disabled):hover { opacity: .88; transform: translateY(-2px); }
+.sty-footer-note {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--fm);
+}
+</style>
 </body>
 </html>
