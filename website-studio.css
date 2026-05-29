@@ -212,28 +212,24 @@ input, textarea, select { font-family: inherit; color: var(--text); outline: non
 .ob-add-btn:hover{border-color:var(--accent);color:var(--accent)}
 .ob-add-btn.sm{padding:6px 10px;font-size:10px;width:auto}
 
-/* Theme picker */
-.ob-theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.ob-theme-grid.compact{grid-template-columns:repeat(3,1fr)}
+/* Theme picker — 16 styles, 4-column grid */
+.ob-theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ob-theme-grid.compact{grid-template-columns:repeat(4,1fr)}
 .ob-theme-opt{
   border:2px solid var(--border);border-radius:var(--r);overflow:hidden;
   cursor:pointer;transition:.15s;background:var(--surface2);
 }
 .ob-theme-opt:hover{border-color:var(--text3)}
 .ob-theme-opt.active{border-color:var(--accent)}
-.ob-theme-preview{height:52px;padding:10px;display:flex;flex-direction:column;gap:5px}
-.dark-prev{background:#1a1814}
-.navy-prev{background:#0f172a}
-.clean-prev{background:#f8fafc}
-.midnight-prev{background:#080810}
-.rose-prev{background:#1a0d12}
-.forest-prev{background:#14532d}
-.ob-tp-bar{height:8px;border-radius:3px;background:rgba(255,255,255,.2);width:60%}
-.clean-prev .ob-tp-bar{background:rgba(0,0,0,.15)}
-.ob-tp-line{height:5px;border-radius:2px;background:rgba(255,255,255,.1);width:100%}
+/* Preview swatch — bg and bar colours come from inline styles on each card */
+.ob-theme-preview{
+  height:44px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.ob-tp-bar{height:7px;border-radius:3px;width:55%}
+.ob-tp-line{height:4px;border-radius:2px;width:100%}
 .ob-tp-line.short{width:70%}
-.clean-prev .ob-tp-line{background:rgba(0,0,0,.08)}
-.ob-theme-name{font-size:10px;font-weight:700;font-family:var(--fm);text-align:center;padding:6px;color:var(--text2)}
+.ob-theme-name{font-size:9px;font-weight:700;font-family:var(--fm);text-align:center;padding:5px 4px;color:var(--text2);line-height:1.2}
 .ob-theme-opt.active .ob-theme-name{color:var(--accent)}
 
 .ob-color-row{display:flex;align-items:center;gap:10px}
@@ -481,7 +477,7 @@ input, textarea, select { font-family: inherit; color: var(--text); outline: non
 .gen-step.active{color:var(--accent);border-color:rgba(201,126,8,.4);background:rgba(201,126,8,.08)}
 .gen-step.done{color:var(--green);border-color:rgba(34,197,94,.3)}
 
-
+.builder-mobile-bar{
   display:none;flex-shrink:0;
   background:var(--surface);border-bottom:1px solid var(--border);
   padding:0;
@@ -508,7 +504,7 @@ input, textarea, select { font-family: inherit; color: var(--text); outline: non
   .dash-headline{font-size:32px}
   .ob-platforms-grid{grid-template-columns:1fr}
   .ob-grid{grid-template-columns:1fr}
-  .ob-theme-grid{grid-template-columns:repeat(2,1fr)}
+  .ob-theme-grid{grid-template-columns:repeat(3,1fr)}
 
   /* MOBILE BUILDER: preview top, editor bottom sheet */
   .builder-shell{
