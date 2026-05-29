@@ -267,6 +267,7 @@ tr:hover td{background:var(--bg2);}
       <nav class="sb-nav">
         <a href="#" onclick="return nav('hero',this)"><span class="sb-ico">🎞️</span>Hero Slideshow</a>
         <a href="#" onclick="return nav('services',this)"><span class="sb-ico">🛎️</span>Services</a>
+        <a href="#" onclick="return nav('about',this)"><span class="sb-ico">👥</span>About Page</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -292,7 +293,7 @@ tr:hover td{background:var(--bg2);}
         <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico">📊</div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
 <div class="quick-card" onclick="nav('createevent',null)"><div class="quick-ico">📅</div><div class="quick-title">Create Event</div><div class="quick-desc">Set up a new photo event with access code and expiry</div></div>
         <div class="quick-card" onclick="nav('uploadphotos',null)"><div class="quick-ico">🖼️</div><div class="quick-title">Upload Photos</div><div class="quick-desc">Add photos to an existing event gallery</div></div>
-<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico">🔗</div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div><div class="quick-card" onclick="nav('services',null)"><div class="quick-ico">🛎️</div><div class="quick-title">Manage Services</div><div class="quick-desc">Add, edit and reorder the services shown on your Services page</div></div>
+<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico">🔗</div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div><div class="quick-card" onclick="nav('services',null)"><div class="quick-ico">🛎️</div><div class="quick-title">Manage Services</div><div class="quick-desc">Add, edit and reorder the services shown on your Services page</div></div><div class="quick-card" onclick="nav('about',null)"><div class="quick-ico">👥</div><div class="quick-title">Edit About Page</div><div class="quick-desc">Update your story, team photos, bios and why-choose-us pillars</div></div>
       </div>
     </div>
     <!-- HOMEPAGE CONTENT -->
@@ -611,6 +612,101 @@ tr:hover td{background:var(--bg2);}
             Toggle <strong>Active</strong> to hide/show a service without deleting it.
           </div>
           <a href="services.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview Services Page</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT PAGE EDITOR -->
+    <div class="page" id="page-about">
+      <div class="page-header">
+        <div class="page-title">About Page</div>
+        <div class="page-sub">Edit the story, team members, and "Why Choose Us" pillars shown on about.html.</div>
+      </div>
+      <div class="ws-layout">
+        <div>
+
+          <!-- STORY SECTION -->
+          <div class="card" style="margin-bottom:18px;">
+            <div class="card-head">
+              <h2>📖 Our Story</h2>
+              <button class="btn btn-gold" onclick="saveAboutStory()">💾 Save Story</button>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+              <div id="aboutStoryAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;"></div>
+
+              <div class="field-group">
+                <div class="field-label">Header Tagline</div>
+                <input type="text" id="ab-tagline" placeholder="e.g. We started Impact Grid Events because…"/>
+                <div class="field-hint">One sentence shown under the page headline.</div>
+              </div>
+
+              <div class="field-group">
+                <div class="field-label">Story Text</div>
+                <textarea id="ab-story" rows="8" placeholder="Your origin story. Separate paragraphs with a blank line."></textarea>
+                <div class="field-hint">Use a blank line between paragraphs. Each becomes its own &lt;p&gt; on the page.</div>
+              </div>
+
+              <div class="field-group">
+                <div class="field-label">Story Section Image</div>
+                <div class="upload-zone" id="abStoryImgZone" style="margin-bottom:10px;"
+                  onclick="document.getElementById('abStoryImgFileIn').click()"
+                  ondragover="onDragOver(event,'abStoryImgZone')"
+                  ondragleave="onDragLeave(event,'abStoryImgZone')"
+                  ondrop="onDropAboutImg(event,'story')">
+                  <div class="upload-zone-ico">📂</div>
+                  <div class="upload-zone-title">Drop an image or click to upload</div>
+                  <div class="upload-zone-sub">JPG · PNG · WebP · Shown beside your story text</div>
+                  <input type="file" id="abStoryImgFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleAboutImgFile(event,'story')"/>
+                </div>
+                <div id="abStoryImgProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:8px;font-size:12px;color:var(--gold);"></div>
+                <input type="text" id="ab-story-img" placeholder="Or paste an image URL" oninput="updateAboutImgPreview('story','ab-story-img','abStoryImgPreviewWrap','abStoryImgPreview')"/>
+                <div id="abStoryImgPreviewWrap" style="display:none;margin-top:10px;">
+                  <img id="abStoryImgPreview" style="width:100%;max-height:220px;object-fit:cover;border-radius:var(--r);border:1px solid var(--border2);" src="" alt="Preview"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TEAM MEMBERS -->
+          <div class="card" style="margin-bottom:18px;">
+            <div class="card-head">
+              <h2>👥 Team Members</h2>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="addTeamMember()">+ Add Member</button>
+                <button class="btn btn-gold" onclick="saveTeamMembers()">💾 Save Team</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="teamMembersList" style="display:flex;flex-direction:column;gap:14px;">
+                <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WHY CHOOSE US PILLARS -->
+          <div class="card" style="margin-bottom:18px;">
+            <div class="card-head">
+              <h2>✅ Why Choose Us — Pillars</h2>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="addPillar()">+ Add Pillar</button>
+                <button class="btn btn-gold" onclick="savePillars()">💾 Save Pillars</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="pillarsList" style="display:flex;flex-direction:column;gap:10px;">
+                <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="ws-sticky">
+          <div class="hint-box">
+            <strong>How the About page works</strong><br><br>
+            All content reads from the <code>about_page</code> Supabase table (single row). The team members and pillars are stored as JSON arrays in that row.<br><br>
+            Changes go live immediately — no redeploy needed.
+          </div>
+          <a href="about.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview About Page</a>
         </div>
       </div>
     </div>
@@ -2118,6 +2214,301 @@ window.nav = function(page, el){
 document.getElementById('svcModal').addEventListener('click', function(e){
   if(e.target === this) closeSvcModal();
 });
+
+/* ══════════════════════════════════════════
+   ABOUT PAGE ADMIN
+══════════════════════════════════════════ */
+var ABOUT_BUCKET = 'site-media';
+var _aboutData   = null;
+
+async function loadAboutAdmin() {
+  try {
+    var sb = getSupabase();
+    var res = await sb.from('about_page').select('*').limit(1).maybeSingle();
+    if (res.error) throw res.error;
+    _aboutData = res.data || {};
+    populateAboutForm(_aboutData);
+  } catch(e) {
+    toast('⚠️','Could not load About data', e.message||'');
+    _aboutData = {};
+    populateAboutForm({});
+  }
+}
+
+function populateAboutForm(d) {
+  /* Story fields */
+  var tagEl = document.getElementById('ab-tagline');
+  var stEl  = document.getElementById('ab-story');
+  var imgEl = document.getElementById('ab-story-img');
+  if (tagEl) tagEl.value = d.tagline || '';
+  if (stEl)  stEl.value  = d.story_text || '';
+  if (imgEl) { imgEl.value = d.story_image_url || ''; updateAboutImgPreview('story','ab-story-img','abStoryImgPreviewWrap','abStoryImgPreview'); }
+
+  /* Team */
+  renderTeamEditor(d.team || [
+    { name:'TJ',   role:'Creative Director', bio:'TJ leads all photography and content creation on the ground.', photo_url:'' },
+    { name:'Dara', role:'Founder',           bio:'Dara handles the technology, digital systems, and overall direction.', photo_url:'' }
+  ]);
+
+  /* Pillars */
+  renderPillarsEditor(d.pillars || [
+    { icon:'📸', title:'High-Quality Photography', description:'Professional event photography delivered at full resolution, fast.' },
+    { icon:'🎬', title:'Content Creation',         description:'Polished content ready for social media, print, or internal use.' },
+    { icon:'⚡', title:'Fast Media Delivery',      description:'Your gallery is ready within 24 hours. Guests can browse and download straight away.' },
+    { icon:'🗂️', title:'Organised Galleries',     description:'Clean, branded online gallery. No login, no app — just a link.' }
+  ]);
+}
+
+/* ── Story Save ── */
+async function saveAboutStory() {
+  var tagline         = (document.getElementById('ab-tagline').value||'').trim();
+  var story_text      = (document.getElementById('ab-story').value||'').trim();
+  var story_image_url = (document.getElementById('ab-story-img').value||'').trim();
+
+  var alert = document.getElementById('aboutStoryAlert');
+  alert.style.display = 'none';
+
+  try {
+    var sb = getSupabase();
+    var payload = { tagline, story_text, story_image_url };
+    var res;
+    if (_aboutData && _aboutData.id) {
+      res = await sb.from('about_page').update(payload).eq('id', _aboutData.id);
+    } else {
+      res = await sb.from('about_page').insert([payload]).select().single();
+      if (res.data) _aboutData = res.data;
+    }
+    if (res.error) throw res.error;
+    toast('✅','Story saved!','About page updated.');
+  } catch(e) {
+    alert.style.display = 'block';
+    alert.style.background = 'var(--red-dim)';
+    alert.style.color = 'var(--red)';
+    alert.textContent = 'Save failed: ' + (e.message||'Unknown error');
+  }
+}
+
+/* ── Team Editor ── */
+function renderTeamEditor(members) {
+  var list = document.getElementById('teamMembersList');
+  if (!list) return;
+  if (!members.length) { list.innerHTML = '<div class="empty"><div class="empty-ico">👤</div><div class="empty-txt">No team members yet. Click + Add Member.</div></div>'; return; }
+  list.innerHTML = members.map(function(m, i) {
+    return (
+      '<div class="card" style="margin-bottom:0;" id="teamRow'+i+'">' +
+        '<div class="card-head">' +
+          '<h2 style="font-size:13px;">' + (m.name||'Member '+(i+1)) + '</h2>' +
+          '<button class="btn btn-red btn-sm" onclick="removeTeamMember('+i+')">✕ Remove</button>' +
+        '</div>' +
+        '<div class="card-body" style="display:flex;flex-direction:column;gap:10px;">' +
+          '<div class="form-grid">' +
+            '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Name *</div><input type="text" id="tm-name-'+i+'" value="'+_esc(m.name)+'" placeholder="e.g. TJ"/></div>' +
+            '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Role *</div><input type="text" id="tm-role-'+i+'" value="'+_esc(m.role)+'" placeholder="e.g. Creative Director"/></div>' +
+          '</div>' +
+          '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Bio</div><textarea id="tm-bio-'+i+'" rows="3" placeholder="Short bio…">'+_esc(m.bio)+'</textarea></div>' +
+          '<div class="field-group" style="margin-bottom:0;">' +
+            '<div class="field-label">Photo</div>' +
+            '<div class="upload-zone" style="margin-bottom:8px;" onclick="document.getElementById(\'tm-file-'+i+'\').click()" ondragover="onDragOver(event,\'tm-dz-'+i+'\')" ondragleave="onDragLeave(event,\'tm-dz-'+i+'\')" ondrop="onDropTeamPhoto(event,'+i+')" id="tm-dz-'+i+'">' +
+              '<div class="upload-zone-ico" style="font-size:20px;">📂</div>' +
+              '<div class="upload-zone-title" style="font-size:12px;">Drop photo or click to upload</div>' +
+              '<input type="file" id="tm-file-'+i+'" accept="image/jpeg,image/png,image/webp" onchange="handleTeamPhotoFile(event,'+i+')"/>' +
+            '</div>' +
+            '<div id="tm-prog-'+i+'" style="display:none;font-size:12px;color:var(--gold);margin-bottom:8px;"></div>' +
+            '<input type="text" id="tm-photo-'+i+'" value="'+_esc(m.photo_url)+'" placeholder="Or paste photo URL" oninput="updateAboutImgPreview('+i+',\'tm-photo-'+i+'\',\'tm-prev-wrap-'+i+'\',\'tm-prev-img-'+i+'\')"/>' +
+            '<div id="tm-prev-wrap-'+i+'" style="'+(m.photo_url?'':'display:none;')+'margin-top:8px;">' +
+              '<img id="tm-prev-img-'+i+'" src="'+_esc(m.photo_url)+'" style="width:100%;max-height:160px;object-fit:cover;object-position:center top;border-radius:var(--r);border:1px solid var(--border2);" alt=""/>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+function _esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function addTeamMember() {
+  var members = collectTeamMembers();
+  members.push({ name:'', role:'', bio:'', photo_url:'' });
+  renderTeamEditor(members);
+}
+
+function removeTeamMember(i) {
+  var members = collectTeamMembers();
+  members.splice(i, 1);
+  renderTeamEditor(members);
+}
+
+function collectTeamMembers() {
+  var members = [];
+  var rows = document.querySelectorAll('[id^="tm-name-"]');
+  rows.forEach(function(el) {
+    var i = el.id.replace('tm-name-','');
+    members.push({
+      name:      (document.getElementById('tm-name-'+i)||{}).value||'',
+      role:      (document.getElementById('tm-role-'+i)||{}).value||'',
+      bio:       (document.getElementById('tm-bio-'+i)||{}).value||'',
+      photo_url: (document.getElementById('tm-photo-'+i)||{}).value||''
+    });
+  });
+  return members;
+}
+
+async function saveTeamMembers() {
+  var members = collectTeamMembers();
+  try {
+    var sb = getSupabase();
+    var res;
+    if (_aboutData && _aboutData.id) {
+      res = await sb.from('about_page').update({ team: members }).eq('id', _aboutData.id);
+    } else {
+      res = await sb.from('about_page').insert([{ team: members }]).select().single();
+      if (res.data) _aboutData = res.data;
+    }
+    if (res.error) throw res.error;
+    toast('✅','Team saved!', members.length + ' member' + (members.length!==1?'s':'') + ' updated.');
+  } catch(e) {
+    toast('⚠️','Save failed', e.message||'');
+  }
+}
+
+/* Team photo upload */
+function onDropTeamPhoto(e, idx) {
+  e.preventDefault();
+  onDragLeave(e, 'tm-dz-'+idx);
+  var files = Array.from(e.dataTransfer.files||[]).filter(function(f){ return f.type.startsWith('image/'); });
+  if (files.length) _uploadAboutImg(files[0], idx, 'team');
+}
+function handleTeamPhotoFile(e, idx) {
+  var files = Array.from(e.target.files||[]).filter(function(f){ return f.type.startsWith('image/'); });
+  e.target.value = '';
+  if (files.length) _uploadAboutImg(files[0], idx, 'team');
+}
+
+/* ── Pillars Editor ── */
+function renderPillarsEditor(pillars) {
+  var list = document.getElementById('pillarsList');
+  if (!list) return;
+  if (!pillars.length) { list.innerHTML = '<div class="empty"><div class="empty-ico">✅</div><div class="empty-txt">No pillars yet. Click + Add Pillar.</div></div>'; return; }
+  list.innerHTML = pillars.map(function(p, i) {
+    return (
+      '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;" id="pillarRow'+i+'">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+          '<div style="font-size:13px;font-weight:700;">' + (p.icon||'✅') + ' Pillar ' + (i+1) + '</div>' +
+          '<button class="btn btn-red btn-sm" onclick="removePillar('+i+')">✕</button>' +
+        '</div>' +
+        '<div class="form-grid" style="margin-bottom:8px;">' +
+          '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Icon / Emoji</div><input type="text" id="pl-icon-'+i+'" value="'+_esc(p.icon)+'" placeholder="📸" style="max-width:80px;"/></div>' +
+          '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Title *</div><input type="text" id="pl-title-'+i+'" value="'+_esc(p.title)+'" placeholder="e.g. Fast Delivery"/></div>' +
+        '</div>' +
+        '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Description</div><textarea id="pl-desc-'+i+'" rows="2" placeholder="One or two sentences.">'+_esc(p.description)+'</textarea></div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+function addPillar() {
+  var pillars = collectPillars();
+  pillars.push({ icon:'✦', title:'', description:'' });
+  renderPillarsEditor(pillars);
+}
+
+function removePillar(i) {
+  var pillars = collectPillars();
+  pillars.splice(i, 1);
+  renderPillarsEditor(pillars);
+}
+
+function collectPillars() {
+  var pillars = [];
+  var rows = document.querySelectorAll('[id^="pl-icon-"]');
+  rows.forEach(function(el) {
+    var i = el.id.replace('pl-icon-','');
+    pillars.push({
+      icon:        (document.getElementById('pl-icon-'+i)||{}).value||'',
+      title:       (document.getElementById('pl-title-'+i)||{}).value||'',
+      description: (document.getElementById('pl-desc-'+i)||{}).value||''
+    });
+  });
+  return pillars;
+}
+
+async function savePillars() {
+  var pillars = collectPillars();
+  try {
+    var sb = getSupabase();
+    var res;
+    if (_aboutData && _aboutData.id) {
+      res = await sb.from('about_page').update({ pillars: pillars }).eq('id', _aboutData.id);
+    } else {
+      res = await sb.from('about_page').insert([{ pillars: pillars }]).select().single();
+      if (res.data) _aboutData = res.data;
+    }
+    if (res.error) throw res.error;
+    toast('✅','Pillars saved!', pillars.length + ' pillar' + (pillars.length!==1?'s':'') + ' updated.');
+  } catch(e) {
+    toast('⚠️','Save failed', e.message||'');
+  }
+}
+
+/* ── Shared image upload for About page ── */
+async function _uploadAboutImg(file, ctx, type) {
+  var progId = type === 'team' ? 'tm-prog-'+ctx : 'abStoryImgProg';
+  var inputId = type === 'team' ? 'tm-photo-'+ctx : 'ab-story-img';
+  var wrapId  = type === 'team' ? 'tm-prev-wrap-'+ctx : 'abStoryImgPreviewWrap';
+  var imgId   = type === 'team' ? 'tm-prev-img-'+ctx : 'abStoryImgPreview';
+  var prog = document.getElementById(progId);
+  if (prog) { prog.style.display = 'block'; prog.textContent = 'Uploading…'; }
+  try {
+    var sb   = getSupabase();
+    var ext  = file.name.split('.').pop()||'jpg';
+    var path = 'about/' + (type==='team'?'team/':'story/') + Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
+    var {error: upErr} = await sb.storage.from(ABOUT_BUCKET).upload(path, file, {upsert:true});
+    if (upErr) throw upErr;
+    var {data} = sb.storage.from(ABOUT_BUCKET).getPublicUrl(path);
+    var input = document.getElementById(inputId);
+    if (input) input.value = data.publicUrl;
+    updateAboutImgPreview(ctx, inputId, wrapId, imgId);
+    if (prog) prog.style.display = 'none';
+    toast('✅','Photo uploaded','Click Save to apply.');
+  } catch(e) {
+    if (prog) { prog.style.display = 'none'; }
+    toast('⚠️','Upload failed', e.message||'');
+  }
+}
+
+function onDropAboutImg(e, type) {
+  e.preventDefault();
+  onDragLeave(e, 'abStoryImgZone');
+  var files = Array.from(e.dataTransfer.files||[]).filter(function(f){ return f.type.startsWith('image/'); });
+  if (files.length) _uploadAboutImg(files[0], 'story', type);
+}
+function handleAboutImgFile(e, type) {
+  var files = Array.from(e.target.files||[]).filter(function(f){ return f.type.startsWith('image/'); });
+  e.target.value = '';
+  if (files.length) _uploadAboutImg(files[0], 'story', type);
+}
+
+function updateAboutImgPreview(ctx, inputId, wrapId, imgId) {
+  var url  = (document.getElementById(inputId)||{}).value||'';
+  var wrap = document.getElementById(wrapId);
+  var img  = document.getElementById(imgId);
+  if (!wrap || !img) return;
+  if (url) { wrap.style.display = 'block'; img.src = url; }
+  else      { wrap.style.display = 'none'; }
+}
+
+/* Wire up nav loader for About */
+(function(){
+  var _origNav2 = window.nav;
+  window.nav = function(page, el){
+    var result = _origNav2 ? _origNav2(page, el) : false;
+    if (page === 'about') setTimeout(loadAboutAdmin, 50);
+    return result;
+  };
+})();
 
 var GALLERY_LS_KEY = 'ig_gallery_strip';
 var HERO_LS_KEY    = 'ig_hero_grid';
