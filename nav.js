@@ -170,19 +170,7 @@
           desktopLinks +
         '</ul>' +
 
-        /* ── Website sub-nav: shown only on website-studio.html ── */
-        '<div class="nav-sub-section" id="wsSubNav" style="display:none;padding:0 8px;margin-bottom:8px;">' +
-          '<div class="nav-sub-label">Website Studio</div>' +
-          '<button class="nav-sub-item active" id="navSubCreate" onclick="dashShowTab(\'create\')" title="Create a Website">' +
-            '<span class="nav-sub-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>' +
-            '<span class="nav-sub-label-text">Create a Website</span>' +
-          '</button>' +
-          '<button class="nav-sub-item" id="navSubMy" onclick="dashShowTab(\'my\')" title="My Websites">' +
-            '<span class="nav-sub-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span>' +
-            '<span class="nav-sub-label-text">My Websites</span>' +
-            '<span class="nav-sub-count" id="navSubCount" style="display:none">0</span>' +
-          '</button>' +
-        '</div>' +
+        /* wsSubNav: items are injected directly into .nav-links by JS below — no static HTML needed here */ +
 
         '<div class="nav-bottom">' +
           '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">Dark mode</button>' +
@@ -265,6 +253,55 @@
       if (page === 'website-studio.html' || page === '') {
         var wsSubNav = document.getElementById('wsSubNav');
         if (wsSubNav) wsSubNav.style.display = '';
+
+        /* ── Inject Create Website + My Websites directly into the sidebar nav list ── */
+        /* This runs after the nav HTML is injected, so elements exist */
+        setTimeout(function() {
+          var navLinks = document.querySelector('.nav .nav-links');
+          if (!navLinks) return;
+
+          /* Find the <a> pointing to website-studio.html */
+          var websiteA = Array.prototype.filter.call(
+            navLinks.querySelectorAll('a'),
+            function(a) { return a.getAttribute('href') === 'website-studio.html'; }
+          )[0];
+          if (!websiteA) return;
+
+          var parentLi = websiteA.closest('li');
+          if (!parentLi) return;
+
+          /* Turn the Website link into a non-clickable section label */
+          websiteA.style.cssText += 'pointer-events:none;cursor:default;opacity:0.4;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:12px 11px 3px;';
+
+          /* Build Create a Website item */
+          var liCreate = document.createElement('li');
+          liCreate.innerHTML =
+            '<button class="nav-sub-item active" id="navSubCreate" onclick="dashShowTab(\'create\')" title="Create a Website" style="width:100%;text-align:left">' +
+              '<span class="nav-sub-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>' +
+              '<span class="nav-sub-label-text">Create a Website</span>' +
+            '</button>';
+
+          /* Build My Websites item */
+          var liMy = document.createElement('li');
+          liMy.innerHTML =
+            '<button class="nav-sub-item" id="navSubMy" onclick="dashShowTab(\'my\')" title="My Websites" style="width:100%;text-align:left">' +
+              '<span class="nav-sub-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span>' +
+              '<span class="nav-sub-label-text">My Websites</span>' +
+              '<span class="nav-sub-count" id="navSubCount" style="display:none">0</span>' +
+            '</button>';
+
+          parentLi.after(liCreate, liMy);
+
+          /* Patch dashShowTab to also sync these nav-links items */
+          var _origDST = window.dashShowTab;
+          window.dashShowTab = function(tab) {
+            if (typeof _origDST === 'function') _origDST(tab);
+            var c = document.getElementById('navSubCreate');
+            var m = document.getElementById('navSubMy');
+            if (c) c.classList.toggle('active', tab === 'create');
+            if (m) m.classList.toggle('active', tab === 'my');
+          };
+        }, 0);
       }
     })();
 
