@@ -21,19 +21,19 @@
   </script>
 
   <style>
-    /* ════════════════════════════════════════
+    /* 
        SERVICES PAGE — page-local styles only.
        shared.css owns: reset, body bg+grain,
        nav rail, page-wrap offset, .btn-*, .card,
        .grid-*, .section, .label-tag, .anim-*, 
        .page-hero, footer, mobile breakpoints.
-    ════════════════════════════════════════ */
+     */
 
     :root {
       --sv-display: 'Fraunces', Georgia, serif;
     }
 
-    /* ── Full-bleed: undoes page-wrap left-offset for edge-to-edge sections ── */
+    /*  Full-bleed: undoes page-wrap left-offset for edge-to-edge sections  */
     .full-bleed {
       margin-left: calc(-1 * var(--nav-w-collapsed, 52px));
       width: 100vw;
@@ -42,7 +42,7 @@
       .full-bleed { margin-left: 0; width: 100%; }
     }
 
-    /* ── PAGE HEADER ─────────────────────────────── */
+    /*  PAGE HEADER  */
     .sv-header {
       padding: 96px 40px 72px;
       text-align: center;
@@ -69,7 +69,7 @@
       margin: 0 auto;
     }
 
-    /* ── SERVICES GRID ───────────────────────────── */
+    /*  SERVICES GRID  */
     .sv-section {
       max-width: 1220px;
       margin: 0 auto;
@@ -82,7 +82,7 @@
       gap: 3px;
     }
 
-    /* ── SERVICE CARD ────────────────────────────── */
+    /*  SERVICE CARD  */
     /* Extends shared .card but overrides padding/radius for image-first layout */
     .sv-card {
       background: var(--card);
@@ -136,12 +136,6 @@
       flex-direction: column;
     }
 
-    .sv-card-icon {
-      font-size: 26px;
-      margin-bottom: 14px;
-      display: block;
-    }
-
     .sv-card-title {
       font-family: var(--sv-display);
       font-size: clamp(22px, 2.2vw, 30px);
@@ -174,8 +168,22 @@
       width: 56px;
       opacity: 1;
     }
+    /* Price badge */
+    .sv-card-price {
+      display: inline-block;
+      margin-top: 16px;
+      font-family: var(--fm);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold);
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-glo);
+      border-radius: 100px;
+      padding: 4px 12px;
+      letter-spacing: 0.04em;
+    }
 
-    /* ── SKELETON LOADER ─────────────────────────── */
+    /*  SKELETON LOADER  */
     .sv-skeleton {
       background: var(--card);
       border: 1px solid var(--border);
@@ -196,63 +204,22 @@
     .sv-sk-line.w80 { width: 80%; }
     .sv-sk-line.w42 { width: 42%; }
 
-    /* ── EMPTY / ERROR STATE ─────────────────────── */
+    /*  EMPTY / ERROR STATE  */
     .sv-empty {
       grid-column: 1 / -1;
       text-align: center;
       padding: 80px 20px;
       color: var(--text3);
     }
-    .sv-empty-ico { font-size: 40px; margin-bottom: 14px; }
     .sv-empty-txt { font-size: 15px; }
 
-    /* ── CTA STRIP ───────────────────────────────── */
-    .sv-cta {
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 100px 40px;
-    }
-    .sv-cta-inner {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .sv-cta-title {
-      font-family: var(--sv-display);
-      font-size: clamp(34px, 4.2vw, 58px);
-      font-weight: 300;
-      line-height: 1.07;
-      letter-spacing: -0.03em;
-      color: var(--text);
-      margin: 16px 0 18px;
-    }
-    .sv-cta-title em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .sv-cta-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-weight: 300;
-      margin-bottom: 36px;
-      line-height: 1.7;
-    }
-    .sv-cta-btns {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    /* ── RESPONSIVE ──────────────────────────────── */
+    /*  RESPONSIVE  */
     @media (max-width: 900px) {
       .sv-grid        { grid-template-columns: 1fr; }
       .sv-section     { padding: 8px 20px 72px; }
       .sv-header      { padding: 72px 20px 56px; }
       .sv-card-body   { padding: 24px 24px 28px; }
-      .sv-cta         { padding: 72px 20px; }
-    }
+  }
     @media (max-width: 600px) {
       .sv-card-img    { height: 200px; }
       .sv-sk-img      { height: 180px; }
@@ -302,36 +269,32 @@
   <script>renderFooter();</script>
 
   <script>
-  /* ════════════════════════════════════════
+  /* 
      SERVICES — fetch from Supabase, render
-  ════════════════════════════════════════ */
+   */
 
   var FALLBACK_SERVICES = [
     {
       id:'f1', title:'Professional Photography',
       description:'High-quality event photography from an experienced creative. We capture the moments that matter — candid, posed, and everything in between.',
-      icon:'',
       image_url:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80&fit=crop',
       sort_order:0
     },
     {
       id:'f2', title:'High-Quality Content Creation',
       description:'Beyond photos — we create polished content ready for social media, print, or internal use. Clips, highlights, and branded assets delivered fast.',
-      icon:'',
       image_url:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80&fit=crop',
       sort_order:10
     },
     {
       id:'f3', title:'Organised Online Galleries',
       description:'Every photo is sorted into a clean, branded online gallery. Guests browse and download their shots in seconds — no app, no login required.',
-      icon:'',
       image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop',
       sort_order:20
     },
     {
       id:'f4', title:'Easy Preview & Download Systems',
       description:'We build the digital infrastructure around your event. Guests get a private link, preview their photos instantly, and download in full resolution.',
-      icon:'',
       image_url:'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80&fit=crop',
       sort_order:30
     }
@@ -359,25 +322,25 @@
     }
 
     grid.innerHTML = services.map(function(s, i){
-      /* Image block — full photo if set, plain placeholder otherwise */
       var imgBlock = s.image_url
         ? '<div class="sv-card-img-wrap">' +
             '<img class="sv-card-img" src="'+esc(s.image_url)+'" alt="'+esc(s.title)+'" loading="'+(i<2?'eager':'lazy')+'"/>' +
           '</div>'
         : '<div class="sv-card-placeholder"></div>';
 
-      /* No icon block — clean card layout */
-      var iconBlock = '';
+      var priceBlock = s.price
+        ? '<span class="sv-card-price">'+esc(s.price)+'</span>'
+        : '';
 
       var delay = DELAYS[Math.min(i, DELAYS.length-1)];
 
       return '<div class="sv-card anim-fade-up '+delay+'">' +
         imgBlock +
         '<div class="sv-card-body">' +
-          iconBlock +
           '<h2 class="sv-card-title">'+esc(s.title)+'</h2>' +
           '<p class="sv-card-desc">'+esc(s.description)+'</p>' +
           '<div class="sv-card-line"></div>' +
+          priceBlock +
         '</div>' +
       '</div>';
     }).join('');
@@ -393,7 +356,7 @@
 
       var res = await sb
         .from('services')
-        .select('id,title,description,icon,image_url,sort_order')
+        .select('id,title,description,price,image_url,sort_order')
         .eq('is_active', true)
         .order('sort_order', {ascending:true});
 
@@ -405,7 +368,7 @@
     }
   }
 
-  /* ── Shared .anim scroll observer (mirrors shared.css .anim class) ── */
+  /*  Shared .anim scroll observer (mirrors shared.css .anim class)  */
   function initAnim(){
     var els = document.querySelectorAll('.anim-fade-up:not(.visible)');
     if(!els.length) return;
