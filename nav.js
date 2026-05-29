@@ -329,8 +329,8 @@
               '</div>' +
               '<p>Creator intelligence for content that actually performs.</p>' +
             '</div>' +
-            '<div class="fc"><h4>Product</h4><a href="creator-studio.html">Creator Studio</a><a href="carousel-studio.html">Carousel Studio</a><a href="portfolio-studio.html">Portfolio Studio</a><a href="consulting.html">Consulting</a><a href="pricing.html">Pricing</a></div>' +
-            '<div class="fc"><h4>Company</h4><a href="about.html">About</a><a href="consulting.html">Consulting</a><a href="contact.html">Contact Us</a></div>' +
+            '<div class="fc"><h4>Product</h4><a href="index.html">Gallery Platform</a><a href="website-studio.html">Website Studio</a><a href="pricing.html">Pricing</a><a href="dashboard.html">Dashboard</a></div>' +
+            '<div class="fc"><h4>Company</h4><a href="about.html">About</a><a href="contact.html">Contact Us</a></div>' +
             '<div class="fc"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>' +
           '</div>' +
           '<div class="footer-bot">' +
