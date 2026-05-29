@@ -3200,3 +3200,134 @@ button:focus-visible,
   .wss-demo-style-name { display: none; }
   .wss-demo-toolbar { padding: 8px 12px; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD SIDEBAR LAYOUT
+══════════════════════════════════════════════════════════ */
+.dash-layout {
+  display: flex;
+  min-height: calc(100vh - var(--nav-h));
+}
+
+/* ── Sidebar ── */
+.dash-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: calc(100vh - var(--nav-h));
+  overflow-y: auto;
+}
+
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: none;
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.dash-nav-item:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+.dash-nav-item.active {
+  background: rgba(201,126,8,.1);
+  border-color: rgba(201,126,8,.3);
+  color: var(--gold);
+}
+.dash-nav-item svg {
+  flex-shrink: 0;
+  opacity: .7;
+}
+.dash-nav-item.active svg { opacity: 1; }
+
+.dash-nav-count {
+  margin-left: auto;
+  background: var(--gold);
+  color: #07090f;
+  font-size: 9px;
+  font-weight: 800;
+  font-family: var(--fm);
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+/* ── Tab content panels ── */
+.dash-tab-content {
+  flex: 1;
+  display: none;
+  overflow-y: auto;
+  min-width: 0;
+}
+.dash-tab-content.active {
+  display: block;
+}
+
+/* ── Equal-square style grid (remove featured wide behaviour) ── */
+#wsStyleShowcase .wss-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+#wsStyleShowcase .wss-featured {
+  grid-column: span 1;
+}
+#wsStyleShowcase .wss-featured .wss-full-preview {
+  aspect-ratio: 16 / 10;
+}
+#wsStyleShowcase .wss-featured .wss-full-headline {
+  font-size: 22px;
+}
+@media (max-width: 1200px) {
+  #wsStyleShowcase .wss-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  #wsStyleShowcase .wss-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Mobile: sidebar collapses to top tab strip ── */
+@media (max-width: 900px) {
+  .dash-layout {
+    flex-direction: column;
+  }
+  .dash-sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    padding: 10px 16px;
+    gap: 8px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow-x: auto;
+  }
+  .dash-nav-item {
+    flex-shrink: 0;
+    width: auto;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
