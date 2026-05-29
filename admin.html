@@ -2301,8 +2301,8 @@ function loadServices(){
       var img = s.image_url
         ? '<img src="'+s.image_url+'" style="width:48px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--border);"/>'
         : '<div style="width:48px;height:34px;border-radius:6px;background:var(--bg3);"></div>';
-      var priceCell = s.price
-        ? '<span style="font-family:var(--fm);font-size:12px;color:var(--gold);font-weight:700;">'+s.price+'</span>'
+      var priceCell = s.icon
+        ? '<span style="font-family:var(--fm);font-size:12px;color:var(--gold);font-weight:700;">'+s.icon+'</span>'
         : '<span style="color:var(--text3);font-size:12px;">—</span>';
       var status = s.is_active ? '<span class="pill pill-active">Active</span>' : '<span class="pill pill-paused">Hidden</span>';
       html += '<tr>'
@@ -2325,7 +2325,7 @@ function openServiceModal(prefill){
   document.getElementById('svc-id').value        = prefill ? (prefill.id||'') : '';
   document.getElementById('svc-title').value     = prefill ? (prefill.title||'') : '';
   document.getElementById('svc-desc').value      = prefill ? (prefill.description||'') : '';
-  document.getElementById('svc-price').value     = prefill ? (prefill.price||'') : '';
+  document.getElementById('svc-price').value     = prefill ? (prefill.icon||'') : '';
   document.getElementById('svc-image').value     = prefill ? (prefill.image_url||'') : '';
   document.getElementById('svc-order').value     = prefill ? (prefill.sort_order||0) : 0;
   var toggle = document.getElementById('svc-active-toggle');
@@ -2376,7 +2376,7 @@ async function saveService(){
   var sort_order= parseInt(document.getElementById('svc-order').value)||0;
   var is_active = document.getElementById('svc-active-toggle').classList.contains('on');
 
-  var payload = { title, description: desc, price: price||null, image_url: image_url||null, sort_order, is_active };
+  var payload = { title, description: desc, icon: price||null, image_url: image_url||null, sort_order, is_active };
 
   try {
     var sb = getSupabase();
