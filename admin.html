@@ -557,6 +557,105 @@ tr:hover td{background:var(--bg2);}
               <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()">✨ Create Event →</button>
             </div>
           </div>
+
+          <!-- ── EMAIL NOTIFICATION ── -->
+          <div class="card" style="margin-top:16px;">
+            <div class="card-head">
+              <h2>📧 Owner Notification Email</h2>
+              <span style="font-size:11px;color:var(--text3);">Sent automatically when event is created</span>
+            </div>
+            <div class="card-body">
+              <div class="field-group" style="margin-bottom:12px;">
+                <div class="field-label">Subject</div>
+                <input type="text" id="ev-email-subject" class="form-input" value="Your event is ready — {{event_name}}" placeholder="Email subject"/>
+                <div class="field-hint">Use {{owner_name}}, {{event_name}}, {{event_code}}, {{event_url}} as merge fields</div>
+              </div>
+              <div class="field-group">
+                <div class="field-label">Email Body</div>
+                <textarea id="ev-email-body" rows="9" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;color:var(--text);font-size:13px;font-family:inherit;resize:vertical;line-height:1.6;">Hi {{owner_name}},
+
+Your event gallery is ready! Here are your access details:
+
+🎉 Event: {{event_name}}
+🔑 Access Code: {{event_code}}
+🔗 Gallery Link: {{event_url}}
+
+Share the link and code with your guests so they can find their photos.
+
+If you have any questions, just reply to this email.
+
+— ImpactGrid Events Team</textarea>
+                <div class="field-hint">Plain text only. Merge fields are replaced when the email is sent.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── INVOICE ── -->
+          <div class="card" style="margin-top:16px;">
+            <div class="card-head">
+              <h2>🧾 Invoice</h2>
+              <span style="font-size:11px;color:var(--text3);">Saved with event · attach to confirmation emails later</span>
+            </div>
+            <div class="card-body">
+              <div class="form-grid" style="margin-bottom:12px;">
+                <div class="field-group">
+                  <div class="field-label">Invoice Number</div>
+                  <input type="text" id="inv-number" class="form-input" placeholder="INV-000003"/>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Invoice Date</div>
+                  <input type="date" id="inv-date" class="form-input"/>
+                </div>
+              </div>
+              <div class="form-grid" style="margin-bottom:12px;">
+                <div class="field-group">
+                  <div class="field-label">Due Date</div>
+                  <input type="date" id="inv-due-date" class="form-input"/>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Bill To (Client Name)</div>
+                  <input type="text" id="inv-client" class="form-input" placeholder="e.g. Moji"/>
+                </div>
+              </div>
+
+              <!-- Line Items -->
+              <div style="margin-bottom:8px;">
+                <div style="display:grid;grid-template-columns:1fr 80px 80px 80px 36px;gap:6px;margin-bottom:6px;">
+                  <div class="field-label" style="margin:0;">Description</div>
+                  <div class="field-label" style="margin:0;">Qty</div>
+                  <div class="field-label" style="margin:0;">Rate (£)</div>
+                  <div class="field-label" style="margin:0;">Amount</div>
+                  <div></div>
+                </div>
+                <div id="inv-line-items">
+                  <!-- rows injected by JS -->
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="addInvLineItem()" style="margin-top:6px;">+ Add Line</button>
+              </div>
+
+              <!-- Discount & Totals -->
+              <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:8px;">
+                <div style="display:flex;justify-content:flex-end;gap:16px;align-items:center;margin-bottom:8px;">
+                  <span style="font-size:12px;color:var(--text3);">Discount (£)</span>
+                  <input type="number" id="inv-discount" min="0" step="0.01" value="0" oninput="updateInvTotals()" style="width:90px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:5px 8px;color:var(--text);font-size:13px;text-align:right;"/>
+                </div>
+                <div style="text-align:right;font-size:13px;color:var(--text2);margin-bottom:4px;">Subtotal: <strong id="inv-subtotal">£0.00</strong></div>
+                <div style="text-align:right;font-size:14px;font-weight:700;color:var(--text);">Total: <strong id="inv-total">£0.00</strong></div>
+                <div style="text-align:right;font-size:14px;font-weight:700;color:var(--gold);margin-top:4px;">Balance Due: <strong id="inv-balance">£0.00</strong></div>
+              </div>
+
+              <div class="field-group" style="margin-top:12px;">
+                <div class="field-label">Notes <span style="font-weight:400;color:var(--text3);font-size:11px;">(optional)</span></div>
+                <textarea id="inv-notes" rows="2" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;resize:vertical;">Thanks for your business.</textarea>
+              </div>
+
+              <div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);font-size:11px;color:var(--text3);">
+                <strong style="color:var(--text2);">Payment Details (auto-filled on invoice)</strong><br>
+                Account Name: Drussell Technical Services Ltd · Account Number: 10881117 · Sort Code: 231470
+              </div>
+            </div>
+          </div>
+
         </div>
         <div class="ws-sticky">
           <div id="templatePreviewCard" style="border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2);box-shadow:var(--sh);transition:all .3s;">
@@ -972,7 +1071,7 @@ function nav(id,el){
   if(el) el.classList.add('active');
   var loaders={
     eventactivity:'loadEventActivity',
-    events:'loadEvents',createevent:'setDefaultExpiry',
+    events:'loadEvents',createevent:'initCreateEventPage',
     uploadphotos:'loadUploadPhotos',
     downloadrequests:'loadDownloadRequests',
     reviews:'loadEventReviews',
@@ -994,6 +1093,12 @@ function toast(icon,msg,sub,persist){
 
 /* ══ ALIAS — events-pages.html calls createEvent(), script exports igCreateEvent ══ */
 window.createEvent = function(){ if(window.igCreateEvent) window.igCreateEvent(); };
+
+/* ══ Init Create Event page — sets expiry and invoice defaults ══ */
+window.initCreateEventPage = function(){
+  if(window.setDefaultExpiry)    window.setDefaultExpiry();
+  if(window.initInvoiceDefaults) window.initInvoiceDefaults();
+};
 
 /* ══ STATS ══ */
 async function loadStats(){
