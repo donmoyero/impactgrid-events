@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Impact Grid Events</title>
+  <meta name="description" content="Meet the team behind Impact Grid Events — capturing moments and delivering experiences in Manchester." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KVJC5DE2WT');
+  </script>
+
+  <style>
+    /* ════════════════════════════════════════
+       ABOUT PAGE — page-local styles only.
+    ════════════════════════════════════════ */
+    :root { --ab-display: 'Fraunces', Georgia, serif; }
+
+    /* ── PAGE HEADER ─────────────────────── */
+    .ab-header {
+      padding: 96px 40px 72px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .ab-headline {
+      font-family: var(--ab-display);
+      font-size: clamp(42px, 5.5vw, 74px);
+      font-weight: 300;
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+    .ab-headline em { font-style: italic; color: var(--gold); }
+    .ab-sub {
+      font-size: clamp(15px, 1.6vw, 18px);
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.72;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── ORIGIN STORY ────────────────────── */
+    .ab-story {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 72px 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 72px;
+      align-items: center;
+    }
+    .ab-story-img-wrap {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      aspect-ratio: 4/5;
+      background: var(--bg2);
+    }
+    .ab-story-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.92);
+    }
+    /* Gold accent corner */
+    .ab-story-img-wrap::before {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: -1px;
+      width: 80px;
+      height: 80px;
+      background: var(--gold);
+      opacity: 0.15;
+      border-radius: 0 20px 0 0;
+      z-index: 1;
+    }
+    .ab-story-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 72px;
+      background: var(--bg2);
+    }
+    .ab-story-text {}
+    .ab-story-body {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.82;
+    }
+    .ab-story-body p + p { margin-top: 18px; }
+
+    /* ── WHY CHOOSE US ───────────────────── */
+    .ab-why {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 40px;
+    }
+    .ab-why-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .ab-why-header {
+      margin-bottom: 48px;
+    }
+    .ab-why-title {
+      font-family: var(--ab-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 300;
+      line-height: 1.07;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-top: 12px;
+    }
+    .ab-why-title em { font-style: italic; color: var(--gold); }
+    .ab-pillars {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .ab-pillar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 36px;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .ab-pillar:hover {
+      border-color: var(--gold-glo);
+      transform: translateY(-3px);
+      box-shadow: var(--sh2);
+    }
+    .ab-pillar-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+    .ab-pillar-title {
+      font-family: var(--fb);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .ab-pillar-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.72;
+    }
+    .ab-pillar-line {
+      width: 28px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-top: 20px;
+      opacity: 0.4;
+      transition: width 0.35s ease, opacity 0.35s ease;
+    }
+    .ab-pillar:hover .ab-pillar-line { width: 52px; opacity: 1; }
+
+    /* ── TEAM SECTION ────────────────────── */
+    .ab-team {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+    .ab-team-header { margin-bottom: 48px; }
+    .ab-team-title {
+      font-family: var(--ab-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 300;
+      line-height: 1.07;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-top: 12px;
+    }
+    .ab-team-title em { font-style: italic; color: var(--gold); }
+    .ab-team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .ab-member {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .ab-member:hover {
+      border-color: var(--gold-glo);
+      transform: translateY(-4px);
+      box-shadow: var(--sh2);
+    }
+    .ab-member-photo-wrap {
+      width: 100%;
+      aspect-ratio: 3/2;
+      overflow: hidden;
+      background: var(--bg2);
+      position: relative;
+    }
+    .ab-member-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      filter: brightness(0.9);
+      transition: filter 0.4s, transform 0.5s;
+    }
+    .ab-member:hover .ab-member-photo { filter: brightness(1); transform: scale(1.03); }
+    .ab-member-photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+    .ab-member-body { padding: 28px 32px 32px; }
+    .ab-member-name {
+      font-family: var(--ab-display);
+      font-size: clamp(24px, 2.4vw, 32px);
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.1;
+    }
+    .ab-member-role {
+      font-family: var(--fm);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .ab-member-bio {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.72;
+    }
+    .ab-member-line {
+      width: 28px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-top: 20px;
+      opacity: 0.4;
+      transition: width 0.35s ease, opacity 0.35s ease;
+    }
+    .ab-member:hover .ab-member-line { width: 52px; opacity: 1; }
+
+    /* ── CTA ─────────────────────────────── */
+    .ab-cta {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 100px 40px;
+    }
+    .ab-cta-inner { max-width: 600px; margin: 0 auto; }
+    .ab-cta-title {
+      font-family: var(--ab-display);
+      font-size: clamp(34px, 4.2vw, 58px);
+      font-weight: 300;
+      line-height: 1.07;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin: 16px 0 18px;
+    }
+    .ab-cta-title em { font-style: italic; color: var(--gold); }
+    .ab-cta-sub {
+      font-size: 16px;
+      color: var(--text2);
+      font-weight: 300;
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+    .ab-cta-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ── LOADING SKELETON ────────────────── */
+    .ab-skeleton {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .ab-sk-img { width: 100%; aspect-ratio: 3/2; background: var(--bg2); }
+    .ab-sk-body { padding: 28px 32px; }
+    .ab-sk-line { height: 13px; border-radius: 8px; background: var(--bg2); margin-bottom: 12px; }
+    .ab-sk-line.w40 { width: 40%; }
+    .ab-sk-line.w70 { width: 70%; }
+    .ab-sk-line.w55 { width: 55%; }
+
+    /* ── RESPONSIVE ─────────────────────── */
+    @media (max-width: 900px) {
+      .ab-story { grid-template-columns: 1fr; gap: 40px; padding: 48px 20px; }
+      .ab-story-img-wrap { aspect-ratio: 16/9; }
+      .ab-pillars { grid-template-columns: 1fr; }
+      .ab-team-grid { grid-template-columns: 1fr; }
+      .ab-header { padding: 72px 20px 48px; }
+      .ab-why { padding: 56px 20px; }
+      .ab-team { padding: 56px 20px; }
+      .ab-cta { padding: 72px 20px; }
+      .ab-pillar { padding: 24px; }
+      .ab-member-body { padding: 22px 24px 26px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Script load order required by nav.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="plan-config.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
+
+  <!-- Nav -->
+  <div id="ig-nav"></div>
+  <script src="nav.js"></script>
+  <script>renderNav('about.html');</script>
+
+  <div class="page-wrap">
+
+    <!-- PAGE HEADER -->
+    <header class="ab-header">
+      <div class="label-tag anim-fade-up">Who We Are</div>
+      <h1 class="ab-headline anim-fade-up delay-1">
+        Two people.<br><em>One mission.</em>
+      </h1>
+      <p class="ab-sub anim-fade-up delay-2" id="aboutTagline">
+        We started Impact Grid Events because great events deserve great photography — and guests deserve to actually receive their photos.
+      </p>
+    </header>
+
+    <div class="divider"></div>
+
+    <!-- ORIGIN STORY -->
+    <section class="ab-story" id="storySection">
+      <div class="ab-story-img-wrap anim-fade-up">
+        <div class="ab-story-img-placeholder" id="storyImgPlaceholder">📷</div>
+        <img class="ab-story-img" id="storyImg" src="" alt="Our story" style="display:none;" />
+      </div>
+      <div class="ab-story-text anim-fade-up delay-1">
+        <div class="label-tag">Our Story</div>
+        <div class="ab-story-body" id="storyBody">
+          <p>Impact Grid Events was founded after Dara identified a growing problem in the event industry — great events were often followed by poor photography quality, slow media delivery, and a poor attendee experience after the event ended.</p>
+          <p>To solve this, he brought together TJ, a creative focused on delivering high-quality photography and memorable content creation, and Dara, who develops the technology and digital systems behind the experience.</p>
+          <p>Together, the team built Impact Grid Events to combine photography, content creation, and technology into one seamless event media platform.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- WHY CHOOSE US -->
+    <section class="ab-why">
+      <div class="ab-why-inner">
+        <div class="ab-why-header anim-fade-up">
+          <div class="label-tag">Why Choose Us</div>
+          <h2 class="ab-why-title">We don't just shoot.<br><em>We deliver.</em></h2>
+        </div>
+        <div class="ab-pillars" id="pillarsGrid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- TEAM -->
+    <section class="ab-team">
+      <div class="ab-team-header anim-fade-up">
+        <div class="label-tag">The Team</div>
+        <h2 class="ab-team-title">The people<br><em>behind the lens.</em></h2>
+      </div>
+      <div class="ab-team-grid" id="teamGrid">
+        <!-- Skeleton while loading -->
+        <div class="ab-skeleton"><div class="ab-sk-img"></div><div class="ab-sk-body"><div class="ab-sk-line w40"></div><div class="ab-sk-line w70"></div><div class="ab-sk-line w55"></div></div></div>
+        <div class="ab-skeleton"><div class="ab-sk-img"></div><div class="ab-sk-body"><div class="ab-sk-line w40"></div><div class="ab-sk-line w70"></div><div class="ab-sk-line w55"></div></div></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="ab-cta">
+      <div class="ab-cta-inner">
+        <div class="label-tag" style="justify-content:center;">Work With Us</div>
+        <h2 class="ab-cta-title">Like what<br><em>you see?</em></h2>
+        <p class="ab-cta-sub">We're a small team that cares deeply about every event we cover. Get in touch and let's make something great.</p>
+        <div class="ab-cta-btns">
+          <a href="contact.html" class="btn btn-gold">Book Us Now</a>
+          <a href="portfolio.html" class="btn btn-ghost">See Our Work →</a>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /.page-wrap -->
+
+  <!-- Footer -->
+  <div id="ig-footer"></div>
+  <script>renderFooter();</script>
+
+  <script>
+  /* ════════════════════════════════════════
+     ABOUT — load from Supabase about_page table
+  ════════════════════════════════════════ */
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Default fallback data ── */
+  var FALLBACK = {
+    tagline: 'We started Impact Grid Events because great events deserve great photography — and guests deserve to actually receive their photos.',
+    story_text: 'Impact Grid Events was founded after Dara identified a growing problem in the event industry — great events were often followed by poor photography quality, slow media delivery, and a poor attendee experience after the event ended.\n\nTo solve this, he brought together TJ, a creative focused on delivering high-quality photography and memorable content creation, and Dara, who develops the technology and digital systems behind the experience.\n\nTogether, the team built Impact Grid Events to combine photography, content creation, and technology into one seamless event media platform.',
+    story_image_url: '',
+    pillars: [
+      { icon: '📸', title: 'High-Quality Photography', description: 'Professional event photography that captures every candid moment and posed shot — delivered at full resolution, fast.' },
+      { icon: '🎬', title: 'Content Creation', description: 'Beyond photos — we produce polished content ready for social media, print, or internal use.' },
+      { icon: '⚡', title: 'Fast Media Delivery', description: 'No more waiting weeks. Your gallery is ready within 24 hours of the event. Guests can browse and download straight away.' },
+      { icon: '🗂️', title: 'Organised Galleries', description: 'Every photo sorted into a clean, branded online gallery. No login, no app — just a link that works.' }
+    ],
+    team: [
+      { name: 'TJ', role: 'Creative Director', bio: 'TJ brings the creative vision. With an eye for the moment that matters, she leads all photography and content creation on the ground — ensuring every event is documented with quality and intention.', photo_url: '' },
+      { name: 'Dara', role: 'Founder', bio: 'Dara identified the problem and built the solution. He handles the technology, digital systems, and overall direction of Impact Grid Events — making sure the experience is as smooth behind the scenes as it is in front of the camera.', photo_url: '' }
+    ]
+  };
+
+  var DELAYS = ['', 'delay-1', 'delay-2', 'delay-3'];
+
+  function renderPillars(pillars) {
+    var grid = document.getElementById('pillarsGrid');
+    if (!grid) return;
+    grid.innerHTML = (pillars || []).map(function(p, i) {
+      return (
+        '<div class="ab-pillar anim-fade-up ' + (DELAYS[i] || '') + '">' +
+          '<span class="ab-pillar-icon">' + esc(p.icon) + '</span>' +
+          '<div class="ab-pillar-title">' + esc(p.title) + '</div>' +
+          '<div class="ab-pillar-desc">' + esc(p.description) + '</div>' +
+          '<div class="ab-pillar-line"></div>' +
+        '</div>'
+      );
+    }).join('');
+    initAnim();
+  }
+
+  function renderTeam(members) {
+    var grid = document.getElementById('teamGrid');
+    if (!grid) return;
+    grid.innerHTML = (members || []).map(function(m, i) {
+      var photoBlock = m.photo_url
+        ? '<img class="ab-member-photo" src="' + esc(m.photo_url) + '" alt="' + esc(m.name) + '" loading="lazy"/>'
+        : '<div class="ab-member-photo-placeholder">👤</div>';
+      return (
+        '<div class="ab-member anim-fade-up ' + (DELAYS[i] || '') + '">' +
+          '<div class="ab-member-photo-wrap">' + photoBlock + '</div>' +
+          '<div class="ab-member-body">' +
+            '<div class="ab-member-name">' + esc(m.name) + '</div>' +
+            '<div class="ab-member-role">' + esc(m.role) + '</div>' +
+            '<div class="ab-member-bio">' + esc(m.bio) + '</div>' +
+            '<div class="ab-member-line"></div>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+    initAnim();
+  }
+
+  function renderStory(data) {
+    /* Tagline */
+    var tEl = document.getElementById('aboutTagline');
+    if (tEl && data.tagline) tEl.textContent = data.tagline;
+
+    /* Story image */
+    if (data.story_image_url) {
+      var img = document.getElementById('storyImg');
+      var ph  = document.getElementById('storyImgPlaceholder');
+      img.src = data.story_image_url;
+      img.style.display = 'block';
+      ph.style.display  = 'none';
+    }
+
+    /* Story text — support newline-separated paragraphs */
+    var body = document.getElementById('storyBody');
+    if (body && data.story_text) {
+      body.innerHTML = data.story_text.split('\n\n').filter(Boolean).map(function(p) {
+        return '<p>' + esc(p.trim()) + '</p>';
+      }).join('');
+    }
+  }
+
+  async function loadAbout() {
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if (!sb) { applyFallback(); return; }
+
+      var res = await sb
+        .from('about_page')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (res.error) throw res.error;
+      var d = res.data;
+      if (!d) { applyFallback(); return; }
+
+      renderStory(d);
+      renderPillars(d.pillars && d.pillars.length ? d.pillars : FALLBACK.pillars);
+      renderTeam(d.team && d.team.length ? d.team : FALLBACK.team);
+
+    } catch(e) {
+      console.warn('About page fetch failed, using fallback:', e);
+      applyFallback();
+    }
+  }
+
+  function applyFallback() {
+    renderStory(FALLBACK);
+    renderPillars(FALLBACK.pillars);
+    renderTeam(FALLBACK.team);
+  }
+
+  /* ── Scroll animations ── */
+  function initAnim() {
+    var els = document.querySelectorAll('.anim-fade-up:not(.visible)');
+    if (!els.length) return;
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function(el) { io.observe(el); });
+    } else {
+      els.forEach(function(el) { el.classList.add('visible'); });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { loadAbout(); initAnim(); });
+  } else {
+    loadAbout();
+    initAnim();
+  }
+  </script>
+
+</body>
+</html>
