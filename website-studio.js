@@ -406,9 +406,21 @@ function wssSelectStyle(styleId) {
     if (found) window.psSelectedStyleName = found.name;
   }
 
+  // Map style-id -> p.html theme key and set it immediately so the
+  // generator uses the correct theme without depending on Step 4.
+  var themeMap = window.STYLE_TO_THEME || {};
+  var resolvedTheme = themeMap[styleId] || styleId;
+  psState.selectedTheme = resolvedTheme;
+
+  // Pre-select the matching swatch in Step 4 so it looks correct if
+  // the user lands there and changes their mind.
+  document.querySelectorAll('#obContent4 .ob-theme-opt').forEach(function(opt) {
+    opt.classList.toggle('active', opt.dataset.theme === resolvedTheme);
+  });
+
   // Toast confirmation (defined in nav.js / shared utilities)
   if (typeof showToast === 'function') {
-    showToast('✦ Style selected: ' + window.psSelectedStyleName);
+    showToast('❖ Style selected: ' + window.psSelectedStyleName);
   }
 
   // Run the gated create flow (auth + plan limits)
@@ -419,12 +431,6 @@ function wssSelectStyle(styleId) {
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   AI PROMPT HERO — wssStartAI / wssAiFill
-   Called from the AI prompt box at the top of the showcase.
-   Stores the user's description, then runs the gated create
-   flow. The description pre-fills the onboarding textarea.
-══════════════════════════════════════════════════════════ */
 function wssAiFill(text) {
   var input = document.getElementById('wssAiPrompt');
   if (input) {
@@ -1572,7 +1578,7 @@ function addTestimonialRow() {
 function selectTheme(el, themeId) {
   document.querySelectorAll("#obContent4 .ob-theme-opt").forEach(o => o.classList.remove("active"));
   el.classList.add("active");
-  psState.selectedTheme = themeId;
+  psState.selectedTheme = themeId || 'obsidian-luxe';
 }
 
 function selectEditTheme(el, themeId) {
@@ -1889,7 +1895,7 @@ function populateBuilder(pf) {
   checkStripeReturn();
   // Set active theme button
   document.querySelectorAll("#tabDesign .ob-theme-opt").forEach(o => {
-    o.classList.toggle("active", o.dataset.theme === (pf.theme || "dark"));
+    o.classList.toggle("active", o.dataset.theme === (pf.theme || "obsidian-luxe"));
   });
   updatePreviewLive();
 }
