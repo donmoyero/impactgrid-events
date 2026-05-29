@@ -1074,6 +1074,16 @@ function renderDashGrid() {
   count.textContent = psState.portfolios.length + " website" + (psState.portfolios.length !== 1 ? "s" : "");
   // Keep localStorage in sync so settings.html usage bar reads the real count without a DB call
   try { localStorage.setItem('ig_portfolio_count', String(psState.portfolios.length)); } catch(e) {}
+  // Update sidebar nav badge
+  var navCount = document.getElementById('dashNavCount');
+  if (navCount) {
+    if (psState.portfolios.length > 0) {
+      navCount.textContent = psState.portfolios.length;
+      navCount.style.display = '';
+    } else {
+      navCount.style.display = 'none';
+    }
+  }
   grid.querySelectorAll(".pf-card").forEach(c => c.remove());
 
   if (!psState.portfolios.length) {
