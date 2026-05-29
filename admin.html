@@ -221,13 +221,13 @@ tr:hover td{background:var(--bg2);}
     <div class="topbar-logo-mark" style="display:none;">IG</div>
     ImpactGrid
   </a>
-  <button class="mobile-menu-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
+  <button class="mobile-menu-btn" id="menuBtn" onclick="toggleSidebar()"></button>
   <div class="topbar-div"></div>
-  <div class="admin-badge">🔒 Admin Workstation</div>
+  <div class="admin-badge"> Admin Workstation</div>
   <div class="topbar-right">
     <span class="topbar-user" id="topbarUser"></span>
-    <button class="topbar-btn" id="themeToggleBtn" onclick="toggleAdminTheme()" title="Toggle light/dark">🌙</button>
-    <a href="index.html" target="_blank" class="topbar-btn">🔗 View Site</a>
+    <button class="topbar-btn" id="themeToggleBtn" onclick="toggleAdminTheme()" title="Toggle light/dark"></button>
+    <a href="index.html" target="_blank" class="topbar-btn"> View Site</a>
     <button class="topbar-btn topbar-btn-red" onclick="igLogout()">⎋ Sign Out</button>
   </div>
 </div>
@@ -235,39 +235,39 @@ tr:hover td{background:var(--bg2);}
 <div class="shell">
   <aside class="sidebar" id="mainSidebar">
     <div class="sb-brand">
-      <div class="sb-brand-icon">🖥️</div>
+      <div class="sb-brand-icon"></div>
       <div style="flex:1;"><div class="sb-brand-title">Admin Panel</div><div class="sb-brand-sub">ImpactGrid Group</div></div>
-      <button onclick="closeSidebar()" class="mobile-menu-btn" style="font-size:14px;margin-left:auto;">✕</button>
+      <button onclick="closeSidebar()" class="mobile-menu-btn" style="font-size:14px;margin-left:auto;"></button>
     </div>
     <div class="sb-section">
       <div class="sb-section-label">Workstation</div>
       <nav class="sb-nav">
-        <a href="#" class="active" onclick="return nav('overview',this)"><span class="sb-ico">◈</span>Overview</a>
-        <a href="#" onclick="return nav('eventactivity',this)"><span class="sb-ico">📊</span>Event Activity</a>
+        <a href="#" class="active" onclick="return nav('overview',this)"><span class="sb-ico"></span>Overview</a>
+        <a href="#" onclick="return nav('eventactivity',this)"><span class="sb-ico"></span>Event Activity</a>
       </nav>
     </div>
     <div class="sb-section">
-      <div class="sb-section-label">📸 Events</div>
+      <div class="sb-section-label"> Events</div>
       <nav class="sb-nav">
-        <a href="#" onclick="return nav('events',this)"><span class="sb-ico">📅</span>All Events</a>
-        <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico">➕</span>Create Event</a>
-        <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico">🖼️</span>Upload Photos</a>
-        <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico">⭐</span>Reviews<span class="sb-badge" id="reviewsBadge" style="display:none;">0</span></a>
-        <a href="#" onclick="return nav('bookings',this)"><span class="sb-ico">📆</span>Bookings<span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></a>
+        <a href="#" onclick="return nav('events',this)"><span class="sb-ico"></span>All Events</a>
+        <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico"></span>Create Event</a>
+        <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico"></span>Upload Photos</a>
+        <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico"></span>Reviews<span class="sb-badge" id="reviewsBadge" style="display:none;">0</span></a>
+        <a href="#" onclick="return nav('bookings',this)"><span class="sb-ico"></span>Bookings<span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></a>
       </nav>
     </div>
     <div class="sb-section">
       <div class="sb-section-label">Communication</div>
       <nav class="sb-nav">
-        <a href="#" onclick="return nav('mail',this)"><span class="sb-ico">✉️</span>Mail<span class="sb-badge" id="mailBadge" style="display:none;">0</span></a>
+        <a href="#" onclick="return nav('mail',this)"><span class="sb-ico"></span>Mail<span class="sb-badge" id="mailBadge" style="display:none;">0</span></a>
       </nav>
     </div>
     <div class="sb-section">
-      <div class="sb-section-label">🌐 Website</div>
+      <div class="sb-section-label"> Website</div>
       <nav class="sb-nav">
-        <a href="#" onclick="return nav('hero',this)"><span class="sb-ico">🎞️</span>Hero Slideshow</a>
-        <a href="#" onclick="return nav('services',this)"><span class="sb-ico">🛎️</span>Services</a>
-        <a href="#" onclick="return nav('about',this)"><span class="sb-ico">👥</span>About Page</a>
+        <a href="#" onclick="return nav('hero',this)"><span class="sb-ico"></span>Hero Slideshow</a>
+        <a href="#" onclick="return nav('services',this)"><span class="sb-ico"></span>Services</a>
+        <a href="#" onclick="return nav('about',this)"><span class="sb-ico"></span>About Page</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -290,10 +290,10 @@ tr:hover td{background:var(--bg2);}
 <div class="stat-card"><div class="stat-label">Events</div><div class="stat-val" id="stat-events" style="color:var(--blue);">—</div><div class="stat-sub">Active</div></div>
       </div>
       <div class="quick-grid">
-        <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico">📊</div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
-<div class="quick-card" onclick="nav('createevent',null)"><div class="quick-ico">📅</div><div class="quick-title">Create Event</div><div class="quick-desc">Set up a new photo event with access code and expiry</div></div>
-        <div class="quick-card" onclick="nav('uploadphotos',null)"><div class="quick-ico">🖼️</div><div class="quick-title">Upload Photos</div><div class="quick-desc">Add photos to an existing event gallery</div></div>
-<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico">🔗</div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div><div class="quick-card" onclick="nav('services',null)"><div class="quick-ico">🛎️</div><div class="quick-title">Manage Services</div><div class="quick-desc">Add, edit and reorder the services shown on your Services page</div></div><div class="quick-card" onclick="nav('about',null)"><div class="quick-ico">👥</div><div class="quick-title">Edit About Page</div><div class="quick-desc">Update your story, team photos, bios and Mission &amp; Vision pillars</div></div>
+        <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico"></div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
+<div class="quick-card" onclick="nav('createevent',null)"><div class="quick-ico"></div><div class="quick-title">Create Event</div><div class="quick-desc">Set up a new photo event with access code and expiry</div></div>
+        <div class="quick-card" onclick="nav('uploadphotos',null)"><div class="quick-ico"></div><div class="quick-title">Upload Photos</div><div class="quick-desc">Add photos to an existing event gallery</div></div>
+<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico"></div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div><div class="quick-card" onclick="nav('services',null)"><div class="quick-ico"></div><div class="quick-title">Manage Services</div><div class="quick-desc">Add, edit and reorder the services shown on your Services page</div></div><div class="quick-card" onclick="nav('about',null)"><div class="quick-ico"></div><div class="quick-title">Edit About Page</div><div class="quick-desc">Update your story, team photos, bios and Mission &amp; Vision pillars</div></div>
       </div>
     </div>
     <!-- HOMEPAGE CONTENT -->
@@ -301,12 +301,12 @@ tr:hover td{background:var(--bg2);}
       <div class="page-header"><div class="page-title">Homepage Content</div><div class="page-sub">Edit section titles, subtitles, CTA text, and ecosystem card copy.</div></div>
       <div class="ws-layout">
         <div>
-          <div class="card"><div class="card-head"><h2>📝 Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()">💾 Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div></div>
-          <div class="card"><div class="card-head"><h2>🔗 Ecosystem Cards</h2><button class="btn btn-gold" onclick="saveEcoCards()">💾 Save</button></div><div class="card-body" id="ecoEditor"><div class="empty"><div class="empty-ico">⏳</div></div></div></div>
+          <div class="card"><div class="card-head"><h2> Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()"> Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div></div>
+          <div class="card"><div class="card-head"><h2> Ecosystem Cards</h2><button class="btn btn-gold" onclick="saveEcoCards()"> Save</button></div><div class="card-body" id="ecoEditor"><div class="empty"><div class="empty-ico">⏳</div></div></div></div>
         </div>
         <div class="ws-sticky">
           <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds.</div>
-          <a href="index.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview Homepage</a>
+          <a href="index.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Homepage</a>
         </div>
       </div>
     </div>
@@ -317,24 +317,24 @@ tr:hover td{background:var(--bg2);}
         <div class="page-sub">Drag &amp; drop images for every visual section of the homepage. Each section saves independently.</div>
       </div>
 
-      <!-- ── SECTION 1: HERO BACKGROUND GRID ── -->
+      <!--  SECTION 1: HERO BACKGROUND GRID  -->
       <div class="card" style="margin-bottom:18px;">
         <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-herogrid')">
           <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;">🏞️</span>
+            <span style="font-size:18px;"></span>
             <div>
               <div style="font-size:14px;font-weight:800;">Hero Background Grid</div>
               <div style="font-size:11px;color:var(--text3);margin-top:1px;">The 5 split images visible behind the hero headline</div>
             </div>
           </div>
-          <span id="chev-herogrid" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
+          <span id="chev-herogrid" style="font-size:11px;color:var(--text3);transition:transform .2s;"></span>
         </div>
         <div id="sec-herogrid" style="display:none;border-top:1px solid var(--border);">
           <div style="padding:20px;">
             <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Exactly 5 images. First image spans both rows on the left. Drag to reorder or drop files to upload.</p>
             <!-- drop zone -->
             <div class="upload-zone" id="hgDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hgFileIn').click()" ondragover="onDragOver(event,'hgDropZone')" ondragleave="onDragLeave(event,'hgDropZone')" ondrop="onDropSection(event,'hgDropZone','heroGridList','hero_grid',5)">
-              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop images here or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP · up to 5 images</div>
               <input type="file" id="hgFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'heroGridList','hero_grid',5)"/>
@@ -343,29 +343,29 @@ tr:hover td{background:var(--bg2);}
             <div id="heroGridList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
               <button class="btn btn-ghost btn-sm" onclick="addSectionRow('heroGridList','hero_grid',5)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('heroGridList','hero_grid','Hero grid')">💾 Save Hero Grid</button>
+              <button class="btn btn-gold" onclick="saveSectionList('heroGridList','hero_grid','Hero grid')"> Save Hero Grid</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── SECTION 3: SCROLLING GALLERY STRIP ── -->
+      <!--  SECTION 3: SCROLLING GALLERY STRIP  -->
       <div class="card" style="margin-bottom:18px;">
         <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-gallerystrip')">
           <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;">🎬</span>
+            <span style="font-size:18px;"></span>
             <div>
               <div style="font-size:14px;font-weight:800;">Scrolling Gallery Strip</div>
               <div style="font-size:11px;color:var(--text3);margin-top:1px;">The auto-scrolling image band below the hero section</div>
             </div>
           </div>
-          <span id="chev-gallerystrip" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
+          <span id="chev-gallerystrip" style="font-size:11px;color:var(--text3);transition:transform .2s;"></span>
         </div>
         <div id="sec-gallerystrip" style="display:none;border-top:1px solid var(--border);">
           <div style="padding:20px;">
             <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Add as many images as you like. They scroll continuously in two rows. Drag to reorder.</p>
             <div class="upload-zone" id="gsDropZone" style="margin-bottom:14px;" onclick="document.getElementById('gsFileIn').click()" ondragover="onDragOver(event,'gsDropZone')" ondragleave="onDragLeave(event,'gsDropZone')" ondrop="onDropSection(event,'gsDropZone','galleryStripList','gallery_strip',99)">
-              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop images here or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files</div>
               <input type="file" id="gsFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'galleryStripList','gallery_strip',99)"/>
@@ -374,30 +374,30 @@ tr:hover td{background:var(--bg2);}
             <div id="galleryStripList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
               <button class="btn btn-ghost btn-sm" onclick="addSectionRow('galleryStripList','gallery_strip',99)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('galleryStripList','gallery_strip','Gallery strip')">💾 Save Gallery Strip</button>
+              <button class="btn btn-gold" onclick="saveSectionList('galleryStripList','gallery_strip','Gallery strip')"> Save Gallery Strip</button>
             </div>
           </div>
         </div>
       </div>
 
 
-      <!-- ── SECTION 5: HOW IT WORKS IMAGE ── -->
+      <!--  SECTION 5: HOW IT WORKS IMAGE  -->
       <div class="card" style="margin-bottom:18px;">
         <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-howimage')">
           <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;">⚙️</span>
+            <span style="font-size:18px;"></span>
             <div>
               <div style="font-size:14px;font-weight:800;">"How It Works" Image</div>
               <div style="font-size:11px;color:var(--text3);margin-top:1px;">The side image in the "Simple workflow. Powerful results." section</div>
             </div>
           </div>
-          <span id="chev-howimage" style="font-size:11px;color:var(--text3);transition:transform .2s;">▼</span>
+          <span id="chev-howimage" style="font-size:11px;color:var(--text3);transition:transform .2s;"></span>
         </div>
         <div id="sec-howimage" style="display:none;border-top:1px solid var(--border);">
           <div style="padding:20px;">
             <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Single image displayed beside the workflow steps.</p>
             <div class="upload-zone" id="hiDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hiFileIn').click()" ondragover="onDragOver(event,'hiDropZone')" ondragleave="onDragLeave(event,'hiDropZone')" ondrop="onDropSection(event,'hiDropZone','howImageList','how_image',1)">
-              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop an image here or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP · 1 image</div>
               <input type="file" id="hiFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleSectionFiles(event,'howImageList','how_image',1)"/>
@@ -406,7 +406,7 @@ tr:hover td{background:var(--bg2);}
             <div id="howImageList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
               <button class="btn btn-ghost btn-sm" onclick="addSectionRow('howImageList','how_image',1)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('howImageList','how_image','How it works image')">💾 Save Image</button>
+              <button class="btn btn-gold" onclick="saveSectionList('howImageList','how_image','How it works image')"> Save Image</button>
             </div>
           </div>
         </div>
@@ -416,18 +416,18 @@ tr:hover td{background:var(--bg2);}
         <strong>How it works</strong><br><br>
         Uploading a file sends it to Supabase storage and saves the URL automatically. You can also paste any URL directly. Changes go live immediately — no redeploy needed.
         <br><br>
-        <a href="index.html" target="_blank" class="btn btn-green btn-sm" style="margin-top:6px;display:inline-flex;">🔗 Preview Homepage</a>
+        <a href="index.html" target="_blank" class="btn btn-green btn-sm" style="margin-top:6px;display:inline-flex;"> Preview Homepage</a>
       </div>
     </div>
     <!-- UPDATES -->
     <div class="page" id="page-updates">
       <div class="page-header"><div class="page-title">Updates Section</div><div class="page-sub">Edit the "ImpactGrid — Latest Updates" section on the homepage.</div></div>
-      <div class="card"><div class="card-head"><h2>📢 Update Cards</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addUpdateCard()">+ Add Card</button><button class="btn btn-gold" onclick="saveUpdateCards()">💾 Save All</button></div></div><div class="card-body" id="updateCardsEditor"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div>
+      <div class="card"><div class="card-head"><h2> Update Cards</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addUpdateCard()">+ Add Card</button><button class="btn btn-gold" onclick="saveUpdateCards()"> Save All</button></div></div><div class="card-body" id="updateCardsEditor"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div>
     </div>
     <!-- TESTIMONIALS -->
     <div class="page" id="page-testimonials">
       <div class="page-header"><div class="page-title">Testimonials</div><div class="page-sub">Edit the "What People Say" section.</div></div>
-      <div class="card"><div class="card-head"><h2>💬 Testimonials</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTestimonial()">+ Add</button><button class="btn btn-gold" onclick="saveTestimonials()">💾 Save All</button></div></div>
+      <div class="card"><div class="card-head"><h2> Testimonials</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTestimonial()">+ Add</button><button class="btn btn-gold" onclick="saveTestimonials()"> Save All</button></div></div>
         <div class="card-body">
           <div style="background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px;">
             <div class="field-group" style="margin-bottom:10px;"><div class="field-label">Section Heading</div><input type="text" id="trust-title-input" placeholder="e.g. The platform speaks for itself"/></div>
@@ -440,7 +440,7 @@ tr:hover td{background:var(--bg2);}
     <!-- TICKER -->
     <div class="page" id="page-ticker">
       <div class="page-header"><div class="page-title">Ticker</div><div class="page-sub">Edit the scrolling announcement bar.</div></div>
-      <div class="card"><div class="card-head"><h2>📡 Ticker Items</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTickerRow()">+ Add</button><button class="btn btn-gold" onclick="saveTicker()">💾 Save All</button></div></div>
+      <div class="card"><div class="card-head"><h2> Ticker Items</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTickerRow()">+ Add</button><button class="btn btn-gold" onclick="saveTicker()"> Save All</button></div></div>
         <div class="card-body">
           <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Click the coloured tag to cycle between New / Live / Soon.</p>
           <div id="tickerList"><div class="empty"><div class="empty-ico">⏳</div></div></div>
@@ -483,14 +483,14 @@ tr:hover td{background:var(--bg2);}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <!-- Device breakdown -->
         <div class="card">
-          <div class="card-head"><h2>📱 Device Types</h2></div>
+          <div class="card-head"><h2> Device Types</h2></div>
           <div class="card-body" id="act-devices">
             <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
           </div>
         </div>
         <!-- Location breakdown -->
         <div class="card">
-          <div class="card-head"><h2>🌍 Visitor Locations</h2></div>
+          <div class="card-head"><h2> Visitor Locations</h2></div>
           <div class="card-body" id="act-locations">
             <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
           </div>
@@ -500,7 +500,7 @@ tr:hover td{background:var(--bg2);}
       <!-- Visit log table -->
       <div class="card" style="margin-bottom:16px;">
         <div class="card-head">
-          <h2>👁 Page Visit Log</h2>
+          <h2> Page Visit Log</h2>
           <span style="font-size:11px;color:var(--text3);">Most recent first</span>
         </div>
         <div class="card-body table-wrap" id="act-visit-log">
@@ -511,7 +511,7 @@ tr:hover td{background:var(--bg2);}
       <!-- Downloads log table -->
       <div class="card" style="margin-bottom:16px;">
         <div class="card-head">
-          <h2>⬇ Downloads Log</h2>
+          <h2> Downloads Log</h2>
           <span style="font-size:11px;color:var(--text3);">Every photo download recorded from event galleries</span>
         </div>
         <div class="card-body table-wrap" id="act-downloads-log">
@@ -523,7 +523,7 @@ tr:hover td{background:var(--bg2);}
     <!-- ALL EVENTS -->
     <div class="page" id="page-events">
       <div class="page-header"><div class="page-title">Events</div><div class="page-sub">All ImpactGrid photo events.</div></div>
-      <div class="card"><div class="card-head"><h2>📅 All Events</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button><button class="btn btn-gold" onclick="nav('createevent',null)">➕ Create Event</button></div></div><div class="card-body table-wrap" id="eventsList"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div>
+      <div class="card"><div class="card-head"><h2> All Events</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button><button class="btn btn-gold" onclick="nav('createevent',null)"> Create Event</button></div></div><div class="card-body table-wrap" id="eventsList"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div>
     </div>
     <!-- CREATE EVENT -->
     <div class="page" id="page-createevent">
@@ -531,7 +531,7 @@ tr:hover td{background:var(--bg2);}
       <div class="ws-layout">
         <div>
           <div class="card">
-            <div class="card-head"><h2>📋 Event Details</h2></div>
+            <div class="card-head"><h2> Event Details</h2></div>
             <div class="card-body">
               <div id="createEventAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
               <div class="field-group" style="margin-bottom:12px;"><div class="field-label">Event Name *</div><input type="text" id="ev-name" placeholder="e.g. Johnson Wedding 2026" oninput="updateTemplatePreview()"/></div>
@@ -543,10 +543,10 @@ tr:hover td{background:var(--bg2);}
                 <div class="field-group"><div class="field-label">Expiry Date</div><input type="date" id="ev-expiry"/><div class="field-hint">Default: 30 days from today</div></div>
               </div>
               <div class="form-grid" style="margin-bottom:16px;">
-                <div class="field-group"><div class="field-label">Access Code</div><div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/><button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;">🎲</button></div></div>
+                <div class="field-group"><div class="field-label">Access Code</div><div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/><button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;"></button></div></div>
                 <div class="field-group"><div class="field-label">Template *</div>
                   <select id="ev-template" onchange="updateTemplatePreview()" style="width:100%;">
-                    <option value="professional">📊 Professional</option><option value="kids">🎉 Kids</option><option value="birthday">🎂 Birthday</option><option value="wedding">💍 Wedding</option><option value="sports">🏆 Sports</option><option value="nightlife">🎧 Nightlife</option><option value="gala">✦ Gala / Premium</option><option value="ceremony">🎓 Ceremony</option>
+                    <option value="professional"> Professional</option><option value="kids"> Kids</option><option value="birthday"> Birthday</option><option value="wedding"> Wedding</option><option value="sports"> Sports</option><option value="nightlife"> Nightlife</option><option value="gala"> Gala / Premium</option><option value="ceremony"> Ceremony</option>
                   </select>
                 </div>
               </div>
@@ -554,14 +554,14 @@ tr:hover td{background:var(--bg2);}
                 <div class="toggle on" id="ev-code-toggle" onclick="toggleRequireCode()"></div>
                 <div><div style="font-size:13px;font-weight:600;">Require Access Code</div><div style="font-size:11px;color:var(--text3);">Guests must enter the code to view the gallery</div></div>
               </div>
-              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()">✨ Create Event →</button>
+              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()"> Create Event →</button>
             </div>
           </div>
 
-          <!-- ── EMAIL NOTIFICATION ── -->
+          <!--  EMAIL NOTIFICATION  -->
           <div class="card" style="margin-top:16px;">
             <div class="card-head">
-              <h2>📧 Owner Notification Email</h2>
+              <h2> Owner Notification Email</h2>
               <span style="font-size:11px;color:var(--text3);">Sent automatically when event is created</span>
             </div>
             <div class="card-body">
@@ -576,9 +576,9 @@ tr:hover td{background:var(--bg2);}
 
 Your event gallery is ready! Here are your access details:
 
-🎉 Event: {{event_name}}
-🔑 Access Code: {{event_code}}
-🔗 Gallery Link: {{event_url}}
+ Event: {{event_name}}
+ Access Code: {{event_code}}
+ Gallery Link: {{event_url}}
 
 Share the link and code with your guests so they can find their photos.
 
@@ -590,10 +590,10 @@ If you have any questions, just reply to this email.
             </div>
           </div>
 
-          <!-- ── INVOICE ── -->
+          <!--  INVOICE  -->
           <div class="card" style="margin-top:16px;">
             <div class="card-head">
-              <h2>🧾 Invoice</h2>
+              <h2> Invoice</h2>
               <span style="font-size:11px;color:var(--text3);">Saved with event · attach to confirmation emails later</span>
             </div>
             <div class="card-body">
@@ -659,7 +659,7 @@ If you have any questions, just reply to this email.
         </div>
         <div class="ws-sticky">
           <div id="templatePreviewCard" style="border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2);box-shadow:var(--sh);transition:all .3s;">
-            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">👁 Template Preview</div>
+            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);"> Template Preview</div>
             <div id="templatePreviewInner"></div>
           </div>
           <div class="hint-box" style="margin-top:12px;"><strong>How events work</strong><br><br>After creating, upload photos from <strong>Upload Photos</strong>. Guests scan their face to find their photos instantly.</div>
@@ -672,9 +672,9 @@ If you have any questions, just reply to this email.
       <div class="page-header"><div class="page-title">Upload Photos</div><div class="page-sub">Upload photos to an event. Preview versions are available immediately.</div></div>
       <div class="ws-layout">
         <div>
-          <div class="card"><div class="card-head"><h2>📅 Select Event</h2></div><div class="card-body"><div class="field-group"><div class="field-label">Event</div><select id="upload-event-select" onchange="onUploadEventChange()"><option value="">— Select an event —</option></select></div><div id="upload-event-info" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:4px;"><div style="font-size:12px;color:var(--text2);" id="upload-event-meta"></div></div></div></div>
-          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2>📤 Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico">📸</div><div class="upload-zone-title">Drop photos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
-          <div class="card" id="upload-photos-list-card" style="display:none;"><div class="card-head"><h2>🖼️ Event Photos</h2><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button></div><div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico">📸</div><div class="empty-txt">No photos yet.</div></div></div></div>
+          <div class="card"><div class="card-head"><h2> Select Event</h2></div><div class="card-body"><div class="field-group"><div class="field-label">Event</div><select id="upload-event-select" onchange="onUploadEventChange()"><option value="">— Select an event —</option></select></div><div id="upload-event-info" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:4px;"><div style="font-size:12px;color:var(--text2);" id="upload-event-meta"></div></div></div></div>
+          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2> Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico"></div><div class="upload-zone-title">Drop photos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
+          <div class="card" id="upload-photos-list-card" style="display:none;"><div class="card-head"><h2> Event Photos</h2><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button></div><div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">No photos yet.</div></div></div></div>
         </div>
         <div class="ws-sticky"><div class="hint-box"><strong>Upload tips</strong><br><br>You can upload multiple photos at once.<br><br>Photos are stored in the event bucket and are available immediately in the gallery after upload.</div></div>
       </div>
@@ -692,7 +692,7 @@ If you have any questions, just reply to this email.
           <!-- Service list -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2>🛎️ Your Services</h2>
+              <h2> Your Services</h2>
               <div style="display:flex;gap:8px;">
                 <button class="btn btn-ghost btn-sm" onclick="loadServices()">↻ Refresh</button>
                 <button class="btn btn-gold" onclick="openServiceModal()">+ Add Service</button>
@@ -706,11 +706,11 @@ If you have any questions, just reply to this email.
         <div class="ws-sticky">
           <div class="hint-box">
             <strong>How services work</strong><br><br>
-            Each service has a <strong>title</strong>, <strong>description</strong>, an optional <strong>image</strong>, and a <strong>sort order</strong>.<br><br>
+            Each service has a <strong>title</strong>, <strong>description</strong>, an optional <strong>price</strong>, an optional <strong>image</strong>, and a <strong>sort order</strong>.<br><br>
             Drag images straight from your computer or paste a URL. Services are shown on <code>services.html</code> in the order you set.<br><br>
             Toggle <strong>Active</strong> to hide/show a service without deleting it.
           </div>
-          <a href="services.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview Services Page</a>
+          <a href="services.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Services Page</a>
         </div>
       </div>
     </div>
@@ -727,8 +727,8 @@ If you have any questions, just reply to this email.
           <!-- STORY SECTION -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2>📖 Our Story</h2>
-              <button class="btn btn-gold" onclick="saveAboutStory()">💾 Save Story</button>
+              <h2> Our Story</h2>
+              <button class="btn btn-gold" onclick="saveAboutStory()"> Save Story</button>
             </div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
               <div id="aboutStoryAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;"></div>
@@ -752,7 +752,7 @@ If you have any questions, just reply to this email.
                   ondragover="onDragOver(event,'abStoryImgZone')"
                   ondragleave="onDragLeave(event,'abStoryImgZone')"
                   ondrop="onDropAboutImg(event,'story')">
-                  <div class="upload-zone-ico">📂</div>
+                  <div class="upload-zone-ico"></div>
                   <div class="upload-zone-title">Drop an image or click to upload</div>
                   <div class="upload-zone-sub">JPG · PNG · WebP · Shown beside your story text</div>
                   <input type="file" id="abStoryImgFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleAboutImgFile(event,'story')"/>
@@ -769,10 +769,10 @@ If you have any questions, just reply to this email.
           <!-- TEAM MEMBERS -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2>👥 Team Members</h2>
+              <h2> Team Members</h2>
               <div style="display:flex;gap:8px;">
                 <button class="btn btn-ghost btn-sm" onclick="addTeamMember()">+ Add Member</button>
-                <button class="btn btn-gold" onclick="saveTeamMembers()">💾 Save Team</button>
+                <button class="btn btn-gold" onclick="saveTeamMembers()"> Save Team</button>
               </div>
             </div>
             <div class="card-body">
@@ -785,10 +785,10 @@ If you have any questions, just reply to this email.
           <!-- MISSION & VISION PILLARS -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2>🎯 Mission & Vision — Pillars</h2>
+              <h2> Mission & Vision — Pillars</h2>
               <div style="display:flex;gap:8px;">
                 <button class="btn btn-ghost btn-sm" onclick="addPillar()">+ Add Pillar</button>
-                <button class="btn btn-gold" onclick="savePillars()">💾 Save Pillars</button>
+                <button class="btn btn-gold" onclick="savePillars()"> Save Pillars</button>
               </div>
             </div>
             <div class="card-body">
@@ -805,7 +805,7 @@ If you have any questions, just reply to this email.
             All content reads from the <code>about_page</code> Supabase table (single row). The team members and Mission &amp; Vision pillars are stored as JSON arrays in that row.<br><br>
             Changes go live immediately — no redeploy needed.
           </div>
-          <a href="about.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview About Page</a>
+          <a href="about.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview About Page</a>
         </div>
       </div>
     </div>
@@ -815,7 +815,7 @@ If you have any questions, just reply to this email.
       <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
         <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
           <h2 style="font-size:16px;font-weight:900;" id="svcModalTitle">Add Service</h2>
-          <button onclick="closeSvcModal()" style="font-size:18px;color:var(--text3);background:none;border:none;cursor:pointer;line-height:1;">✕</button>
+          <button onclick="closeSvcModal()" style="font-size:18px;color:var(--text3);background:none;border:none;cursor:pointer;line-height:1;"></button>
         </div>
         <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
           <input type="hidden" id="svc-id"/>
@@ -831,9 +831,9 @@ If you have any questions, just reply to this email.
           </div>
 
           <div class="field-group">
-            <div class="field-label">Icon / Emoji <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
-            <input type="text" id="svc-icon" placeholder="e.g. 📸" style="max-width:120px;"/>
-            <div class="field-hint">One emoji shown before the title on the public page.</div>
+            <div class="field-label">Price <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
+            <input type="text" id="svc-price" placeholder="e.g. From £299 · POA · Included"/>
+            <div class="field-hint">Shown on the services page. Use "POA" for price on application, or leave blank.</div>
           </div>
 
           <div class="field-group">
@@ -844,7 +844,7 @@ If you have any questions, just reply to this email.
               ondragover="onDragOver(event,'svcImgZone')"
               ondragleave="onDragLeave(event,'svcImgZone')"
               ondrop="onDropSvcImg(event)">
-              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop an image or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP</div>
               <input type="file" id="svcImgFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleSvcImgFile(event)"/>
@@ -873,7 +873,7 @@ If you have any questions, just reply to this email.
 
           <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:4px;">
             <button class="btn btn-ghost" onclick="closeSvcModal()">Cancel</button>
-            <button class="btn btn-gold" id="svcSaveBtn" onclick="saveService()">💾 Save Service</button>
+            <button class="btn btn-gold" id="svcSaveBtn" onclick="saveService()"> Save Service</button>
           </div>
         </div>
       </div>
@@ -886,15 +886,15 @@ If you have any questions, just reply to this email.
         <div>
           <!-- Tabs -->
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
-            <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);">✏️ Compose</button>
-            <button id="mail-tab-inbox-btn"   onclick="switchMailTab('inbox')"   style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);">📥 Inbox</button>
-            <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);">📤 Sent</button>
+            <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);"> Compose</button>
+            <button id="mail-tab-inbox-btn"   onclick="switchMailTab('inbox')"   style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);"> Inbox</button>
+            <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);"> Sent</button>
           </div>
 
           <!-- COMPOSE -->
           <div id="mail-tab-compose">
             <div class="card">
-              <div class="card-head"><h2>✏️ New Email</h2></div>
+              <div class="card-head"><h2> New Email</h2></div>
               <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
                 <div class="field-group">
                   <div class="field-label">To</div>
@@ -909,7 +909,7 @@ If you have any questions, just reply to this email.
                   <textarea id="mail-body" rows="10" placeholder="Type your message here…" style="resize:vertical;"></textarea>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                  <button class="btn btn-gold" onclick="sendMail()">📨 Send Email</button>
+                  <button class="btn btn-gold" onclick="sendMail()"> Send Email</button>
                   <button class="btn btn-ghost" onclick="clearCompose()">Clear</button>
                   <span style="font-size:11px;color:var(--text3);">Sent from events@impactgridgroup.com via Resend</span>
                 </div>
@@ -921,9 +921,9 @@ If you have any questions, just reply to this email.
           <!-- INBOX -->
           <div id="mail-tab-inbox" style="display:none;">
             <div class="card">
-              <div class="card-head"><h2>📥 Inbox</h2><button class="btn btn-ghost btn-sm" onclick="loadInbox()">↻ Refresh</button></div>
+              <div class="card-head"><h2> Inbox</h2><button class="btn btn-ghost btn-sm" onclick="loadInbox()">↻ Refresh</button></div>
               <div class="card-body" id="mail-inbox-list">
-                <div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
             <!-- Open email thread -->
@@ -935,7 +935,7 @@ If you have any questions, just reply to this email.
                 </div>
                 <div style="display:flex;gap:6px;">
                   <button class="btn btn-ghost btn-sm" onclick="replyTo()">↩ Reply</button>
-                  <button class="btn btn-ghost btn-sm" onclick="document.getElementById('mail-open-card').style.display='none'">✕ Close</button>
+                  <button class="btn btn-ghost btn-sm" onclick="document.getElementById('mail-open-card').style.display='none'"> Close</button>
                 </div>
               </div>
               <div class="card-body" id="mail-open-body" style="white-space:pre-wrap;font-size:13px;line-height:1.7;"></div>
@@ -945,9 +945,9 @@ If you have any questions, just reply to this email.
           <!-- SENT -->
           <div id="mail-tab-sent" style="display:none;">
             <div class="card">
-              <div class="card-head"><h2>📤 Sent</h2><button class="btn btn-ghost btn-sm" onclick="loadSent()">↻ Refresh</button></div>
+              <div class="card-head"><h2> Sent</h2><button class="btn btn-ghost btn-sm" onclick="loadSent()">↻ Refresh</button></div>
               <div class="card-body" id="mail-sent-list">
-                <div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
           </div>
@@ -960,7 +960,7 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
-    <!-- ══ REVIEWS ══ -->
+    <!--  REVIEWS  -->
     <div class="page" id="page-reviews">
       <div class="page-header">
         <div class="page-title">Reviews</div>
@@ -972,13 +972,13 @@ If you have any questions, just reply to this email.
           <!-- Filter tabs -->
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
             <button id="rev-tab-pending"  onclick="setReviewFilter('pending')"  style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);transition:all .2s;">⏳ Pending <span id="rev-count-pending" style="font-size:11px;opacity:.6;">0</span></button>
-            <button id="rev-tab-approved" onclick="setReviewFilter('approved')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;">✅ Approved <span id="rev-count-approved" style="font-size:11px;opacity:.6;">0</span></button>
-            <button id="rev-tab-all"      onclick="setReviewFilter('all')"      style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;">📋 All <span id="rev-count-all" style="font-size:11px;opacity:.6;">0</span></button>
+            <button id="rev-tab-approved" onclick="setReviewFilter('approved')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;"> Approved <span id="rev-count-approved" style="font-size:11px;opacity:.6;">0</span></button>
+            <button id="rev-tab-all"      onclick="setReviewFilter('all')"      style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;"> All <span id="rev-count-all" style="font-size:11px;opacity:.6;">0</span></button>
           </div>
 
           <!-- Reviews list -->
           <div id="reviews-table-wrap">
-            <div class="empty"><div class="empty-ico">⭐</div><div class="empty-txt">Loading reviews…</div></div>
+            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading reviews…</div></div>
           </div>
         </div>
 
@@ -997,9 +997,9 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
-  <!-- ══════════════════════════════════════
+  <!-- 
        BOOKINGS PAGE
-  ══════════════════════════════════════ -->
+   -->
   <div class="page" id="page-bookings">
     <div class="page-header">
       <div class="page-title">Bookings</div>
@@ -1019,8 +1019,8 @@ If you have any questions, just reply to this email.
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:#07090f;">All</button>
           <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)">⏳ Pending</button>
-          <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)">✅ Confirmed</button>
-          <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)">✕ Rejected</button>
+          <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)"> Confirmed</button>
+          <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)"> Rejected</button>
           <button class="btn btn-ghost btn-sm" onclick="loadBookings()">↻ Refresh</button>
         </div>
       </div>
@@ -1031,7 +1031,7 @@ If you have any questions, just reply to this email.
 
     <div class="card">
       <div class="card-head">
-        <h2>🚫 Block Dates</h2>
+        <h2> Block Dates</h2>
         <span style="font-size:11px;color:var(--text3);">Blocked dates show as unavailable on the Book Us page</span>
       </div>
       <div class="card-body">
@@ -1047,27 +1047,27 @@ If you have any questions, just reply to this email.
           <button class="btn btn-gold" onclick="blockDate()" style="flex-shrink:0;white-space:nowrap;">Block Date</button>
         </div>
         <div id="blockedDatesList">
-          <div class="empty"><div class="empty-ico">📅</div><div class="empty-txt">No dates blocked.</div></div>
+          <div class="empty"><div class="empty-ico"></div><div class="empty-txt">No dates blocked.</div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════
+  <!-- 
        CONFIRM BOOKING MODAL
-  ══════════════════════════════════════ -->
+   -->
   <div id="confirmModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
     <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
       <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-family:var(--fd);font-size:16px;font-weight:900;">✅ Confirm Booking</div>
-        <button onclick="closeConfirmModal()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;">✕ Close</button>
+        <div style="font-family:var(--fd);font-size:16px;font-weight:900;"> Confirm Booking</div>
+        <button onclick="closeConfirmModal()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;"> Close</button>
       </div>
       <div style="padding:20px;">
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px;font-size:13px;" id="modalBookingSummary"></div>
         <div id="modalAlert" style="display:none;padding:10px 14px;border-radius:var(--r);font-size:12px;margin-bottom:14px;"></div>
 
         <div style="margin-bottom:14px;">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;">🧾 Invoice</div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;"> Invoice</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
             <div>
               <div class="field-label" style="font-size:10px;margin-bottom:5px;">Invoice No.</div>
@@ -1108,14 +1108,14 @@ If you have any questions, just reply to this email.
         </div>
 
         <div style="margin-bottom:16px;">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;">📦 Package / Notes <span style="font-weight:400;">(included in confirmation email)</span></div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;"> Package / Notes <span style="font-weight:400;">(included in confirmation email)</span></div>
           <textarea id="modal-package-notes" rows="3" placeholder="e.g. 4-hour photography package includes 200 edited photos, delivered within 7 days…" style="font-size:12px;"></textarea>
         </div>
 
         <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
           <button class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
-          <button class="btn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBookingFromModal()">✕ Reject Instead</button>
-          <button class="btn btn-gold" id="confirmSendBtn" onclick="confirmBooking()">✅ Confirm &amp; Send →</button>
+          <button class="btn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBookingFromModal()"> Reject Instead</button>
+          <button class="btn btn-gold" id="confirmSendBtn" onclick="confirmBooking()"> Confirm &amp; Send →</button>
         </div>
       </div>
     </div>
@@ -1123,7 +1123,7 @@ If you have any questions, just reply to this email.
 
   </div>
 </div>
-<div class="toast" id="toast"><div class="toast-icon" id="toastIco">✅</div><div><div class="toast-msg" id="toastMsg"></div><div class="toast-sub" id="toastSub"></div></div></div>
+<div class="toast" id="toast"><div class="toast-icon" id="toastIco"></div><div><div class="toast-msg" id="toastMsg"></div><div class="toast-sub" id="toastSub"></div></div></div>
 
 <!-- Main site auth/DB (Supabase — for login, hero slides, testimonials, etc.) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1138,15 +1138,15 @@ If you have any questions, just reply to this email.
 <script src="reviews-script.js"></script>
 
 <script>
-/* ══ CONFIG ══ */
+/*  CONFIG  */
 var IG_ADMIN_EMAIL = 'admin@impactgridgroup.com';
 var BUCKET      = 'site-media';
 var EVENTS_API  = 'https://impactgrid-events-api.onrender.com';
 
-/* ══ Supabase client: getSupabase() / getContentClient() from supabase-config.js ══ */
+/*  Supabase client: getSupabase() / getContentClient() from supabase-config.js  */
 var heroSlides=[], heroEditId=null, tickerItems=[], testimonials=[], updateCards=[];
 
-/* ══ BOOT ══ */
+/*  BOOT  */
 document.addEventListener('DOMContentLoaded', async function(){
   initAdminTheme();
   var c = getSupabase();
@@ -1157,12 +1157,12 @@ document.addEventListener('DOMContentLoaded', async function(){
   loadStats();
 });
 
-/* ══ THEME ══ */
+/*  THEME  */
 function toggleAdminTheme(){
   var isDark=document.documentElement.getAttribute('data-theme')==='dark';
   var newTheme=isDark?'light':'dark';
   document.documentElement.setAttribute('data-theme',newTheme);
-  document.getElementById('themeToggleBtn').textContent=newTheme==='dark'?'🌙':'☀️';
+  document.getElementById('themeToggleBtn').textContent=newTheme==='dark'?'':'';
   try{localStorage.setItem('ig_theme',newTheme);}catch(e){}
 }
 function initAdminTheme(){
@@ -1170,11 +1170,11 @@ function initAdminTheme(){
     var saved=localStorage.getItem('ig_theme')||'light';
     document.documentElement.setAttribute('data-theme',saved);
     var btn=document.getElementById('themeToggleBtn');
-    if(btn) btn.textContent=saved==='dark'?'🌙':'☀️';
+    if(btn) btn.textContent=saved==='dark'?'':'';
   }catch(e){}
 }
 
-/* ══ SIDEBAR ══ */
+/*  SIDEBAR  */
 function toggleSidebar(){
   var sidebar=document.getElementById('mainSidebar'),overlay=document.getElementById('sidebarOverlay');
   sidebar.classList.contains('open')?closeSidebar():(sidebar.classList.add('open'),overlay.classList.add('open'),document.body.style.overflow='hidden');
@@ -1185,7 +1185,7 @@ function closeSidebar(){
   document.body.style.overflow='';
 }
 
-/* ══ NAV ══ */
+/*  NAV  */
 function nav(id,el){
   if(window.innerWidth<=700) closeSidebar();
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
@@ -1206,7 +1206,7 @@ function nav(id,el){
   return false;
 }
 
-/* ══ TOAST ══ */
+/*  TOAST  */
 function toast(icon,msg,sub,persist){
   var t=document.getElementById('toast');
   document.getElementById('toastIco').textContent=icon;
@@ -1216,16 +1216,16 @@ function toast(icon,msg,sub,persist){
   if(!persist) setTimeout(function(){t.classList.remove('show');},3500);
 }
 
-/* ══ ALIAS — events-pages.html calls createEvent(), script exports igCreateEvent ══ */
+/*  ALIAS — events-pages.html calls createEvent(), script exports igCreateEvent  */
 window.createEvent = function(){ if(window.igCreateEvent) window.igCreateEvent(); };
 
-/* ══ Init Create Event page — sets expiry and invoice defaults ══ */
+/*  Init Create Event page — sets expiry and invoice defaults  */
 window.initCreateEventPage = function(){
   if(window.setDefaultExpiry)    window.setDefaultExpiry();
   if(window.initInvoiceDefaults) window.initInvoiceDefaults();
 };
 
-/* ══ STATS ══ */
+/*  STATS  */
 async function loadStats(){
   function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
   /* Events count comes from Firebase (via events-script.js db) */
@@ -1235,7 +1235,7 @@ async function loadStats(){
   }catch(e){ set('stat-events','—'); }
 }
 
-/* ══ HELPERS ══ */
+/*  HELPERS  */
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
 function g(id){var el=document.getElementById(id);return el?el.value:'';}
@@ -1244,16 +1244,16 @@ function onDragLeave(e,id){document.getElementById(id).classList.remove('drag');
 function onDrop(e,id,fn){e.preventDefault();document.getElementById(id).classList.remove('drag');var f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)fn(f);}
 function onDropMulti(e,id){e.preventDefault();document.getElementById(id).classList.remove('drag');var files=Array.from(e.dataTransfer.files||[]);if(files.length)uploadPhotos(files);}
 
-/* ══ HOMEPAGE CONTENT ══ */
+/*  HOMEPAGE CONTENT  */
 var CONTENT_DEFS=[
-  {section:'🔗 Ecosystem Section',fields:[{key:'ecosystem_title',label:'Section Title',type:'text'},{key:'ecosystem_sub',label:'Section Subtitle',type:'textarea'}]},
-  {section:'📖 Use Cases Section',fields:[{key:'usecases_title',label:'Section Title',type:'text'},{key:'usecases_sub',label:'Section Subtitle',type:'textarea'}]},
-  {section:'🎯 CTA Banner',fields:[{key:'cta_title',label:'Banner Heading',type:'text'},{key:'cta_subtitle',label:'Banner Subtitle',type:'textarea'}]},
-  {section:'💬 Testimonials Section',fields:[{key:'trust_title',label:'Section Heading',type:'text'},{key:'trust_label',label:'Label Tag',type:'text'}]}
+  {section:' Ecosystem Section',fields:[{key:'ecosystem_title',label:'Section Title',type:'text'},{key:'ecosystem_sub',label:'Section Subtitle',type:'textarea'}]},
+  {section:' Use Cases Section',fields:[{key:'usecases_title',label:'Section Title',type:'text'},{key:'usecases_sub',label:'Section Subtitle',type:'textarea'}]},
+  {section:' CTA Banner',fields:[{key:'cta_title',label:'Banner Heading',type:'text'},{key:'cta_subtitle',label:'Banner Subtitle',type:'textarea'}]},
+  {section:' Testimonials Section',fields:[{key:'trust_title',label:'Section Heading',type:'text'},{key:'trust_label',label:'Label Tag',type:'text'}]}
 ];
 var ECO_CARDS=[
-  {prefix:'eco_consulting',label:'📊 Consulting'},{prefix:'eco_analytics',label:'⚡ Analytics'},
-  {prefix:'eco_creator',label:'🎬 Creator Studio'},{prefix:'eco_network',label:'🌐 Network'}
+  {prefix:'eco_consulting',label:' Consulting'},{prefix:'eco_analytics',label:' Analytics'},
+  {prefix:'eco_creator',label:' Creator Studio'},{prefix:'eco_network',label:' Network'}
 ];
 var _kvCache={};
 
@@ -1268,18 +1268,18 @@ async function loadHomepageEditor(){
         var inp=f.type==='textarea'?'<textarea id="kv-'+f.key+'" rows="2">'+esc(val)+'</textarea>':'<input type="text" id="kv-'+f.key+'" value="'+esc(val)+'"/>';
         return'<div class="field-group"><div class="field-label">'+esc(f.label)+'</div>'+inp+'</div>';
       }).join('');
-      return'<div class="cs-item'+(si===0?' open':'')+'" id="cs-'+si+'"><div class="cs-head" onclick="toggleCs('+si+')"><div class="cs-head-left"><span class="cs-head-icon">'+section.section.split(' ')[0]+'</span><div><div class="cs-head-name">'+esc(section.section.replace(/^\S+\s/,''))+'</div><div class="cs-head-meta">'+section.fields.length+' fields</div></div></div><span class="cs-chevron">▾</span></div><div class="cs-body">'+fieldsHtml+'</div></div>';
+      return'<div class="cs-item'+(si===0?' open':'')+'" id="cs-'+si+'"><div class="cs-head" onclick="toggleCs('+si+')"><div class="cs-head-left"><span class="cs-head-icon">'+section.section.split(' ')[0]+'</span><div><div class="cs-head-name">'+esc(section.section.replace(/^\S+\s/,''))+'</div><div class="cs-head-meta">'+section.fields.length+' fields</div></div></div><span class="cs-chevron"></span></div><div class="cs-body">'+fieldsHtml+'</div></div>';
     }).join('');
     loadEcoEditor(data||[]);
-  }catch(e){el.innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">'+esc(e.message)+'</div></div>';}
+  }catch(e){el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">'+esc(e.message)+'</div></div>';}
 }
 function toggleCs(idx){var el=document.getElementById('cs-'+idx);if(el)el.classList.toggle('open');}
 async function saveHomepageContent(){
   var upserts=[];
   CONTENT_DEFS.forEach(function(section){section.fields.forEach(function(f){var el=document.getElementById('kv-'+f.key);if(el)upserts.push({key:f.key,value:el.value});});});
   var {error}=await getSupabase().from('site_content').upsert(upserts,{onConflict:'key'});
-  if(error){toast('⚠️','Save failed',error.message);return;}
-  toast('✅','Content saved!','Changes live on homepage');
+  if(error){toast('','Save failed',error.message);return;}
+  toast('','Content saved!','Changes live on homepage');
 }
 function loadEcoEditor(existingData){
   var el=document.getElementById('ecoEditor');if(!el)return;
@@ -1300,18 +1300,18 @@ async function saveEcoCards(){
     if(de)upserts.push({key:c.prefix+'_desc',value:de.value});
   });
   var {error}=await getSupabase().from('site_content').upsert(upserts,{onConflict:'key'});
-  if(error){toast('⚠️','Save failed',error.message);return;}
-  toast('✅','Ecosystem cards saved!','');
+  if(error){toast('','Save failed',error.message);return;}
+  toast('','Ecosystem cards saved!','');
 }
 
-/* ══ HERO SLIDESHOW ══ */
+/*  HERO SLIDESHOW  */
 function handleHeroFile(e){var f=e.target.files&&e.target.files[0];if(f)uploadHeroFile(f);e.target.value='';}
 function setProgress(p){document.getElementById('heroUploadBar').style.width=p+'%';document.getElementById('heroUploadPct').textContent=p+'%';}
 
 async function uploadHeroFile(file){
   var allowed=['video/mp4','video/quicktime','video/webm','image/jpeg','image/png','image/webp'];
-  if(!allowed.includes(file.type)){toast('⚠️','Unsupported type','Use MP4, MOV, WebM, JPG, PNG or WebP');return;}
-  if(file.size>200*1024*1024){toast('⚠️','File too large','Max 200MB');return;}
+  if(!allowed.includes(file.type)){toast('','Unsupported type','Use MP4, MOV, WebM, JPG, PNG or WebP');return;}
+  if(file.size>200*1024*1024){toast('','File too large','Max 200MB');return;}
   var isVideo=file.type.startsWith('video/');
   var ext=file.name.split('.').pop();
   var fname='slides/'+Date.now()+'-'+Math.random().toString(36).substring(2,8)+'.'+ext;
@@ -1319,7 +1319,7 @@ async function uploadHeroFile(file){
   progEl.style.display='block';
   document.getElementById('heroUploadName').textContent=file.name;
   setProgress(0);
-  toast('📤','Uploading '+file.name,'Please wait…',true);
+  toast('','Uploading '+file.name,'Please wait…',true);
   try{
     var c=getSupabase();
     var {error:upErr}=await c.storage.from(BUCKET).upload(fname,file,{contentType:file.type,upsert:false});
@@ -1336,29 +1336,29 @@ async function uploadHeroFile(file){
     }).select().single();
     if(insErr) throw insErr;
     setProgress(100);progEl.style.display='none';
-    toast('✅','Slide uploaded!',isVideo?'Video added':'Image added');
+    toast('','Slide uploaded!',isVideo?'Video added':'Image added');
     loadHeroSlides();
     setTimeout(function(){if(row)openHeroCaption(row);},500);
-  }catch(err){progEl.style.display='none';toast('⚠️','Upload failed',err.message);}
+  }catch(err){progEl.style.display='none';toast('','Upload failed',err.message);}
 }
 
 async function loadHeroSlides(){
   var el=document.getElementById('heroSlideList');
-  el.innerHTML='<div class="empty"><div class="empty-ico">🎞️</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try{
     var {data}=await getSupabase().from('site_slides').select('*').order('sort_order',{ascending:true});
     heroSlides=data||[];
-    if(!heroSlides.length){el.innerHTML='<div class="empty"><div class="empty-ico">🖼️</div><div class="empty-txt">No slides yet. Upload one above.</div></div>';return;}
+    if(!heroSlides.length){el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No slides yet. Upload one above.</div></div>';return;}
     el.innerHTML=heroSlides.map(function(s){
       var isVideo=s.type==='video';
-      var thumb=isVideo?'<div class="slide-thumb-video">▶️</div>':'<img class="slide-thumb" src="'+esc(s.url)+'" alt=""/>';
+      var thumb=isVideo?'<div class="slide-thumb-video"></div>':'<img class="slide-thumb" src="'+esc(s.url)+'" alt=""/>';
       return'<div class="slide-row'+(heroEditId===s.id?' editing':'')+'" id="srow-'+s.id+'">'+thumb+
         '<div class="slide-info"><div class="slide-title">'+(s.title||'Untitled')+'</div>'+
-        '<div class="slide-meta">'+(isVideo?'🎬 Video':'🖼 Image')+(s.caption?' · has caption':' · no caption')+'</div></div>'+
+        '<div class="slide-meta">'+(isVideo?' Video':' Image')+(s.caption?' · has caption':' · no caption')+'</div></div>'+
         '<div class="slide-actions">'+
           '<div class="toggle'+(s.active?' on':'')+'" onclick="toggleSlide(\''+s.id+'\','+s.active+')"></div>'+
-          '<button class="btn btn-ghost btn-icon" onclick="openHeroCaption(heroSlides.find(function(x){return x.id===\''+s.id+'\'}))">✏️</button>'+
-          '<button class="btn btn-red btn-icon btn-sm" onclick="deleteSlide(\''+s.id+'\',\''+esc(s.storage_path||'')+'\')">✕</button>'+
+          '<button class="btn btn-ghost btn-icon" onclick="openHeroCaption(heroSlides.find(function(x){return x.id===\''+s.id+'\'}))"></button>'+
+          '<button class="btn btn-red btn-icon btn-sm" onclick="deleteSlide(\''+s.id+'\',\''+esc(s.storage_path||'')+'\')"></button>'+
         '</div></div>';
     }).join('');
   }catch(e){el.innerHTML='<div class="empty"><div class="empty-txt">Error: '+esc(e.message)+'</div></div>';}
@@ -1371,7 +1371,7 @@ async function deleteSlide(id,path){
   if(path){try{await c.storage.from(BUCKET).remove([path]);}catch(e){}}
   await c.from('site_slides').delete().eq('id',id);
   if(heroEditId===id){heroEditId=null;resetCaptionPanel();}
-  loadHeroSlides();toast('🗑️','Slide deleted','');
+  loadHeroSlides();toast('','Slide deleted','');
 }
 
 var OVERLAY_COLORS=[
@@ -1398,11 +1398,11 @@ function openHeroCaption(slide){
     '<div class="field-group"><div class="field-label">Accent Colour</div><div class="color-row">'+swatches+'</div><input type="hidden" id="cap-color" value="'+(slide.overlay_color||'#c97e08')+'"/></div>'+
     '<div class="caption-preview-box" id="capPreviewBox">'+buildCapPreview(slide)+'</div>'+
     '<div style="display:flex;gap:8px;margin-top:4px;">'+
-      '<button class="btn btn-gold" style="flex:1;" onclick="saveCaption(\''+slide.id+'\')">💾 Save Caption</button>'+
-      '<button class="btn btn-red btn-icon" onclick="deleteSlide(\''+slide.id+'\',\''+esc(slide.storage_path||'')+'\')">🗑</button>'+
+      '<button class="btn btn-gold" style="flex:1;" onclick="saveCaption(\''+slide.id+'\')"> Save Caption</button>'+
+      '<button class="btn btn-red btn-icon" onclick="deleteSlide(\''+slide.id+'\',\''+esc(slide.storage_path||'')+'\')"></button>'+
     '</div>';
 }
-function resetCaptionPanel(){document.getElementById('heroCaptionInner').innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text3);"><div style="font-size:28px;margin-bottom:10px;">👈</div><div style="font-size:12px;">Select a slide to edit.</div></div>';}
+function resetCaptionPanel(){document.getElementById('heroCaptionInner').innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text3);"><div style="font-size:28px;margin-bottom:10px;"></div><div style="font-size:12px;">Select a slide to edit.</div></div>';}
 function pickSwatch(el,hex){document.querySelectorAll('.color-sw').forEach(function(s){s.classList.remove('sel');});el.classList.add('sel');var ci=document.getElementById('cap-color');if(ci)ci.value=hex;updateCapPreview();}
 function buildCapPreview(d){
   var tagColors={new:'background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);',live:'background:var(--green-dim);color:var(--green);border:1px solid rgba(15,168,118,.2);',soon:'background:var(--blue-dim);color:var(--blue);border:1px solid rgba(45,110,219,.2);'};
@@ -1417,16 +1417,16 @@ function updateCapPreview(){var el=document.getElementById('capPreviewBox');if(!
 async function saveCaption(id){
   var payload={title:g('cap-title').trim(),caption:g('cap-caption').trim(),tag_text:g('cap-tag-text').trim()||'New',tag_type:g('cap-tag-type')||'new',cta_text:g('cap-cta-text').trim(),cta_url:g('cap-cta-url').trim(),overlay_color:g('cap-color')||'#c97e08'};
   var {error}=await getSupabase().from('site_slides').update(payload).eq('id',id);
-  if(error){toast('⚠️','Save failed',error.message);return;}
-  toast('✅','Caption saved!','Live on homepage');loadHeroSlides();
+  if(error){toast('','Save failed',error.message);return;}
+  toast('','Caption saved!','Live on homepage');loadHeroSlides();
 }
 
-/* ══ UPDATES ══ */
+/*  UPDATES  */
 var DEFAULT_UPDATES=[
-  {icon:'🚀',color:'#c97e08',badge:'New Release',title:'ImpactGrid V3.0 Is Here',desc:'AI-powered risk scoring, performance matrix, enhanced forecasting, and Dijo built directly into your dashboard.',cta:'Explore V3.0 →',cta_url:'analytics.html',num:'01',ver:'V3.0 · 2026'},
-  {icon:'🤖',color:'#2d6edb',badge:'Live Now',title:'Meet Dijo — Your AI Business Adviser',desc:'Always on. Direct answers about your business health, risks, and growth strategy.',cta:'Talk to Dijo →',cta_url:'ai.html',num:'02',ver:'AI · 2026'},
-  {icon:'🌐',color:'#0fa876',badge:'New Feature',title:'ImpactGrid Network Is Open',desc:'Professionals, analysts, creators, and employers connecting through one intelligent network.',cta:'Join the Network →',cta_url:'network.html',num:'03',ver:'Network · 2026'},
-  {icon:'🎬',color:'#7c3aed',badge:'New',title:'Creator Intelligence Engine',desc:'Real trend signals. AI-powered hooks, captions, and posting windows.',cta:'Open Creator Studio →',cta_url:'creator-studio.html',num:'04',ver:'Studio · 2026'}
+  {icon:'',color:'#c97e08',badge:'New Release',title:'ImpactGrid V3.0 Is Here',desc:'AI-powered risk scoring, performance matrix, enhanced forecasting, and Dijo built directly into your dashboard.',cta:'Explore V3.0 →',cta_url:'analytics.html',num:'01',ver:'V3.0 · 2026'},
+  {icon:'',color:'#2d6edb',badge:'Live Now',title:'Meet Dijo — Your AI Business Adviser',desc:'Always on. Direct answers about your business health, risks, and growth strategy.',cta:'Talk to Dijo →',cta_url:'ai.html',num:'02',ver:'AI · 2026'},
+  {icon:'',color:'#0fa876',badge:'New Feature',title:'ImpactGrid Network Is Open',desc:'Professionals, analysts, creators, and employers connecting through one intelligent network.',cta:'Join the Network →',cta_url:'network.html',num:'03',ver:'Network · 2026'},
+  {icon:'',color:'#7c3aed',badge:'New',title:'Creator Intelligence Engine',desc:'Real trend signals. AI-powered hooks, captions, and posting windows.',cta:'Open Creator Studio →',cta_url:'creator-studio.html',num:'04',ver:'Studio · 2026'}
 ];
 async function loadUpdateCards(){
   var el=document.getElementById('updateCardsEditor');
@@ -1446,7 +1446,7 @@ function renderUpdateCards(){
         '<input type="text" value="'+esc(c.badge||'')+'" placeholder="Badge text" style="flex:1;" oninput="updateCards['+i+'].badge=this.value"/>'+
         '<input type="text" value="'+esc(c.num||'')+'" placeholder="No." style="width:56px;" oninput="updateCards['+i+'].num=this.value"/>'+
         '<input type="text" value="'+esc(c.color||'#c97e08')+'" placeholder="#colour" style="width:90px;" oninput="updateCards['+i+'].color=this.value"/>'+
-        '<button class="btn btn-red btn-icon btn-sm" onclick="removeUpdateCard('+i+')">✕</button></div>'+
+        '<button class="btn btn-red btn-icon btn-sm" onclick="removeUpdateCard('+i+')"></button></div>'+
       '<div class="field-group" style="margin-bottom:10px;"><div class="field-label">Title</div><input type="text" value="'+esc(c.title||'')+'" oninput="updateCards['+i+'].title=this.value"/></div>'+
       '<div class="field-group" style="margin-bottom:10px;"><div class="field-label">Description</div><textarea rows="2" oninput="updateCards['+i+'].desc=this.value">'+esc(c.desc||'')+'</textarea></div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'+
@@ -1456,22 +1456,22 @@ function renderUpdateCards(){
       '</div></div>';
   }).join('');
 }
-function addUpdateCard(){updateCards.push({icon:'✨',color:'#c97e08',badge:'New',title:'',desc:'',cta:'',cta_url:'',num:String(updateCards.length+1).padStart(2,'0'),ver:'2026',id:null,sort_order:updateCards.length+1,active:true});renderUpdateCards();}
+function addUpdateCard(){updateCards.push({icon:'',color:'#c97e08',badge:'New',title:'',desc:'',cta:'',cta_url:'',num:String(updateCards.length+1).padStart(2,'0'),ver:'2026',id:null,sort_order:updateCards.length+1,active:true});renderUpdateCards();}
 function removeUpdateCard(i){updateCards.splice(i,1);renderUpdateCards();}
 async function saveUpdateCards(){
   try{
     var c=getSupabase();
     await c.from('site_updates').delete().neq('id','00000000-0000-0000-0000-000000000000');
     var rows=updateCards.filter(function(u){return u.title&&u.title.trim();}).map(function(u,i){
-      return{icon:u.icon||'✨',color:u.color||'#c97e08',badge:u.badge||'New',badge_style:'',ico_style:'',title:u.title.trim(),desc:u.desc||'',cta:u.cta||'',cta_url:u.cta_url||'',num:u.num||String(i+1).padStart(2,'0'),ver:u.ver||'2026',sort_order:i+1,active:true};
+      return{icon:u.icon||'',color:u.color||'#c97e08',badge:u.badge||'New',badge_style:'',ico_style:'',title:u.title.trim(),desc:u.desc||'',cta:u.cta||'',cta_url:u.cta_url||'',num:u.num||String(i+1).padStart(2,'0'),ver:u.ver||'2026',sort_order:i+1,active:true};
     });
     var {error}=await c.from('site_updates').insert(rows);
     if(error) throw error;
-    toast('✅','Updates saved!',rows.length+' cards live');loadUpdateCards();
-  }catch(e){toast('⚠️','Save failed',e.message);}
+    toast('','Updates saved!',rows.length+' cards live');loadUpdateCards();
+  }catch(e){toast('','Save failed',e.message);}
 }
 
-/* ══ TESTIMONIALS ══ */
+/*  TESTIMONIALS  */
 var DEFAULT_TESTS=[
   {quote:"The risk scoring caught a client concentration problem we hadn't noticed.",name:'Sarah K.',role:'Founder, Strategy Consultancy',initial:'S',active:true},
   {quote:"Dijo gives me the kind of honest, direct analysis I'd get from a senior adviser.",name:'Marcus T.',role:'Director, Growth Agency',initial:'M',active:true},
@@ -1502,7 +1502,7 @@ function renderTestimonials(){
       '</div>'+
       '<div style="display:flex;align-items:center;gap:6px;">'+
         '<div class="toggle'+(t.active!==false?' on':'')+'" onclick="testimonials['+i+'].active=!testimonials['+i+'].active;renderTestimonials()"></div>'+
-        '<button class="btn btn-red btn-icon btn-sm" onclick="testimonials.splice('+i+',1);renderTestimonials()">✕</button>'+
+        '<button class="btn btn-red btn-icon btn-sm" onclick="testimonials.splice('+i+',1);renderTestimonials()"></button>'+
       '</div></div>'+
       '<div class="field-group" style="margin-bottom:8px;"><div class="field-label">Quote</div><textarea rows="3" oninput="testimonials['+i+'].quote=this.value">'+esc(t.quote||'')+'</textarea></div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr 60px;gap:8px;">'+
@@ -1527,11 +1527,11 @@ async function saveTestimonials(){
     });
     var {error}=await c.from('site_testimonials').insert(rows);
     if(error) throw error;
-    toast('✅','Testimonials saved!',rows.length+' quotes live');loadTestimonials();
-  }catch(e){toast('⚠️','Save failed',e.message);}
+    toast('','Testimonials saved!',rows.length+' quotes live');loadTestimonials();
+  }catch(e){toast('','Save failed',e.message);}
 }
 
-/* ══ TICKER ══ */
+/*  TICKER  */
 var DEFAULT_TICKER=[
   {text:'ImpactGrid V3.0 — Advanced analytics with AI risk scoring now live',type:'new'},
   {text:'Dijo AI — Your personal business co-pilot, always on',type:'live'},
@@ -1551,7 +1551,7 @@ function renderTicker(){
   el.innerHTML=tickerItems.map(function(item,i){
     var labels={new:'New',live:'Live',soon:'Soon'};
     return'<div class="ticker-row" data-idx="'+i+'">'+
-      '<span style="cursor:grab;color:var(--text3);">⠿</span>'+
+      '<span style="cursor:grab;color:var(--text3);"></span>'+
       '<button class="ticker-type ttype-'+(item.type||'new')+'" onclick="cycleTickerType('+i+')">'+(labels[item.type||'new']||'New')+'</button>'+
       '<input type="text" value="'+esc(item.text||'')+'" placeholder="Ticker message…" oninput="tickerItems['+i+'].text=this.value;updateTickerPreview()"/>'+
       '<button onclick="tickerItems.splice('+i+',1);renderTicker()" style="flex-shrink:0;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px 6px;">×</button>'+
@@ -1571,20 +1571,20 @@ async function saveTicker(){
     await c.from('site_ticker').delete().neq('id','00000000-0000-0000-0000-000000000000');
     var {error}=await c.from('site_ticker').insert(toSave.map(function(t,i){return{text:t.text.trim(),type:t.type||'new',sort_order:i+1,active:true};}));
     if(error) throw error;
-    toast('✅','Ticker saved!',toSave.length+' items live');loadTicker();
-  }catch(e){toast('⚠️','Save failed',e.message);}
+    toast('','Ticker saved!',toSave.length+' items live');loadTicker();
+  }catch(e){toast('','Save failed',e.message);}
 }
 
-/* ══ TEMPLATE PREVIEW ══ */
+/*  TEMPLATE PREVIEW  */
 var TPL_PREVIEWS={
-  professional:{bg:'#f8f9fc',accent:'#2563eb',text:'#0d1020',text2:'#505878',btnBg:'#2563eb',btnColor:'#fff',name:'Professional',emoji:'📊'},
-  kids:{bg:'#fffbf0',accent:'#f97316',text:'#1c1400',text2:'#7a6000',btnBg:'linear-gradient(135deg,#f97316,#ec4899)',btnColor:'#fff',name:'Kids',emoji:'🎉'},
-  birthday:{bg:'#fff5f8',accent:'#f43f5e',text:'#1a0510',text2:'#7f3045',btnBg:'linear-gradient(135deg,#f43f5e,#a855f7)',btnColor:'#fff',name:'Birthday',emoji:'🎂'},
-  wedding:{bg:'#fdfaf7',accent:'#9b7653',text:'#1a1208',text2:'#6b5a3e',btnBg:'linear-gradient(135deg,#9b7653,#c4a46b)',btnColor:'#fff',name:'Wedding',emoji:'💍'},
-  sports:{bg:'#f0f4ff',accent:'#4f46e5',text:'#0a0e1a',text2:'#3730a3',btnBg:'#4f46e5',btnColor:'#fff',name:'Sports',emoji:'🏆'},
-  nightlife:{bg:'#080612',accent:'#8b5cf6',text:'#f0ecff',text2:'#9d8fff',btnBg:'linear-gradient(135deg,#8b5cf6,#f472b6)',btnColor:'#fff',name:'Nightlife',emoji:'🎧'},
-  gala:{bg:'#0a0804',accent:'#d4af37',text:'#f5f0e8',text2:'#a09070',btnBg:'linear-gradient(135deg,#d4af37,#f0d060)',btnColor:'#000',name:'Gala',emoji:'✦'},
-  ceremony:{bg:'#faf8f5',accent:'#7c5c3a',text:'#1a1510',text2:'#6b5c45',btnBg:'linear-gradient(135deg,#7c5c3a,#a07850)',btnColor:'#fff',name:'Ceremony',emoji:'🎓'}
+  professional:{bg:'#f8f9fc',accent:'#2563eb',text:'#0d1020',text2:'#505878',btnBg:'#2563eb',btnColor:'#fff',name:'Professional',emoji:''},
+  kids:{bg:'#fffbf0',accent:'#f97316',text:'#1c1400',text2:'#7a6000',btnBg:'linear-gradient(135deg,#f97316,#ec4899)',btnColor:'#fff',name:'Kids',emoji:''},
+  birthday:{bg:'#fff5f8',accent:'#f43f5e',text:'#1a0510',text2:'#7f3045',btnBg:'linear-gradient(135deg,#f43f5e,#a855f7)',btnColor:'#fff',name:'Birthday',emoji:''},
+  wedding:{bg:'#fdfaf7',accent:'#9b7653',text:'#1a1208',text2:'#6b5a3e',btnBg:'linear-gradient(135deg,#9b7653,#c4a46b)',btnColor:'#fff',name:'Wedding',emoji:''},
+  sports:{bg:'#f0f4ff',accent:'#4f46e5',text:'#0a0e1a',text2:'#3730a3',btnBg:'#4f46e5',btnColor:'#fff',name:'Sports',emoji:''},
+  nightlife:{bg:'#080612',accent:'#8b5cf6',text:'#f0ecff',text2:'#9d8fff',btnBg:'linear-gradient(135deg,#8b5cf6,#f472b6)',btnColor:'#fff',name:'Nightlife',emoji:''},
+  gala:{bg:'#0a0804',accent:'#d4af37',text:'#f5f0e8',text2:'#a09070',btnBg:'linear-gradient(135deg,#d4af37,#f0d060)',btnColor:'#000',name:'Gala',emoji:''},
+  ceremony:{bg:'#faf8f5',accent:'#7c5c3a',text:'#1a1510',text2:'#6b5c45',btnBg:'linear-gradient(135deg,#7c5c3a,#a07850)',btnColor:'#fff',name:'Ceremony',emoji:''}
 };
 function updateTemplatePreview(){
   var sel=document.getElementById('ev-template');
@@ -1598,12 +1598,12 @@ function updateTemplatePreview(){
       '<div style="font-size:11px;color:'+t.text2+';">'+t.name+' Template</div>'+
     '</div>'+
     '<div style="background:'+t.bg+';padding:12px 14px;display:flex;gap:6px;justify-content:center;">'+
-      '<div style="background:rgba(128,128,128,.1);font-size:9px;padding:4px 10px;border-radius:4px;font-weight:600;color:'+t.text2+';">🔍 Find My Photos</div>'+
-      '<div style="background:'+t.btnBg+';color:'+t.btnColor+';font-size:9px;padding:4px 10px;border-radius:4px;font-weight:700;">📥 Request</div>'+
+      '<div style="background:rgba(128,128,128,.1);font-size:9px;padding:4px 10px;border-radius:4px;font-weight:600;color:'+t.text2+';"> Find My Photos</div>'+
+      '<div style="background:'+t.btnBg+';color:'+t.btnColor+';font-size:9px;padding:4px 10px;border-radius:4px;font-weight:700;"> Request</div>'+
     '</div>';
 }
 
-/* ══ EVENTS ══ */
+/*  EVENTS  */
 /* igCreateEvent, loadEvents, loadUploadPhotos, uploadPhotos, loadEventPhotos,
    deletePhoto, toggleEvent, deleteEvent, goUploadForEvent, onUploadEventChange,
    handlePhotoInputChange, generateCode, slugify, toggleRequireCode
@@ -1621,25 +1621,25 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 function printQR(slug,code,name){window.open('qr-print.html?event='+slug+'&code='+code+'&name='+encodeURIComponent(name)+'&base='+encodeURIComponent(window.location.origin),'_blank','width=740,height=620');}
-function copyEventLink(slug,code){var url=window.location.origin+'/event.html?event='+slug+'&code='+code;navigator.clipboard.writeText(url).then(function(){toast('🔗','Link copied!','');}).catch(function(){prompt('Copy this link:',url);});}
+function copyEventLink(slug,code){var url=window.location.origin+'/event.html?event='+slug+'&code='+code;navigator.clipboard.writeText(url).then(function(){toast('','Link copied!','');}).catch(function(){prompt('Copy this link:',url);});}
 
-/* ══ LOGOUT ══ */
+/*  LOGOUT  */
 async function igLogout(){
   await getSupabase().auth.signOut();
   window.location.href='index.html';
 }
 
-/* ══════════════════════════════════════════════════════
+/* 
    EVENT ACTIVITY DASHBOARD
    Reads from:
      event_page_visits  (id, event_id, visited_at, user_agent, country, city, ip)
      download_requests  (id, event_id, user_email, status, created_at)
    Falls back gracefully if table doesn't exist yet.
-══════════════════════════════════════════════════════ */
+ */
 async function loadEventActivity(){
   var eventId = (document.getElementById('activity-event-select')||{}).value || '';
 
-  /* ── Populate event dropdown from Firebase if empty ── */
+  /*  Populate event dropdown from Firebase if empty  */
   var sel = document.getElementById('activity-event-select');
   if(sel && sel.options.length <= 1){
     try{
@@ -1653,7 +1653,7 @@ async function loadEventActivity(){
     }catch(e){}
   }
 
-  /* ── Load visits from Firebase ── */
+  /*  Load visits from Firebase  */
   try{
     var visitsSnap;
     try{
@@ -1686,7 +1686,7 @@ async function loadEventActivity(){
     console.warn('[Activity] visits error:', e.message);
   }
 
-  /* ── Load downloads log ── */
+  /*  Load downloads log  */
   loadDownloadsLog(eventId);
 }
 
@@ -1700,19 +1700,19 @@ function renderActivityStats(visits, eventId){
 }
 
 function parseDevice(ua){
-  if(!ua) return { type:'Unknown', icon:'❓' };
+  if(!ua) return { type:'Unknown', icon:'' };
   ua = ua.toLowerCase();
-  if(/iphone|android.*mobile|windows phone/.test(ua)) return { type:'Mobile', icon:'📱' };
-  if(/ipad|android(?!.*mobile)/.test(ua))             return { type:'Tablet', icon:'📲' };
-  if(/mac|windows|linux/.test(ua))                    return { type:'Desktop', icon:'🖥️' };
-  return { type:'Other', icon:'🌐' };
+  if(/iphone|android.*mobile|windows phone/.test(ua)) return { type:'Mobile', icon:'' };
+  if(/ipad|android(?!.*mobile)/.test(ua))             return { type:'Tablet', icon:'' };
+  if(/mac|windows|linux/.test(ua))                    return { type:'Desktop', icon:'' };
+  return { type:'Other', icon:'' };
 }
 
 function renderDeviceBreakdown(visits){
   var el = document.getElementById('act-devices');
   if(!el) return;
   if(!visits.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico">📱</div><div class="empty-txt">No visit data yet.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No visit data yet.</div></div>';
     return;
   }
   var counts = {};
@@ -1735,7 +1735,7 @@ function renderLocationBreakdown(visits){
   var el = document.getElementById('act-locations');
   if(!el) return;
   if(!visits.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico">🌍</div><div class="empty-txt">No location data yet.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No location data yet.</div></div>';
     return;
   }
   var counts = {};
@@ -1748,7 +1748,7 @@ function renderLocationBreakdown(visits){
   el.innerHTML = sorted.map(function(k){
     var pct = Math.round(counts[k]/total*100);
     return '<div style="margin-bottom:14px;">'
-      + '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;"><span>🌍 '+esc(k)+'</span><span style="color:var(--text3);">'+counts[k]+' <span style="font-size:11px;">('+pct+'%)</span></span></div>'
+      + '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;"><span> '+esc(k)+'</span><span style="color:var(--text3);">'+counts[k]+' <span style="font-size:11px;">('+pct+'%)</span></span></div>'
       + '<div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;">'
       + '<div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:4px;transition:width .5s;"></div>'
       + '</div></div>';
@@ -1759,7 +1759,7 @@ function renderVisitLog(visits){
   var el = document.getElementById('act-visit-log');
   if(!el) return;
   if(!visits.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico">👁</div><div class="empty-txt">No page visits recorded yet. See setup instructions below.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No page visits recorded yet. See setup instructions below.</div></div>';
     return;
   }
   el.innerHTML = '<table><thead><tr><th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>IP</th></tr></thead><tbody>'
@@ -1781,12 +1781,12 @@ function renderVisitLog(visits){
 }
 
 
-/* ══════════════════════════════════════════════════════
+/* 
    DOWNLOADS LOG
    Reads from photo_downloads — logged by event.html
    after every successful download.
    Columns: id, event_id, event_name, photo_id, user_agent, created_at
-══════════════════════════════════════════════════════ */
+ */
 async function loadDownloadsLog(eventId){
   var el = document.getElementById('act-downloads-log');
   if(!el) return;
@@ -1820,7 +1820,7 @@ function renderDownloadsLog(data){
   var el = document.getElementById('act-downloads-log');
   if(!el) return;
   if(!data.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico">⬇</div><div class="empty-txt">No downloads recorded yet.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No downloads recorded yet.</div></div>';
     return;
   }
 
@@ -1856,7 +1856,7 @@ function renderDownloadsLog(data){
           + '<td style="font-size:11px;color:var(--text3);white-space:nowrap;">' + esc(timeStr) + '</td>'
           + '<td style="font-size:12px;font-weight:600;">' + esc(d.event_name || d.event_id || '—') + '</td>'
           + '<td>' + dev.icon + ' <span style="font-size:11px;color:var(--text2);">' + dev.type + '</span></td>'
-          + '<td style="font-size:12px;">🌍 ' + esc(loc) + '</td>'
+          + '<td style="font-size:12px;"> ' + esc(loc) + '</td>'
           + '<td style="font-family:var(--fm);font-size:10px;color:var(--text3);">' + esc(d.ip || '—') + '</td>'
           + '<td style="font-family:var(--fm);font-size:10px;color:var(--text3);">' + esc(shortId) + '</td>'
           + '</tr>';
@@ -1867,7 +1867,7 @@ function renderDownloadsLog(data){
 
 function renderActivitySetupPrompt(){
   var html = '<div style="background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r2);padding:20px 24px;font-size:13px;line-height:1.8;">'
-    + '<strong style="font-size:15px;">⚙️ Setup Required — Add Visit Tracking</strong><br><br>'
+    + '<strong style="font-size:15px;"> Setup Required — Add Visit Tracking</strong><br><br>'
     + 'To see page visits, create an <code>event_page_visits</code> table in your Supabase project, then call the tracking function from your event page.<br><br>'
     + '<strong>1. Create Supabase table</strong><br>'
     + '<code style="display:block;background:var(--bg3);padding:12px;border-radius:8px;margin:8px 0;font-size:11px;white-space:pre-wrap;">create table event_page_visits (\n  id uuid primary key default gen_random_uuid(),\n  event_id uuid references events(id) on delete cascade,\n  event_name text,\n  visited_at timestamptz default now(),\n  user_agent text,\n  country text,\n  city text,\n  ip text\n);</code>'
@@ -1886,9 +1886,9 @@ function renderActivitySetupPrompt(){
   if(uEl) uEl.textContent = '—';
 }
 
-/* ══════════════════════════════
+/* 
    MAIL
-══════════════════════════════ */
+ */
 var _mailTab = 'compose';
 
 function switchMailTab(tab){
@@ -1918,9 +1918,9 @@ async function sendMail(){
   var to      = (document.getElementById('mail-to').value||'').trim();
   var subject = (document.getElementById('mail-subject').value||'').trim();
   var body    = (document.getElementById('mail-body').value||'').trim();
-  if(!to)      { toast('⚠️','Missing recipient','Enter a To address'); return; }
-  if(!subject) { toast('⚠️','Missing subject','Enter a subject'); return; }
-  if(!body)    { toast('⚠️','Empty message','Write your message first'); return; }
+  if(!to)      { toast('','Missing recipient','Enter a To address'); return; }
+  if(!subject) { toast('','Missing subject','Enter a subject'); return; }
+  if(!body)    { toast('','Empty message','Write your message first'); return; }
 
   var btn = document.querySelector('#mail-tab-compose .btn-gold');
   if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
@@ -1940,15 +1940,15 @@ async function sendMail(){
       to_email: to, subject: subject, body: body
     });
 
-    toast('✅','Email sent!', 'To: ' + to);
+    toast('','Email sent!', 'To: ' + to);
     clearCompose();
     /* Show status */
     var s = document.getElementById('mail-send-status');
-    if(s){ s.style.display='block'; s.innerHTML='<div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--green);">✅ Email delivered to '+esc(to)+'</div>'; }
+    if(s){ s.style.display='block'; s.innerHTML='<div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--green);"> Email delivered to '+esc(to)+'</div>'; }
   }catch(e){
-    toast('⚠️','Failed to send', e.message);
+    toast('','Failed to send', e.message);
   }finally{
-    if(btn){ btn.disabled=false; btn.textContent='📨 Send Email'; }
+    if(btn){ btn.disabled=false; btn.textContent=' Send Email'; }
   }
 }
 
@@ -1964,7 +1964,7 @@ async function loadInbox(){
       .limit(50);
     if(error) throw error;
     if(!data || !data.length){
-      el.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No messages yet.<br><span style="font-size:11px;color:var(--text3);">Replies from guests will appear here once you set up the Resend webhook.</span></div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No messages yet.<br><span style="font-size:11px;color:var(--text3);">Replies from guests will appear here once you set up the Resend webhook.</span></div></div>';
       return;
     }
     /* Update badge */
@@ -1977,7 +1977,7 @@ async function loadInbox(){
           var dt = new Date(m.received_at);
           var time = dt.toLocaleDateString('en-GB') + ' ' + dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
           return '<div onclick="openMail(\''+esc(m.id)+'\')" style="display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r);cursor:pointer;background:'+(m.read?'transparent':'var(--blue-dim)')+';border:1px solid '+(m.read?'transparent':'var(--blue-dim)')+';transition:background .15s;" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\''+(m.read?'transparent':'var(--blue-dim)')+'\';">'
-            + '<div style="font-size:18px;flex-shrink:0;">'+(m.read?'📧':'📩')+'</div>'
+            + '<div style="font-size:18px;flex-shrink:0;">'+(m.read?'':'')+'</div>'
             + '<div style="flex:1;min-width:0;">'
             + '<div style="display:flex;justify-content:space-between;gap:8px;">'
             + '<span style="font-size:13px;font-weight:'+(m.read?'500':'700')+';">'+esc(m.from_email)+'</span>'
@@ -2029,7 +2029,7 @@ async function loadSent(){
       .limit(50);
     if(error) throw error;
     if(!data || !data.length){
-      el.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No sent emails yet.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No sent emails yet.</div></div>';
       return;
     }
     el.innerHTML = '<div style="display:flex;flex-direction:column;gap:1px;">'
@@ -2037,7 +2037,7 @@ async function loadSent(){
           var dt   = new Date(m.created_at);
           var time = dt.toLocaleDateString('en-GB') + ' ' + dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
           return '<div style="display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r);border:1px solid transparent;">'
-            + '<div style="font-size:18px;flex-shrink:0;">📤</div>'
+            + '<div style="font-size:18px;flex-shrink:0;"></div>'
             + '<div style="flex:1;min-width:0;">'
             + '<div style="display:flex;justify-content:space-between;gap:8px;">'
             + '<span style="font-size:13px;font-weight:500;">To: '+esc(m.to_email)+'</span>'
@@ -2053,7 +2053,7 @@ async function loadSent(){
   }
 }
 
-/* ── HOMEPAGE IMAGES MANAGER ────────────────────────────────────────────── */
+/*  HOMEPAGE IMAGES MANAGER  */
 
 /* Default fallback images */
 var DEFAULT_GALLERY_STRIP = [
@@ -2169,7 +2169,7 @@ function makeSectionRow(url, index, key, max){
     + '<div class="slide-actions">'
     +   '<button class="btn btn-ghost btn-icon" title="Move up"   onclick="moveSectionRow(this,\'up\')"  >↑</button>'
     +   '<button class="btn btn-ghost btn-icon" title="Move down" onclick="moveSectionRow(this,\'down\')" >↓</button>'
-    +   '<button class="btn btn-red  btn-icon" title="Remove"     onclick="removeSectionRow(this)"        >✕</button>'
+    +   '<button class="btn btn-red  btn-icon" title="Remove"     onclick="removeSectionRow(this)"        ></button>'
     + '</div>';
   return row;
 }
@@ -2189,7 +2189,7 @@ function removeSectionRow(btn){ btn.closest('.slide-row').remove(); }
 
 function addSectionRow(containerId, key, max){
   var el = document.getElementById(containerId);
-  if(el.children.length >= max){ toast('⚠️','Max '+max+' images for this section',''); return; }
+  if(el.children.length >= max){ toast('','Max '+max+' images for this section',''); return; }
   el.appendChild(makeSectionRow('', el.children.length, key, max));
   el.lastElementChild.querySelector('input').focus();
 }
@@ -2201,7 +2201,7 @@ function getSectionUrls(containerId){
 
 async function saveSectionList(containerId, key, label){
   var urls = getSectionUrls(containerId);
-  if(!urls.length){ toast('⚠️','No images to save','Add at least one image'); return; }
+  if(!urls.length){ toast('','No images to save','Add at least one image'); return; }
   var btn = event && event.target;
   if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
   try {
@@ -2209,11 +2209,11 @@ async function saveSectionList(containerId, key, label){
     var {error} = await sb.from('site_content').upsert([{ key: key, value: JSON.stringify(urls) }], { onConflict: 'key' });
     if(error) throw error;
     try{ localStorage.setItem('ig_'+key, JSON.stringify(urls)); }catch(e){}
-    toast('✅', label+' saved!', 'Homepage updated immediately');
+    toast('', label+' saved!', 'Homepage updated immediately');
   } catch(e){
-    toast('⚠️','Save failed', e.message || 'Check Supabase connection');
+    toast('','Save failed', e.message || 'Check Supabase connection');
   } finally {
-    if(btn){ btn.disabled = false; btn.textContent = '💾 Save '+(label.split(' ')[0]||''); }
+    if(btn){ btn.disabled = false; btn.textContent = ' Save '+(label.split(' ')[0]||''); }
   }
 }
 
@@ -2242,8 +2242,8 @@ async function uploadSectionFiles(files, listId, key, max){
   var current = el ? el.children.length : 0;
   if(current + files.length > max){
     files = files.slice(0, Math.max(0, max - current));
-    if(!files.length){ toast('⚠️','Limit reached','Max '+max+' images for this section'); return; }
-    toast('⚠️','Trimmed to '+max+' images','Only the first files were used');
+    if(!files.length){ toast('','Limit reached','Max '+max+' images for this section'); return; }
+    toast('','Trimmed to '+max+' images','Only the first files were used');
   }
 
   if(prog){ prog.style.display = 'block'; prog.textContent = 'Uploading 0 / '+files.length+'…'; }
@@ -2261,7 +2261,7 @@ async function uploadSectionFiles(files, listId, key, max){
       var {data: urlData} = sb.storage.from(BUCKET).getPublicUrl(path);
       if(urlData && urlData.publicUrl) uploaded.push(urlData.publicUrl);
     } catch(e){
-      toast('⚠️','Upload failed: '+file.name, e.message || '');
+      toast('','Upload failed: '+file.name, e.message || '');
     }
   }
 
@@ -2272,37 +2272,43 @@ async function uploadSectionFiles(files, listId, key, max){
     uploaded.forEach(function(url, idx){
       if(el) el.appendChild(makeSectionRow(url, currentCount + idx, key, max));
     });
-    toast('✅', uploaded.length+' image'+(uploaded.length>1?'s':'')+' uploaded', 'Click Save to publish');
+    toast('', uploaded.length+' image'+(uploaded.length>1?'s':'')+' uploaded', 'Click Save to publish');
   }
 }
 
-/* ═══════════════════════════════════════
+/* 
    SERVICES — admin CRUD
-═══════════════════════════════════════ */
+ */
 
 var BUCKET = (typeof BUCKET !== 'undefined') ? BUCKET : 'event-photos';
-var SVC_BUCKET = 'site-media'; /* public bucket for service images */
+var SVC_BUCKET = 'site-images'; /* public bucket for service images */
 
 /* Called when nav('services') fires */
 function loadServices(){
   var el = document.getElementById('servicesList');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-txt">Loading…</div></div>';
   var sb = getSupabase();
   sb.from('services').select('*').order('sort_order',{ascending:true}).then(function(res){
     if(res.error){ el.innerHTML = '<div class="empty"><div class="empty-txt">Error: '+res.error.message+'</div></div>'; return; }
     var rows = res.data || [];
-    if(!rows.length){ el.innerHTML = '<div class="empty"><div class="empty-ico">🛎️</div><div class="empty-txt">No services yet. Click "+ Add Service" to create your first.</div></div>'; return; }
-    var html = '<table><thead><tr><th></th><th>Service</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead><tbody>';
+    if(!rows.length){ el.innerHTML = '<div class="empty"><div class="empty-txt">No services yet. Click “+ Add Service” to create your first.</div></div>'; return; }
+    var html = '<table><thead><tr><th></th><th>Service</th><th>Price</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead><tbody>';
     rows.forEach(function(s){
-      var img = s.image_url ? '<img src="'+s.image_url+'" style="width:48px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--border);"/>' : '<div style="width:48px;height:34px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;">'+(s.icon||'🛎️')+'</div>';
+      var img = s.image_url
+        ? '<img src="'+s.image_url+'" style="width:48px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--border);"/>'
+        : '<div style="width:48px;height:34px;border-radius:6px;background:var(--bg3);"></div>';
+      var priceCell = s.price
+        ? '<span style="font-family:var(--fm);font-size:12px;color:var(--gold);font-weight:700;">'+s.price+'</span>'
+        : '<span style="color:var(--text3);font-size:12px;">—</span>';
       var status = s.is_active ? '<span class="pill pill-active">Active</span>' : '<span class="pill pill-paused">Hidden</span>';
       html += '<tr>'
         + '<td>'+img+'</td>'
-        + '<td><div style="font-weight:700;font-size:13px;">'+(s.icon?s.icon+' ':'')+s.title+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.description+'</div></td>'
+        + '<td><div style="font-weight:700;font-size:13px;">'+s.title+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.description+'</div></td>'
+        + '<td>'+priceCell+'</td>'
         + '<td>'+status+'</td>'
         + '<td style="font-family:var(--fm);font-size:12px;">'+s.sort_order+'</td>'
-        + '<td><div class="td-actions"><button class="btn btn-blue btn-sm" onclick="editService('+JSON.stringify(s).replace(/"/g,'&quot;')+')">✏️ Edit</button><button class="btn btn-red btn-sm" onclick="deleteService(\''+s.id+'\',\''+s.title.replace(/'/g,'')+"'"+')">🗑</button></div></td>'
+        + '<td><div class="td-actions"><button class="btn btn-blue btn-sm" onclick="editService('+JSON.stringify(s).replace(/"/g,'&quot;')+')">Edit</button><button class="btn btn-red btn-sm" onclick="deleteService(''+s.id+'',''+s.title.replace(/'/g,'')+"'"+')">Delete</button></div></td>'
         + '</tr>';
     });
     html += '</tbody></table>';
@@ -2316,7 +2322,7 @@ function openServiceModal(prefill){
   document.getElementById('svc-id').value        = prefill ? (prefill.id||'') : '';
   document.getElementById('svc-title').value     = prefill ? (prefill.title||'') : '';
   document.getElementById('svc-desc').value      = prefill ? (prefill.description||'') : '';
-  document.getElementById('svc-icon').value      = prefill ? (prefill.icon||'') : '';
+  document.getElementById('svc-price').value     = prefill ? (prefill.price||'') : '';
   document.getElementById('svc-image').value     = prefill ? (prefill.image_url||'') : '';
   document.getElementById('svc-order').value     = prefill ? (prefill.sort_order||0) : 0;
   var toggle = document.getElementById('svc-active-toggle');
@@ -2324,7 +2330,7 @@ function openServiceModal(prefill){
   else { toggle.classList.add('on'); }
   document.getElementById('svcAlert').style.display = 'none';
   document.getElementById('svcSaveBtn').disabled = false;
-  document.getElementById('svcSaveBtn').textContent = '💾 Save Service';
+  document.getElementById('svcSaveBtn').textContent = ' Save Service';
   updateSvcPreview();
   m.style.display = 'flex';
   document.getElementById('svc-title').focus();
@@ -2362,12 +2368,12 @@ async function saveService(){
   btn.disabled = true; btn.textContent = 'Saving…';
 
   var id        = document.getElementById('svc-id').value;
-  var icon      = (document.getElementById('svc-icon').value||'').trim();
+  var price     = (document.getElementById('svc-price').value||'').trim();
   var image_url = (document.getElementById('svc-image').value||'').trim();
   var sort_order= parseInt(document.getElementById('svc-order').value)||0;
   var is_active = document.getElementById('svc-active-toggle').classList.contains('on');
 
-  var payload = { title, description: desc, icon: icon||null, image_url: image_url||null, sort_order, is_active };
+  var payload = { title, description: desc, price: price||null, image_url: image_url||null, sort_order, is_active };
 
   try {
     var sb = getSupabase();
@@ -2378,12 +2384,12 @@ async function saveService(){
       res = await sb.from('services').insert([payload]);
     }
     if(res.error) throw res.error;
-    toast('✅', id ? 'Service updated!' : 'Service created!', 'Services page updated.');
+    toast('', id ? 'Service updated!' : 'Service created!', 'Services page updated.');
     closeSvcModal();
     loadServices();
   } catch(e){
     _svcAlert('Save failed: '+(e.message||'Unknown error'));
-    btn.disabled = false; btn.textContent = '💾 Save Service';
+    btn.disabled = false; btn.textContent = ' Save Service';
   }
 }
 
@@ -2393,14 +2399,14 @@ async function deleteService(id, title){
     var sb = getSupabase();
     var res = await sb.from('services').delete().eq('id', id);
     if(res.error) throw res.error;
-    toast('🗑', 'Service deleted', title);
+    toast('', 'Service deleted', title);
     loadServices();
   } catch(e){
-    toast('⚠️', 'Delete failed', e.message||'');
+    toast('', 'Delete failed', e.message||'');
   }
 }
 
-/* ── Image upload for service modal ── */
+/*  Image upload for service modal  */
 function onDropSvcImg(e){
   e.preventDefault();
   onDragLeave(e,'svcImgZone');
@@ -2416,7 +2422,7 @@ async function _uploadSvcImg(file){
   var prog = document.getElementById('svcImgProg');
   prog.style.display='block'; prog.textContent='Uploading…';
   try {
-    var sb   = (typeof getAuthClient === 'function') ? getAuthClient() : getSupabase();
+    var sb   = getSupabase();
     var ext  = file.name.split('.').pop()||'jpg';
     var path = 'services/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
     var {error: upErr} = await sb.storage.from(SVC_BUCKET).upload(path, file, {upsert:true});
@@ -2425,10 +2431,10 @@ async function _uploadSvcImg(file){
     document.getElementById('svc-image').value = data.publicUrl;
     updateSvcPreview();
     prog.style.display='none';
-    toast('✅','Image uploaded','Click Save to apply.');
+    toast('','Image uploaded','Click Save to apply.');
   } catch(e){
     prog.style.display='none';
-    toast('⚠️','Upload failed', e.message||'');
+    toast('','Upload failed', e.message||'');
   }
 }
 
@@ -2445,9 +2451,9 @@ document.getElementById('svcModal').addEventListener('click', function(e){
   if(e.target === this) closeSvcModal();
 });
 
-/* ══════════════════════════════════════════
+/* 
    ABOUT PAGE ADMIN
-══════════════════════════════════════════ */
+ */
 var ABOUT_BUCKET = 'site-media';
 var _aboutData   = null;
 
@@ -2459,7 +2465,7 @@ async function loadAboutAdmin() {
     _aboutData = res.data || {};
     populateAboutForm(_aboutData);
   } catch(e) {
-    toast('⚠️','Could not load About data', e.message||'');
+    toast('','Could not load About data', e.message||'');
     _aboutData = {};
     populateAboutForm({});
   }
@@ -2482,14 +2488,14 @@ function populateAboutForm(d) {
 
   /* Pillars */
   renderPillarsEditor(d.pillars || [
-    { icon:'🎯', title:'Our Mission',       description:'To deliver a seamless event media experience — capturing every moment with precision and putting photos in guests\' hands within 24 hours, every time.' },
-    { icon:'🔭', title:'Our Vision',        description:'To become the leading event media platform in the UK — where photography, content, and technology work as one.' },
-    { icon:'💡', title:'Our Values',        description:'Quality without compromise. Speed without sacrificing care. Technology that serves people, not the other way around.' },
-    { icon:'🚀', title:'Where We\'re Going', description:'Building the infrastructure for the future of event media — scalable, branded, and guest-first from start to finish.' }
+    { icon:'', title:'Our Mission',       description:'To deliver a seamless event media experience — capturing every moment with precision and putting photos in guests\' hands within 24 hours, every time.' },
+    { icon:'', title:'Our Vision',        description:'To become the leading event media platform in the UK — where photography, content, and technology work as one.' },
+    { icon:'', title:'Our Values',        description:'Quality without compromise. Speed without sacrificing care. Technology that serves people, not the other way around.' },
+    { icon:'', title:'Where We\'re Going', description:'Building the infrastructure for the future of event media — scalable, branded, and guest-first from start to finish.' }
   ]);
 }
 
-/* ── Story Save ── */
+/*  Story Save  */
 async function saveAboutStory() {
   var tagline         = (document.getElementById('ab-tagline').value||'').trim();
   var story_text      = (document.getElementById('ab-story').value||'').trim();
@@ -2509,7 +2515,7 @@ async function saveAboutStory() {
       if (res.data) _aboutData = res.data;
     }
     if (res.error) throw res.error;
-    toast('✅','Story saved!','About page updated.');
+    toast('','Story saved!','About page updated.');
   } catch(e) {
     alert.style.display = 'block';
     alert.style.background = 'var(--red-dim)';
@@ -2518,17 +2524,17 @@ async function saveAboutStory() {
   }
 }
 
-/* ── Team Editor ── */
+/*  Team Editor  */
 function renderTeamEditor(members) {
   var list = document.getElementById('teamMembersList');
   if (!list) return;
-  if (!members.length) { list.innerHTML = '<div class="empty"><div class="empty-ico">👤</div><div class="empty-txt">No team members yet. Click + Add Member.</div></div>'; return; }
+  if (!members.length) { list.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No team members yet. Click + Add Member.</div></div>'; return; }
   list.innerHTML = members.map(function(m, i) {
     return (
       '<div class="card" style="margin-bottom:0;" id="teamRow'+i+'">' +
         '<div class="card-head">' +
           '<h2 style="font-size:13px;">' + (m.name||'Member '+(i+1)) + '</h2>' +
-          '<button class="btn btn-red btn-sm" onclick="removeTeamMember('+i+')">✕ Remove</button>' +
+          '<button class="btn btn-red btn-sm" onclick="removeTeamMember('+i+')"> Remove</button>' +
         '</div>' +
         '<div class="card-body" style="display:flex;flex-direction:column;gap:10px;">' +
           '<div class="form-grid">' +
@@ -2539,7 +2545,7 @@ function renderTeamEditor(members) {
           '<div class="field-group" style="margin-bottom:0;">' +
             '<div class="field-label">Photo</div>' +
             '<div class="upload-zone" style="margin-bottom:8px;" onclick="document.getElementById(\'tm-file-'+i+'\').click()" ondragover="onDragOver(event,\'tm-dz-'+i+'\')" ondragleave="onDragLeave(event,\'tm-dz-'+i+'\')" ondrop="onDropTeamPhoto(event,'+i+')" id="tm-dz-'+i+'">' +
-              '<div class="upload-zone-ico" style="font-size:20px;">📂</div>' +
+              '<div class="upload-zone-ico" style="font-size:20px;"></div>' +
               '<div class="upload-zone-title" style="font-size:12px;">Drop photo or click to upload</div>' +
               '<input type="file" id="tm-file-'+i+'" accept="image/jpeg,image/png,image/webp" onchange="handleTeamPhotoFile(event,'+i+')"/>' +
             '</div>' +
@@ -2598,9 +2604,9 @@ async function saveTeamMembers() {
       if (res.data) _aboutData = res.data;
     }
     if (res.error) throw res.error;
-    toast('✅','Team saved!', members.length + ' member' + (members.length!==1?'s':'') + ' updated.');
+    toast('','Team saved!', members.length + ' member' + (members.length!==1?'s':'') + ' updated.');
   } catch(e) {
-    toast('⚠️','Save failed', e.message||'');
+    toast('','Save failed', e.message||'');
   }
 }
 
@@ -2617,20 +2623,20 @@ function handleTeamPhotoFile(e, idx) {
   if (files.length) _uploadAboutImg(files[0], idx, 'team');
 }
 
-/* ── Pillars Editor ── */
+/*  Pillars Editor  */
 function renderPillarsEditor(pillars) {
   var list = document.getElementById('pillarsList');
   if (!list) return;
-  if (!pillars.length) { list.innerHTML = '<div class="empty"><div class="empty-ico">✅</div><div class="empty-txt">No pillars yet. Click + Add Pillar.</div></div>'; return; }
+  if (!pillars.length) { list.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No pillars yet. Click + Add Pillar.</div></div>'; return; }
   list.innerHTML = pillars.map(function(p, i) {
     return (
       '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;" id="pillarRow'+i+'">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-          '<div style="font-size:13px;font-weight:700;">' + (p.icon||'✅') + ' Pillar ' + (i+1) + '</div>' +
-          '<button class="btn btn-red btn-sm" onclick="removePillar('+i+')">✕</button>' +
+          '<div style="font-size:13px;font-weight:700;">' + (p.icon||'') + ' Pillar ' + (i+1) + '</div>' +
+          '<button class="btn btn-red btn-sm" onclick="removePillar('+i+')"></button>' +
         '</div>' +
         '<div class="form-grid" style="margin-bottom:8px;">' +
-          '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Icon / Emoji</div><input type="text" id="pl-icon-'+i+'" value="'+_esc(p.icon)+'" placeholder="📸" style="max-width:80px;"/></div>' +
+          '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Icon / Emoji</div><input type="text" id="pl-icon-'+i+'" value="'+_esc(p.icon)+'" placeholder="" style="max-width:80px;"/></div>' +
           '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Title *</div><input type="text" id="pl-title-'+i+'" value="'+_esc(p.title)+'" placeholder="e.g. Fast Delivery"/></div>' +
         '</div>' +
         '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Description</div><textarea id="pl-desc-'+i+'" rows="2" placeholder="One or two sentences.">'+_esc(p.description)+'</textarea></div>' +
@@ -2641,7 +2647,7 @@ function renderPillarsEditor(pillars) {
 
 function addPillar() {
   var pillars = collectPillars();
-  pillars.push({ icon:'✦', title:'', description:'' });
+  pillars.push({ icon:'', title:'', description:'' });
   renderPillarsEditor(pillars);
 }
 
@@ -2677,13 +2683,13 @@ async function savePillars() {
       if (res.data) _aboutData = res.data;
     }
     if (res.error) throw res.error;
-    toast('✅','Pillars saved!', pillars.length + ' pillar' + (pillars.length!==1?'s':'') + ' updated.');
+    toast('','Pillars saved!', pillars.length + ' pillar' + (pillars.length!==1?'s':'') + ' updated.');
   } catch(e) {
-    toast('⚠️','Save failed', e.message||'');
+    toast('','Save failed', e.message||'');
   }
 }
 
-/* ── Shared image upload for About page ── */
+/*  Shared image upload for About page  */
 async function _uploadAboutImg(file, ctx, type) {
   var progId = type === 'team' ? 'tm-prog-'+ctx : 'abStoryImgProg';
   var inputId = type === 'team' ? 'tm-photo-'+ctx : 'ab-story-img';
@@ -2702,10 +2708,10 @@ async function _uploadAboutImg(file, ctx, type) {
     if (input) input.value = data.publicUrl;
     updateAboutImgPreview(ctx, inputId, wrapId, imgId);
     if (prog) prog.style.display = 'none';
-    toast('✅','Photo uploaded','Click Save to apply.');
+    toast('','Photo uploaded','Click Save to apply.');
   } catch(e) {
     if (prog) { prog.style.display = 'none'; }
-    toast('⚠️','Upload failed', e.message||'');
+    toast('','Upload failed', e.message||'');
   }
 }
 
@@ -2750,9 +2756,9 @@ function saveGalleryImages(){
 }
 function loadGalleryImagesPage(){ loadAllHomepageSections(); }
 
-/* ════════════════════════════════════════════════════
+/* 
    BOOKINGS — Admin JS
-════════════════════════════════════════════════════ */
+ */
 var _allBookings    = [];
 var _currentBooking = null;
 var _modalLineCount = 0;
@@ -2794,11 +2800,11 @@ function filterBookings(status, btn) {
 
 function renderBookingsTable(data) {
   var el = document.getElementById('bookingsList');
-  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No bookings found.</div></div>'; return; }
+  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No bookings found.</div></div>'; return; }
   var STATUS_PILL = {
     pending  : '<span class="pill" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);">⏳ Pending</span>',
-    confirmed: '<span class="pill pill-active">✅ Confirmed</span>',
-    rejected : '<span class="pill pill-rejected">✕ Rejected</span>'
+    confirmed: '<span class="pill pill-active"> Confirmed</span>',
+    rejected : '<span class="pill pill-rejected"> Rejected</span>'
   };
   el.innerHTML = '<table><thead><tr><th>Name</th><th>Date</th><th>Event Type</th><th>Location</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>'
     + data.map(function(b){
@@ -2812,9 +2818,9 @@ function renderBookingsTable(data) {
           + '<td>' + pill + '</td>'
           + '<td style="font-size:12px;color:var(--text3);">' + submitted + '</td>'
           + '<td><div class="td-actions">'
-          + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')">✅ Confirm</button>' : '')
-          + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')">✕ Reject</button>' : '')
-          + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')">👁 View</button>'
+          + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')"> Confirm</button>' : '')
+          + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')"> Reject</button>' : '')
+          + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')"> View</button>'
           + '</div></td></tr>';
       }).join('')
     + '</tbody></table>';
@@ -2833,9 +2839,9 @@ async function rejectBooking(id) {
     var res  = await fetch(API+'/api/booking-reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
     var data = await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
-    toast('✕','Booking rejected','Client notified by email');
+    toast('','Booking rejected','Client notified by email');
     loadBookings();
-  } catch(e){ toast('⚠️','Error',e.message); }
+  } catch(e){ toast('','Error',e.message); }
 }
 
 function openConfirmModal(id) {
@@ -2862,7 +2868,7 @@ function openConfirmModal(id) {
   document.getElementById('modal-package-notes').value = '';
   document.getElementById('modalAlert').style.display  = 'none';
   var btn = document.getElementById('confirmSendBtn');
-  btn.disabled=false; btn.textContent='✅ Confirm & Send →';
+  btn.disabled=false; btn.textContent=' Confirm & Send →';
   modalUpdateTotals();
   var modal = document.getElementById('confirmModal');
   modal.style.display='flex';
@@ -2890,7 +2896,7 @@ function modalAddLine(desc,qty,rate){
     '<input type="number" value="'+(qty||1)+'" min="0" step="0.01" oninput="modalUpdateTotals()" style="'+s+'text-align:center;" class="ml-qty"/>'+
     '<input type="number" value="'+(rate||0)+'" min="0" step="0.01" oninput="modalUpdateTotals()" style="'+s+'text-align:right;" class="ml-rate"/>'+
     '<div class="ml-amt" style="display:flex;align-items:center;justify-content:flex-end;font-size:12px;font-weight:600;color:var(--text2);">£0.00</div>'+
-    '<button onclick="document.getElementById(\'mline-'+id+'\').remove();modalUpdateTotals();" style="background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);border-radius:6px;cursor:pointer;font-size:11px;">✕</button>';
+    '<button onclick="document.getElementById(\'mline-'+id+'\').remove();modalUpdateTotals();" style="background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);border-radius:6px;cursor:pointer;font-size:11px;"></button>';
   container.appendChild(row);
   modalUpdateTotals();
 }
@@ -2980,13 +2986,13 @@ async function confirmBooking(){
     var num=parseInt(invoice.invoice_number.replace(/\D/g,''),10);
     if(!isNaN(num)) localStorage.setItem('ig_last_inv_num',String(num));
 
-    showModalAlert('✅ Event created! Code: '+code+' · Confirmation email sent to '+b.email, true);
-    btn.textContent='✅ Done';
-    toast('✅','Booking confirmed!',evName+' · '+b.email);
+    showModalAlert(' Event created! Code: '+code+' · Confirmation email sent to '+b.email, true);
+    btn.textContent=' Done';
+    toast('','Booking confirmed!',evName+' · '+b.email);
     setTimeout(function(){ closeConfirmModal(); loadBookings(); if(window.loadEvents) loadEvents(); if(window.loadStats) loadStats(); },2000);
   } catch(e){
     showModalAlert('Error: '+e.message, false);
-    btn.disabled=false; btn.textContent='✅ Confirm & Send →';
+    btn.disabled=false; btn.textContent=' Confirm & Send →';
   }
 }
 
@@ -3005,14 +3011,14 @@ async function loadBlockedDatesList(){
     var res=await fetch(API+'/api/blocked-dates');
     var data=await res.json();
     var dates=data.dates_full||data.dates||[];
-    if(!dates.length){ el.innerHTML='<div class="empty"><div class="empty-ico">📅</div><div class="empty-txt">No dates blocked.</div></div>'; return; }
+    if(!dates.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No dates blocked.</div></div>'; return; }
     el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px;">'
       +dates.map(function(d){
           var dateStr=d.date||d; var reason=d.reason||'';
           return '<div style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--red-dim);border:1px solid var(--red-glo);border-radius:100px;font-size:12px;">'
             +'<span style="font-family:var(--fm);color:var(--red);">'+esc(dateStr)+'</span>'
             +(reason?'<span style="color:var(--text3);">—</span><span style="color:var(--text2);">'+esc(reason)+'</span>':'')
-            +'<button onclick="unblockDate(\''+esc(dateStr)+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;" title="Unblock">✕</button>'
+            +'<button onclick="unblockDate(\''+esc(dateStr)+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;" title="Unblock"></button>'
             +'</div>';
         }).join('')+'</div>';
   } catch(e){ el.innerHTML='<div class="empty"><div class="empty-txt">Error loading dates.</div></div>'; }
@@ -3021,17 +3027,17 @@ async function loadBlockedDatesList(){
 async function blockDate(){
   var dateVal=document.getElementById('block-date-input').value;
   var reasonVal=document.getElementById('block-reason-input').value.trim();
-  if(!dateVal){ toast('⚠️','Select a date first',''); return; }
+  if(!dateVal){ toast('','Select a date first',''); return; }
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try {
     var res=await fetch(API+'/api/block-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateVal,reason:reasonVal})});
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
-    toast('🚫','Date blocked',dateVal);
+    toast('','Date blocked',dateVal);
     document.getElementById('block-date-input').value='';
     document.getElementById('block-reason-input').value='';
     loadBlockedDatesList();
-  } catch(e){ toast('⚠️','Error',e.message); }
+  } catch(e){ toast('','Error',e.message); }
 }
 
 async function unblockDate(dateStr){
@@ -3041,9 +3047,9 @@ async function unblockDate(dateStr){
     var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateStr})});
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
-    toast('✅','Date unblocked',dateStr);
+    toast('','Date unblocked',dateStr);
     loadBlockedDatesList();
-  } catch(e){ toast('⚠️','Error',e.message); }
+  } catch(e){ toast('','Error',e.message); }
 }
 
 window.loadBookings      = loadBookings;
