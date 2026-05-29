@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio — Impact Grid Events</title>
+  <meta name="description" content="Our portfolio of event photography and content creation. Impact Grid Events — Manchester." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KVJC5DE2WT');
+  </script>
+
+  <style>
+    /* ════════════════════════════════════════
+       PORTFOLIO PAGE — page-local styles only.
+       shared.css owns: reset, body bg+grain,
+       nav rail, page-wrap offset, .btn-*, .card,
+       .section, .label-tag, .anim-*, footer,
+       mobile breakpoints.
+    ════════════════════════════════════════ */
+
+    :root {
+      --pf-display: 'Fraunces', Georgia, serif;
+    }
+
+    /* ── PAGE HEADER ─────────────────────────── */
+    .pf-header {
+      padding: 96px 40px 64px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .pf-headline {
+      font-family: var(--pf-display);
+      font-size: clamp(42px, 5.5vw, 74px);
+      font-weight: 300;
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+    .pf-headline em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .pf-sub {
+      font-size: clamp(15px, 1.6vw, 18px);
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.72;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* ── STATS BAR ──────────────────────────── */
+    .pf-stats {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      max-width: 600px;
+      margin: 48px auto 0;
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--card);
+    }
+    .pf-stat {
+      flex: 1;
+      padding: 24px 20px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .pf-stat:last-child { border-right: none; }
+    .pf-stat-val {
+      font-family: var(--pf-display);
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .pf-stat-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      font-family: var(--fm);
+    }
+
+    /* ── EVENT FILTER TABS ──────────────────── */
+    .pf-filter-wrap {
+      max-width: 1220px;
+      margin: 64px auto 0;
+      padding: 0 40px;
+    }
+    .pf-filter-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      font-family: var(--fm);
+      margin-bottom: 16px;
+    }
+    .pf-filter-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pf-tab {
+      padding: 8px 18px;
+      border-radius: 100px;
+      border: 1px solid var(--border2);
+      background: var(--card);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--fb);
+    }
+    .pf-tab:hover { color: var(--text); border-color: var(--gold-glo); }
+    .pf-tab.active {
+      background: var(--gold-dim);
+      border-color: var(--gold-glo);
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* ── EVENT CARDS GRID ───────────────────── */
+    .pf-events {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 32px 40px 80px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .pf-event-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .pf-event-card:hover {
+      border-color: var(--gold-glo);
+      transform: translateY(-4px);
+      box-shadow: var(--sh2);
+    }
+
+    .pf-event-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.88);
+      transition: filter 0.4s, transform 0.5s;
+    }
+    .pf-event-card:hover .pf-event-thumb {
+      filter: brightness(1);
+      transform: scale(1.03);
+    }
+
+    /* "View gallery" overlay on hover */
+    .pf-event-thumb-wrap {
+      overflow: hidden;
+      position: relative;
+    }
+    .pf-event-thumb-ov {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .pf-event-card:hover .pf-event-thumb-ov { opacity: 1; }
+    .pf-event-thumb-ov-txt {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.5);
+      padding: 10px 20px;
+      border-radius: 100px;
+    }
+
+    .pf-event-body {
+      padding: 22px 24px 24px;
+    }
+    .pf-event-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .pf-event-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-family: var(--fm);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-glo);
+      color: var(--gold);
+    }
+    .pf-event-date {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: var(--fm);
+    }
+    .pf-event-title {
+      font-family: var(--pf-display);
+      font-size: clamp(18px, 1.8vw, 22px);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .pf-event-desc {
+      font-size: 13.5px;
+      color: var(--text2);
+      font-weight: 300;
+      line-height: 1.65;
+    }
+    .pf-event-count {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text3);
+      font-family: var(--fm);
+    }
+    .pf-event-line {
+      width: 28px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-top: 16px;
+      opacity: 0.4;
+      transition: width 0.35s ease, opacity 0.35s ease;
+    }
+    .pf-event-card:hover .pf-event-line { width: 52px; opacity: 1; }
+
+    /* ── FLIP BOOK LIGHTBOX ─────────────────── */
+    .fp-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+    }
+    .fp-lightbox.open { display: flex; }
+
+    .fp-lightbox-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+    .fp-lightbox-title {
+      font-family: var(--pf-display);
+      font-size: 18px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.9);
+      font-style: italic;
+    }
+    .fp-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-family: var(--fb);
+    }
+    .fp-close:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── THE FLIP BOOK (ported from p.html) ── */
+    .fp-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      margin-top: 64px;
+      width: 100%;
+    }
+
+    .fp-book-wrap {
+      position: relative;
+      perspective: 1800px;
+    }
+
+    .fp-book {
+      position: relative;
+      width: min(520px, 85vw);
+      height: min(390px, 64vw);
+      transform-style: preserve-3d;
+    }
+
+    .fp-page {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transform-origin: left center;
+      transition: transform 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+      cursor: pointer;
+    }
+    .fp-page.flipped { transform: rotateY(-180deg); }
+
+    .fp-front, .fp-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+      border-radius: 2px 12px 12px 2px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 4px 0 12px rgba(0,0,0,0.3);
+    }
+    .fp-back {
+      transform: rotateY(180deg);
+      border-radius: 12px 2px 2px 12px;
+      box-shadow: -4px 0 12px rgba(0,0,0,0.3), 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    .fp-front img, .fp-back img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Book spine shadow */
+    .fp-crease {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 18px;
+      height: 100%;
+      background: linear-gradient(to left, rgba(0,0,0,0.25), transparent);
+      pointer-events: none;
+    }
+    .back-crease {
+      right: auto;
+      left: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.25), transparent);
+    }
+
+    .fp-page-num {
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      font-family: var(--fm);
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      background: rgba(0,0,0,0.4);
+      padding: 3px 9px;
+      border-radius: 100px;
+      backdrop-filter: blur(4px);
+    }
+    .fp-back .fp-page-num { right: auto; left: 16px; }
+
+    .fp-back-blank {
+      width: 100%;
+      height: 100%;
+      background: #0d0d0d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .fp-back-icon { font-size: 28px; color: var(--gold); opacity: 0.6; }
+    .fp-back-text {
+      font-family: var(--fm);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── FLIP CONTROLS ──────────────────────── */
+    .fp-controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .fp-btn {
+      padding: 9px 22px;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--fb);
+    }
+    .fp-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.35);
+      color: #fff;
+    }
+    .fp-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .fp-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      max-width: 200px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .fp-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 0;
+    }
+    .fp-dot.active {
+      background: var(--gold);
+      transform: scale(1.4);
+    }
+
+    /* ── EMPTY STATE ────────────────────────── */
+    .pf-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text3);
+    }
+
+    /* ── CTA STRIP ───────────────────────────── */
+    .pf-cta {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 100px 40px;
+    }
+    .pf-cta-inner { max-width: 600px; margin: 0 auto; }
+    .pf-cta-title {
+      font-family: var(--pf-display);
+      font-size: clamp(34px, 4.2vw, 58px);
+      font-weight: 300;
+      line-height: 1.07;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin: 16px 0 18px;
+    }
+    .pf-cta-title em { font-style: italic; color: var(--gold); }
+    .pf-cta-sub {
+      font-size: 16px;
+      color: var(--text2);
+      font-weight: 300;
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+    .pf-cta-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 1100px) {
+      .pf-events { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .pf-events { grid-template-columns: 1fr; padding: 16px 20px 60px; }
+      .pf-header { padding: 72px 20px 48px; }
+      .pf-filter-wrap { padding: 0 20px; }
+      .pf-cta { padding: 72px 20px; }
+      .pf-stats { margin: 36px 20px 0; }
+      .fp-book { width: 85vw; height: 64vw; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Script load order required by nav.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="plan-config.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
+
+  <!-- Nav -->
+  <div id="ig-nav"></div>
+  <script src="nav.js"></script>
+  <script>renderNav('portfolio.html');</script>
+
+  <div class="page-wrap">
+
+    <!-- PAGE HEADER -->
+    <header class="pf-header">
+      <div class="label-tag anim-fade-up">Our Work</div>
+      <h1 class="pf-headline anim-fade-up delay-1">
+        Real events.<br><em>Real moments.</em>
+      </h1>
+      <p class="pf-sub anim-fade-up delay-2">
+        Every gallery below is from a real event we covered. Click any event to flip through the photos — just like a photo book.
+      </p>
+
+      <!-- Stats bar -->
+      <div class="pf-stats anim-fade-up delay-3">
+        <div class="pf-stat">
+          <div class="pf-stat-val">2</div>
+          <div class="pf-stat-lbl">Events Covered</div>
+        </div>
+        <div class="pf-stat">
+          <div class="pf-stat-val">100%</div>
+          <div class="pf-stat-lbl">5-Star Feedback</div>
+        </div>
+        <div class="pf-stat">
+          <div class="pf-stat-val">24h</div>
+          <div class="pf-stat-lbl">Delivery Time</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="divider"></div>
+
+    <!-- FILTER TABS -->
+    <div class="pf-filter-wrap">
+      <div class="pf-filter-label">Filter by type</div>
+      <div class="pf-filter-tabs" id="filterTabs">
+        <button class="pf-tab active" data-filter="all">All Events</button>
+        <button class="pf-tab" data-filter="social">Social Events</button>
+        <button class="pf-tab" data-filter="portrait">Portrait Sessions</button>
+        <button class="pf-tab" data-filter="content">Content Creation</button>
+      </div>
+    </div>
+
+    <!-- EVENT CARDS GRID -->
+    <div class="pf-events" id="eventsGrid">
+      <!-- Populated by JS below -->
+    </div>
+
+    <!-- CTA STRIP -->
+    <section class="pf-cta">
+      <div class="pf-cta-inner">
+        <div class="label-tag" style="justify-content:center;">Next chapter</div>
+        <h2 class="pf-cta-title">Your event could<br><em>be in here.</em></h2>
+        <p class="pf-cta-sub">We're booking events now. Tell us your date and we'll make it unforgettable.</p>
+        <div class="pf-cta-btns">
+          <a href="contact.html" class="btn btn-gold">Book Us Now</a>
+          <a href="services.html" class="btn btn-ghost">See Our Services →</a>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /.page-wrap -->
+
+  <!-- FLIP BOOK LIGHTBOX -->
+  <div class="fp-lightbox" id="fpLightbox" role="dialog" aria-modal="true">
+    <div class="fp-lightbox-header">
+      <div class="fp-lightbox-title" id="fpLightboxTitle">Gallery</div>
+      <button class="fp-close" id="fpCloseBtn" aria-label="Close gallery">✕</button>
+    </div>
+
+    <div class="fp-stage" id="fpStage">
+      <div class="fp-book-wrap">
+        <div class="fp-book" id="fpBook">
+          <!-- Pages injected by JS -->
+        </div>
+      </div>
+      <div class="fp-controls">
+        <button class="fp-btn fp-btn-prev" id="fpBtnPrev" onclick="fpStep(-1)" aria-label="Previous" disabled>← Prev</button>
+        <div class="fp-dots" id="fpDots"></div>
+        <button class="fp-btn fp-btn-next" id="fpBtnNext" onclick="fpStep(1)" aria-label="Next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div id="ig-footer"></div>
+  <script>renderFooter();</script>
+
+  <script>
+  /* ════════════════════════════════════════
+     PORTFOLIO — event data + flip book
+  ════════════════════════════════════════ */
+
+  /* ── Fallback event data ── */
+  var FALLBACK_EVENTS = [
+    {
+      id: 'e1',
+      title: 'Summer Social — Outdoor Gathering',
+      description: 'Candid photography and content creation for a vibrant community outdoor event in Manchester.',
+      category: 'social',
+      date: 'May 2026',
+      cover: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&q=80&fit=crop',
+      photos: [
+        'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=85&fit=crop',
+      ]
+    },
+    {
+      id: 'e2',
+      title: 'Editorial Portrait Session',
+      description: 'Styled portrait and fashion photography with a creative editorial concept and branded content delivery.',
+      category: 'portrait',
+      date: 'Dec 2025',
+      cover: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80&fit=crop',
+      photos: [
+        'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=900&q=85&fit=crop',
+        'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=900&q=85&fit=crop',
+      ]
+    }
+  ];
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  var DELAYS = ['', 'delay-1', 'delay-2', 'delay-3', 'delay-4'];
+  var allEvents = [];
+  var activeFilter = 'all';
+
+  /* ─────────────────────────────────────────
+     RENDER EVENT CARDS
+  ───────────────────────────────────────── */
+  function renderEvents(events) {
+    var grid = document.getElementById('eventsGrid');
+    if (!grid) return;
+
+    var filtered = activeFilter === 'all'
+      ? events
+      : events.filter(function(e) { return e.category === activeFilter; });
+
+    if (!filtered.length) {
+      grid.innerHTML =
+        '<div class="pf-empty">' +
+          '<div style="font-size:40px;margin-bottom:14px">📷</div>' +
+          '<div style="font-size:15px">No events in this category yet — check back soon.</div>' +
+        '</div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map(function(ev, i) {
+      var delay = DELAYS[Math.min(i, DELAYS.length - 1)];
+      var photoCount = (ev.photos || []).length;
+      return (
+        '<div class="pf-event-card anim-fade-up ' + delay + '" onclick="openGallery(\'' + esc(ev.id) + '\')">' +
+          '<div class="pf-event-thumb-wrap">' +
+            '<img class="pf-event-thumb" src="' + esc(ev.cover) + '" alt="' + esc(ev.title) + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '"/>' +
+            '<div class="pf-event-thumb-ov"><span class="pf-event-thumb-ov-txt">Open Gallery ↗</span></div>' +
+          '</div>' +
+          '<div class="pf-event-body">' +
+            '<div class="pf-event-meta">' +
+              '<span class="pf-event-tag">' + esc(ev.category) + '</span>' +
+              '<span class="pf-event-date">' + esc(ev.date) + '</span>' +
+            '</div>' +
+            '<h2 class="pf-event-title">' + esc(ev.title) + '</h2>' +
+            '<p class="pf-event-desc">' + esc(ev.description) + '</p>' +
+            '<div class="pf-event-count">📷 ' + photoCount + ' photo' + (photoCount !== 1 ? 's' : '') + '</div>' +
+            '<div class="pf-event-line"></div>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    initAnim();
+  }
+
+  /* ─────────────────────────────────────────
+     LOAD FROM SUPABASE (with fallback)
+  ───────────────────────────────────────── */
+  async function loadEvents() {
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if (!sb) { allEvents = FALLBACK_EVENTS; renderEvents(allEvents); return; }
+
+      var res = await sb
+        .from('portfolio_events')
+        .select('id,title,description,category,date,cover,photos,sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: false });
+
+      if (res.error) throw res.error;
+      allEvents = (res.data && res.data.length) ? res.data : FALLBACK_EVENTS;
+      renderEvents(allEvents);
+    } catch(e) {
+      console.warn('Portfolio fetch failed, using fallback:', e);
+      allEvents = FALLBACK_EVENTS;
+      renderEvents(allEvents);
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     FILTER TABS
+  ───────────────────────────────────────── */
+  document.getElementById('filterTabs').addEventListener('click', function(e) {
+    var tab = e.target.closest('.pf-tab');
+    if (!tab) return;
+    document.querySelectorAll('.pf-tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    activeFilter = tab.dataset.filter;
+    renderEvents(allEvents);
+  });
+
+  /* ─────────────────────────────────────────
+     FLIP BOOK LIGHTBOX
+  ───────────────────────────────────────── */
+  var _fpIdx = 0;
+  var _fpTotal = 0;
+  var _fpFlipping = false;
+  var _fpCurrentEvent = null;
+
+  function openGallery(eventId) {
+    var ev = allEvents.find(function(e) { return e.id === eventId; });
+    if (!ev || !ev.photos || !ev.photos.length) return;
+
+    _fpCurrentEvent = ev;
+    _fpIdx = 0;
+    _fpTotal = ev.photos.length;
+    _fpFlipping = false;
+
+    /* Set title */
+    document.getElementById('fpLightboxTitle').textContent = ev.title;
+
+    /* Build pages */
+    var book = document.getElementById('fpBook');
+    book.innerHTML = ev.photos.map(function(url, i) {
+      var nextUrl = ev.photos[i + 1] || '';
+      return (
+        '<div class="fp-page" id="fpPage' + i + '" style="z-index:' + (_fpTotal - i) + '">' +
+          '<div class="fp-front">' +
+            '<img src="' + esc(url) + '" alt="Photo ' + (i+1) + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '"/>' +
+            '<div class="fp-page-num">' + (i+1) + ' / ' + _fpTotal + '</div>' +
+            '<div class="fp-crease"></div>' +
+          '</div>' +
+          '<div class="fp-back">' +
+            (nextUrl
+              ? '<img src="' + esc(nextUrl) + '" alt="Photo ' + (i+2) + '" loading="lazy"/>' +
+                '<div class="fp-page-num">' + (i+2) + ' / ' + _fpTotal + '</div>' +
+                '<div class="fp-crease back-crease"></div>'
+              : '<div class="fp-back-blank"><div class="fp-back-icon">✦</div><div class="fp-back-text">End of Gallery</div></div>'
+            ) +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    /* Build dots */
+    document.getElementById('fpDots').innerHTML = ev.photos.map(function(_, i) {
+      return '<button class="fp-dot' + (i === 0 ? ' active' : '') + '" onclick="fpGoto(' + i + ')" aria-label="Photo ' + (i+1) + '"></button>';
+    }).join('');
+
+    /* Reset controls */
+    document.getElementById('fpBtnPrev').disabled = true;
+    document.getElementById('fpBtnNext').disabled = _fpTotal <= 1;
+
+    /* Open lightbox */
+    document.getElementById('fpLightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('fpLightbox').classList.remove('open');
+    document.body.style.overflow = '';
+    _fpCurrentEvent = null;
+  }
+
+  document.getElementById('fpCloseBtn').addEventListener('click', closeLightbox);
+  document.getElementById('fpLightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+
+  function fpGoto(i) {
+    if (_fpFlipping || i === _fpIdx) return;
+    _fpFlipping = true;
+    var dir = i > _fpIdx ? 1 : -1;
+    var steps = Math.abs(i - _fpIdx);
+
+    function flipOne() {
+      if (steps-- <= 0) { _fpFlipping = false; return; }
+      var cur = _fpIdx;
+      var pg = document.getElementById('fpPage' + cur);
+      if (dir > 0) {
+        if (pg) { pg.classList.add('flipped'); pg.style.zIndex = (_fpTotal - cur); }
+        _fpIdx++;
+      } else {
+        _fpIdx--;
+        var pg2 = document.getElementById('fpPage' + _fpIdx);
+        if (pg2) { pg2.classList.remove('flipped'); pg2.style.zIndex = (_fpTotal - _fpIdx); }
+      }
+      document.querySelectorAll('.fp-dot').forEach(function(d, j) {
+        d.classList.toggle('active', j === _fpIdx);
+      });
+      var pb = document.getElementById('fpBtnPrev');
+      var nb = document.getElementById('fpBtnNext');
+      if (pb) pb.disabled = _fpIdx === 0;
+      if (nb) nb.disabled = _fpIdx >= _fpTotal - 1;
+      if (steps > 0) setTimeout(flipOne, 120);
+      else setTimeout(function() { _fpFlipping = false; }, 700);
+    }
+    flipOne();
+  }
+
+  function fpStep(d) {
+    fpGoto(Math.max(0, Math.min(_fpIdx + d, _fpTotal - 1)));
+  }
+
+  /* Keyboard nav */
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('fpLightbox').classList.contains('open')) return;
+    if (e.key === 'ArrowLeft')  fpStep(-1);
+    if (e.key === 'ArrowRight') fpStep(1);
+    if (e.key === 'Escape')     closeLightbox();
+  });
+
+  /* Touch swipe on lightbox */
+  var _fpTx = 0;
+  var fpStageEl = document.getElementById('fpStage');
+  fpStageEl.addEventListener('touchstart', function(e) { _fpTx = e.touches[0].clientX; }, { passive: true });
+  fpStageEl.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - _fpTx;
+    if (Math.abs(dx) > 50) fpStep(dx < 0 ? 1 : -1);
+  });
+
+  /* ─────────────────────────────────────────
+     SCROLL ANIMATIONS
+  ───────────────────────────────────────── */
+  function initAnim() {
+    var els = document.querySelectorAll('.anim-fade-up:not(.visible)');
+    if (!els.length) return;
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function(el) { io.observe(el); });
+    } else {
+      els.forEach(function(el) { el.classList.add('visible'); });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { loadEvents(); initAnim(); });
+  } else {
+    loadEvents();
+    initAnim();
+  }
+  </script>
+
+</body>
+</html>
