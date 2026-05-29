@@ -51,17 +51,13 @@
     }
 
     .sv-headline {
-      font-family: var(--sv-display);
-      font-size: clamp(42px, 5.5vw, 74px);
-      font-weight: 300;
+      font-family: var(--fb);
+      font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 900;
       line-height: 1.04;
       letter-spacing: -0.03em;
       color: var(--text);
-      margin-bottom: 22px;
-    }
-    .sv-headline em {
-      font-style: italic;
-      color: var(--gold);
+      margin-bottom: 0;
     }
 
     .sv-sub {
@@ -280,14 +276,7 @@
 
     <!-- PAGE HEADER -->
     <header class="sv-header">
-      <!-- .label-tag from shared.css: gold line + uppercase mono label -->
-      <div class="label-tag anim-fade-up">What We Do</div>
-      <h1 class="sv-headline anim-fade-up delay-1">
-        Every service.<br><em>One team.</em>
-      </h1>
-      <p class="sv-sub anim-fade-up delay-2">
-        From the moment we arrive to the second your guests download their photos — we handle it all. Professional, fast, and built around your event.
-      </p>
+      <h1 class="sv-headline anim-fade-up"><strong>What We Do</strong></h1>
     </header>
 
     <!-- DIVIDER -->
@@ -304,20 +293,7 @@
       </div>
     </section>
 
-    <!-- CTA STRIP -->
-    <section class="sv-cta full-bleed">
-      <div class="sv-cta-inner">
-        <!-- .label-tag from shared.css -->
-        <div class="label-tag" style="justify-content:center;">Ready to book?</div>
-        <h2 class="sv-cta-title">Let's make your<br><em>event unforgettable.</em></h2>
-        <p class="sv-cta-sub">Tell us your date and what you need. We'll get back to you within 24 hours.</p>
-        <div class="sv-cta-btns">
-          <!-- .btn-gold and .btn-ghost both defined in shared.css -->
-          <a href="contact.html" class="btn btn-gold">Book Us Now</a>
-          <a href="portfolio.html" class="btn btn-ghost">See Our Work →</a>
-        </div>
-      </div>
-    </section>
+
 
   </div><!-- /.page-wrap -->
 
@@ -334,28 +310,28 @@
     {
       id:'f1', title:'Professional Photography',
       description:'High-quality event photography from an experienced creative. We capture the moments that matter — candid, posed, and everything in between.',
-      icon:'📸',
+      icon:'',
       image_url:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80&fit=crop',
       sort_order:0
     },
     {
       id:'f2', title:'High-Quality Content Creation',
       description:'Beyond photos — we create polished content ready for social media, print, or internal use. Clips, highlights, and branded assets delivered fast.',
-      icon:'🎬',
+      icon:'',
       image_url:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80&fit=crop',
       sort_order:10
     },
     {
       id:'f3', title:'Organised Online Galleries',
       description:'Every photo is sorted into a clean, branded online gallery. Guests browse and download their shots in seconds — no app, no login required.',
-      icon:'🗂️',
+      icon:'',
       image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop',
       sort_order:20
     },
     {
       id:'f4', title:'Easy Preview & Download Systems',
       description:'We build the digital infrastructure around your event. Guests get a private link, preview their photos instantly, and download in full resolution.',
-      icon:'⬇️',
+      icon:'',
       image_url:'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80&fit=crop',
       sort_order:30
     }
@@ -377,24 +353,21 @@
     if(!services || !services.length){
       grid.innerHTML =
         '<div class="sv-empty">' +
-          '<div class="sv-empty-ico">🛎️</div>' +
           '<div class="sv-empty-txt">Services coming soon. Check back shortly.</div>' +
         '</div>';
       return;
     }
 
     grid.innerHTML = services.map(function(s, i){
-      /* Image block — full photo if set, large emoji placeholder otherwise */
+      /* Image block — full photo if set, plain placeholder otherwise */
       var imgBlock = s.image_url
         ? '<div class="sv-card-img-wrap">' +
             '<img class="sv-card-img" src="'+esc(s.image_url)+'" alt="'+esc(s.title)+'" loading="'+(i<2?'eager':'lazy')+'"/>' +
           '</div>'
-        : (s.icon ? '<div class="sv-card-placeholder">'+esc(s.icon)+'</div>' : '');
+        : '<div class="sv-card-placeholder"></div>';
 
-      /* Show emoji in body only when a photo is also present */
-      var iconBlock = (s.icon && s.image_url)
-        ? '<span class="sv-card-icon">'+esc(s.icon)+'</span>'
-        : '';
+      /* No icon block — clean card layout */
+      var iconBlock = '';
 
       var delay = DELAYS[Math.min(i, DELAYS.length-1)];
 
