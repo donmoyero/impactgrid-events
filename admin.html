@@ -2256,7 +2256,7 @@ async function uploadSectionFiles(files, listId, key, max){
   for(var i = 0; i < files.length; i++){
     var file = files[i];
     var ext  = file.name.split('.').pop() || 'jpg';
-    var path = 'site-images/'+key+'-'+Date.now()+'-'+i+'.'+ext;
+    var path = 'sections/'+key+'-'+Date.now()+'-'+i+'.'+ext;
     if(prog) prog.textContent = 'Uploading '+(i+1)+' / '+files.length+' — '+file.name;
     try {
       var {error: upErr} = await sb.storage.from(BUCKET).upload(path, file, { upsert: true });
@@ -2284,7 +2284,7 @@ async function uploadSectionFiles(files, listId, key, max){
  */
 
 var BUCKET = (typeof BUCKET !== 'undefined') ? BUCKET : 'event-photos';
-var SVC_BUCKET = 'site-images'; /* public bucket for service images */
+var SVC_BUCKET = 'site-media'; /* public bucket for service images */
 
 /* Called when nav('services') fires */
 function loadServices(){
@@ -2391,7 +2391,10 @@ async function saveService(){
     closeSvcModal();
     loadServices();
   } catch(e){
-    _svcAlert('Save failed: '+(e.message||'Unknown error'));
+    console.error('[saveService] error:', e);
+    var msg = e.message || (e.details ? e.details : '') || 'Unknown error';
+    if(e.code) msg = e.code + ': ' + msg;
+    _svcAlert('Save failed: ' + msg);
     btn.disabled = false; btn.textContent = '✓ Save Service';
   }
 }
