@@ -2113,6 +2113,134 @@ button:focus-visible,
 }
 .nav:not(.expanded) .ws-nav-chev { display: none; }
 
+/* ── Sidebar two-section layout ── */
+.ws-panel-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color .15s, background .15s;
+  text-align: left;
+}
+.ws-panel-section-toggle:hover { color: var(--text); background: var(--bg2); }
+.ws-panel-section-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.ws-panel-chevron {
+  opacity: .5;
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+.ws-panel-section-toggle[aria-expanded="false"] .ws-panel-chevron {
+  transform: rotate(-90deg);
+}
+
+.ws-panel-section-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .25s ease;
+}
+.ws-panel-section-body.open { max-height: 600px; }
+
+/* Create Website section inner */
+.ws-panel-create-ai {
+  padding: 10px 12px 4px;
+}
+.ws-panel-create-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 7px;
+}
+.ws-panel-create-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ws-panel-create-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text);
+  font-family: inherit;
+  min-width: 0;
+}
+.ws-panel-create-input::placeholder { color: var(--text3); }
+.ws-panel-create-go {
+  flex-shrink: 0;
+  background: var(--gold);
+  border: none;
+  color: #0c0a07;
+  width: 30px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s;
+}
+.ws-panel-create-go:hover { background: var(--gold-hi, #e6c040); }
+
+.ws-panel-create-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 4px;
+  font-size: 10px;
+  color: var(--text3);
+}
+.ws-panel-create-divider::before,
+.ws-panel-create-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.ws-panel-browse-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: calc(100% - 24px);
+  margin: 0 12px 12px;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  font-family: inherit;
+  text-align: left;
+}
+.ws-panel-browse-btn:hover {
+  background: var(--gold-glo, rgba(201,168,76,.08));
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
 /* ══════════════════════════════════════════════════════
    STYLE PICKER (moved from HTML)
 ══════════════════════════════════════════════════════ */
