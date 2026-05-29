@@ -2281,7 +2281,7 @@ async function uploadSectionFiles(files, listId, key, max){
 ═══════════════════════════════════════ */
 
 var BUCKET = (typeof BUCKET !== 'undefined') ? BUCKET : 'event-photos';
-var SVC_BUCKET = 'site-images'; /* public bucket for service images */
+var SVC_BUCKET = 'site-media'; /* public bucket for service images */
 
 /* Called when nav('services') fires */
 function loadServices(){
@@ -2416,7 +2416,7 @@ async function _uploadSvcImg(file){
   var prog = document.getElementById('svcImgProg');
   prog.style.display='block'; prog.textContent='Uploading…';
   try {
-    var sb   = getSupabase();
+    var sb   = (typeof getAuthClient === 'function') ? getAuthClient() : getSupabase();
     var ext  = file.name.split('.').pop()||'jpg';
     var path = 'services/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
     var {error: upErr} = await sb.storage.from(SVC_BUCKET).upload(path, file, {upsert:true});
