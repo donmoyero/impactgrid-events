@@ -328,8 +328,8 @@
           '</div>'
         : '<div class="sv-card-placeholder"></div>';
 
-      var priceBlock = s.price
-        ? '<span class="sv-card-price">'+esc(s.price)+'</span>'
+      var priceBlock = s.icon
+        ? '<span class="sv-card-price">'+esc(s.icon)+'</span>'
         : '';
 
       var delay = DELAYS[Math.min(i, DELAYS.length-1)];
@@ -356,7 +356,7 @@
 
       var res = await sb
         .from('services')
-        .select('id,title,description,price,image_url,sort_order')
+        .select('id,title,description,icon,image_url,sort_order')
         .eq('is_active', true)
         .order('sort_order', {ascending:true});
 
