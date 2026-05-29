@@ -194,18 +194,17 @@
             '<a href="login.html" class="btn-ghost-sm">Admin Login</a>' +
           '</div>' +
 
-          /* ── USER: shown when logged in ── */
+          /* ── USER: shown when logged in (admin only) ── */
           '<div id="navUser" style="display:none;position:relative;">' +
             '<button class="user-btn" onclick="toggleDD()" aria-label="Account menu">' +
               '<div class="u-av" id="userAv">?</div>' +
-              '<span class="u-name" id="userName">Account</span>' +
+              '<span class="u-name" id="userName">Admin</span>' +
               '<span class="u-chev">▾</span>' +
             '</button>' +
             '<div class="u-drop" id="uDrop">' +
               '<div class="dd-email" id="userEmail"></div>' +
               '<div class="dd-div"></div>' +
-              '<a href="dashboard.html" id="ddDashLink">My Dashboard</a>' +
-              '<a href="settings.html">Account Settings</a>' +
+              '<a href="admin.html" id="ddDashLink">Admin Panel</a>' +
               '<div class="dd-div"></div>' +
               '<button onclick="igSignOut()">Sign out</button>' +
             '</div>' +
@@ -242,9 +241,9 @@
           '<div class="mob-out" id="mobOut" style="display:none;">' +
             '<a href="login.html" class="mob-alink" onclick="closeSidebar()">Admin Login</a>' +
           '</div>' +
-          /* Logged-in state */
+          /* Logged-in state — admin only */
           '<div class="mob-in" id="mobIn">' +
-            '<a href="dashboard.html" id="mobDashCta" class="mob-adash" onclick="closeSidebar()">My Dashboard →</a>' +
+            '<a href="admin.html" id="mobDashCta" class="mob-adash" onclick="closeSidebar()">Admin Panel →</a>' +
             '<button class="mob-asignout" onclick="igSignOut()">Sign out</button>' +
           '</div>' +
         '</div>' +
@@ -595,23 +594,13 @@
      so admins go to admin.html, everyone else to dashboard.html
   ───────────────────────────────────────── */
   function _setDashboardLinks(role) {
-    var isAdmin = (role === 'admin');
-    var href    = isAdmin ? 'admin.html' : 'dashboard.html';
-    var label   = isAdmin ? 'Admin Panel' : 'My Dashboard';
+    /* Only admin can log in — always link to admin.html */
+    var href  = 'admin.html';
+    var label = 'Admin Panel';
 
-    // Desktop nav link
-    var navLink = document.getElementById('navDashLink');
-    if (navLink) { navLink.href = href; }
-
-    // Desktop dropdown link
     var ddLink = document.getElementById('ddDashLink');
     if (ddLink) { ddLink.href = href; ddLink.textContent = label; }
 
-    // Mobile nav link
-    var mobLink = document.getElementById('mobDashLink');
-    if (mobLink) { mobLink.href = href; }
-
-    // Mobile CTA button
     var mobCta = document.getElementById('mobDashCta');
     if (mobCta) { mobCta.href = href; mobCta.textContent = label + ' →'; }
   }
@@ -705,12 +694,12 @@
     // Dispatch plan-ready event so tools can react immediately
     document.dispatchEvent(new CustomEvent('ig-plan-ready', { detail: { plan: _cachedPlan, aiUses: _cachedAiUses } }));
 
-    // ── Update nav display ──
-    var effectiveRole = (role === 'admin' || fallbackEmail === 'admin@impactgridgroup.com') ? 'admin' : role;
-    var displayName = effectiveRole === 'admin' ? 'Admin' : name;
+    // ── Update nav display — only admin can log in ──
+    var effectiveRole = 'admin';
+    var displayName   = 'Admin';
     window.setNavUser({ email: fallbackEmail, user_metadata: { full_name: displayName, avatar_url: avatarUrl } });
 
-    // ── Update dashboard links based on role (admin email also gets admin panel) ──
+    // ── Update dashboard links ──
     _setDashboardLinks(effectiveRole);
 
     // ── Update any element with data-ig-name (greeting, welcome text etc.) ──
