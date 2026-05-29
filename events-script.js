@@ -132,6 +132,120 @@ function clearOwnerAvatar(){
 }
 
 /* ════════════════════════════════════════════════════
+   INVOICE HELPERS
+════════════════════════════════════════════════════ */
+var _invLineCount = 0;
+
+function initInvoiceDefaults(){
+  var today = new Date();
+  var fmt   = function(d){ return d.toISOString().split('T')[0]; };
+  var due   = new Date(); due.setDate(due.getDate() + 7);
+
+  var dateEl = document.getElementById('inv-date');
+  var dueEl  = document.getElementById('inv-due-date');
+  if(dateEl && !dateEl.value) dateEl.value = fmt(today);
+  if(dueEl  && !dueEl.value)  dueEl.value  = fmt(due);
+
+  /* Auto-number: increment from last stored number */
+  var numEl = document.getElementById('inv-number');
+  if(numEl && !numEl.value){
+    var last = parseInt(localStorage.getItem('ig_last_inv_num') || '2', 10);
+    var next = last + 1;
+    numEl.value = 'INV-' + String(next).padStart(6, '0');
+  }
+
+  /* Add first blank line item if none exist */
+  var container = document.getElementById('inv-line-items');
+  if(container && container.children.length === 0) addInvLineItem();
+}
+
+function addInvLineItem(desc, qty, rate){
+  var container = document.getElementById('inv-line-items');
+  if(!container) return;
+  var id = ++_invLineCount;
+  var row = document.createElement('div');
+  row.id = 'inv-row-' + id;
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 80px 80px 36px;gap:6px;margin-bottom:6px;';
+  row.innerHTML = '<input type="text" value="' + esc(desc||'') + '" placeholder="e.g. Photography" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;color:var(--text);font-size:12px;" class="inv-desc"/>'+
+    '<input type="number" value="' + (qty||1) + '" min="0" step="0.01" oninput="updateInvTotals()" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;color:var(--text);font-size:12px;text-align:center;" class="inv-qty"/>'+
+    '<input type="number" value="' + (rate||0) + '" min="0" step="0.01" oninput="updateInvTotals()" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;color:var(--text);font-size:12px;text-align:right;" class="inv-rate"/>'+
+    '<div class="inv-amount" style="display:flex;align-items:center;justify-content:flex-end;font-size:12px;font-weight:600;color:var(--text2);">£0.00</div>'+
+    '<button onclick="removeInvLineItem(\'inv-row-'+id+'\')" style="background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);border-radius:var(--r);cursor:pointer;font-size:12px;" title="Remove">✕</button>';
+  container.appendChild(row);
+  updateInvTotals();
+}
+
+function removeInvLineItem(rowId){
+  var el = document.getElementById(rowId);
+  if(el) el.remove();
+  updateInvTotals();
+}
+
+function updateInvTotals(){
+  var container = document.getElementById('inv-line-items');
+  if(!container) return;
+  var subtotal = 0;
+  container.querySelectorAll('div[id^="inv-row-"]').forEach(function(row){
+    var qty  = parseFloat(row.querySelector('.inv-qty').value)  || 0;
+    var rate = parseFloat(row.querySelector('.inv-rate').value) || 0;
+    var amt  = qty * rate;
+    subtotal += amt;
+    row.querySelector('.inv-amount').textContent = '£' + amt.toFixed(2);
+  });
+  var discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+  var total    = Math.max(0, subtotal - discount);
+  document.getElementById('inv-subtotal').textContent = '£' + subtotal.toFixed(2);
+  document.getElementById('inv-total').textContent    = '£' + total.toFixed(2);
+  document.getElementById('inv-balance').textContent  = '£' + total.toFixed(2);
+}
+
+function collectInvoiceData(){
+  var container = document.getElementById('inv-line-items');
+  var lines = [];
+  if(container){
+    container.querySelectorAll('div[id^="inv-row-"]').forEach(function(row){
+      var desc = row.querySelector('.inv-desc').value.trim();
+      var qty  = parseFloat(row.querySelector('.inv-qty').value)  || 0;
+      var rate = parseFloat(row.querySelector('.inv-rate').value) || 0;
+      if(desc || qty || rate) lines.push({ description: desc, qty: qty, rate: rate, amount: qty * rate });
+    });
+  }
+  var discount  = parseFloat(document.getElementById('inv-discount').value) || 0;
+  var subtotal  = lines.reduce(function(s,l){ return s + l.amount; }, 0);
+  var total     = Math.max(0, subtotal - discount);
+  return {
+    invoice_number : (document.getElementById('inv-number').value||'').trim(),
+    invoice_date   : document.getElementById('inv-date').value,
+    due_date       : document.getElementById('inv-due-date').value,
+    client_name    : (document.getElementById('inv-client').value||'').trim(),
+    line_items     : lines,
+    discount       : discount,
+    subtotal       : subtotal,
+    total          : total,
+    balance_due    : total,
+    notes          : (document.getElementById('inv-notes').value||'').trim(),
+    payment_info   : 'Account Name: Drussell Technical Services Ltd | Account Number: 10881117 | Sort Code: 231470'
+  };
+}
+
+function resetInvoiceForm(){
+  ['inv-number','inv-date','inv-due-date','inv-client','inv-notes'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  var disc = document.getElementById('inv-discount'); if(disc) disc.value = '0';
+  var container = document.getElementById('inv-line-items'); if(container) container.innerHTML = '';
+  _invLineCount = 0;
+  ['inv-subtotal','inv-total','inv-balance'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.textContent = '£0.00';
+  });
+}
+
+window.addInvLineItem    = addInvLineItem;
+window.removeInvLineItem = removeInvLineItem;
+window.updateInvTotals   = updateInvTotals;
+window.initInvoiceDefaults = initInvoiceDefaults;
+
+/* ════════════════════════════════════════════════════
    CREATE EVENT
 ════════════════════════════════════════════════════ */
 async function igCreateEvent(){
@@ -167,6 +281,11 @@ async function igCreateEvent(){
       }
     }
 
+    /* Collect email template & invoice before saving */
+    var emailSubject = (document.getElementById('ev-email-subject') ? document.getElementById('ev-email-subject').value.trim() : '') || 'Your event is ready — {{event_name}}';
+    var emailBody    = (document.getElementById('ev-email-body')    ? document.getElementById('ev-email-body').value.trim()    : '') || '';
+    var invoiceData  = collectInvoiceData();
+
     /* Save event to Firestore */
     var evRef = await addDoc(collection(db, 'events'), {
       name             : name,
@@ -179,8 +298,17 @@ async function igCreateEvent(){
       event_slug       : slug,
       expiry_date      : new Date(expiry).toISOString(),
       is_active        : true,
+      email_subject    : emailSubject,
+      email_body       : emailBody,
+      invoice          : invoiceData,
       created_at       : serverTimestamp()
     });
+
+    /* Bump invoice counter */
+    if(invoiceData.invoice_number){
+      var num = parseInt(invoiceData.invoice_number.replace(/\D/g,''), 10);
+      if(!isNaN(num)) localStorage.setItem('ig_last_inv_num', String(num));
+    }
 
     /* Save event settings */
     await addDoc(collection(db, 'event_settings'), {
@@ -201,13 +329,18 @@ async function igCreateEvent(){
     ['ev-name','ev-owner','ev-owner-name','ev-code'].forEach(function(id){
       var el = document.getElementById(id); if(el) el.value = '';
     });
-    clearOwnerAvatar();
+    resetInvoiceForm();
+    /* Reset email fields */
+    var subj = document.getElementById('ev-email-subject');
+    var body = document.getElementById('ev-email-body');
+    if(subj) subj.value = 'Your event is ready — {{event_name}}';
+    if(body) body.value = 'Hi {{owner_name}},\n\nYour event gallery is ready! Here are your access details:\n\n🎉 Event: {{event_name}}\n🔑 Access Code: {{event_code}}\n🔗 Gallery Link: {{event_url}}\n\nShare the link and code with your guests so they can find their photos.\n\nIf you have any questions, just reply to this email.\n\n— ImpactGrid Events Team';
     setDefaultExpiry();
     evWatermark = true; evRequireCode = true;
     var wt = document.getElementById('ev-watermark-toggle'); if(wt) wt.classList.add('on');
     var ct = document.getElementById('ev-code-toggle');      if(ct) ct.classList.add('on');
 
-    if(ownerEmail) sendOwnerNotification(ownerEmail, ownerName, name, code, slug);
+    if(ownerEmail) sendOwnerNotification(ownerEmail, ownerName, name, code, slug, emailSubject, emailBody);
 
     setTimeout(function(){ nav('events', null); }, 1500);
     loadStats();
@@ -217,15 +350,28 @@ async function igCreateEvent(){
   }
 }
 
-async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode, eventSlug){
+async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode, eventSlug, emailSubject, emailBody){
   if(!ownerEmail) return;
   var base     = 'https://impactgridgroup.com';
   var eventUrl = base + '/event.html?event=' + eventSlug + '&code=' + eventCode;
+
+  /* Replace merge fields */
+  function merge(str){
+    return (str||'')
+      .replace(/\{\{owner_name\}\}/g,  ownerName  || 'there')
+      .replace(/\{\{event_name\}\}/g,  eventName  || '')
+      .replace(/\{\{event_code\}\}/g,  eventCode  || '')
+      .replace(/\{\{event_url\}\}/g,   eventUrl   || '');
+  }
+
+  var finalSubject = merge(emailSubject || 'Your event is ready — ' + eventName);
+  var finalBody    = merge(emailBody    || 'Hi ' + (ownerName||'there') + ',\n\nYour event "' + eventName + '" is ready.\n\nCode: ' + eventCode + '\nLink: ' + eventUrl);
+
   try{
     var res  = await fetch(EVENTS_API + '/api/notify-owner', {
       method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({ ownerEmail: ownerEmail, ownerName: ownerName, eventName: eventName, eventCode: eventCode, eventUrl: eventUrl })
+      body   : JSON.stringify({ ownerEmail: ownerEmail, ownerName: ownerName, eventName: eventName, eventCode: eventCode, eventUrl: eventUrl, subject: finalSubject, body: finalBody })
     });
     if(!res.ok){
       var txt = await res.text();
