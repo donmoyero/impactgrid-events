@@ -1669,17 +1669,54 @@
     </button>
   </div>
 
-  <button class="ws-panel-new-btn" onclick="closeWsPanel(); showScreen('screenStylePicker');">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    New Website
+  <!-- ── Section 1: Create Website ── -->
+  <button class="ws-panel-section-toggle" id="wsSectionCreateToggle" onclick="wsPanelToggleSection('create')" aria-expanded="true">
+    <span class="ws-panel-section-toggle-label">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create Website
+    </span>
+    <svg class="ws-panel-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
   </button>
+  <div class="ws-panel-section-body open" id="wsSectionCreateBody">
+    <!-- AI prompt mini -->
+    <div class="ws-panel-create-ai">
+      <div class="ws-panel-create-label">Powered by Dijo AI</div>
+      <div class="ws-panel-create-input-wrap">
+        <input
+          type="text"
+          id="wsPanelAiPrompt"
+          class="ws-panel-create-input"
+          placeholder="Describe yourself…"
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter')wsPanelStartAI()"
+        />
+        <button class="ws-panel-create-go" onclick="wsPanelStartAI()" title="Build my site">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Or pick a style -->
+    <div class="ws-panel-create-divider"><span>or pick a style</span></div>
+    <button class="ws-panel-browse-btn" onclick="closeWsPanel(); document.getElementById('wssGrid') && document.getElementById('wssGrid').scrollIntoView({behavior:'smooth'});">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Browse 16 styles
+    </button>
+  </div>
 
-  <div class="ws-panel-section-label">My Websites</div>
-
-  <div class="ws-panel-sites" id="wsPanelSites">
-    <div class="ws-panel-empty" id="wsPanelEmpty">
-      <div class="ws-panel-empty-icon">✦</div>
-      <p>No websites yet.<br/>Pick a style to get started.</p>
+  <!-- ── Section 2: My Websites ── -->
+  <button class="ws-panel-section-toggle" id="wsSectionMyToggle" onclick="wsPanelToggleSection('my')" aria-expanded="true">
+    <span class="ws-panel-section-toggle-label">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      My Websites
+    </span>
+    <svg class="ws-panel-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="ws-panel-section-body open" id="wsSectionMyBody">
+    <div class="ws-panel-sites" id="wsPanelSites">
+      <div class="ws-panel-empty" id="wsPanelEmpty">
+        <div class="ws-panel-empty-icon">✦</div>
+        <p>No websites yet.<br/>Pick a style to get started.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -1763,6 +1800,28 @@ function refreshWsPanelSites() {
     });
     list.appendChild(btn);
   });
+}
+
+/* Toggle a section open/closed */
+function wsPanelToggleSection(section) {
+  var bodyId   = section === 'create' ? 'wsSectionCreateBody' : 'wsSectionMyBody';
+  var toggleId = section === 'create' ? 'wsSectionCreateToggle' : 'wsSectionMyToggle';
+  var body     = document.getElementById(bodyId);
+  var toggle   = document.getElementById(toggleId);
+  if (!body) return;
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (toggle) toggle.setAttribute('aria-expanded', String(!isOpen));
+}
+
+/* Mini AI prompt in panel — fills main input and fires wssStartAI */
+function wsPanelStartAI() {
+  var val = (document.getElementById('wsPanelAiPrompt') || {}).value || '';
+  if (!val.trim()) return;
+  var mainInput = document.getElementById('wssAiPrompt');
+  if (mainInput) mainInput.value = val;
+  closeWsPanel();
+  if (typeof wssStartAI === 'function') wssStartAI();
 }
 
 /* Intercept the nav "Website" link to open panel instead of navigating */
