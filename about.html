@@ -33,15 +33,14 @@
       margin: 0 auto;
     }
     .ab-headline {
-      font-family: var(--ab-display);
-      font-size: clamp(42px, 5.5vw, 74px);
-      font-weight: 300;
+      font-family: var(--fb);
+      font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 900;
       line-height: 1.04;
       letter-spacing: -0.03em;
       color: var(--text);
-      margin-bottom: 20px;
+      margin-bottom: 0;
     }
-    .ab-headline em { font-style: italic; color: var(--gold); }
     .ab-sub {
       font-size: clamp(15px, 1.6vw, 18px);
       font-weight: 300;
@@ -121,15 +120,14 @@
       margin-bottom: 48px;
     }
     .ab-why-title {
-      font-family: var(--ab-display);
-      font-size: clamp(32px, 4vw, 52px);
-      font-weight: 300;
+      font-family: var(--fb);
+      font-size: clamp(28px, 3.2vw, 42px);
+      font-weight: 900;
       line-height: 1.07;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.025em;
       color: var(--text);
-      margin-top: 12px;
+      margin-top: 0;
     }
-    .ab-why-title em { font-style: italic; color: var(--gold); }
     .ab-pillars {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -138,6 +136,7 @@
     .ab-pillar {
       background: var(--card);
       border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
       border-radius: 20px;
       padding: 32px 36px;
       transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
@@ -147,13 +146,14 @@
       transform: translateY(-3px);
       box-shadow: var(--sh2);
     }
-    .ab-pillar-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+    .ab-pillar-icon { display: none; }
     .ab-pillar-title {
       font-family: var(--fb);
-      font-size: 17px;
-      font-weight: 700;
+      font-size: 19px;
+      font-weight: 800;
       color: var(--text);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
     }
     .ab-pillar-desc {
       font-size: 14px;
@@ -180,15 +180,14 @@
     }
     .ab-team-header { margin-bottom: 48px; }
     .ab-team-title {
-      font-family: var(--ab-display);
-      font-size: clamp(32px, 4vw, 52px);
-      font-weight: 300;
+      font-family: var(--fb);
+      font-size: clamp(28px, 3.2vw, 42px);
+      font-weight: 900;
       line-height: 1.07;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.025em;
       color: var(--text);
-      margin-top: 12px;
+      margin-top: 0;
     }
-    .ab-team-title em { font-style: italic; color: var(--gold); }
     .ab-team-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -346,13 +345,7 @@
 
     <!-- PAGE HEADER -->
     <header class="ab-header">
-      <div class="label-tag anim-fade-up">Who We Are</div>
-      <h1 class="ab-headline anim-fade-up delay-1">
-        Our<br><em>Mission & Vision.</em>
-      </h1>
-      <p class="ab-sub anim-fade-up delay-2" id="aboutTagline">
-        To redefine event media by combining photography, content creation, and technology into one seamless experience — so every moment is captured, delivered, and remembered.
-      </p>
+      <h1 class="ab-headline anim-fade-up"><strong>Who We Are</strong></h1>
     </header>
 
     <div class="divider"></div>
@@ -360,7 +353,7 @@
     <!-- ORIGIN STORY -->
     <section class="ab-story" id="storySection">
       <div class="ab-story-img-wrap anim-fade-up">
-        <div class="ab-story-img-placeholder" id="storyImgPlaceholder">📷</div>
+        <div class="ab-story-img-placeholder" id="storyImgPlaceholder"></div>
         <img class="ab-story-img" id="storyImg" src="" alt="Our story" style="display:none;" />
       </div>
       <div class="ab-story-text anim-fade-up delay-1">
@@ -375,12 +368,11 @@
 
     <div class="divider"></div>
 
-    <!-- WHY CHOOSE US -->
+    <!-- MISSION & VISION -->
     <section class="ab-why">
       <div class="ab-why-inner">
         <div class="ab-why-header anim-fade-up">
-          <div class="label-tag">Mission & Vision</div>
-          <h2 class="ab-why-title">What we stand for.<br><em>Where we're going.</em></h2>
+          <h2 class="ab-why-title"><strong>Mission &amp; Vision</strong></h2>
         </div>
         <div class="ab-pillars" id="pillarsGrid">
           <!-- Rendered by JS -->
@@ -393,8 +385,7 @@
     <!-- TEAM -->
     <section class="ab-team">
       <div class="ab-team-header anim-fade-up">
-        <div class="label-tag">The Team</div>
-        <h2 class="ab-team-title">The people<br><em>behind the lens.</em></h2>
+        <h2 class="ab-team-title"><strong>The Team</strong></h2>
       </div>
       <div class="ab-team-grid" id="teamGrid">
         <!-- Skeleton while loading -->
@@ -402,7 +393,6 @@
         <div class="ab-skeleton"><div class="ab-sk-img"></div><div class="ab-sk-body"><div class="ab-sk-line w40"></div><div class="ab-sk-line w70"></div><div class="ab-sk-line w55"></div></div></div>
       </div>
     </section>
-
 
 
 
@@ -423,14 +413,14 @@
 
   /* ── Default fallback data ── */
   var FALLBACK = {
-    tagline: 'To redefine event media by combining photography, content creation, and technology into one seamless experience — so every moment is captured, delivered, and remembered.',
+    tagline: '',
     story_text: 'Impact Grid Events was founded after Dara identified a growing problem in the event industry — great events were often followed by poor photography quality, slow media delivery, and a poor attendee experience after the event ended.\n\nTo solve this, he brought together TJ, a creative focused on delivering high-quality photography and memorable content creation, and Dara, who develops the technology and digital systems behind the experience.\n\nTogether, the team built Impact Grid Events to combine photography, content creation, and technology into one seamless event media platform.',
     story_image_url: '',
     pillars: [
-      { icon: '🎯', title: 'Our Mission', description: 'To deliver a seamless event media experience — capturing every moment with precision and putting photos in guests\' hands within 24 hours, every time.' },
-      { icon: '🔭', title: 'Our Vision', description: 'To become the leading event media platform in the UK — where photography, content, and technology work as one.' },
-      { icon: '💡', title: 'Our Values', description: 'Quality without compromise. Speed without sacrificing care. Technology that serves people, not the other way around.' },
-      { icon: '🚀', title: 'Where We\'re Going', description: 'Building the infrastructure for the future of event media — scalable, branded, and guest-first from start to finish.' }
+      { icon: '', title: 'Our Mission', description: 'To deliver professional event photography and content creation across Manchester and the UK — capturing every moment with precision, and putting fully edited photos in guests\u2019 hands within 24 hours. No delays. No excuses. Just exceptional event media, every time.' },
+      { icon: '', title: 'Our Vision', description: 'To become the UK\u2019s most trusted event media company — where professional photography, fast media delivery, and branded guest galleries set the standard for how events are documented and remembered.' },
+      { icon: '', title: 'Our Values', description: 'Quality over quantity. Speed without compromise. Every event we cover \u2014 from corporate events and private parties to brand activations in Manchester \u2014 is treated with the same dedication: outstanding photography, seamless delivery, and a guest experience that lasts long after the night ends.' },
+      { icon: '', title: 'Where We\'re Going', description: 'We\u2019re building the infrastructure for the future of event media. Scalable branded galleries, same-day content delivery, and a photography service that grows with the events industry \u2014 city by city, event by event, starting in Manchester.' }
     ],
     team: [
       { name: 'TJ', role: 'Creative Director', bio: 'TJ brings the creative vision. With an eye for the moment that matters, she leads all photography and content creation on the ground — ensuring every event is documented with quality and intention.', photo_url: '' },
@@ -446,8 +436,7 @@
     grid.innerHTML = (pillars || []).map(function(p, i) {
       return (
         '<div class="ab-pillar anim-fade-up ' + (DELAYS[i] || '') + '">' +
-          '<span class="ab-pillar-icon">' + esc(p.icon) + '</span>' +
-          '<div class="ab-pillar-title">' + esc(p.title) + '</div>' +
+          '<div class="ab-pillar-title"><strong>' + esc(p.title) + '</strong></div>' +
           '<div class="ab-pillar-desc">' + esc(p.description) + '</div>' +
           '<div class="ab-pillar-line"></div>' +
         '</div>'
@@ -462,7 +451,7 @@
     grid.innerHTML = (members || []).map(function(m, i) {
       var photoBlock = m.photo_url
         ? '<img class="ab-member-photo" src="' + esc(m.photo_url) + '" alt="' + esc(m.name) + '" loading="lazy"/>'
-        : '<div class="ab-member-photo-placeholder">👤</div>';
+        : '<div class="ab-member-photo-placeholder"></div>';
       return (
         '<div class="ab-member anim-fade-up ' + (DELAYS[i] || '') + '">' +
           '<div class="ab-member-photo-wrap">' + photoBlock + '</div>' +
