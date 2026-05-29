@@ -189,10 +189,9 @@
         '<div class="nav-bottom">' +
           '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">Dark mode</button>' +
 
-          /* ── GUEST: shown when logged out ── */
-          '<div id="navGuest" class="nav-guest" style="display:flex;flex-direction:column;gap:7px;">' +
-            '<a href="login.html" class="btn-ghost-sm">Login</a>' +
-            '<a href="join.html" class="btn-gold-sm">Join Free</a>' +
+          /* ── GUEST: hidden from public — admin accesses login via footer link ── */
+          '<div id="navGuest" class="nav-guest" style="display:none;flex-direction:column;gap:7px;">' +
+            '<a href="login.html" class="btn-ghost-sm">Admin Login</a>' +
           '</div>' +
 
           /* ── USER: shown when logged in ── */
@@ -239,10 +238,9 @@
         '</div>' +
         '<div class="mob-nav">' + mobileLinks + '</div>' +
         '<div class="mob-auth">' +
-          /* Guest state */
-          '<div class="mob-out" id="mobOut">' +
-            '<a href="login.html" class="mob-alink" onclick="closeSidebar()">Login</a>' +
-            '<a href="join.html" class="mob-acta" onclick="closeSidebar()">Join Free →</a>' +
+          /* Guest state — hidden from public */
+          '<div class="mob-out" id="mobOut" style="display:none;">' +
+            '<a href="login.html" class="mob-alink" onclick="closeSidebar()">Admin Login</a>' +
           '</div>' +
           /* Logged-in state */
           '<div class="mob-in" id="mobIn">' +
@@ -337,7 +335,7 @@
           '</div>' +
           '<div class="footer-bot">' +
             '<span>© 2026 ImpactGrid Group Ltd. All rights reserved.</span>' +
-            '<div class="footer-legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>' +
+            '<div class="footer-legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="login.html" style="opacity:0.35;font-size:11px;" id="footerAdminLink">Admin</a></div>' +
             '<button class="footer-tbtn" onclick="toggleTheme()" id="footerTBtn" aria-label="Toggle dark/light mode">Dark mode</button>' +
           '</div>' +
         '</div>' +
@@ -525,6 +523,10 @@
     if (guest) guest.style.display = 'none';
     if (user)  user.style.display  = 'flex';
 
+    /* Hide footer admin link — they're already in */
+    var footerAdmin = document.getElementById('footerAdminLink');
+    if (footerAdmin) footerAdmin.style.display = 'none';
+
     /* Avatar — real photo takes priority over initial */
     var avEl = document.getElementById('userAv');
     if (avEl) {
@@ -567,13 +569,13 @@
   window.setNavGuest = function() {
     var guest = document.getElementById('navGuest');
     var user  = document.getElementById('navUser');
-    if (guest) guest.style.display = 'flex';
+    if (guest) guest.style.display = 'none'; /* keep hidden — admin uses footer link */
     if (user)  user.style.display  = 'none';
 
     var mobOut  = document.getElementById('mobOut');
     var mobIn   = document.getElementById('mobIn');
     var mobCard = document.getElementById('mobUserCard');
-    if (mobOut)  mobOut.classList.remove('hide');
+    if (mobOut)  mobOut.style.display = 'none'; /* hidden from public */
     if (mobIn)   mobIn.classList.remove('show');
     if (mobCard) mobCard.classList.remove('show');
   };
