@@ -46,6 +46,23 @@
       overflow-x: hidden;
     }
 
+    /* ── FULL-BLEED HELPER ─────────────────────────────
+       nav.js shifts the whole body/page-wrap right by
+       --nav-w-collapsed (the collapsed sidebar width).
+       Full-bleed sections (hero, ticker, gallery, cta)
+       must undo that offset so they span the full viewport.
+    ──────────────────────────────────────────────────── */
+    .full-bleed {
+      margin-left: calc(-1 * var(--nav-w-collapsed, 56px));
+      width: 100vw;
+    }
+    @media (max-width: 768px) {
+      .full-bleed {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+
     /* ── HERO ──────────────────────────────────────── */
     .hero {
       min-height: 100vh;
@@ -757,7 +774,7 @@
   <div class="page-wrap">
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero full-bleed">
     <div class="hero-images" id="heroImagesGrid">
       <!-- loaded dynamically from Supabase site_content -->
     </div>
@@ -777,7 +794,7 @@
 
 
   <!-- GALLERY STRIP -->
-  <div class="gallery-strip">
+  <div class="gallery-strip full-bleed">
     <div class="gallery-row" id="galleryRow1">
       <!-- loaded dynamically from Supabase site_content -->
     </div>
@@ -885,7 +902,7 @@
   </section>
 
   <!-- CTA -->
-  <section class="cta-section">
+  <section class="cta-section full-bleed">
     <div class="cta-bg"></div>
     <div class="cta-inner">
       <div class="section-label">Stay in the loop</div>
