@@ -253,7 +253,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico">➕</span>Create Event</a>
         <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico">🖼️</span>Upload Photos</a>
         <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico">⭐</span>Reviews<span class="sb-badge" id="reviewsBadge" style="display:none;">0</span></a>
-
+        <a href="#" onclick="return nav('bookings',this)"><span class="sb-ico">📆</span>Bookings<span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></a>
       </nav>
     </div>
     <div class="sb-section">
@@ -997,6 +997,130 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
+  <!-- ══════════════════════════════════════
+       BOOKINGS PAGE
+  ══════════════════════════════════════ -->
+  <div class="page" id="page-bookings">
+    <div class="page-header">
+      <div class="page-title">Bookings</div>
+      <div class="page-sub">Manage booking requests from the Book Us page. Confirm to auto-create the event in Firebase.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-label">Total</div><div class="stat-val" id="bk-stat-total">—</div></div>
+      <div class="stat-card"><div class="stat-label" style="color:var(--gold);">Pending</div><div class="stat-val" id="bk-stat-pending" style="color:var(--gold);">—</div></div>
+      <div class="stat-card"><div class="stat-label" style="color:var(--green);">Confirmed</div><div class="stat-val" id="bk-stat-confirmed" style="color:var(--green);">—</div></div>
+      <div class="stat-card"><div class="stat-label" style="color:var(--red);">Rejected</div><div class="stat-val" id="bk-stat-rejected" style="color:var(--red);">—</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>All Bookings</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:#07090f;">All</button>
+          <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)">⏳ Pending</button>
+          <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)">✅ Confirmed</button>
+          <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)">✕ Rejected</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadBookings()">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="card-body table-wrap" id="bookingsList">
+        <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>🚫 Block Dates</h2>
+        <span style="font-size:11px;color:var(--text3);">Blocked dates show as unavailable on the Book Us page</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;">
+          <div class="field-group" style="flex:1;min-width:180px;margin-bottom:0;">
+            <div class="field-label">Date to Block</div>
+            <input type="date" id="block-date-input"/>
+          </div>
+          <div class="field-group" style="flex:2;min-width:200px;margin-bottom:0;">
+            <div class="field-label">Reason <span style="font-weight:400;color:var(--text3);font-size:10px;">(optional, internal only)</span></div>
+            <input type="text" id="block-reason-input" placeholder="e.g. Already booked — Smith Wedding"/>
+          </div>
+          <button class="btn btn-gold" onclick="blockDate()" style="flex-shrink:0;white-space:nowrap;">Block Date</button>
+        </div>
+        <div id="blockedDatesList">
+          <div class="empty"><div class="empty-ico">📅</div><div class="empty-txt">No dates blocked.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       CONFIRM BOOKING MODAL
+  ══════════════════════════════════════ -->
+  <div id="confirmModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
+      <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:var(--fd);font-size:16px;font-weight:900;">✅ Confirm Booking</div>
+        <button onclick="closeConfirmModal()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;">✕ Close</button>
+      </div>
+      <div style="padding:20px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px;font-size:13px;" id="modalBookingSummary"></div>
+        <div id="modalAlert" style="display:none;padding:10px 14px;border-radius:var(--r);font-size:12px;margin-bottom:14px;"></div>
+
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;">🧾 Invoice</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div>
+              <div class="field-label" style="font-size:10px;margin-bottom:5px;">Invoice No.</div>
+              <input type="text" id="modal-inv-number" placeholder="INV-000003"/>
+            </div>
+            <div>
+              <div class="field-label" style="font-size:10px;margin-bottom:5px;">Client Name</div>
+              <input type="text" id="modal-inv-client" placeholder="Client name"/>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div>
+              <div class="field-label" style="font-size:10px;margin-bottom:5px;">Invoice Date</div>
+              <input type="date" id="modal-inv-date"/>
+            </div>
+            <div>
+              <div class="field-label" style="font-size:10px;margin-bottom:5px;">Due Date</div>
+              <input type="date" id="modal-inv-due"/>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Line Items</div>
+          <div style="display:grid;grid-template-columns:1fr 70px 80px 70px 30px;gap:5px;margin-bottom:5px;">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Description</div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Qty</div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Rate £</div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Amount</div>
+            <div></div>
+          </div>
+          <div id="modal-line-items"></div>
+          <button class="btn btn-ghost btn-sm" onclick="modalAddLine()" style="margin-top:6px;font-size:11px;">+ Add Line</button>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+            <span style="font-size:11px;color:var(--text3);">Discount £</span>
+            <input type="number" id="modal-inv-discount" value="0" min="0" step="0.01" oninput="modalUpdateTotals()" style="width:80px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:5px 8px;color:var(--text);font-size:12px;text-align:right;"/>
+          </div>
+          <div style="text-align:right;margin-top:6px;font-size:12px;color:var(--text2);">Subtotal: <strong id="modal-subtotal">£0.00</strong></div>
+          <div style="text-align:right;margin-top:2px;font-size:13px;font-weight:700;">Total: <strong id="modal-total">£0.00</strong></div>
+          <div style="text-align:right;margin-top:2px;font-size:13px;font-weight:700;color:var(--gold);">Balance Due: <strong id="modal-balance">£0.00</strong></div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;">📦 Package / Notes <span style="font-weight:400;">(included in confirmation email)</span></div>
+          <textarea id="modal-package-notes" rows="3" placeholder="e.g. 4-hour photography package includes 200 edited photos, delivered within 7 days…" style="font-size:12px;"></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+          <button class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
+          <button class="btn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBookingFromModal()">✕ Reject Instead</button>
+          <button class="btn btn-gold" id="confirmSendBtn" onclick="confirmBooking()">✅ Confirm &amp; Send →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </div>
 </div>
 <div class="toast" id="toast"><div class="toast-icon" id="toastIco">✅</div><div><div class="toast-msg" id="toastMsg"></div><div class="toast-sub" id="toastSub"></div></div></div>
@@ -1075,7 +1199,8 @@ function nav(id,el){
     uploadphotos:'loadUploadPhotos',
     downloadrequests:'loadDownloadRequests',
     reviews:'loadEventReviews',
-    hero:'loadAllHomepageSections'
+    hero:'loadAllHomepageSections',
+    bookings:'loadBookings'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
   return false;
@@ -2624,6 +2749,315 @@ function saveGalleryImages(){
   saveSectionList('heroGridList','hero_grid','Hero grid');
 }
 function loadGalleryImagesPage(){ loadAllHomepageSections(); }
+
+/* ════════════════════════════════════════════════════
+   BOOKINGS — Admin JS
+════════════════════════════════════════════════════ */
+var _allBookings    = [];
+var _currentBooking = null;
+var _modalLineCount = 0;
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function loadBookings() {
+  var el = document.getElementById('bookingsList');
+  if (!el) return;
+  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  try {
+    var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+    var res  = await fetch(API + '/api/bookings');
+    var data = await res.json();
+    _allBookings = data.bookings || [];
+
+    var counts = { total:0, pending:0, confirmed:0, rejected:0 };
+    _allBookings.forEach(function(b){ counts.total++; if(counts[b.status]!==undefined) counts[b.status]++; });
+    ['total','pending','confirmed','rejected'].forEach(function(k){
+      var e2 = document.getElementById('bk-stat-'+k); if(e2) e2.textContent = counts[k];
+    });
+    var badge = document.getElementById('bookingsBadge');
+    if(badge){ badge.textContent = counts.pending; badge.style.display = counts.pending > 0 ? 'inline-flex' : 'none'; }
+
+    renderBookingsTable(_allBookings);
+    if(counts.pending > 0) filterBookings('pending', document.getElementById('bk-filter-pending'));
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+  loadBlockedDatesList();
+}
+
+function filterBookings(status, btn) {
+  document.querySelectorAll('[id^="bk-filter-"]').forEach(function(b){ b.style.background=''; b.style.color=''; });
+  if(btn){ btn.style.background='var(--gold)'; btn.style.color='#07090f'; }
+  var filtered = status==='all' ? _allBookings : _allBookings.filter(function(b){ return b.status===status; });
+  renderBookingsTable(filtered);
+}
+
+function renderBookingsTable(data) {
+  var el = document.getElementById('bookingsList');
+  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No bookings found.</div></div>'; return; }
+  var STATUS_PILL = {
+    pending  : '<span class="pill" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);">⏳ Pending</span>',
+    confirmed: '<span class="pill pill-active">✅ Confirmed</span>',
+    rejected : '<span class="pill pill-rejected">✕ Rejected</span>'
+  };
+  el.innerHTML = '<table><thead><tr><th>Name</th><th>Date</th><th>Event Type</th><th>Location</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>'
+    + data.map(function(b){
+        var pill      = STATUS_PILL[b.status] || STATUS_PILL.pending;
+        var submitted = b.created_at ? new Date(b.created_at).toLocaleDateString('en-GB') : '—';
+        return '<tr>'
+          + '<td style="font-weight:700;">' + esc(b.name) + '<br><span style="font-size:10px;color:var(--text3);font-weight:400;">' + esc(b.email) + '</span></td>'
+          + '<td style="font-family:var(--fm);font-size:12px;color:var(--gold);">' + esc(b.event_date||'—') + '</td>'
+          + '<td><span class="pill pill-applied" style="font-size:9px;">' + esc(b.event_type||'—') + '</span></td>'
+          + '<td style="font-size:12px;color:var(--text2);">' + esc(b.location||'—') + '</td>'
+          + '<td>' + pill + '</td>'
+          + '<td style="font-size:12px;color:var(--text3);">' + submitted + '</td>'
+          + '<td><div class="td-actions">'
+          + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')">✅ Confirm</button>' : '')
+          + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')">✕ Reject</button>' : '')
+          + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')">👁 View</button>'
+          + '</div></td></tr>';
+      }).join('')
+    + '</tbody></table>';
+}
+
+function viewBookingDetail(id) {
+  var b = _allBookings.find(function(x){ return x.id===id; });
+  if(!b) return;
+  alert('Name: '+b.name+'\nEmail: '+b.email+'\nPhone: '+(b.phone||'—')+'\nDate: '+(b.event_date||'—')+'\nType: '+(b.event_type||'—')+'\nGuests: '+(b.guest_count||'—')+'\nLocation: '+(b.location||'—')+'\nNotes: '+(b.notes||'—'));
+}
+
+async function rejectBooking(id) {
+  if(!confirm('Reject this booking and notify the client?')) return;
+  var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+  try {
+    var res  = await fetch(API+'/api/booking-reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
+    var data = await res.json();
+    if(!data.success) throw new Error(data.error||'Failed');
+    toast('✕','Booking rejected','Client notified by email');
+    loadBookings();
+  } catch(e){ toast('⚠️','Error',e.message); }
+}
+
+function openConfirmModal(id) {
+  _currentBooking = _allBookings.find(function(b){ return b.id===id; });
+  if(!_currentBooking) return;
+  var b = _currentBooking;
+  document.getElementById('modalBookingSummary').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+    + _mrow('Client',b.name)+_mrow('Email',b.email)+_mrow('Date',b.event_date||'—')+_mrow('Type',b.event_type||'—')
+    + _mrow('Guests',b.guest_count||'—')+_mrow('Location',b.location||'—')+'</div>'
+    + (b.notes?'<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);"><strong>Notes:</strong> '+esc(b.notes)+'</div>':'');
+
+  var today=new Date(); var due=new Date(); due.setDate(due.getDate()+7);
+  var fmt=function(d){return d.toISOString().split('T')[0];};
+  document.getElementById('modal-inv-date').value   = fmt(today);
+  document.getElementById('modal-inv-due').value    = fmt(due);
+  document.getElementById('modal-inv-client').value = b.name;
+  var last = parseInt(localStorage.getItem('ig_last_inv_num')||'2',10);
+  document.getElementById('modal-inv-number').value = 'INV-'+String(last+1).padStart(6,'0');
+  document.getElementById('modal-line-items').innerHTML = '';
+  _modalLineCount = 0;
+  modalAddLine(b.event_type||'Photography',1,0);
+  document.getElementById('modal-inv-discount').value  = '0';
+  document.getElementById('modal-package-notes').value = '';
+  document.getElementById('modalAlert').style.display  = 'none';
+  var btn = document.getElementById('confirmSendBtn');
+  btn.disabled=false; btn.textContent='✅ Confirm & Send →';
+  modalUpdateTotals();
+  var modal = document.getElementById('confirmModal');
+  modal.style.display='flex';
+}
+
+function _mrow(label,val){
+  return '<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">'+label+'</div>'
+    +'<div style="font-size:12px;font-weight:600;">'+esc(val)+'</div></div>';
+}
+
+function closeConfirmModal(){
+  document.getElementById('confirmModal').style.display='none';
+  _currentBooking=null;
+}
+
+function modalAddLine(desc,qty,rate){
+  var container=document.getElementById('modal-line-items');
+  var id=++_modalLineCount;
+  var row=document.createElement('div');
+  row.id='mline-'+id;
+  row.style.cssText='display:grid;grid-template-columns:1fr 70px 80px 70px 30px;gap:5px;margin-bottom:5px;';
+  var s='background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:5px 7px;color:var(--text);font-size:12px;';
+  row.innerHTML=
+    '<input type="text" value="'+esc(desc||'')+'" placeholder="Service" style="'+s+'" class="ml-desc"/>'+
+    '<input type="number" value="'+(qty||1)+'" min="0" step="0.01" oninput="modalUpdateTotals()" style="'+s+'text-align:center;" class="ml-qty"/>'+
+    '<input type="number" value="'+(rate||0)+'" min="0" step="0.01" oninput="modalUpdateTotals()" style="'+s+'text-align:right;" class="ml-rate"/>'+
+    '<div class="ml-amt" style="display:flex;align-items:center;justify-content:flex-end;font-size:12px;font-weight:600;color:var(--text2);">£0.00</div>'+
+    '<button onclick="document.getElementById(\'mline-'+id+'\').remove();modalUpdateTotals();" style="background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);border-radius:6px;cursor:pointer;font-size:11px;">✕</button>';
+  container.appendChild(row);
+  modalUpdateTotals();
+}
+
+function modalUpdateTotals(){
+  var container=document.getElementById('modal-line-items');
+  if(!container) return;
+  var subtotal=0;
+  container.querySelectorAll('div[id^="mline-"]').forEach(function(row){
+    var qty=parseFloat(row.querySelector('.ml-qty').value)||0;
+    var rate=parseFloat(row.querySelector('.ml-rate').value)||0;
+    var amt=qty*rate; subtotal+=amt;
+    row.querySelector('.ml-amt').textContent='£'+amt.toFixed(2);
+  });
+  var disc=parseFloat(document.getElementById('modal-inv-discount').value)||0;
+  var total=Math.max(0,subtotal-disc);
+  document.getElementById('modal-subtotal').textContent='£'+subtotal.toFixed(2);
+  document.getElementById('modal-total').textContent='£'+total.toFixed(2);
+  document.getElementById('modal-balance').textContent='£'+total.toFixed(2);
+}
+
+function modalCollectInvoice(){
+  var container=document.getElementById('modal-line-items');
+  var lines=[];
+  container.querySelectorAll('div[id^="mline-"]').forEach(function(row){
+    var desc=row.querySelector('.ml-desc').value.trim();
+    var qty=parseFloat(row.querySelector('.ml-qty').value)||0;
+    var rate=parseFloat(row.querySelector('.ml-rate').value)||0;
+    if(desc||qty||rate) lines.push({description:desc,qty:qty,rate:rate,amount:qty*rate});
+  });
+  var disc=parseFloat(document.getElementById('modal-inv-discount').value)||0;
+  var subtotal=lines.reduce(function(s,l){return s+l.amount;},0);
+  var total=Math.max(0,subtotal-disc);
+  return {
+    invoice_number : document.getElementById('modal-inv-number').value.trim(),
+    invoice_date   : document.getElementById('modal-inv-date').value,
+    due_date       : document.getElementById('modal-inv-due').value,
+    client_name    : document.getElementById('modal-inv-client').value.trim(),
+    line_items:lines, discount:disc, subtotal:subtotal, total:total, balance_due:total,
+    notes:'Thanks for your business.',
+    payment_info:'Account Name: Drussell Technical Services Ltd | Account Number: 10881117 | Sort Code: 231470'
+  };
+}
+
+async function confirmBooking(){
+  var b=_currentBooking; if(!b) return;
+  var invoice=modalCollectInvoice();
+  var packageNotes=document.getElementById('modal-package-notes').value.trim();
+  var alertEl=document.getElementById('modalAlert');
+  function showModalAlert(msg,ok){
+    alertEl.textContent=msg;
+    alertEl.style.cssText='display:block;padding:10px 14px;border-radius:var(--r);font-size:12px;margin-bottom:14px;'
+      +(ok?'background:var(--green-dim);border:1px solid rgba(45,212,160,.25);color:var(--green);'
+          :'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
+  }
+  var btn=document.getElementById('confirmSendBtn');
+  btn.disabled=true; btn.textContent='⏳ Creating event…';
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+
+  try {
+    var evName=(b.event_type||'Event')+' — '+(b.name||'Client')+(b.event_date?' ('+b.event_date+')':'');
+    var code  =_bkRandomCode();
+    var slug  =(b.name||'event').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+Date.now();
+    var expiry=new Date(); expiry.setDate(expiry.getDate()+30);
+
+    var evRef=await addDoc(collection(db,'events'),{
+      name:evName, type:'professional', template:'professional',
+      owner_email:b.email||null, owner_name:b.name||null, owner_avatar_url:null,
+      event_code:code, event_slug:slug,
+      expiry_date:expiry.toISOString(), is_active:true,
+      booking_id:b.id, invoice:invoice, created_at:serverTimestamp()
+    });
+    await addDoc(collection(db,'event_settings'),{
+      event_id:evRef.id, require_code:true, template:'professional',
+      watermark_enabled:true, created_at:serverTimestamp()
+    });
+
+    btn.textContent='⏳ Confirming & emailing…';
+    var eventUrl='https://impactgridgroup.com/event.html?event='+slug+'&code='+code;
+    var res=await fetch(API+'/api/booking-confirm',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({bookingId:b.id,eventId:evRef.id,eventCode:code,eventUrl:eventUrl,packageNotes:packageNotes,invoice:invoice})
+    });
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Backend error');
+
+    var num=parseInt(invoice.invoice_number.replace(/\D/g,''),10);
+    if(!isNaN(num)) localStorage.setItem('ig_last_inv_num',String(num));
+
+    showModalAlert('✅ Event created! Code: '+code+' · Confirmation email sent to '+b.email, true);
+    btn.textContent='✅ Done';
+    toast('✅','Booking confirmed!',evName+' · '+b.email);
+    setTimeout(function(){ closeConfirmModal(); loadBookings(); if(window.loadEvents) loadEvents(); if(window.loadStats) loadStats(); },2000);
+  } catch(e){
+    showModalAlert('Error: '+e.message, false);
+    btn.disabled=false; btn.textContent='✅ Confirm & Send →';
+  }
+}
+
+function rejectBookingFromModal(){ if(!_currentBooking) return; var id=_currentBooking.id; closeConfirmModal(); rejectBooking(id); }
+
+function _bkRandomCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; var code='';
+  for(var i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+async function loadBlockedDatesList(){
+  var el=document.getElementById('blockedDatesList'); if(!el) return;
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try {
+    var res=await fetch(API+'/api/blocked-dates');
+    var data=await res.json();
+    var dates=data.dates_full||data.dates||[];
+    if(!dates.length){ el.innerHTML='<div class="empty"><div class="empty-ico">📅</div><div class="empty-txt">No dates blocked.</div></div>'; return; }
+    el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+      +dates.map(function(d){
+          var dateStr=d.date||d; var reason=d.reason||'';
+          return '<div style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--red-dim);border:1px solid var(--red-glo);border-radius:100px;font-size:12px;">'
+            +'<span style="font-family:var(--fm);color:var(--red);">'+esc(dateStr)+'</span>'
+            +(reason?'<span style="color:var(--text3);">—</span><span style="color:var(--text2);">'+esc(reason)+'</span>':'')
+            +'<button onclick="unblockDate(\''+esc(dateStr)+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;" title="Unblock">✕</button>'
+            +'</div>';
+        }).join('')+'</div>';
+  } catch(e){ el.innerHTML='<div class="empty"><div class="empty-txt">Error loading dates.</div></div>'; }
+}
+
+async function blockDate(){
+  var dateVal=document.getElementById('block-date-input').value;
+  var reasonVal=document.getElementById('block-reason-input').value.trim();
+  if(!dateVal){ toast('⚠️','Select a date first',''); return; }
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try {
+    var res=await fetch(API+'/api/block-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateVal,reason:reasonVal})});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Failed');
+    toast('🚫','Date blocked',dateVal);
+    document.getElementById('block-date-input').value='';
+    document.getElementById('block-reason-input').value='';
+    loadBlockedDatesList();
+  } catch(e){ toast('⚠️','Error',e.message); }
+}
+
+async function unblockDate(dateStr){
+  if(!confirm('Unblock '+dateStr+'?')) return;
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try {
+    var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateStr})});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Failed');
+    toast('✅','Date unblocked',dateStr);
+    loadBlockedDatesList();
+  } catch(e){ toast('⚠️','Error',e.message); }
+}
+
+window.loadBookings      = loadBookings;
+window.filterBookings    = filterBookings;
+window.openConfirmModal  = openConfirmModal;
+window.closeConfirmModal = closeConfirmModal;
+window.confirmBooking    = confirmBooking;
+window.rejectBooking     = rejectBooking;
+window.rejectBookingFromModal = rejectBookingFromModal;
+window.viewBookingDetail = viewBookingDetail;
+window.modalAddLine      = modalAddLine;
+window.modalUpdateTotals = modalUpdateTotals;
+window.blockDate         = blockDate;
+window.unblockDate       = unblockDate;
 
 </script>
 </body>
