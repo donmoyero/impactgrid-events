@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Services — Impact Grid Events</title>
+  <meta name="description" content="Professional event photography, content creation, and organised online galleries. Impact Grid Events — Manchester." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Fraunces — display font matching index.html -->
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css"/>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KVJC5DE2WT');
+  </script>
+
+  <style>
+    /* ════════════════════════════════════════
+       SERVICES PAGE — page-local styles only.
+       shared.css owns: reset, body bg+grain,
+       nav rail, page-wrap offset, .btn-*, .card,
+       .grid-*, .section, .label-tag, .anim-*, 
+       .page-hero, footer, mobile breakpoints.
+    ════════════════════════════════════════ */
+
+    :root {
+      --sv-display: 'Fraunces', Georgia, serif;
+    }
+
+    /* ── Full-bleed: undoes page-wrap left-offset for edge-to-edge sections ── */
+    .full-bleed {
+      margin-left: calc(-1 * var(--nav-w-collapsed, 52px));
+      width: 100vw;
+    }
+    @media (max-width: 768px) {
+      .full-bleed { margin-left: 0; width: 100%; }
+    }
+
+    /* ── PAGE HEADER ─────────────────────────────── */
+    .sv-header {
+      padding: 96px 40px 72px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .sv-headline {
+      font-family: var(--sv-display);
+      font-size: clamp(42px, 5.5vw, 74px);
+      font-weight: 300;
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
+    .sv-headline em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .sv-sub {
+      font-size: clamp(15px, 1.6vw, 18px);
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.72;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── SERVICES GRID ───────────────────────────── */
+    .sv-section {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 16px 40px 120px;
+    }
+
+    .sv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px;
+    }
+
+    /* ── SERVICE CARD ────────────────────────────── */
+    /* Extends shared .card but overrides padding/radius for image-first layout */
+    .sv-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .sv-card:hover {
+      border-color: var(--gold-glo);
+      transform: translateY(-4px);
+      box-shadow: var(--sh2);
+    }
+
+    .sv-card-img-wrap { overflow: hidden; flex-shrink: 0; }
+
+    .sv-card-img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.88);
+      transition: filter 0.4s, transform 0.5s;
+    }
+    .sv-card:hover .sv-card-img {
+      filter: brightness(1);
+      transform: scale(1.03);
+    }
+
+    /* Placeholder when no image set */
+    .sv-card-placeholder {
+      width: 100%;
+      height: 200px;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sv-card-body {
+      padding: 32px 36px 36px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sv-card-icon {
+      font-size: 26px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .sv-card-title {
+      font-family: var(--sv-display);
+      font-size: clamp(22px, 2.2vw, 30px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .sv-card-desc {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.72;
+      flex: 1;
+    }
+
+    /* Expanding gold accent line — mirrors index.html section style */
+    .sv-card-line {
+      width: 32px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-top: 28px;
+      opacity: 0.5;
+      transition: width 0.35s ease, opacity 0.35s ease;
+    }
+    .sv-card:hover .sv-card-line {
+      width: 56px;
+      opacity: 1;
+    }
+
+    /* ── SKELETON LOADER ─────────────────────────── */
+    .sv-skeleton {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    /* pulse keyframe comes from shared.css */
+    .sv-sk-img  { width: 100%; height: 240px; background: var(--bg2); }
+    .sv-sk-body { padding: 32px 36px; }
+    .sv-sk-line {
+      height: 13px;
+      border-radius: 8px;
+      background: var(--bg2);
+      margin-bottom: 12px;
+    }
+    .sv-sk-line.w55 { width: 55%; }
+    .sv-sk-line.w80 { width: 80%; }
+    .sv-sk-line.w42 { width: 42%; }
+
+    /* ── EMPTY / ERROR STATE ─────────────────────── */
+    .sv-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text3);
+    }
+    .sv-empty-ico { font-size: 40px; margin-bottom: 14px; }
+    .sv-empty-txt { font-size: 15px; }
+
+    /* ── CTA STRIP ───────────────────────────────── */
+    .sv-cta {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 100px 40px;
+    }
+    .sv-cta-inner {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .sv-cta-title {
+      font-family: var(--sv-display);
+      font-size: clamp(34px, 4.2vw, 58px);
+      font-weight: 300;
+      line-height: 1.07;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin: 16px 0 18px;
+    }
+    .sv-cta-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .sv-cta-sub {
+      font-size: 16px;
+      color: var(--text2);
+      font-weight: 300;
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+    .sv-cta-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 900px) {
+      .sv-grid        { grid-template-columns: 1fr; }
+      .sv-section     { padding: 8px 20px 72px; }
+      .sv-header      { padding: 72px 20px 56px; }
+      .sv-card-body   { padding: 24px 24px 28px; }
+      .sv-cta         { padding: 72px 20px; }
+    }
+    @media (max-width: 600px) {
+      .sv-card-img    { height: 200px; }
+      .sv-sk-img      { height: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Script load order required by nav.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="plan-config.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
+
+  <!-- Nav -->
+  <div id="ig-nav"></div>
+  <script src="nav.js"></script>
+  <script>renderNav('services.html');</script>
+
+  <div class="page-wrap">
+
+    <!-- PAGE HEADER -->
+    <header class="sv-header">
+      <!-- .label-tag from shared.css: gold line + uppercase mono label -->
+      <div class="label-tag anim-fade-up">What We Do</div>
+      <h1 class="sv-headline anim-fade-up delay-1">
+        Every service.<br><em>One team.</em>
+      </h1>
+      <p class="sv-sub anim-fade-up delay-2">
+        From the moment we arrive to the second your guests download their photos — we handle it all. Professional, fast, and built around your event.
+      </p>
+    </header>
+
+    <!-- DIVIDER -->
+    <div class="divider"></div>
+
+    <!-- SERVICES GRID -->
+    <section class="sv-section">
+      <div class="sv-grid" id="servicesGrid">
+        <!-- Skeleton cards shown while loading -->
+        <div class="sv-skeleton"><div class="sv-sk-img"></div><div class="sv-sk-body"><div class="sv-sk-line w55"></div><div class="sv-sk-line w80"></div><div class="sv-sk-line w42"></div></div></div>
+        <div class="sv-skeleton"><div class="sv-sk-img"></div><div class="sv-sk-body"><div class="sv-sk-line w55"></div><div class="sv-sk-line w80"></div><div class="sv-sk-line w42"></div></div></div>
+        <div class="sv-skeleton"><div class="sv-sk-img"></div><div class="sv-sk-body"><div class="sv-sk-line w55"></div><div class="sv-sk-line w80"></div><div class="sv-sk-line w42"></div></div></div>
+        <div class="sv-skeleton"><div class="sv-sk-img"></div><div class="sv-sk-body"><div class="sv-sk-line w55"></div><div class="sv-sk-line w80"></div><div class="sv-sk-line w42"></div></div></div>
+      </div>
+    </section>
+
+    <!-- CTA STRIP -->
+    <section class="sv-cta full-bleed">
+      <div class="sv-cta-inner">
+        <!-- .label-tag from shared.css -->
+        <div class="label-tag" style="justify-content:center;">Ready to book?</div>
+        <h2 class="sv-cta-title">Let's make your<br><em>event unforgettable.</em></h2>
+        <p class="sv-cta-sub">Tell us your date and what you need. We'll get back to you within 24 hours.</p>
+        <div class="sv-cta-btns">
+          <!-- .btn-gold and .btn-ghost both defined in shared.css -->
+          <a href="contact.html" class="btn btn-gold">Book Us Now</a>
+          <a href="portfolio.html" class="btn btn-ghost">See Our Work →</a>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /.page-wrap -->
+
+  <!-- Footer -->
+  <div id="ig-footer"></div>
+  <script>renderFooter();</script>
+
+  <script>
+  /* ════════════════════════════════════════
+     SERVICES — fetch from Supabase, render
+  ════════════════════════════════════════ */
+
+  var FALLBACK_SERVICES = [
+    {
+      id:'f1', title:'Professional Photography',
+      description:'High-quality event photography from an experienced creative. We capture the moments that matter — candid, posed, and everything in between.',
+      icon:'📸',
+      image_url:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80&fit=crop',
+      sort_order:0
+    },
+    {
+      id:'f2', title:'High-Quality Content Creation',
+      description:'Beyond photos — we create polished content ready for social media, print, or internal use. Clips, highlights, and branded assets delivered fast.',
+      icon:'🎬',
+      image_url:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80&fit=crop',
+      sort_order:10
+    },
+    {
+      id:'f3', title:'Organised Online Galleries',
+      description:'Every photo is sorted into a clean, branded online gallery. Guests browse and download their shots in seconds — no app, no login required.',
+      icon:'🗂️',
+      image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop',
+      sort_order:20
+    },
+    {
+      id:'f4', title:'Easy Preview & Download Systems',
+      description:'We build the digital infrastructure around your event. Guests get a private link, preview their photos instantly, and download in full resolution.',
+      icon:'⬇️',
+      image_url:'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80&fit=crop',
+      sort_order:30
+    }
+  ];
+
+  function esc(str){
+    return String(str||'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* stagger delays matching shared.css .delay-1..5 */
+  var DELAYS = ['','delay-1','delay-2','delay-3','delay-4','delay-5'];
+
+  function renderServices(services){
+    var grid = document.getElementById('servicesGrid');
+    if(!grid) return;
+
+    if(!services || !services.length){
+      grid.innerHTML =
+        '<div class="sv-empty">' +
+          '<div class="sv-empty-ico">🛎️</div>' +
+          '<div class="sv-empty-txt">Services coming soon. Check back shortly.</div>' +
+        '</div>';
+      return;
+    }
+
+    grid.innerHTML = services.map(function(s, i){
+      /* Image block — full photo if set, large emoji placeholder otherwise */
+      var imgBlock = s.image_url
+        ? '<div class="sv-card-img-wrap">' +
+            '<img class="sv-card-img" src="'+esc(s.image_url)+'" alt="'+esc(s.title)+'" loading="'+(i<2?'eager':'lazy')+'"/>' +
+          '</div>'
+        : (s.icon ? '<div class="sv-card-placeholder">'+esc(s.icon)+'</div>' : '');
+
+      /* Show emoji in body only when a photo is also present */
+      var iconBlock = (s.icon && s.image_url)
+        ? '<span class="sv-card-icon">'+esc(s.icon)+'</span>'
+        : '';
+
+      var delay = DELAYS[Math.min(i, DELAYS.length-1)];
+
+      return '<div class="sv-card anim-fade-up '+delay+'">' +
+        imgBlock +
+        '<div class="sv-card-body">' +
+          iconBlock +
+          '<h2 class="sv-card-title">'+esc(s.title)+'</h2>' +
+          '<p class="sv-card-desc">'+esc(s.description)+'</p>' +
+          '<div class="sv-card-line"></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    /* Trigger shared.css .anim scroll observer on new cards */
+    initAnim();
+  }
+
+  async function loadServices(){
+    try{
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if(!sb){ renderServices(FALLBACK_SERVICES); return; }
+
+      var res = await sb
+        .from('services')
+        .select('id,title,description,icon,image_url,sort_order')
+        .eq('is_active', true)
+        .order('sort_order', {ascending:true});
+
+      if(res.error) throw res.error;
+      renderServices(res.data && res.data.length ? res.data : FALLBACK_SERVICES);
+    } catch(e){
+      console.warn('Services fetch failed, using fallback:', e);
+      renderServices(FALLBACK_SERVICES);
+    }
+  }
+
+  /* ── Shared .anim scroll observer (mirrors shared.css .anim class) ── */
+  function initAnim(){
+    var els = document.querySelectorAll('.anim-fade-up:not(.visible)');
+    if(!els.length) return;
+    if('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){
+            e.target.classList.add('visible');
+            io.unobserve(e.target);
+          }
+        });
+      }, {threshold:0.12});
+      els.forEach(function(el){ io.observe(el); });
+    } else {
+      /* Fallback: reveal all immediately */
+      els.forEach(function(el){ el.classList.add('visible'); });
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ loadServices(); initAnim(); });
+  } else {
+    loadServices();
+    initAnim();
+  }
+  </script>
+
+</body>
+</html>
