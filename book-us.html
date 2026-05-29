@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Book Us — ImpactGrid Events</title>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+/* ── PAGE-SPECIFIC: booking page only ── */
+
+/* Hero */
+.bk-hero {
+  padding: 100px 32px 72px;
+  text-align: center;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(240,180,41,.12), transparent);
+  position: relative; overflow: hidden;
+}
+.bk-hero::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(240,180,41,.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(240,180,41,.04) 0%, transparent 40%);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--fm); font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold-glo);
+  padding: 5px 14px; border-radius: 100px; margin-bottom: 24px;
+}
+.hero-eyebrow::before { content: '●'; font-size: 7px; animation: pulse 2s infinite; }
+.hero-title {
+  font-size: clamp(42px, 7vw, 78px); font-weight: 900;
+  line-height: 1.0; letter-spacing: -.04em; margin-bottom: 20px;
+}
+.hero-title span { color: var(--gold); }
+.hero-sub {
+  font-size: 17px; color: var(--text2); max-width: 520px; margin: 0 auto 40px; line-height: 1.7;
+}
+.hero-scroll-hint {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text3); letter-spacing: .06em;
+  animation: fadeUp 1s ease .8s both;
+}
+.scroll-arrow { animation: bounce 1.8s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+
+/* Booking layout */
+.bk-section { max-width: 1000px; margin: 0 auto; padding: 60px 24px; }
+.section-label {
+  font-family: var(--fm); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 12px;
+}
+.section-title  { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+.section-sub    { font-size: 14px; color: var(--text2); margin-bottom: 36px; }
+
+.booking-wrap {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start;
+}
+@media(max-width:760px) { .booking-wrap { grid-template-columns: 1fr; } }
+
+/* Calendar */
+.cal-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r2); overflow: hidden; box-shadow: var(--sh);
+}
+.cal-head {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cal-month { font-family: var(--fd); font-size: 16px; font-weight: 900; }
+.cal-nav   { display: flex; gap: 6px; }
+.cal-btn {
+  width: 32px; height: 32px; border-radius: var(--r); border: 1px solid var(--border2);
+  background: var(--bg2); color: var(--text2); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.cal-btn:hover { border-color: var(--gold); color: var(--gold); }
+.cal-body    { padding: 16px 20px 20px; }
+.cal-dow     { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 8px; }
+.cal-dow-cell {
+  text-align: center; font-family: var(--fm); font-size: 9px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--text3); padding: 4px 0;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cal-day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid transparent; transition: all .15s; position: relative;
+}
+.cal-day:hover:not(.cal-day--other):not(.cal-day--past):not(.cal-day--blocked) {
+  background: var(--bg3); border-color: var(--border2);
+}
+.cal-day--other   { color: var(--text3); pointer-events: none; }
+.cal-day--past    { color: var(--text3); pointer-events: none; opacity: .4; }
+.cal-day--blocked { pointer-events: none; }
+.cal-day--blocked::after {
+  content: ''; position: absolute; inset: 3px; border-radius: 7px;
+  background: repeating-linear-gradient(-45deg,var(--red-dim),var(--red-dim) 2px,transparent 2px,transparent 7px);
+  border: 1px solid var(--red-glo);
+}
+.cal-day--blocked span { opacity: .35; }
+.cal-day--today::before {
+  content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%; background: var(--gold);
+}
+.cal-day--selected {
+  background: linear-gradient(135deg,var(--gold),var(--gold2)) !important;
+  color: #07090f !important; font-weight: 700; border-color: transparent !important;
+  box-shadow: var(--sh-gold);
+}
+.cal-legend {
+  display: flex; gap: 16px; margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.cal-legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text3); }
+.cal-legend-dot  { width: 12px; height: 12px; border-radius: 4px; }
+.legend-avail    { background: var(--bg3); border: 1px solid var(--border2); }
+.legend-sel      { background: linear-gradient(135deg,var(--gold),var(--gold2)); }
+.legend-blocked  { background: repeating-linear-gradient(-45deg,var(--red-dim),var(--red-dim) 2px,transparent 2px,transparent 6px); border: 1px solid var(--red-glo); }
+.legend-today    { background: var(--bg3); border: 1px solid var(--border2); position: relative; }
+.legend-today::after { content: ''; position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--gold); }
+
+/* Form card */
+.form-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r2); overflow: hidden; box-shadow: var(--sh);
+}
+.form-head {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.form-head-icon  { font-size: 16px; }
+.form-head-title { font-family: var(--fd); font-size: 15px; font-weight: 900; }
+.form-head-date  {
+  margin-left: auto; font-family: var(--fm); font-size: 10px;
+  color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold-glo);
+  padding: 3px 10px; border-radius: 100px; letter-spacing: .04em;
+}
+.form-body       { padding: 20px; }
+.field-row       { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media(max-width:500px) { .field-row { grid-template-columns: 1fr; } }
+.field-group     { margin-bottom: 0; }
+.field-group-full{ margin-bottom: 12px; }
+.field-label     { font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+input, textarea, select {
+  font-family: var(--fb); font-size: 13px; color: var(--text);
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 11px 14px; width: 100%; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim);
+}
+select option { background: var(--bg2); }
+textarea { resize: vertical; min-height: 80px; }
+
+/* Date prompt */
+.date-prompt     { text-align: center; padding: 32px 20px; color: var(--text3); }
+.date-prompt-ico { font-size: 32px; margin-bottom: 10px; }
+.date-prompt-txt { font-size: 13px; line-height: 1.6; }
+
+/* Submit button */
+.btn-submit {
+  width: 100%; padding: 14px; border-radius: var(--r); border: none; cursor: pointer;
+  background: linear-gradient(135deg,var(--gold),var(--gold2));
+  color: #07090f; font-family: var(--fd); font-size: 15px; font-weight: 900;
+  letter-spacing: -.01em; margin-top: 16px; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--sh-gold); }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Alerts */
+.alert     { padding: 12px 16px; border-radius: var(--r); font-size: 13px; margin-bottom: 14px; display: none; }
+.alert-err { background: var(--red-dim); border: 1px solid var(--red-glo); color: var(--red); }
+.alert-ok  { background: var(--green-dim); border: 1px solid rgba(45,212,160,.25); color: var(--green); }
+
+/* Success state */
+.success-wrap  { max-width: 520px; margin: 80px auto; padding: 24px; text-align: center; animation: fadeUp .5s ease; }
+.success-icon  { width: 72px; height: 72px; border-radius: 50%; background: var(--green-dim); border: 2px solid rgba(45,212,160,.3); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
+.success-title { font-size: 28px; margin-bottom: 10px; }
+.success-sub   { color: var(--text2); font-size: 15px; line-height: 1.7; margin-bottom: 24px; }
+.success-detail{ background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; text-align: left; margin-bottom: 24px; }
+.success-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.success-detail-row:last-child { border-bottom: none; }
+.success-detail-label { color: var(--text3); }
+.success-detail-val   { font-weight: 600; color: var(--text); }
+.btn-back {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
+  border-radius: var(--r); background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.btn-back:hover { color: var(--text); border-color: var(--gold); }
+
+/* Why grid */
+.why-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 36px; }
+@media(max-width:640px) { .why-grid { grid-template-columns: 1fr; } }
+.why-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); padding: 24px; transition: all .25s; }
+.why-card:hover { border-color: var(--gold-glo); transform: translateY(-3px); box-shadow: var(--sh2); }
+.why-icon  { font-size: 28px; margin-bottom: 14px; }
+.why-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.why-desc  { font-size: 13px; color: var(--text2); line-height: 1.65; }
+</style>
+</head>
+<body>
+
+<!-- nav.js injects the left-rail nav here -->
+<div id="ig-nav"></div>
+
+<!-- HERO -->
+<section class="bk-hero">
+  <div class="hero-eyebrow">Now Booking 2025 &amp; 2026</div>
+  <h1 class="hero-title">Let's Capture<br><span>Your Moment</span></h1>
+  <p class="hero-sub">Professional photography &amp; videography for weddings, corporate events, portraits and more. Pick a date and tell us about your event.</p>
+  <div class="hero-scroll-hint">
+    <span class="scroll-arrow">↓</span> Select a date to get started
+  </div>
+</section>
+
+<!-- BOOKING SECTION -->
+<section class="bk-section" id="booking">
+  <div class="section-label">Book a Session</div>
+  <h2 class="section-title">Check Availability</h2>
+  <p class="section-sub">Choose an available date then fill in your details — we'll confirm within 24 hours.</p>
+
+  <!-- Main booking UI -->
+  <div id="bookingUI">
+    <div class="booking-wrap">
+
+      <!-- Calendar -->
+      <div class="cal-card">
+        <div class="cal-head">
+          <div class="cal-month" id="calMonth">Loading…</div>
+          <div class="cal-nav">
+            <button class="cal-btn" id="calPrev" onclick="changeMonth(-1)" title="Previous month">‹</button>
+            <button class="cal-btn" id="calNext" onclick="changeMonth(1)"  title="Next month">›</button>
+          </div>
+        </div>
+        <div class="cal-body">
+          <div class="cal-dow">
+            <div class="cal-dow-cell">Su</div><div class="cal-dow-cell">Mo</div>
+            <div class="cal-dow-cell">Tu</div><div class="cal-dow-cell">We</div>
+            <div class="cal-dow-cell">Th</div><div class="cal-dow-cell">Fr</div>
+            <div class="cal-dow-cell">Sa</div>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-avail"></div>Available</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-sel"></div>Selected</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-blocked"></div>Unavailable</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-today"></div>Today</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="form-card">
+        <div class="form-head">
+          <span class="form-head-icon">📋</span>
+          <span class="form-head-title">Your Details</span>
+          <span class="form-head-date" id="formDateBadge" style="display:none;"></span>
+        </div>
+        <div class="form-body">
+          <div id="formAlert" class="alert"></div>
+
+          <!-- Date prompt shown before date is picked -->
+          <div id="datePrompt" class="date-prompt">
+            <div class="date-prompt-ico">📅</div>
+            <div class="date-prompt-txt">Pick an available date on the calendar<br>to unlock the booking form.</div>
+          </div>
+
+          <!-- Actual form (hidden until date selected) -->
+          <div id="bookingForm" style="display:none;">
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">Full Name *</label>
+                <input type="text" id="bk-name" placeholder="Your name"/>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Email *</label>
+                <input type="email" id="bk-email" placeholder="you@email.com"/>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">Phone *</label>
+                <input type="tel" id="bk-phone" placeholder="+44 7000 000000"/>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Event Type *</label>
+                <select id="bk-type">
+                  <option value="">— Select type —</option>
+                  <option value="Wedding">Wedding</option>
+                  <option value="Corporate">Corporate</option>
+                  <option value="Portrait">Portrait</option>
+                  <option value="Social">Social / Party</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">Guest Count</label>
+                <input type="number" id="bk-guests" placeholder="e.g. 80" min="1"/>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Location / Venue</label>
+                <input type="text" id="bk-location" placeholder="e.g. Manchester City Centre"/>
+              </div>
+            </div>
+            <div class="field-group-full">
+              <label class="field-label">Additional Notes</label>
+              <textarea id="bk-notes" placeholder="Tell us more about your event, any special requirements…" rows="3"></textarea>
+            </div>
+
+            <button class="btn-submit" id="submitBtn" onclick="submitBooking()">
+              <span id="submitLabel">✦ Send Booking Request</span>
+            </button>
+            <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px;">We'll confirm within 24 hours. No payment taken at this stage.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div id="successUI" style="display:none;">
+    <div class="success-wrap">
+      <div class="success-icon">✓</div>
+      <h2 class="success-title">Request Sent!</h2>
+      <p class="success-sub">Thanks — we've received your booking request and will confirm within 24 hours. Check your inbox for a confirmation email.</p>
+      <div class="success-detail" id="successDetail"></div>
+      <button class="btn-back" onclick="resetBooking()">← Make another booking</button>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="bk-section" style="padding-top:0;">
+  <div class="section-label">Why ImpactGrid</div>
+  <h2 class="section-title">Moments Worth Keeping</h2>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon">📸</div>
+      <div class="why-title">Face Recognition Gallery</div>
+      <div class="why-desc">Guests find their own photos instantly using our AI face recognition — no searching through hundreds of images.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">⚡</div>
+      <div class="why-title">Same-Day Gallery</div>
+      <div class="why-desc">Photos are uploaded and available to guests while the event is still happening. Live memories, live sharing.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🔒</div>
+      <div class="why-title">Private &amp; Secure</div>
+      <div class="why-desc">Galleries are access-code protected. Only your guests see your photos. Everything auto-expires after 30 days.</div>
+    </div>
+  </div>
+</section>
+
+<!-- nav.js injects the footer here -->
+<div id="ig-footer"></div>
+
+<!-- ── Script load order (per nav.js docs) ── -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="plan-config.js"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="nav.js"></script>
+
+<script>
+/* ── Boot nav ── */
+renderNav('contact.html');
+renderFooter();
+
+/* ── Page-specific JS ── */
+const EVENTS_API = 'https://impactgrid-events-api.onrender.com';
+
+var today        = new Date(); today.setHours(0,0,0,0);
+var calYear      = today.getFullYear();
+var calMonth     = today.getMonth();
+var selectedDate = null;
+var blockedDates = [];
+
+var MONTH_NAMES = ['January','February','March','April','May','June',
+  'July','August','September','October','November','December'];
+
+async function loadBlockedDates() {
+  try {
+    const res  = await fetch(EVENTS_API + '/api/blocked-dates');
+    const data = await res.json();
+    blockedDates = data.dates || [];
+  } catch(e) { blockedDates = []; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  var firstDay    = new Date(calYear, calMonth, 1).getDay();
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  document.getElementById('calMonth').textContent = MONTH_NAMES[calMonth] + ' ' + calYear;
+
+  var prevBtn = document.getElementById('calPrev');
+  prevBtn.disabled = (calYear === today.getFullYear() && calMonth === today.getMonth());
+  prevBtn.style.opacity = prevBtn.disabled ? '.3' : '1';
+
+  var grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  for (var i = 0; i < firstDay; i++) {
+    var blank = document.createElement('div');
+    blank.className = 'cal-day cal-day--other';
+    grid.appendChild(blank);
+  }
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var cell    = document.createElement('div');
+    var dateObj = new Date(calYear, calMonth, d);
+    var dateStr = isoDate(dateObj);
+    var isPast  = dateObj < today;
+    var isToday = dateObj.getTime() === today.getTime();
+    var isBlock = blockedDates.includes(dateStr);
+    var isSel   = (dateStr === selectedDate);
+
+    var cls = 'cal-day';
+    if (isPast)        cls += ' cal-day--past';
+    else if (isBlock)  cls += ' cal-day--blocked';
+    if (isToday)       cls += ' cal-day--today';
+    if (isSel)         cls += ' cal-day--selected';
+
+    cell.className = cls;
+    cell.innerHTML = '<span>' + d + '</span>';
+    if (!isPast && !isBlock) {
+      cell.onclick = (function(ds){ return function(){ selectDate(ds); }; })(dateStr);
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function isoDate(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0;  calYear++; }
+  renderCalendar();
+}
+
+function selectDate(dateStr) {
+  selectedDate = dateStr;
+  renderCalendar();
+  document.getElementById('datePrompt').style.display  = 'none';
+  document.getElementById('bookingForm').style.display = 'block';
+  var badge = document.getElementById('formDateBadge');
+  var parts = dateStr.split('-');
+  badge.textContent = MONTH_NAMES[parseInt(parts[1])-1].slice(0,3) + ' ' + parseInt(parts[2]) + ', ' + parts[0];
+  badge.style.display = 'inline-flex';
+  if (window.innerWidth < 760) {
+    document.querySelector('.form-card').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
+async function submitBooking() {
+  var alertEl = document.getElementById('formAlert');
+  function showAlert(msg, ok) {
+    alertEl.textContent = msg;
+    alertEl.className = 'alert ' + (ok ? 'alert-ok' : 'alert-err');
+    alertEl.style.display = 'block';
+  }
+  alertEl.style.display = 'none';
+
+  var name     = document.getElementById('bk-name').value.trim();
+  var email    = document.getElementById('bk-email').value.trim();
+  var phone    = document.getElementById('bk-phone').value.trim();
+  var type     = document.getElementById('bk-type').value;
+  var guests   = document.getElementById('bk-guests').value.trim();
+  var location = document.getElementById('bk-location').value.trim();
+  var notes    = document.getElementById('bk-notes').value.trim();
+
+  if (!selectedDate) { showAlert('Please select a date on the calendar first.', false); return; }
+  if (!name)         { showAlert('Please enter your full name.', false); return; }
+  if (!email || !email.includes('@')) { showAlert('Please enter a valid email address.', false); return; }
+  if (!phone)        { showAlert('Please enter a phone number.', false); return; }
+  if (!type)         { showAlert('Please select an event type.', false); return; }
+
+  var btn = document.getElementById('submitBtn');
+  var lbl = document.getElementById('submitLabel');
+  btn.disabled = true;
+  lbl.textContent = '⏳ Sending…';
+
+  try {
+    const res  = await fetch(EVENTS_API + '/api/booking-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, event_type: type, event_date: selectedDate, guest_count: guests||null, location: location||null, notes: notes||null })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed');
+
+    document.getElementById('bookingUI').style.display = 'none';
+    var parts = selectedDate.split('-');
+    var readableDate = MONTH_NAMES[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
+    document.getElementById('successDetail').innerHTML =
+      row('Name', name) + row('Email', email) + row('Date', readableDate) + row('Event Type', type) + (guests ? row('Guest Count', guests) : '');
+    document.getElementById('successUI').style.display = 'block';
+    window.scrollTo({ top: document.getElementById('booking').offsetTop - 80, behavior:'smooth' });
+
+  } catch(err) {
+    showAlert('Something went wrong: ' + err.message, false);
+    btn.disabled = false;
+    lbl.textContent = '✦ Send Booking Request';
+  }
+}
+
+function row(label, val) {
+  return '<div class="success-detail-row"><span class="success-detail-label">' + label + '</span><span class="success-detail-val">' + val + '</span></div>';
+}
+
+function resetBooking() {
+  selectedDate = null;
+  document.getElementById('bookingUI').style.display  = 'block';
+  document.getElementById('successUI').style.display  = 'none';
+  document.getElementById('bookingForm').style.display = 'none';
+  document.getElementById('datePrompt').style.display  = 'block';
+  document.getElementById('formDateBadge').style.display = 'none';
+  ['bk-name','bk-email','bk-phone','bk-guests','bk-location','bk-notes'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('bk-type').value = '';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitLabel').textContent = '✦ Send Booking Request';
+  document.getElementById('formAlert').style.display = 'none';
+  renderCalendar();
+}
+
+loadBlockedDates();
+</script>
+</body>
+</html>
