@@ -293,7 +293,7 @@ tr:hover td{background:var(--bg2);}
         <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico">📊</div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
 <div class="quick-card" onclick="nav('createevent',null)"><div class="quick-ico">📅</div><div class="quick-title">Create Event</div><div class="quick-desc">Set up a new photo event with access code and expiry</div></div>
         <div class="quick-card" onclick="nav('uploadphotos',null)"><div class="quick-ico">🖼️</div><div class="quick-title">Upload Photos</div><div class="quick-desc">Add photos to an existing event gallery</div></div>
-<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico">🔗</div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div><div class="quick-card" onclick="nav('services',null)"><div class="quick-ico">🛎️</div><div class="quick-title">Manage Services</div><div class="quick-desc">Add, edit and reorder the services shown on your Services page</div></div><div class="quick-card" onclick="nav('about',null)"><div class="quick-ico">👥</div><div class="quick-title">Edit About Page</div><div class="quick-desc">Update your story, team photos, bios and why-choose-us pillars</div></div>
+<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico">🔗</div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div><div class="quick-card" onclick="nav('services',null)"><div class="quick-ico">🛎️</div><div class="quick-title">Manage Services</div><div class="quick-desc">Add, edit and reorder the services shown on your Services page</div></div><div class="quick-card" onclick="nav('about',null)"><div class="quick-ico">👥</div><div class="quick-title">Edit About Page</div><div class="quick-desc">Update your story, team photos, bios and Mission &amp; Vision pillars</div></div>
       </div>
     </div>
     <!-- HOMEPAGE CONTENT -->
@@ -719,7 +719,7 @@ If you have any questions, just reply to this email.
     <div class="page" id="page-about">
       <div class="page-header">
         <div class="page-title">About Page</div>
-        <div class="page-sub">Edit the story, team members, and "Why Choose Us" pillars shown on about.html.</div>
+        <div class="page-sub">Edit the story, team members, and Mission & Vision pillars shown on about.html.</div>
       </div>
       <div class="ws-layout">
         <div>
@@ -782,10 +782,10 @@ If you have any questions, just reply to this email.
             </div>
           </div>
 
-          <!-- WHY CHOOSE US PILLARS -->
+          <!-- MISSION & VISION PILLARS -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2>✅ Why Choose Us — Pillars</h2>
+              <h2>🎯 Mission & Vision — Pillars</h2>
               <div style="display:flex;gap:8px;">
                 <button class="btn btn-ghost btn-sm" onclick="addPillar()">+ Add Pillar</button>
                 <button class="btn btn-gold" onclick="savePillars()">💾 Save Pillars</button>
@@ -802,7 +802,7 @@ If you have any questions, just reply to this email.
         <div class="ws-sticky">
           <div class="hint-box">
             <strong>How the About page works</strong><br><br>
-            All content reads from the <code>about_page</code> Supabase table (single row). The team members and pillars are stored as JSON arrays in that row.<br><br>
+            All content reads from the <code>about_page</code> Supabase table (single row). The team members and Mission &amp; Vision pillars are stored as JSON arrays in that row.<br><br>
             Changes go live immediately — no redeploy needed.
           </div>
           <a href="about.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview About Page</a>
@@ -2482,10 +2482,10 @@ function populateAboutForm(d) {
 
   /* Pillars */
   renderPillarsEditor(d.pillars || [
-    { icon:'📸', title:'High-Quality Photography', description:'Professional event photography delivered at full resolution, fast.' },
-    { icon:'🎬', title:'Content Creation',         description:'Polished content ready for social media, print, or internal use.' },
-    { icon:'⚡', title:'Fast Media Delivery',      description:'Your gallery is ready within 24 hours. Guests can browse and download straight away.' },
-    { icon:'🗂️', title:'Organised Galleries',     description:'Clean, branded online gallery. No login, no app — just a link.' }
+    { icon:'🎯', title:'Our Mission',       description:'To deliver a seamless event media experience — capturing every moment with precision and putting photos in guests\' hands within 24 hours, every time.' },
+    { icon:'🔭', title:'Our Vision',        description:'To become the leading event media platform in the UK — where photography, content, and technology work as one.' },
+    { icon:'💡', title:'Our Values',        description:'Quality without compromise. Speed without sacrificing care. Technology that serves people, not the other way around.' },
+    { icon:'🚀', title:'Where We\'re Going', description:'Building the infrastructure for the future of event media — scalable, branded, and guest-first from start to finish.' }
   ]);
 }
 
