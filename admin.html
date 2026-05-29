@@ -266,6 +266,7 @@ tr:hover td{background:var(--bg2);}
       <div class="sb-section-label">🌐 Website</div>
       <nav class="sb-nav">
         <a href="#" onclick="return nav('hero',this)"><span class="sb-ico">🎞️</span>Hero Slideshow</a>
+        <a href="#" onclick="return nav('services',this)"><span class="sb-ico">🛎️</span>Services</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -291,7 +292,7 @@ tr:hover td{background:var(--bg2);}
         <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico">📊</div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
 <div class="quick-card" onclick="nav('createevent',null)"><div class="quick-ico">📅</div><div class="quick-title">Create Event</div><div class="quick-desc">Set up a new photo event with access code and expiry</div></div>
         <div class="quick-card" onclick="nav('uploadphotos',null)"><div class="quick-ico">🖼️</div><div class="quick-title">Upload Photos</div><div class="quick-desc">Add photos to an existing event gallery</div></div>
-<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico">🔗</div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div>
+<div class="quick-card" onclick="window.open('index.html','_blank')" style="border-style:dashed;"><div class="quick-ico">🔗</div><div class="quick-title">View Live Site</div><div class="quick-desc">Open homepage in a new tab to preview changes</div></div><div class="quick-card" onclick="nav('services',null)"><div class="quick-ico">🛎️</div><div class="quick-title">Manage Services</div><div class="quick-desc">Add, edit and reorder the services shown on your Services page</div></div>
       </div>
     </div>
     <!-- HOMEPAGE CONTENT -->
@@ -579,6 +580,109 @@ tr:hover td{background:var(--bg2);}
       </div>
     </div>
 
+
+    <!-- SERVICES -->
+    <div class="page" id="page-services">
+      <div class="page-header">
+        <div class="page-title">Services</div>
+        <div class="page-sub">Add, edit and reorder the services shown on your Services page. Changes go live immediately.</div>
+      </div>
+      <div class="ws-layout">
+        <div>
+          <!-- Service list -->
+          <div class="card" style="margin-bottom:18px;">
+            <div class="card-head">
+              <h2>🛎️ Your Services</h2>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="loadServices()">↻ Refresh</button>
+                <button class="btn btn-gold" onclick="openServiceModal()">+ Add Service</button>
+              </div>
+            </div>
+            <div class="card-body table-wrap" id="servicesList">
+              <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="ws-sticky">
+          <div class="hint-box">
+            <strong>How services work</strong><br><br>
+            Each service has a <strong>title</strong>, <strong>description</strong>, an optional <strong>image</strong>, and a <strong>sort order</strong>.<br><br>
+            Drag images straight from your computer or paste a URL. Services are shown on <code>services.html</code> in the order you set.<br><br>
+            Toggle <strong>Active</strong> to hide/show a service without deleting it.
+          </div>
+          <a href="services.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;">🔗 Preview Services Page</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE MODAL (add / edit) -->
+    <div id="svcModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <h2 style="font-size:16px;font-weight:900;" id="svcModalTitle">Add Service</h2>
+          <button onclick="closeSvcModal()" style="font-size:18px;color:var(--text3);background:none;border:none;cursor:pointer;line-height:1;">✕</button>
+        </div>
+        <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
+          <input type="hidden" id="svc-id"/>
+
+          <div class="field-group">
+            <div class="field-label">Service Title *</div>
+            <input type="text" id="svc-title" placeholder="e.g. Professional Photography"/>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Short Description *</div>
+            <textarea id="svc-desc" rows="3" placeholder="What you deliver, why it matters. Keep it to 2–3 sentences."></textarea>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Icon / Emoji <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
+            <input type="text" id="svc-icon" placeholder="e.g. 📸" style="max-width:120px;"/>
+            <div class="field-hint">One emoji shown before the title on the public page.</div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Service Image <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
+            <!-- Drop zone -->
+            <div class="upload-zone" id="svcImgZone" style="margin-bottom:10px;"
+              onclick="document.getElementById('svcImgFileIn').click()"
+              ondragover="onDragOver(event,'svcImgZone')"
+              ondragleave="onDragLeave(event,'svcImgZone')"
+              ondrop="onDropSvcImg(event)">
+              <div class="upload-zone-ico">📂</div>
+              <div class="upload-zone-title">Drop an image or click to upload</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP</div>
+              <input type="file" id="svcImgFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleSvcImgFile(event)"/>
+            </div>
+            <div id="svcImgProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:8px;font-size:12px;color:var(--gold);"></div>
+            <!-- URL fallback -->
+            <input type="text" id="svc-image" placeholder="Or paste an image URL" oninput="updateSvcPreview()"/>
+            <!-- Preview -->
+            <div id="svcImgPreviewWrap" style="display:none;margin-top:10px;">
+              <img id="svcImgPreview" style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--r);border:1px solid var(--border2);" src="" alt="Preview"/>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Sort Order</div>
+            <input type="number" id="svc-order" value="0" min="0" style="max-width:100px;"/>
+            <div class="field-hint">Lower number = shown first. Use 0, 10, 20… to leave room for reordering.</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+            <div class="toggle on" id="svc-active-toggle" onclick="this.classList.toggle('on')"></div>
+            <div><div style="font-size:13px;font-weight:600;">Active</div><div style="font-size:11px;color:var(--text3);">Inactive services are hidden from the public page</div></div>
+          </div>
+
+          <div id="svcAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;"></div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:4px;">
+            <button class="btn btn-ghost" onclick="closeSvcModal()">Cancel</button>
+            <button class="btn btn-gold" id="svcSaveBtn" onclick="saveService()">💾 Save Service</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- MAIL -->
     <div class="page" id="page-mail">
@@ -1846,7 +1950,175 @@ async function uploadSectionFiles(files, listId, key, max){
   }
 }
 
-/* Keep old aliases so hero slides page still works */
+/* ═══════════════════════════════════════
+   SERVICES — admin CRUD
+═══════════════════════════════════════ */
+
+var BUCKET = (typeof BUCKET !== 'undefined') ? BUCKET : 'event-photos';
+var SVC_BUCKET = 'site-images'; /* public bucket for service images */
+
+/* Called when nav('services') fires */
+function loadServices(){
+  var el = document.getElementById('servicesList');
+  if(!el) return;
+  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  var sb = getSupabase();
+  sb.from('services').select('*').order('sort_order',{ascending:true}).then(function(res){
+    if(res.error){ el.innerHTML = '<div class="empty"><div class="empty-txt">Error: '+res.error.message+'</div></div>'; return; }
+    var rows = res.data || [];
+    if(!rows.length){ el.innerHTML = '<div class="empty"><div class="empty-ico">🛎️</div><div class="empty-txt">No services yet. Click "+ Add Service" to create your first.</div></div>'; return; }
+    var html = '<table><thead><tr><th></th><th>Service</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead><tbody>';
+    rows.forEach(function(s){
+      var img = s.image_url ? '<img src="'+s.image_url+'" style="width:48px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--border);"/>' : '<div style="width:48px;height:34px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;">'+(s.icon||'🛎️')+'</div>';
+      var status = s.is_active ? '<span class="pill pill-active">Active</span>' : '<span class="pill pill-paused">Hidden</span>';
+      html += '<tr>'
+        + '<td>'+img+'</td>'
+        + '<td><div style="font-weight:700;font-size:13px;">'+(s.icon?s.icon+' ':'')+s.title+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.description+'</div></td>'
+        + '<td>'+status+'</td>'
+        + '<td style="font-family:var(--fm);font-size:12px;">'+s.sort_order+'</td>'
+        + '<td><div class="td-actions"><button class="btn btn-blue btn-sm" onclick="editService('+JSON.stringify(s).replace(/"/g,'&quot;')+')">✏️ Edit</button><button class="btn btn-red btn-sm" onclick="deleteService(\''+s.id+'\',\''+s.title.replace(/'/g,'')+"'"+')">🗑</button></div></td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  });
+}
+
+function openServiceModal(prefill){
+  var m = document.getElementById('svcModal');
+  document.getElementById('svcModalTitle').textContent = prefill ? 'Edit Service' : 'Add Service';
+  document.getElementById('svc-id').value        = prefill ? (prefill.id||'') : '';
+  document.getElementById('svc-title').value     = prefill ? (prefill.title||'') : '';
+  document.getElementById('svc-desc').value      = prefill ? (prefill.description||'') : '';
+  document.getElementById('svc-icon').value      = prefill ? (prefill.icon||'') : '';
+  document.getElementById('svc-image').value     = prefill ? (prefill.image_url||'') : '';
+  document.getElementById('svc-order').value     = prefill ? (prefill.sort_order||0) : 0;
+  var toggle = document.getElementById('svc-active-toggle');
+  if(prefill){ prefill.is_active ? toggle.classList.add('on') : toggle.classList.remove('on'); }
+  else { toggle.classList.add('on'); }
+  document.getElementById('svcAlert').style.display = 'none';
+  document.getElementById('svcSaveBtn').disabled = false;
+  document.getElementById('svcSaveBtn').textContent = '💾 Save Service';
+  updateSvcPreview();
+  m.style.display = 'flex';
+  document.getElementById('svc-title').focus();
+}
+
+function editService(s){ openServiceModal(s); }
+
+function closeSvcModal(){
+  document.getElementById('svcModal').style.display = 'none';
+}
+
+function updateSvcPreview(){
+  var url = (document.getElementById('svc-image').value||'').trim();
+  var wrap = document.getElementById('svcImgPreviewWrap');
+  var img  = document.getElementById('svcImgPreview');
+  if(url){ wrap.style.display='block'; img.src=url; }
+  else    { wrap.style.display='none'; }
+}
+
+function _svcAlert(msg, ok){
+  var el = document.getElementById('svcAlert');
+  el.style.display = 'block';
+  el.style.background = ok ? 'var(--green-dim)' : 'var(--red-dim)';
+  el.style.color = ok ? 'var(--green)' : 'var(--red)';
+  el.textContent = msg;
+}
+
+async function saveService(){
+  var title = (document.getElementById('svc-title').value||'').trim();
+  var desc  = (document.getElementById('svc-desc').value||'').trim();
+  if(!title){ _svcAlert('Title is required.'); return; }
+  if(!desc) { _svcAlert('Description is required.'); return; }
+
+  var btn = document.getElementById('svcSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  var id        = document.getElementById('svc-id').value;
+  var icon      = (document.getElementById('svc-icon').value||'').trim();
+  var image_url = (document.getElementById('svc-image').value||'').trim();
+  var sort_order= parseInt(document.getElementById('svc-order').value)||0;
+  var is_active = document.getElementById('svc-active-toggle').classList.contains('on');
+
+  var payload = { title, description: desc, icon: icon||null, image_url: image_url||null, sort_order, is_active };
+
+  try {
+    var sb = getSupabase();
+    var res;
+    if(id){
+      res = await sb.from('services').update(payload).eq('id', id);
+    } else {
+      res = await sb.from('services').insert([payload]);
+    }
+    if(res.error) throw res.error;
+    toast('✅', id ? 'Service updated!' : 'Service created!', 'Services page updated.');
+    closeSvcModal();
+    loadServices();
+  } catch(e){
+    _svcAlert('Save failed: '+(e.message||'Unknown error'));
+    btn.disabled = false; btn.textContent = '💾 Save Service';
+  }
+}
+
+async function deleteService(id, title){
+  if(!confirm('Delete "'+title+'"? This cannot be undone.')) return;
+  try {
+    var sb = getSupabase();
+    var res = await sb.from('services').delete().eq('id', id);
+    if(res.error) throw res.error;
+    toast('🗑', 'Service deleted', title);
+    loadServices();
+  } catch(e){
+    toast('⚠️', 'Delete failed', e.message||'');
+  }
+}
+
+/* ── Image upload for service modal ── */
+function onDropSvcImg(e){
+  e.preventDefault();
+  onDragLeave(e,'svcImgZone');
+  var files = Array.from(e.dataTransfer.files||[]).filter(function(f){ return f.type.startsWith('image/'); });
+  if(files.length) _uploadSvcImg(files[0]);
+}
+function handleSvcImgFile(e){
+  var files = Array.from(e.target.files||[]).filter(function(f){ return f.type.startsWith('image/'); });
+  e.target.value='';
+  if(files.length) _uploadSvcImg(files[0]);
+}
+async function _uploadSvcImg(file){
+  var prog = document.getElementById('svcImgProg');
+  prog.style.display='block'; prog.textContent='Uploading…';
+  try {
+    var sb   = getSupabase();
+    var ext  = file.name.split('.').pop()||'jpg';
+    var path = 'services/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+    var {error: upErr} = await sb.storage.from(SVC_BUCKET).upload(path, file, {upsert:true});
+    if(upErr) throw upErr;
+    var {data} = sb.storage.from(SVC_BUCKET).getPublicUrl(path);
+    document.getElementById('svc-image').value = data.publicUrl;
+    updateSvcPreview();
+    prog.style.display='none';
+    toast('✅','Image uploaded','Click Save to apply.');
+  } catch(e){
+    prog.style.display='none';
+    toast('⚠️','Upload failed', e.message||'');
+  }
+}
+
+/* Auto-load services when page becomes active */
+var _origNav = window.nav;
+window.nav = function(page, el){
+  var result = _origNav ? _origNav(page, el) : false;
+  if(page === 'services') setTimeout(loadServices, 50);
+  return result;
+};
+
+/* Close modal on backdrop click */
+document.getElementById('svcModal').addEventListener('click', function(e){
+  if(e.target === this) closeSvcModal();
+});
+
 var GALLERY_LS_KEY = 'ig_gallery_strip';
 var HERO_LS_KEY    = 'ig_hero_grid';
 function addGalleryRow(){ addSectionRow('galleryStripList','gallery_strip',99); }
