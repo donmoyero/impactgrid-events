@@ -61,26 +61,10 @@
       <a href="pricing.html" class="ps-upgrade-link" id="psUpgradeLink" style="display:none;">Upgrade plan →</a>
     </div>
 
-    <!-- ══ SIDEBAR + CONTENT LAYOUT ══ -->
-    <div class="dash-layout">
-
-      <!-- ── Sidebar nav ── -->
-      <div class="dash-sidebar">
-        <button class="dash-nav-item active" id="dashNavCreate" onclick="dashShowTab('create')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          <span>Create a Website</span>
-        </button>
-        <button class="dash-nav-item" id="dashNavMy" onclick="dashShowTab('my')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <span>My Websites</span>
-          <span class="dash-nav-count" id="dashNavCount" style="display:none">0</span>
-        </button>
-      </div>
-
-      <!-- ── Tab: Create a Website ── -->
-      <div class="dash-tab-content active" id="dashTabCreate">
-        <!-- ══ STYLE SHOWCASE ══ -->
-        <div class="ws-style-showcase" id="wsStyleShowcase">
+    <!-- ── Tab: Create a Website (default) ── -->
+    <div class="dash-tab-content active" id="dashTabCreate">
+      <!-- ══ STYLE SHOWCASE ══ -->
+      <div class="ws-style-showcase" id="wsStyleShowcase">
 
       <!-- ══ AI PROMPT HERO ══ -->
       <div class="wss-ai-hero">
@@ -784,27 +768,25 @@
         Free to start · No credit card · Live in 5 minutes · You can switch styles anytime
       </div>
 
-        </div><!-- /ws-style-showcase -->
-      </div><!-- /dashTabCreate -->
+      </div><!-- /ws-style-showcase -->
+    </div><!-- /dashTabCreate -->
 
-      <!-- ── Tab: My Websites ── -->
-      <div class="dash-tab-content" id="dashTabMy">
-        <div class="dash-section" id="dashYourSection">
-          <div class="dash-section-header">
-            <span class="dash-section-title">Your Websites</span>
-            <span class="dash-section-count" id="dashCount">0 websites</span>
-          </div>
-          <div class="dash-grid" id="dashGrid">
-            <div class="dash-empty" id="dashEmpty">
-              <div class="dash-empty-icon">✦</div>
-              <div class="dash-empty-title">No websites yet</div>
-              <div class="dash-empty-sub">Pick a style in Create a Website to get started — live in 5 minutes</div>
-            </div>
+    <!-- ── Tab: My Websites ── -->
+    <div class="dash-tab-content" id="dashTabMy">
+      <div class="dash-section" id="dashYourSection">
+        <div class="dash-section-header">
+          <span class="dash-section-title">Your Websites</span>
+          <span class="dash-section-count" id="dashCount">0 websites</span>
+        </div>
+        <div class="dash-grid" id="dashGrid">
+          <div class="dash-empty" id="dashEmpty">
+            <div class="dash-empty-icon">✦</div>
+            <div class="dash-empty-title">No websites yet</div>
+            <div class="dash-empty-sub">Pick a style in Create a Website to get started — live in 5 minutes</div>
           </div>
         </div>
-      </div><!-- /dashTabMy -->
-
-    </div><!-- /dash-layout -->
+      </div>
+    </div><!-- /dashTabMy -->
 
     <!-- ══ DEMO PREVIEW MODAL ══ -->
     <div class="wss-demo-modal" id="wssDemoModal" role="dialog" aria-modal="true" aria-label="Style preview">
@@ -2314,11 +2296,15 @@ function buildDemoHTML(styleId, m) {
    DASHBOARD TAB SWITCHER
 ═══════════════════════════════════════════════════════════ */
 function dashShowTab(tab) {
-  var tabs = document.querySelectorAll('.dash-tab-content');
-  var navItems = document.querySelectorAll('.dash-nav-item');
-  tabs.forEach(function(t) { t.classList.toggle('active', t.id === 'dashTab' + tab.charAt(0).toUpperCase() + tab.slice(1)); });
-  document.getElementById('dashNavCreate').classList.toggle('active', tab === 'create');
-  document.getElementById('dashNavMy').classList.toggle('active', tab === 'my');
+  /* Switch content panels */
+  document.querySelectorAll('.dash-tab-content').forEach(function(t) {
+    t.classList.toggle('active', t.id === 'dashTab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  });
+  /* Sync nav sub-items (in the existing left nav) */
+  var navCreate = document.getElementById('navSubCreate');
+  var navMy     = document.getElementById('navSubMy');
+  if (navCreate) navCreate.classList.toggle('active', tab === 'create');
+  if (navMy)     navMy.classList.toggle('active',     tab === 'my');
 }
 
 /* ═══════════════════════════════════════════════════════════
