@@ -879,4 +879,13 @@
   window.renderNav    = renderNav;
   window.renderFooter = renderFooter;
 
+  /* ── Auto-load AI chat bubble on every page ── */
+  (function() {
+    if (document.getElementById('ig-chat-wrap')) return; // already loaded
+    var s = document.createElement('script');
+    s.src = 'ig-chat.js';
+    s.defer = true;
+    document.body.appendChild(s);
+  })();
+
 })();
