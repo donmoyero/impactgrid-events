@@ -20,128 +20,259 @@
   </script>
 
   <style>
-    /* ════════════════════════════════════════
-       PORTFOLIO PAGE — page-local styles only.
-       shared.css owns: reset, body bg+grain,
-       nav rail, page-wrap offset, .btn-*, .card,
-       .section, .label-tag, .anim-*, footer,
-       mobile breakpoints.
-    ════════════════════════════════════════ */
-
     :root {
       --pf-display: 'Fraunces', Georgia, serif;
     }
 
-    /* ── PAGE HEADER ─────────────────────────── */
-    .pf-header {
-      padding: 96px 40px 64px;
+    /* ── BIG BOOK HERO ──────────────────────── */
+    .pf-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 40px 0;
       text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
     }
-    .pf-headline {
+    .pf-hero-label {
+      font-family: var(--fm);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .pf-hero-title {
       font-family: var(--pf-display);
-      font-size: clamp(42px, 5.5vw, 74px);
+      font-size: clamp(44px, 6vw, 82px);
       font-weight: 300;
-      line-height: 1.04;
+      line-height: 1.02;
       letter-spacing: -0.03em;
       color: var(--text);
-      margin-bottom: 20px;
+      margin-bottom: 60px;
     }
-    .pf-headline em {
+    .pf-hero-title em {
       font-style: italic;
       color: var(--gold);
     }
-    .pf-sub {
-      font-size: clamp(15px, 1.6vw, 18px);
-      font-weight: 300;
-      color: var(--text2);
-      line-height: 1.72;
-      max-width: 500px;
+
+    /* ── HERO BOOK STAGE ────────────────────── */
+    .pf-hero-book-wrap {
+      position: relative;
+      width: min(760px, 90vw);
       margin: 0 auto;
     }
+    /* Glowing platform shadow */
+    .pf-hero-book-wrap::after {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 40px;
+      background: radial-gradient(ellipse at center, var(--gold-glo) 0%, transparent 70%);
+      filter: blur(10px);
+    }
 
-    /* ── STATS BAR ──────────────────────────── */
-    .pf-stats {
+    .pf-hero-book-stage {
+      perspective: 2000px;
+      width: 100%;
       display: flex;
       justify-content: center;
-      gap: 0;
-      max-width: 600px;
-      margin: 48px auto 0;
-      border: 1px solid var(--border2);
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--card);
-    }
-    .pf-stat {
-      flex: 1;
-      padding: 24px 20px;
-      text-align: center;
-      border-right: 1px solid var(--border);
-    }
-    .pf-stat:last-child { border-right: none; }
-    .pf-stat-val {
-      font-family: var(--pf-display);
-      font-size: 32px;
-      font-weight: 400;
-      color: var(--gold);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .pf-stat-lbl {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text3);
-      font-family: var(--fm);
     }
 
-    /* ── EVENT FILTER TABS ──────────────────── */
-    .pf-filter-wrap {
-      max-width: 1220px;
-      margin: 64px auto 0;
-      padding: 0 40px;
+    .pf-hero-book {
+      position: relative;
+      width: min(760px, 90vw);
+      height: min(500px, 59vw);
+      transform-style: preserve-3d;
     }
-    .pf-filter-label {
+
+    .pf-hero-page {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transform-origin: left center;
+      transition: transform 0.7s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+      cursor: pointer;
+    }
+    .pf-hero-page.flipped { transform: rotateY(-180deg); }
+
+    .pf-hero-front, .pf-hero-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+      border-radius: 3px 16px 16px 3px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.55), 6px 0 18px rgba(0,0,0,0.3);
+    }
+    .pf-hero-back {
+      transform: rotateY(180deg);
+      border-radius: 16px 3px 3px 16px;
+      box-shadow: -6px 0 18px rgba(0,0,0,0.3), 0 32px 80px rgba(0,0,0,0.55);
+    }
+    .pf-hero-front img, .pf-hero-back img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* Cover overlay */
+    .pf-hero-front-ov {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 32px 36px;
+    }
+    .pf-hero-back-ov {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 32px 36px;
+    }
+    .pf-hero-ev-title {
+      font-family: var(--pf-display);
+      font-size: clamp(18px, 2.4vw, 28px);
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.15;
+    }
+    .pf-hero-ev-tag {
+      font-family: var(--fm);
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--text3);
+      color: var(--gold);
+    }
+    .pf-hero-page-num {
+      position: absolute;
+      bottom: 14px;
+      right: 20px;
       font-family: var(--fm);
-      margin-bottom: 16px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+      background: rgba(0,0,0,0.4);
+      padding: 3px 10px;
+      border-radius: 100px;
+      backdrop-filter: blur(4px);
     }
-    .pf-filter-tabs {
+    .pf-hero-back .pf-hero-page-num { right: auto; left: 20px; }
+    .pf-hero-crease {
+      position: absolute;
+      top: 0; right: 0;
+      width: 22px; height: 100%;
+      background: linear-gradient(to left, rgba(0,0,0,0.3), transparent);
+      pointer-events: none;
+    }
+    .pf-hero-back-crease {
+      right: auto; left: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.3), transparent);
+    }
+    .pf-hero-back-blank {
+      width: 100%; height: 100%;
+      background: #0d0d0d;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+    }
+    .pf-hero-back-icon { font-size: 36px; color: var(--gold); opacity: 0.5; }
+    .pf-hero-back-text {
+      font-family: var(--fm); font-size: 11px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ── HERO BOOK CONTROLS ─────────────────── */
+    .pf-hero-controls {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 24px;
+      margin-top: 60px;
+      margin-bottom: 20px;
     }
-    .pf-tab {
-      padding: 8px 18px;
+    .pf-hero-btn {
+      padding: 10px 26px;
       border-radius: 100px;
       border: 1px solid var(--border2);
       background: var(--card);
-      font-size: 13px;
-      font-weight: 500;
       color: var(--text2);
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
       font-family: var(--fb);
     }
-    .pf-tab:hover { color: var(--text); border-color: var(--gold-glo); }
-    .pf-tab.active {
-      background: var(--gold-dim);
+    .pf-hero-btn:hover:not(:disabled) {
       border-color: var(--gold-glo);
       color: var(--gold);
-      font-weight: 600;
+    }
+    .pf-hero-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .pf-hero-counter {
+      font-family: var(--pf-display);
+      font-size: 16px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--text3);
+      min-width: 60px;
+      text-align: center;
     }
 
-    /* ── EVENT CARDS GRID ───────────────────── */
+    /* ── EVENT DOTS NAV ─────────────────────── */
+    .pf-ev-dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 72px;
+    }
+    .pf-ev-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--border2);
+      border: none; cursor: pointer;
+      transition: all 0.25s; padding: 0;
+    }
+    .pf-ev-dot.active {
+      background: var(--gold);
+      transform: scale(1.5);
+    }
+
+    /* ── EVENT LIST BELOW ───────────────────── */
+    .pf-divider-label {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 0 40px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .pf-divider-label span {
+      font-family: var(--fm);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--text3);
+      flex-shrink: 0;
+    }
+    .pf-divider-line {
+      flex: 1; height: 1px;
+      background: var(--border);
+    }
+
     .pf-events {
       max-width: 1220px;
       margin: 0 auto;
-      padding: 32px 40px 80px;
+      padding: 0 40px 80px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
@@ -162,7 +293,6 @@
       transform: translateY(-4px);
       box-shadow: var(--sh2);
     }
-
     .pf-event-thumb {
       width: 100%;
       aspect-ratio: 4/3;
@@ -175,184 +305,109 @@
       filter: brightness(1);
       transform: scale(1.03);
     }
-
-    /* "View gallery" overlay on hover */
     .pf-event-thumb-wrap {
       overflow: hidden;
       position: relative;
     }
     .pf-event-thumb-ov {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: rgba(0,0,0,0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
     }
     .pf-event-card:hover .pf-event-thumb-ov { opacity: 1; }
     .pf-event-thumb-ov-txt {
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      color: #fff; font-size: 13px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
       border: 1px solid rgba(255,255,255,0.5);
-      padding: 10px 20px;
-      border-radius: 100px;
+      padding: 10px 20px; border-radius: 100px;
     }
-
-    .pf-event-body {
-      padding: 22px 24px 24px;
-    }
+    .pf-event-body { padding: 22px 24px 24px; }
     .pf-event-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
     }
     .pf-event-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 100px;
-      font-family: var(--fm);
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      background: var(--gold-dim);
-      border: 1px solid var(--gold-glo);
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 100px;
+      font-family: var(--fm); font-size: 9px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--gold-dim); border: 1px solid var(--gold-glo);
       color: var(--gold);
     }
-    .pf-event-date {
-      font-size: 11px;
-      color: var(--text3);
-      font-family: var(--fm);
-    }
+    .pf-event-date { font-size: 11px; color: var(--text3); font-family: var(--fm); }
     .pf-event-title {
       font-family: var(--pf-display);
       font-size: clamp(18px, 1.8vw, 22px);
-      font-weight: 400;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 8px;
+      font-weight: 400; color: var(--text); line-height: 1.2; margin-bottom: 8px;
     }
     .pf-event-desc {
-      font-size: 13.5px;
-      color: var(--text2);
-      font-weight: 300;
-      line-height: 1.65;
+      font-size: 13.5px; color: var(--text2); font-weight: 300; line-height: 1.65;
     }
     .pf-event-count {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--text3);
-      font-family: var(--fm);
+      display: flex; align-items: center; gap: 5px; margin-top: 14px;
+      font-size: 12px; color: var(--text3); font-family: var(--fm);
     }
     .pf-event-line {
-      width: 28px;
-      height: 2px;
-      background: var(--gold);
-      border-radius: 2px;
-      margin-top: 16px;
-      opacity: 0.4;
+      width: 28px; height: 2px; background: var(--gold);
+      border-radius: 2px; margin-top: 16px; opacity: 0.4;
       transition: width 0.35s ease, opacity 0.35s ease;
     }
     .pf-event-card:hover .pf-event-line { width: 52px; opacity: 1; }
 
+    .pf-empty {
+      grid-column: 1 / -1; text-align: center;
+      padding: 80px 20px; color: var(--text3);
+    }
+
     /* ── FLIP BOOK LIGHTBOX ─────────────────── */
     .fp-lightbox {
       display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
+      position: fixed; inset: 0; z-index: 2000;
       background: rgba(0,0,0,0.92);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 24px;
-      padding: 24px;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 24px; padding: 24px;
     }
     .fp-lightbox.open { display: flex; }
-
     .fp-lightbox-header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      position: absolute; top: 0; left: 0; right: 0;
       padding: 20px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; z-index: 10;
     }
     .fp-lightbox-title {
-      font-family: var(--pf-display);
-      font-size: 18px;
-      font-weight: 300;
-      color: rgba(255,255,255,0.9);
-      font-style: italic;
+      font-family: var(--pf-display); font-size: 18px;
+      font-weight: 300; color: rgba(255,255,255,0.9); font-style: italic;
     }
     .fp-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      font-family: var(--fb);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; font-family: var(--fb);
     }
     .fp-close:hover { background: rgba(255,255,255,0.2); }
-
-    /* ── THE FLIP BOOK (ported from p.html) ── */
     .fp-stage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 28px;
-      margin-top: 64px;
-      width: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 28px; margin-top: 64px; width: 100%;
     }
-
-    .fp-book-wrap {
-      position: relative;
-      perspective: 1800px;
-    }
-
+    .fp-book-wrap { position: relative; perspective: 1800px; }
     .fp-book {
       position: relative;
       width: min(520px, 85vw);
       height: min(390px, 64vw);
       transform-style: preserve-3d;
     }
-
     .fp-page {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       transform-style: preserve-3d;
       transform-origin: left center;
       transition: transform 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000);
       cursor: pointer;
     }
     .fp-page.flipped { transform: rotateY(-180deg); }
-
     .fp-front, .fp-back {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       overflow: hidden;
@@ -364,253 +419,131 @@
       border-radius: 12px 2px 2px 12px;
       box-shadow: -4px 0 12px rgba(0,0,0,0.3), 0 20px 60px rgba(0,0,0,0.6);
     }
-
-    .fp-front img, .fp-back img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* Book spine shadow */
+    .fp-front img, .fp-back img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .fp-crease {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 18px;
-      height: 100%;
+      position: absolute; top: 0; right: 0; width: 18px; height: 100%;
       background: linear-gradient(to left, rgba(0,0,0,0.25), transparent);
       pointer-events: none;
     }
     .back-crease {
-      right: auto;
-      left: 0;
+      right: auto; left: 0;
       background: linear-gradient(to right, rgba(0,0,0,0.25), transparent);
     }
-
     .fp-page-num {
-      position: absolute;
-      bottom: 12px;
-      right: 16px;
-      font-family: var(--fm);
-      font-size: 11px;
+      position: absolute; bottom: 12px; right: 16px;
+      font-family: var(--fm); font-size: 11px;
       color: rgba(255,255,255,0.7);
-      background: rgba(0,0,0,0.4);
-      padding: 3px 9px;
-      border-radius: 100px;
-      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.4); padding: 3px 9px;
+      border-radius: 100px; backdrop-filter: blur(4px);
     }
     .fp-back .fp-page-num { right: auto; left: 16px; }
-
     .fp-back-blank {
-      width: 100%;
-      height: 100%;
-      background: #0d0d0d;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      width: 100%; height: 100%; background: #0d0d0d;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
     }
     .fp-back-icon { font-size: 28px; color: var(--gold); opacity: 0.6; }
     .fp-back-text {
-      font-family: var(--fm);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.3);
+      font-family: var(--fm); font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.3);
     }
-
-    /* ── FLIP CONTROLS ──────────────────────── */
-    .fp-controls {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
+    .fp-controls { display: flex; align-items: center; gap: 20px; }
     .fp-btn {
-      padding: 9px 22px;
-      border-radius: 100px;
+      padding: 9px 22px; border-radius: 100px;
       border: 1px solid rgba(255,255,255,0.2);
       background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.8);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: var(--fb);
+      color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; font-family: var(--fb);
     }
     .fp-btn:hover:not(:disabled) {
       background: rgba(255,255,255,0.14);
-      border-color: rgba(255,255,255,0.35);
-      color: #fff;
+      border-color: rgba(255,255,255,0.35); color: #fff;
     }
     .fp-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
     .fp-dots {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      max-width: 200px;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: flex; gap: 6px; align-items: center;
+      max-width: 200px; flex-wrap: wrap; justify-content: center;
     }
     .fp-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      padding: 0;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.25); border: none;
+      cursor: pointer; transition: all 0.2s; padding: 0;
     }
-    .fp-dot.active {
-      background: var(--gold);
-      transform: scale(1.4);
-    }
-
-    /* ── EMPTY STATE ────────────────────────── */
-    .pf-empty {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--text3);
-    }
-
-    /* ── CTA STRIP ───────────────────────────── */
-    .pf-cta {
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 100px 40px;
-    }
-    .pf-cta-inner { max-width: 600px; margin: 0 auto; }
-    .pf-cta-title {
-      font-family: var(--pf-display);
-      font-size: clamp(34px, 4.2vw, 58px);
-      font-weight: 300;
-      line-height: 1.07;
-      letter-spacing: -0.03em;
-      color: var(--text);
-      margin: 16px 0 18px;
-    }
-    .pf-cta-title em { font-style: italic; color: var(--gold); }
-    .pf-cta-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-weight: 300;
-      margin-bottom: 36px;
-      line-height: 1.7;
-    }
-    .pf-cta-btns {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    .fp-dot.active { background: var(--gold); transform: scale(1.4); }
 
     /* ── RESPONSIVE ─────────────────────────── */
     @media (max-width: 1100px) {
       .pf-events { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 768px) {
-      .pf-events { grid-template-columns: 1fr; padding: 16px 20px 60px; }
-      .pf-header { padding: 72px 20px 48px; }
-      .pf-filter-wrap { padding: 0 20px; }
-      .pf-cta { padding: 72px 20px; }
-      .pf-stats { margin: 36px 20px 0; }
+      .pf-events { grid-template-columns: 1fr; padding: 0 20px 60px; }
+      .pf-hero { padding: 60px 20px 0; }
+      .pf-hero-controls { gap: 14px; }
+      .pf-hero-book { height: 59vw; }
+      .pf-divider-label { padding: 0 20px 24px; }
       .fp-book { width: 85vw; height: 64vw; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Script load order required by nav.js -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="plan-config.js"></script>
   <script src="supabase-config.js"></script>
   <script src="auth.js"></script>
 
-  <!-- Nav -->
   <div id="ig-nav"></div>
   <script src="nav.js"></script>
   <script>renderNav('portfolio.html');</script>
 
   <div class="page-wrap">
 
-    <!-- PAGE HEADER -->
-    <header class="pf-header">
-      <div class="label-tag anim-fade-up">Our Work</div>
-      <h1 class="pf-headline anim-fade-up delay-1">
-        Real events.<br><em>Real moments.</em>
-      </h1>
-      <p class="pf-sub anim-fade-up delay-2">
-        Every gallery below is from a real event we covered. Click any event to flip through the photos — just like a photo book.
-      </p>
+    <!-- BIG BOOK HERO -->
+    <section class="pf-hero">
+      <div class="pf-hero-label">Our Work</div>
+      <h1 class="pf-hero-title">ImpactGrid Events<br><em>Portfolio</em></h1>
 
-      <!-- Stats bar -->
-      <div class="pf-stats anim-fade-up delay-3">
-        <div class="pf-stat">
-          <div class="pf-stat-val">2</div>
-          <div class="pf-stat-lbl">Events Covered</div>
-        </div>
-        <div class="pf-stat">
-          <div class="pf-stat-val">100%</div>
-          <div class="pf-stat-lbl">5-Star Feedback</div>
-        </div>
-        <div class="pf-stat">
-          <div class="pf-stat-val">24h</div>
-          <div class="pf-stat-lbl">Delivery Time</div>
+      <!-- Hero flipbook stage -->
+      <div class="pf-hero-book-wrap">
+        <div class="pf-hero-book-stage">
+          <div class="pf-hero-book" id="heroBook">
+            <!-- Pages injected by JS -->
+          </div>
         </div>
       </div>
-    </header>
 
-    <div class="divider"></div>
-
-    <!-- FILTER TABS -->
-    <div class="pf-filter-wrap">
-      <div class="pf-filter-label">Filter by type</div>
-      <div class="pf-filter-tabs" id="filterTabs">
-        <button class="pf-tab active" data-filter="all">All Events</button>
-        <button class="pf-tab" data-filter="social">Social Events</button>
-        <button class="pf-tab" data-filter="portrait">Portrait Sessions</button>
-        <button class="pf-tab" data-filter="content">Content Creation</button>
+      <!-- Controls -->
+      <div class="pf-hero-controls">
+        <button class="pf-hero-btn" id="heroBtnPrev" onclick="heroStep(-1)" disabled>← Prev</button>
+        <div class="pf-hero-counter" id="heroCounter">1 / 1</div>
+        <button class="pf-hero-btn" id="heroBtnNext" onclick="heroStep(1)">Next →</button>
       </div>
-    </div>
 
-    <!-- EVENT CARDS GRID -->
-    <div class="pf-events" id="eventsGrid">
-      <!-- Populated by JS below -->
-    </div>
-
-    <!-- CTA STRIP -->
-    <section class="pf-cta">
-      <div class="pf-cta-inner">
-        <div class="label-tag" style="justify-content:center;">Next chapter</div>
-        <h2 class="pf-cta-title">Your event could<br><em>be in here.</em></h2>
-        <p class="pf-cta-sub">We're booking events now. Tell us your date and we'll make it unforgettable.</p>
-        <div class="pf-cta-btns">
-          <a href="contact.html" class="btn btn-gold">Book Us Now</a>
-          <a href="services.html" class="btn btn-ghost">See Our Services →</a>
-        </div>
-      </div>
+      <!-- Event dots -->
+      <div class="pf-ev-dots" id="heroDots"></div>
     </section>
+
+    <!-- ALL EVENTS GRID -->
+    <div class="pf-divider-label">
+      <span>All Events</span>
+      <div class="pf-divider-line"></div>
+    </div>
+
+    <div class="pf-events" id="eventsGrid">
+      <!-- Populated by JS -->
+    </div>
 
   </div><!-- /.page-wrap -->
 
-  <!-- FLIP BOOK LIGHTBOX -->
+  <!-- FLIP BOOK LIGHTBOX (opens when card clicked) -->
   <div class="fp-lightbox" id="fpLightbox" role="dialog" aria-modal="true">
     <div class="fp-lightbox-header">
       <div class="fp-lightbox-title" id="fpLightboxTitle">Gallery</div>
       <button class="fp-close" id="fpCloseBtn" aria-label="Close gallery">✕</button>
     </div>
-
     <div class="fp-stage" id="fpStage">
       <div class="fp-book-wrap">
-        <div class="fp-book" id="fpBook">
-          <!-- Pages injected by JS -->
-        </div>
+        <div class="fp-book" id="fpBook"></div>
       </div>
       <div class="fp-controls">
         <button class="fp-btn fp-btn-prev" id="fpBtnPrev" onclick="fpStep(-1)" aria-label="Previous" disabled>← Prev</button>
@@ -626,10 +559,9 @@
 
   <script>
   /* ════════════════════════════════════════
-     PORTFOLIO — event data + flip book
+     PORTFOLIO — big book hero + event grid + lightbox
   ════════════════════════════════════════ */
 
-  /* ── Fallback event data ── */
   var FALLBACK_EVENTS = [
     {
       id: 'e1',
@@ -663,39 +595,117 @@
     }
   ];
 
-  function esc(str) {
-    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  var DELAYS = ['', 'delay-1', 'delay-2', 'delay-3', 'delay-4'];
   var allEvents = [];
-  var activeFilter = 'all';
 
-  /* ─────────────────────────────────────────
-     RENDER EVENT CARDS
-  ───────────────────────────────────────── */
+  /* ── HERO BOOK STATE ── */
+  var _hIdx = 0;
+  var _hFlipping = false;
+
+  function buildHeroBook(events) {
+    var book = document.getElementById('heroBook');
+    var dots = document.getElementById('heroDots');
+    if (!book || !events.length) return;
+
+    book.innerHTML = events.map(function(ev, i) {
+      var nextEv = events[i + 1];
+      return (
+        '<div class="pf-hero-page" id="hPage' + i + '" style="z-index:' + (events.length - i) + '" onclick="heroClick(' + i + ')">' +
+          '<div class="pf-hero-front">' +
+            '<img src="' + esc(ev.cover) + '" alt="' + esc(ev.title) + '" loading="' + (i < 1 ? 'eager' : 'lazy') + '"/>' +
+            '<div class="pf-hero-front-ov">' +
+              '<div class="pf-hero-ev-tag">' + esc(ev.category) + ' · ' + esc(ev.date) + '</div>' +
+              '<div class="pf-hero-ev-title">' + esc(ev.title) + '</div>' +
+            '</div>' +
+            '<div class="pf-hero-page-num">' + (i+1) + ' / ' + events.length + '</div>' +
+            '<div class="pf-hero-crease"></div>' +
+          '</div>' +
+          '<div class="pf-hero-back">' +
+            (nextEv
+              ? '<img src="' + esc(nextEv.cover) + '" alt="' + esc(nextEv.title) + '" loading="lazy"/>' +
+                '<div class="pf-hero-back-ov">' +
+                  '<div style="text-align:right;">' +
+                    '<div class="pf-hero-ev-tag">' + esc(nextEv.category) + ' · ' + esc(nextEv.date) + '</div>' +
+                    '<div class="pf-hero-ev-title">' + esc(nextEv.title) + '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="pf-hero-page-num" style="left:20px;right:auto;">' + (i+2) + ' / ' + events.length + '</div>' +
+                '<div class="pf-hero-crease pf-hero-back-crease"></div>'
+              : '<div class="pf-hero-back-blank"><div class="pf-hero-back-icon">✦</div><div class="pf-hero-back-text">End of Portfolio</div></div>'
+            ) +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    dots.innerHTML = events.map(function(_, i) {
+      return '<button class="pf-ev-dot' + (i === 0 ? ' active' : '') + '" onclick="heroGoto(' + i + ')" aria-label="Event ' + (i+1) + '"></button>';
+    }).join('');
+
+    updateHeroControls();
+  }
+
+  function updateHeroControls() {
+    var pb = document.getElementById('heroBtnPrev');
+    var nb = document.getElementById('heroBtnNext');
+    var ct = document.getElementById('heroCounter');
+    if (pb) pb.disabled = _hIdx === 0;
+    if (nb) nb.disabled = _hIdx >= allEvents.length - 1;
+    if (ct) ct.textContent = (_hIdx + 1) + ' / ' + allEvents.length;
+    document.querySelectorAll('.pf-ev-dot').forEach(function(d, j) {
+      d.classList.toggle('active', j === _hIdx);
+    });
+  }
+
+  function heroClick(i) {
+    /* clicking the page flips forward, or opens gallery if already last */
+    if (_hIdx < allEvents.length - 1) heroStep(1);
+    else openGallery(allEvents[_hIdx].id);
+  }
+
+  function heroGoto(i) {
+    if (_hFlipping || i === _hIdx) return;
+    _hFlipping = true;
+    var dir = i > _hIdx ? 1 : -1;
+    var steps = Math.abs(i - _hIdx);
+    function flipOne() {
+      if (steps-- <= 0) { _hFlipping = false; return; }
+      var cur = _hIdx;
+      if (dir > 0) {
+        var pg = document.getElementById('hPage' + cur);
+        if (pg) { pg.classList.add('flipped'); pg.style.zIndex = allEvents.length - cur; }
+        _hIdx++;
+      } else {
+        _hIdx--;
+        var pg2 = document.getElementById('hPage' + _hIdx);
+        if (pg2) { pg2.classList.remove('flipped'); pg2.style.zIndex = allEvents.length - _hIdx; }
+      }
+      updateHeroControls();
+      if (steps > 0) setTimeout(flipOne, 130);
+      else setTimeout(function() { _hFlipping = false; }, 700);
+    }
+    flipOne();
+  }
+
+  function heroStep(d) {
+    heroGoto(Math.max(0, Math.min(_hIdx + d, allEvents.length - 1)));
+  }
+
+  /* ── EVENT CARDS GRID ── */
   function renderEvents(events) {
     var grid = document.getElementById('eventsGrid');
     if (!grid) return;
-
-    var filtered = activeFilter === 'all'
-      ? events
-      : events.filter(function(e) { return e.category === activeFilter; });
-
-    if (!filtered.length) {
-      grid.innerHTML =
-        '<div class="pf-empty">' +
-          '<div style="font-size:40px;margin-bottom:14px">📷</div>' +
-          '<div style="font-size:15px">No events in this category yet — check back soon.</div>' +
-        '</div>';
+    if (!events.length) {
+      grid.innerHTML = '<div class="pf-empty"><div style="font-size:40px;margin-bottom:14px">📷</div><div style="font-size:15px">No events yet — check back soon.</div></div>';
       return;
     }
-
-    grid.innerHTML = filtered.map(function(ev, i) {
-      var delay = DELAYS[Math.min(i, DELAYS.length - 1)];
+    grid.innerHTML = events.map(function(ev, i) {
       var photoCount = (ev.photos || []).length;
       return (
-        '<div class="pf-event-card anim-fade-up ' + delay + '" onclick="openGallery(\'' + esc(ev.id) + '\')">' +
+        '<div class="pf-event-card anim-fade-up" onclick="openGallery(\'' + esc(ev.id) + '\')">' +
           '<div class="pf-event-thumb-wrap">' +
             '<img class="pf-event-thumb" src="' + esc(ev.cover) + '" alt="' + esc(ev.title) + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '"/>' +
             '<div class="pf-event-thumb-ov"><span class="pf-event-thumb-ov-txt">Open Gallery ↗</span></div>' +
@@ -713,67 +723,45 @@
         '</div>'
       );
     }).join('');
-
     initAnim();
   }
 
-  /* ─────────────────────────────────────────
-     LOAD FROM SUPABASE (with fallback)
-  ───────────────────────────────────────── */
+  /* ── LOAD FROM SUPABASE ── */
   async function loadEvents() {
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if (!sb) { allEvents = FALLBACK_EVENTS; renderEvents(allEvents); return; }
-
+      if (!sb) { allEvents = FALLBACK_EVENTS; init(); return; }
       var res = await sb
         .from('portfolio_events')
         .select('id,title,description,category,date,cover,photos,sort_order')
         .eq('is_active', true)
         .order('sort_order', { ascending: false });
-
       if (res.error) throw res.error;
       allEvents = (res.data && res.data.length) ? res.data : FALLBACK_EVENTS;
-      renderEvents(allEvents);
+      init();
     } catch(e) {
       console.warn('Portfolio fetch failed, using fallback:', e);
       allEvents = FALLBACK_EVENTS;
-      renderEvents(allEvents);
+      init();
     }
   }
 
-  /* ─────────────────────────────────────────
-     FILTER TABS
-  ───────────────────────────────────────── */
-  document.getElementById('filterTabs').addEventListener('click', function(e) {
-    var tab = e.target.closest('.pf-tab');
-    if (!tab) return;
-    document.querySelectorAll('.pf-tab').forEach(function(t) { t.classList.remove('active'); });
-    tab.classList.add('active');
-    activeFilter = tab.dataset.filter;
+  function init() {
+    buildHeroBook(allEvents);
     renderEvents(allEvents);
-  });
+  }
 
-  /* ─────────────────────────────────────────
-     FLIP BOOK LIGHTBOX
-  ───────────────────────────────────────── */
-  var _fpIdx = 0;
-  var _fpTotal = 0;
-  var _fpFlipping = false;
-  var _fpCurrentEvent = null;
+  /* ── LIGHTBOX FLIP BOOK ── */
+  var _fpIdx = 0, _fpTotal = 0, _fpFlipping = false, _fpCurrentEvent = null;
 
   function openGallery(eventId) {
     var ev = allEvents.find(function(e) { return e.id === eventId; });
     if (!ev || !ev.photos || !ev.photos.length) return;
-
     _fpCurrentEvent = ev;
     _fpIdx = 0;
     _fpTotal = ev.photos.length;
     _fpFlipping = false;
-
-    /* Set title */
     document.getElementById('fpLightboxTitle').textContent = ev.title;
-
-    /* Build pages */
     var book = document.getElementById('fpBook');
     book.innerHTML = ev.photos.map(function(url, i) {
       var nextUrl = ev.photos[i + 1] || '';
@@ -795,17 +783,11 @@
         '</div>'
       );
     }).join('');
-
-    /* Build dots */
     document.getElementById('fpDots').innerHTML = ev.photos.map(function(_, i) {
       return '<button class="fp-dot' + (i === 0 ? ' active' : '') + '" onclick="fpGoto(' + i + ')" aria-label="Photo ' + (i+1) + '"></button>';
     }).join('');
-
-    /* Reset controls */
     document.getElementById('fpBtnPrev').disabled = true;
     document.getElementById('fpBtnNext').disabled = _fpTotal <= 1;
-
-    /* Open lightbox */
     document.getElementById('fpLightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
@@ -826,7 +808,6 @@
     _fpFlipping = true;
     var dir = i > _fpIdx ? 1 : -1;
     var steps = Math.abs(i - _fpIdx);
-
     function flipOne() {
       if (steps-- <= 0) { _fpFlipping = false; return; }
       var cur = _fpIdx;
@@ -839,9 +820,7 @@
         var pg2 = document.getElementById('fpPage' + _fpIdx);
         if (pg2) { pg2.classList.remove('flipped'); pg2.style.zIndex = (_fpTotal - _fpIdx); }
       }
-      document.querySelectorAll('.fp-dot').forEach(function(d, j) {
-        d.classList.toggle('active', j === _fpIdx);
-      });
+      document.querySelectorAll('.fp-dot').forEach(function(d, j) { d.classList.toggle('active', j === _fpIdx); });
       var pb = document.getElementById('fpBtnPrev');
       var nb = document.getElementById('fpBtnNext');
       if (pb) pb.disabled = _fpIdx === 0;
@@ -852,19 +831,15 @@
     flipOne();
   }
 
-  function fpStep(d) {
-    fpGoto(Math.max(0, Math.min(_fpIdx + d, _fpTotal - 1)));
-  }
+  function fpStep(d) { fpGoto(Math.max(0, Math.min(_fpIdx + d, _fpTotal - 1))); }
 
-  /* Keyboard nav */
   document.addEventListener('keydown', function(e) {
     if (!document.getElementById('fpLightbox').classList.contains('open')) return;
-    if (e.key === 'ArrowLeft')  fpStep(-1);
+    if (e.key === 'ArrowLeft') fpStep(-1);
     if (e.key === 'ArrowRight') fpStep(1);
-    if (e.key === 'Escape')     closeLightbox();
+    if (e.key === 'Escape') closeLightbox();
   });
 
-  /* Touch swipe on lightbox */
   var _fpTx = 0;
   var fpStageEl = document.getElementById('fpStage');
   fpStageEl.addEventListener('touchstart', function(e) { _fpTx = e.touches[0].clientX; }, { passive: true });
@@ -873,9 +848,15 @@
     if (Math.abs(dx) > 50) fpStep(dx < 0 ? 1 : -1);
   });
 
-  /* ─────────────────────────────────────────
-     SCROLL ANIMATIONS
-  ───────────────────────────────────────── */
+  /* Hero swipe */
+  var _hTx = 0;
+  var heroStageEl = document.getElementById('heroBook');
+  heroStageEl.addEventListener('touchstart', function(e) { _hTx = e.touches[0].clientX; }, { passive: true });
+  heroStageEl.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - _hTx;
+    if (Math.abs(dx) > 40) heroStep(dx < 0 ? 1 : -1);
+  });
+
   function initAnim() {
     var els = document.querySelectorAll('.anim-fade-up:not(.visible)');
     if (!els.length) return;
