@@ -353,9 +353,11 @@
 
       var delay = DELAYS[Math.min(i, DELAYS.length-1)];
 
+      /* Strip newlines from desc so it never breaks JS on the receiving page */
+      var cleanDesc = (s.description || '').replace(/[\r\n]+/g, ' ').trim();
       var params = 'service=' + encodeURIComponent(s.title || '')
-        + (s.icon        ? '&price='+ encodeURIComponent(s.icon)        : '')
-        + (s.description ? '&desc=' + encodeURIComponent(s.description) : '');
+        + (s.icon     ? '&price='+ encodeURIComponent(s.icon)  : '')
+        + (cleanDesc  ? '&desc=' + encodeURIComponent(cleanDesc) : '');
       var bookUrl = 'book-us.html?' + params;
 
       return '<div class="sv-card anim-fade-up '+delay+'" style="cursor:pointer;" data-href="'+bookUrl.replace(/"/g, '&quot;')+'">' +
