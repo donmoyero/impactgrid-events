@@ -147,6 +147,17 @@
 
       /* ── Left-side vertical nav ── */
       /* Backdrop — sits between nav and page when expanded, click to collapse */
+      /* ── Mobile top bar (hidden on desktop via CSS) ── */
+      '<div id="ig-mob-topbar" style="display:none;">' +
+        '<a href="index.html" class="mob-topbar-logo">' +
+          '<img src="logo.png" alt="ImpactGrid" onerror="this.style.display=\'none\'" />' +
+          'ImpactGrid' +
+        '</a>' +
+        '<button class="mob-topbar-ham" onclick="openSidebar()" aria-label="Open menu">' +
+          '<span></span><span></span><span></span>' +
+        '</button>' +
+      '</div>' +
+
       '<div class="nav-backdrop" id="navBackdrop" onclick="toggleNavExpand()"></div>' +
       '<nav class="nav" id="mainNav" aria-label="Main navigation">' +
         '<button class="logo" id="navLogo" onclick="toggleNavExpand()" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mainNav">' +
