@@ -3220,28 +3220,10 @@ async function confirmBooking(){
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
 
   try {
-    var evName=(b.event_type||'Event')+' — '+(b.name||'Client')+(b.event_date?' ('+b.event_date+')':'');
-    var code  =_bkRandomCode();
-    var slug  =(b.name||'event').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+Date.now();
-    var expiry=new Date(); expiry.setDate(expiry.getDate()+30);
-
-    var evRef=await addDoc(collection(db,'events'),{
-      name:evName, type:'professional', template:'professional',
-      owner_email:b.email||null, owner_name:b.name||null, owner_avatar_url:null,
-      event_code:code, event_slug:slug,
-      expiry_date:expiry.toISOString(), is_active:true,
-      booking_id:b.id, invoice:invoice, created_at:serverTimestamp()
-    });
-    await addDoc(collection(db,'event_settings'),{
-      event_id:evRef.id, require_code:true, template:'professional',
-      watermark_enabled:true, created_at:serverTimestamp()
-    });
-
-    btn.textContent=' Confirming & emailing…';
-    var eventUrl='https://impactgridgroup.com/event.html?event='+slug+'&code='+code;
+    // Server handles ALL Firestore writes + email — no direct Firebase writes from browser
     var res=await fetch(API+'/api/booking-confirm',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({bookingId:b.id,eventId:evRef.id,eventCode:code,eventUrl:eventUrl,packageNotes:packageNotes,invoice:invoice})
+      body:JSON.stringify({bookingId:b.id, packageNotes:packageNotes, invoice:invoice})
     });
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Backend error');
@@ -3249,7 +3231,8 @@ async function confirmBooking(){
     var num=parseInt(invoice.invoice_number.replace(/\D/g,''),10);
     if(!isNaN(num)) localStorage.setItem('ig_last_inv_num',String(num));
 
-    showModalAlert(' Event created! Code: '+code+' · Confirmation email sent to '+b.email, true);
+    var evName=(b.event_type||'Event')+' — '+(b.name||'Client')+(b.event_date?' ('+b.event_date+')':'');
+    showModalAlert(' Event created! Code: '+data.eventCode+' · Confirmation email sent to '+b.email, true);
     btn.textContent=' Done';
     toast('','Booking confirmed!',evName+' · '+b.email);
     setTimeout(function(){ closeConfirmModal(); loadBookings(); if(window.loadEvents) loadEvents(); if(window.loadStats) loadStats(); },2000);
