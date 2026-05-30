@@ -358,7 +358,7 @@
         + (s.description ? '&desc=' + encodeURIComponent(s.description) : '');
       var bookUrl = 'book-us.html?' + params;
 
-      return '<div class="sv-card anim-fade-up '+delay+'" style="cursor:pointer;" onclick="window.location.href=\''+bookUrl+'\'">' +
+      return '<div class="sv-card anim-fade-up '+delay+'" style="cursor:pointer;" data-href="'+bookUrl.replace(/"/g, '&quot;')+'">' +
         imgBlock +
         '<div class="sv-card-body">' +
           '<h2 class="sv-card-title">'+esc(s.title)+'</h2>' +
@@ -374,6 +374,13 @@
 
     /* Trigger shared.css .anim scroll observer on new cards */
     initAnim();
+
+    /* Attach click handlers via JS — avoids special-char issues in inline onclick */
+    document.querySelectorAll('.sv-card[data-href]').forEach(function(card) {
+      card.addEventListener('click', function() {
+        window.location.href = card.getAttribute('data-href');
+      });
+    });
   }
 
   async function loadServices(){
