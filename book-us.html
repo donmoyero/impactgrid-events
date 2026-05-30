@@ -324,9 +324,9 @@ var selectedDate = null;
 /* ── Pre-fill from service page (?service=...&price=...&desc=...) ── */
 (function() {
   var p        = new URLSearchParams(window.location.search);
-  var svcTitle = p.get('service');
-  var svcPrice = p.get('price');
-  var svcDesc  = p.get('desc');
+  var svcTitle = (p.get('service') || '').replace(/[\r\n]+/g, ' ').trim();
+  var svcPrice = (p.get('price')   || '').replace(/[\r\n]+/g, ' ').trim();
+  var svcDesc  = (p.get('desc')    || '').replace(/[\r\n]+/g, ' ').trim();
   if (!svcTitle) return;
 
   /* Map title keywords → Event Type option values */
@@ -397,8 +397,7 @@ var selectedDate = null;
     /* 3 — pre-fill Notes with package info */
     var notes = document.getElementById('bk-notes');
     if (notes && !notes.value) {
-      notes.value = 'Service: ' + svcTitle + (svcPrice ? ' (' + svcPrice + ')' : '') + '
-';
+      notes.value = 'Service: ' + svcTitle + (svcPrice ? ' (' + svcPrice + ')' : '') + '\n';
     }
 
     /* 4 — update form card header title */
