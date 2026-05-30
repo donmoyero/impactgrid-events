@@ -353,8 +353,10 @@
 
       var delay = DELAYS[Math.min(i, DELAYS.length-1)];
 
-      var serviceParam = encodeURIComponent(s.title || '');
-      var bookUrl = 'book-us.html?service=' + serviceParam;
+      var params = 'service=' + encodeURIComponent(s.title || '')
+        + (s.icon        ? '&price='+ encodeURIComponent(s.icon)        : '')
+        + (s.description ? '&desc=' + encodeURIComponent(s.description) : '');
+      var bookUrl = 'book-us.html?' + params;
 
       return '<div class="sv-card anim-fade-up '+delay+'" style="cursor:pointer;" onclick="window.location.href=\''+bookUrl+'\'">' +
         imgBlock +
