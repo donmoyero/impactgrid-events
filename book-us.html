@@ -321,41 +321,93 @@ var calYear      = today.getFullYear();
 var calMonth     = today.getMonth();
 var selectedDate = null;
 
-/* ── Pre-select service from URL param (?service=Photography etc.) ── */
+/* ── Pre-fill from service page (?service=...&price=...&desc=...) ── */
 (function() {
-  var params = new URLSearchParams(window.location.search);
-  var svc = params.get('service');
-  if (!svc) return;
+  var p        = new URLSearchParams(window.location.search);
+  var svcTitle = p.get('service');
+  var svcPrice = p.get('price');
+  var svcDesc  = p.get('desc');
+  if (!svcTitle) return;
 
-  /* Map service title keywords → bk-type option values */
-  var map = [
-    { keys: ['wedding'],                value: 'Wedding'   },
-    { keys: ['corporate','business'],   value: 'Corporate' },
-    { keys: ['portrait'],               value: 'Portrait'  },
-    { keys: ['social','party','content','creation'], value: 'Social' },
-    { keys: ['gallery','download','preview','online'], value: 'Other' },
+  /* Map title keywords → Event Type option values */
+  var typeMap = [
+    { keys: ['wedding'],                           value: 'Wedding'   },
+    { keys: ['corporate','business','conference'],  value: 'Corporate' },
+    { keys: ['portrait','headshot'],               value: 'Portrait'  },
+    { keys: ['social','party','content','creation','gallery','download','preview'], value: 'Social' },
   ];
-  var lower = svc.toLowerCase();
-  var matched = '';
-  map.forEach(function(m) {
+  var lower   = svcTitle.toLowerCase();
+  var matched = 'Other';
+  typeMap.forEach(function(m) {
     m.keys.forEach(function(k) { if (lower.indexOf(k) !== -1) matched = m.value; });
   });
 
-  /* Wait for DOM then apply */
   function applyService() {
-    var sel = document.getElementById('bk-type');
-    if (!sel) return;
-    if (matched) sel.value = matched;
+    /* 1 — inject service summary card above the two-col layout */
+    var layout = document.querySelector('.bk-layout') || document.querySelector('.page-wrap > section') || document.querySelector('.page-wrap');
+    var card = document.createElement('div');
+    card.id = 'svc-banner';
+    card.style.cssText = [
+      'background:var(--gold-dim)',
+      'border:1px solid var(--gold-glo)',
+      'border-radius:14px',
+      'padding:18px 24px',
+      'margin:0 0 24px',
+      'display:flex',
+      'align-items:center',
+      'justify-content:space-between',
+      'flex-wrap:wrap',
+      'gap:12px'
+    ].join(';');
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;gap:14px;">' +
+        '<div style="font-size:22px;line-height:1;">✦</div>' +
+        '<div>' +
+          '<div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;">Selected Service</div>' +
+          '<div style="font-size:16px;font-weight:800;color:var(--text);line-height:1.2;">' + svcTitle + '</div>' +
+          (svcDesc ? '<div style="font-size:12px;color:var(--text2);margin-top:4px;max-width:480px;line-height:1.5;">' + svcDesc + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      (svcPrice
+        ? '<div style="font-size:18px;font-weight:900;color:var(--gold);white-space:nowrap;">' + svcPrice + '</div>'
+        : '') +
+      '<button onclick="document.getElementById('svc-banner').remove();clearServicePrefill();" ' +
+        'style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;">✕ Change</button>';
 
-    /* Show a subtle banner above the calendar */
-    var banner = document.createElement('div');
-    banner.style.cssText = 'background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--gold);font-weight:600;margin-bottom:18px;';
-    banner.textContent = '✦ Booking: ' + svc + ' — pick a date below to continue';
-    var wrap = document.querySelector('.page-wrap') || document.body;
-    var cal = document.querySelector('.cal-wrap') || wrap.firstElementChild;
-    if (cal && cal.parentNode) cal.parentNode.insertBefore(banner, cal);
-    else wrap.insertBefore(banner, wrap.firstElementChild);
+    /* Insert before the booking layout */
+    var bkSection = document.querySelector('.bk-section') || document.querySelector('section');
+    if (bkSection) bkSection.insertBefore(card, bkSection.firstChild);
+
+    /* 2 — pre-fill Event Type and lock it */
+    var sel = document.getElementById('bk-type');
+    if (sel) {
+      sel.value = matched;
+      sel.style.opacity = '0.6';
+      sel.style.pointerEvents = 'none';
+    }
+
+    /* 3 — pre-fill Notes with package info */
+    var notes = document.getElementById('bk-notes');
+    if (notes && !notes.value) {
+      notes.value = 'Service: ' + svcTitle + (svcPrice ? ' (' + svcPrice + ')' : '') + '
+';
+    }
+
+    /* 4 — update form card header title */
+    var formTitle = document.querySelector('.form-head-title');
+    if (formTitle) formTitle.textContent = 'Your Details — ' + svcTitle;
   }
+
+  window.clearServicePrefill = function() {
+    var sel = document.getElementById('bk-type');
+    if (sel) { sel.value = ''; sel.style.opacity = ''; sel.style.pointerEvents = ''; }
+    var notes = document.getElementById('bk-notes');
+    if (notes && notes.value.indexOf('Service:') === 0) notes.value = '';
+    var formTitle = document.querySelector('.form-head-title');
+    if (formTitle) formTitle.textContent = 'Your Details';
+    /* strip param from URL without reload */
+    window.history.replaceState({}, '', window.location.pathname);
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', applyService);
