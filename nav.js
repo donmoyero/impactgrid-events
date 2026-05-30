@@ -143,19 +143,6 @@
         'body{padding-left:0!important;}' +
         '.page-wrap{padding-left:0!important;}' +
       '}' +
-      /* ── Website sub-nav styles ── */
-      '.nav-sub-section{display:flex;flex-direction:column;gap:2px;overflow:hidden;}' +
-      '.nav-sub-section .nav-sub-label{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:10px 11px 4px;white-space:nowrap;opacity:0;transition:opacity 0.15s ease;pointer-events:none;}' +
-      '.nav.expanded .nav-sub-section .nav-sub-label{opacity:1;pointer-events:auto;}' +
-      '.nav-sub-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px 11px;border-radius:8px;border:none;background:none;cursor:pointer;font-family:var(--fb);font-size:13.5px;color:var(--text2);text-align:left;transition:background .15s,color .15s;white-space:nowrap;overflow:hidden;}' +
-      '.nav-sub-item:hover{background:var(--bg2);color:var(--text);}' +
-      '.nav-sub-item.active{background:rgba(201,126,8,.1);color:var(--gold);}' +
-      '.nav-sub-icon{flex-shrink:0;width:22px;display:flex;align-items:center;justify-content:center;opacity:.75;}' +
-      '.nav-sub-item.active .nav-sub-icon{opacity:1;}' +
-      '.nav-sub-label-text{opacity:0;transition:opacity 0.15s ease;pointer-events:none;flex:1;}' +
-      '.nav.expanded .nav-sub-label-text{opacity:1;pointer-events:auto;}' +
-      '.nav-sub-count{background:var(--gold);color:#07090f;font-size:9px;font-weight:800;min-width:17px;height:17px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transition:opacity 0.15s ease;flex-shrink:0;}' +
-      '.nav.expanded .nav-sub-count{opacity:1;}' +
       '</style>' +
 
       /* ── Left-side vertical nav ── */
@@ -172,19 +159,7 @@
           desktopLinks +
         '</ul>' +
 
-        /* ── Website sub-nav: shown only on website-studio.html ── */
-        '<div class="nav-sub-section" id="wsSubNav" style="display:none;padding:0 8px;margin-bottom:8px;">' +
-          '<div class="nav-sub-label">Website Studio</div>' +
-          '<button class="nav-sub-item active" id="navSubCreate" onclick="dashShowTab(\'create\')" title="Create a Website">' +
-            '<span class="nav-sub-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>' +
-            '<span class="nav-sub-label-text">Create a Website</span>' +
-          '</button>' +
-          '<button class="nav-sub-item" id="navSubMy" onclick="dashShowTab(\'my\')" title="My Websites">' +
-            '<span class="nav-sub-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span>' +
-            '<span class="nav-sub-label-text">My Websites</span>' +
-            '<span class="nav-sub-count" id="navSubCount" style="display:none">0</span>' +
-          '</button>' +
-        '</div>' +
+
 
         '<div class="nav-bottom">' +
           '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">Dark mode</button>' +
@@ -257,15 +232,6 @@
     if (container) container.innerHTML = html;
 
     _initNavInteractions();
-
-    /* ── Show Website sub-nav only on website-studio.html ── */
-    (function() {
-      var page = window.location.pathname.split('/').pop() || 'index.html';
-      if (page === 'website-studio.html' || page === '') {
-        var wsSubNav = document.getElementById('wsSubNav');
-        if (wsSubNav) wsSubNav.style.display = '';
-      }
-    })();
 
     /* Signal that nav HTML is in the DOM — auth modules listen for this */
     document.dispatchEvent(new CustomEvent('ig-nav-ready'));
