@@ -177,6 +177,81 @@
       gap: 14px;
       flex-wrap: wrap;
     }
+    /* ── HERO BUTTONS ───────────────────────────── */
+    .hero-btn-primary {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      background: linear-gradient(135deg, #f0b429 0%, #ffd166 50%, #f0b429 100%);
+      background-size: 200% 100%;
+      background-position: 0% 0%;
+      color: #07090f;
+      font-family: var(--fd, sans-serif);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      padding: 0;
+      border: none;
+      box-shadow: 0 4px 24px rgba(240,180,41,0.35), 0 1px 0 rgba(255,255,255,0.15) inset;
+      transition: background-position 0.4s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      overflow: hidden;
+    }
+    .hero-btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-btn-primary:hover {
+      background-position: 100% 0%;
+      box-shadow: 0 8px 32px rgba(240,180,41,0.55), 0 1px 0 rgba(255,255,255,0.2) inset;
+      transform: translateY(-2px);
+    }
+    .hero-btn-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+    }
+    .hero-btn-text { line-height: 1; }
+    .hero-btn-arrow {
+      font-size: 15px;
+      transition: transform 0.25s ease;
+      display: inline-block;
+    }
+    .hero-btn-primary:hover .hero-btn-arrow { transform: translateX(4px); }
+
+    .hero-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      color: rgba(245,243,239,0.92);
+      font-family: var(--fd, sans-serif);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      padding: 13px 26px;
+      border: 1px solid rgba(245,243,239,0.25);
+      background: rgba(245,243,239,0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    }
+    .hero-btn-secondary:hover {
+      background: rgba(245,243,239,0.14);
+      border-color: rgba(245,243,239,0.5);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
     .hero-note {
       margin-top: 20px;
       font-size: 13px;
@@ -788,8 +863,15 @@
         Professional photography, high-quality content creation, and organised online galleries — delivered fast, so every guest walks away with their moment.
       </p>
       <div class="hero-actions">
-        <a href="contact.html" class="btn-gold">Book Us for Your Event</a>
-        <a href="services.html" class="btn-ghost" style="color:#F5F3EF;border-color:rgba(245,243,239,0.3);">See What We Offer</a>
+        <a href="book-us.html" class="hero-btn-primary">
+          <span class="hero-btn-inner">
+            <span class="hero-btn-text">Book Us for Your Event</span>
+            <span class="hero-btn-arrow">→</span>
+          </span>
+        </a>
+        <a href="services.html" class="hero-btn-secondary">
+          <span>See What We Offer</span>
+        </a>
       </div>
       <p class="hero-note">Based in Manchester &nbsp;·&nbsp; Covering UK events &nbsp;·&nbsp; events@impactgridgroup.com</p>
     </div>
