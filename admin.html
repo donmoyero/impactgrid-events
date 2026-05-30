@@ -1133,13 +1133,11 @@ If you have any questions, just reply to this email.
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
             <div>
               <div class="field-label" style="font-size:10px;margin-bottom:5px;">Invoice Date</div>
-              <div id="modal-inv-date-display" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;font-size:12px;color:var(--text2);">—</div>
-              <input type="hidden" id="modal-inv-date"/>
+              <input type="date" id="modal-inv-date" class="form-input" style="width:100%;"/>
             </div>
             <div>
               <div class="field-label" style="font-size:10px;margin-bottom:5px;">Due Date <span style="font-size:9px;color:var(--text3);">Due on Receipt</span></div>
-              <div id="modal-inv-due-display" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;font-size:12px;color:var(--text2);">—</div>
-              <input type="hidden" id="modal-inv-due"/>
+              <input type="date" id="modal-inv-due" class="form-input" style="width:100%;"/>
             </div>
           </div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Line Items</div>
@@ -3123,10 +3121,8 @@ function openConfirmModal(id) {
   var today=new Date(); var due=new Date(); due.setDate(due.getDate()+7);
   var fmt=function(d){return d.toISOString().split('T')[0];};
   var fmtDisplay=function(d){return d.toLocaleDateString('en-GB');};
-  document.getElementById('modal-inv-date').value   = fmt(today);
-  document.getElementById('modal-inv-due').value    = fmt(due);
-  document.getElementById('modal-inv-date-display').textContent = fmtDisplay(today);
-  document.getElementById('modal-inv-due-display').textContent  = fmtDisplay(due);
+  document.getElementById('modal-inv-date').value = fmt(today);
+  document.getElementById('modal-inv-due').value  = fmt(due);
   document.getElementById('modal-inv-client').value = b.name;
   var last = parseInt(localStorage.getItem('ig_last_inv_num')||'2',10);
   document.getElementById('modal-inv-number').value = 'INV-'+String(last+1).padStart(6,'0');
@@ -3289,13 +3285,11 @@ function generateInvoiceHtml(invoice, clientEmail) {
   return '<!DOCTYPE html><html><head><meta charset="UTF-8"/>'
     +'<style>'
     +'  body{margin:0;padding:40px 20px;background:#f4f6fa;font-family:Arial,sans-serif;color:#111827;}'
-    +'  .wrap{max-width:700px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.08);position:relative;overflow:hidden;}'
+    +'  .wrap{max-width:700px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.08);}'
     +'  table{border-collapse:collapse;width:100%;}'
     +'  th{background:#f3f4f6;font-size:12px;font-weight:700;color:#374151;padding:10px 12px;border-bottom:2px solid #e5e7eb;}'
     +'</style></head><body>'
     +'<div class="wrap">'
-    +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:420px;height:420px;background:url(https://donmoyero.github.io/impactgrid-events/logo.png) center/contain no-repeat;opacity:0.07;pointer-events:none;z-index:0;"></div>'
-    +'<div style="position:relative;z-index:1;">'
 
       /* ── HEADER ── */
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:36px 40px 24px;">'
@@ -3377,7 +3371,6 @@ function generateInvoiceHtml(invoice, clientEmail) {
         +'</div>'
       +'</div>'
 
-    +'</div>'
     +'</div>'
     +'</body></html>';
 }
