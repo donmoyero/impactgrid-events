@@ -220,6 +220,25 @@
       .sv-header      { padding: 72px 20px 56px; }
       .sv-card-body   { padding: 24px 24px 28px; }
   }
+    .sv-book-btn {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-glo);
+      border-radius: 100px;
+      padding: 7px 16px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .sv-card:hover .sv-book-btn {
+      background: var(--gold);
+      color: #07090f;
+      transform: translateX(3px);
+    }
+
     @media (max-width: 600px) {
       .sv-card-img    { height: 200px; }
       .sv-sk-img      { height: 180px; }
@@ -334,13 +353,19 @@
 
       var delay = DELAYS[Math.min(i, DELAYS.length-1)];
 
-      return '<div class="sv-card anim-fade-up '+delay+'">' +
+      var serviceParam = encodeURIComponent(s.title || '');
+      var bookUrl = 'book-us.html?service=' + serviceParam;
+
+      return '<div class="sv-card anim-fade-up '+delay+'" style="cursor:pointer;" onclick="window.location.href=\''+bookUrl+'\'">' +
         imgBlock +
         '<div class="sv-card-body">' +
           '<h2 class="sv-card-title">'+esc(s.title)+'</h2>' +
           '<p class="sv-card-desc">'+esc(s.description)+'</p>' +
           '<div class="sv-card-line"></div>' +
           priceBlock +
+          '<div style="margin-top:20px;">' +
+            '<span class="sv-book-btn">Book This Service →</span>' +
+          '</div>' +
         '</div>' +
       '</div>';
     }).join('');
