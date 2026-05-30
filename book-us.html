@@ -371,12 +371,20 @@ var selectedDate = null;
       (svcPrice
         ? '<div style="font-size:18px;font-weight:900;color:var(--gold);white-space:nowrap;">' + svcPrice + '</div>'
         : '') +
-      '<button onclick="document.getElementById('svc-banner').remove();clearServicePrefill();" ' +
+      '<button id="svc-banner-close" ' +
         'style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;">✕ Change</button>';
 
     /* Insert before the booking layout */
     var bkSection = document.querySelector('.bk-section') || document.querySelector('section');
     if (bkSection) bkSection.insertBefore(card, bkSection.firstChild);
+
+    /* Safe close button — no inline JS */
+    var closeBtn = document.getElementById('svc-banner-close');
+    if (closeBtn) closeBtn.addEventListener('click', function() {
+      var banner = document.getElementById('svc-banner');
+      if (banner) banner.remove();
+      clearServicePrefill();
+    });
 
     /* 2 — pre-fill Event Type and lock it */
     var sel = document.getElementById('bk-type');
