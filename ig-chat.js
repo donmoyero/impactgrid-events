@@ -109,8 +109,8 @@
       width: 52px;
       height: 52px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #e8930a 0%, #f0b429 50%, #ffd166 100%);
-      box-shadow: 0 4px 20px rgba(201,126,8,0.45), 0 0 0 0 rgba(240,180,41,0.4);
+      background: linear-gradient(135deg, #ffe600 0%, #ffe600 50%, #ffed4a 100%);
+      box-shadow: 0 4px 20px rgba(255,230,0,0.45), 0 0 0 0 rgba(255,230,0,0.4);
       border: none;
       cursor: pointer;
       display: flex;
@@ -122,7 +122,7 @@
     }
     #ig-chat-bubble:hover {
       transform: scale(1.1);
-      box-shadow: 0 6px 28px rgba(201,126,8,0.6), 0 0 0 6px rgba(240,180,41,0.15);
+      box-shadow: 0 6px 28px rgba(255,230,0,0.6), 0 0 0 6px rgba(255,230,0,0.15);
     }
     #ig-chat-bubble svg { transition: transform 0.25s; }
     #ig-chat-bubble.open svg.icon-chat { display: none; }
@@ -180,7 +180,7 @@
     #ig-chat-avatar {
       width: 34px; height: 34px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #e8930a, #f0b429);
+      background: linear-gradient(135deg, #ffe600, #ffe600);
       display: flex; align-items: center; justify-content: center;
       font-size: 16px;
       flex-shrink: 0;
@@ -211,11 +211,11 @@
       font-size: 9px;
       font-weight: 700;
       font-family: 'DM Mono', monospace;
-      color: #f0b429;
-      background: rgba(240,180,41,0.12);
+      color: #ffe600;
+      background: rgba(255,230,0,0.12);
       padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(240,180,41,0.2);
+      border: 1px solid rgba(255,230,0,0.2);
       letter-spacing: 0.05em;
     }
 
@@ -255,7 +255,7 @@
       border-bottom-left-radius: 4px;
     }
     .ig-msg.user .ig-msg-bubble {
-      background: linear-gradient(135deg, #e8930a, #f0b429);
+      background: linear-gradient(135deg, #ffe600, #ffe600);
       color: #07090f;
       font-weight: 500;
       border-bottom-right-radius: 4px;
@@ -288,9 +288,9 @@
       white-space: nowrap;
     }
     .ig-chip:hover {
-      border-color: #f0b429;
-      color: #c97e08;
-      background: rgba(240,180,41,0.07);
+      border-color: #ffe600;
+      color: #ffe600;
+      background: rgba(255,230,0,0.07);
     }
     [data-theme="dark"] .ig-chip {
       background: var(--card, #1a1510);
@@ -351,21 +351,21 @@
       color: var(--text, #eef0f6);
       border-color: var(--border2, rgba(255,255,255,0.13));
     }
-    #ig-chat-input:focus { border-color: #f0b429; }
+    #ig-chat-input:focus { border-color: #ffe600; }
     #ig-chat-input::placeholder { color: var(--text3, #9099b8); }
 
     #ig-chat-send {
       width: 38px; height: 38px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #e8930a, #f0b429);
+      background: linear-gradient(135deg, #ffe600, #ffe600);
       border: none;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 2px 8px rgba(201,126,8,0.3);
+      box-shadow: 0 2px 8px rgba(255,230,0,0.3);
     }
-    #ig-chat-send:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(201,126,8,0.45); }
+    #ig-chat-send:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(255,230,0,0.45); }
     #ig-chat-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     /* Footer note */
@@ -391,8 +391,8 @@
 
     /* Keyframes */
     @keyframes ig-pulse {
-      0%, 100% { box-shadow: 0 4px 20px rgba(201,126,8,0.45), 0 0 0 0 rgba(240,180,41,0.4); }
-      50%       { box-shadow: 0 4px 20px rgba(201,126,8,0.45), 0 0 0 10px rgba(240,180,41,0); }
+      0%, 100% { box-shadow: 0 4px 20px rgba(255,230,0,0.45), 0 0 0 0 rgba(255,230,0,0.4); }
+      50%       { box-shadow: 0 4px 20px rgba(255,230,0,0.45), 0 0 0 10px rgba(255,230,0,0); }
     }
     @keyframes ig-msg-in {
       from { opacity: 0; transform: translateY(6px) scale(0.97); }
@@ -429,7 +429,7 @@
       <div id="ig-chat-header">
         <div id="ig-chat-avatar">⚡</div>
         <div id="ig-chat-header-info">
-          <div id="ig-chat-header-name">Dijo</div>
+          <div id="ig-chat-header-name">ImpactGrid</div>
           <div id="ig-chat-header-status">Online · Usually replies instantly</div>
         </div>
         <div id="ig-chat-codename-badge">${codename}</div>
@@ -580,7 +580,11 @@
 
     hasGreeted = true;
     setTimeout(function () {
-      addMessage('Hey ' + codename + '! 👋 How are you?', 'bot');
+      addMessage(
+        `Hey ${codename}! 👋 I'm Spark — ImpactGrid's AI. Looking to book something or just browsing?`,
+        'bot',
+        ['Book an event', 'See what you offer', 'Pricing info', 'Just looking']
+      );
     }, 400);
   }
 
@@ -596,13 +600,6 @@
       setTimeout(function () { inputEl.focus(); }, 300);
     }
   }
-
-  /* ── Auto-open after 5s if not already opened ── */
-  setTimeout(function () {
-    if (!isOpen && history.length === 0) {
-      toggleChat();
-    }
-  }, 5000);
 
   /* ── Show unread dot after delay if not opened ── */
   setTimeout(function () {
