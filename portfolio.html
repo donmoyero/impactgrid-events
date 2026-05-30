@@ -58,7 +58,7 @@
     ═══════════════════════════════════════ */
     .book-scene {
       perspective: 2400px;
-      width: min(1000px, 96vw);
+      width: min(1400px, 98vw);
       margin: 0 auto;
       position: relative;
     }
@@ -80,8 +80,8 @@
     .book-root {
       position: relative;
       width: 100%;
-      /* 2:3 aspect per page, two pages side by side */
-      aspect-ratio: 2 / 0.72;
+      /* taller aspect — shows full portrait/landscape photos without heavy cropping */
+      aspect-ratio: 2 / 1.1;
       transform-style: preserve-3d;
     }
 
@@ -108,8 +108,9 @@
     }
     .book-half img {
       width: 100%; height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
+      background: #0d0d0d;
     }
 
     /* Page number badges */
@@ -230,7 +231,8 @@
     }
     .flip-leaf-face img, .flip-leaf-back img {
       width: 100%; height: 100%;
-      object-fit: cover; display: block;
+      object-fit: contain; display: block;
+      background: #0d0d0d;
     }
     /* page-turn shadow / curl shading */
     .flip-leaf-face::after {
@@ -346,9 +348,8 @@
 </head>
 <body>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="plan-config.js"></script>
-  <script src="supabase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="auth.js"></script>
 
   <div id="ig-nav"></div>
@@ -679,20 +680,22 @@
     if (e.key === 'ArrowLeft')  bookFlip(-1);
   });
 
-  /* ── Load events ── */
+  /* ── Load events from Firebase ── */
+  var _pfDb = null;
+
   async function loadEvents() {
     try {
-      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if (!sb) { useEvents(FALLBACK_EVENTS); return; }
-      var res = await sb
-        .from('portfolio_events')
-        .select('id,title,description,category,date,cover,photos,sort_order')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: false });
-      if (res.error) throw res.error;
-      useEvents((res.data && res.data.length) ? res.data : FALLBACK_EVENTS);
+      var cfg = await fetch('https://impactgrid-events-api.onrender.com/api/firebase-config').then(function(r){ return r.json(); });
+      if (!firebase.apps.length) firebase.initializeApp(cfg);
+      _pfDb = firebase.firestore();
+      var snap = await _pfDb.collection('portfolio_events')
+        .where('is_active', '==', true)
+        .orderBy('created_at', 'desc')
+        .get();
+      var rows = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+      useEvents(rows.length ? rows : FALLBACK_EVENTS);
     } catch(e) {
-      console.warn('Portfolio fetch failed, using fallback:', e);
+      console.warn('Portfolio Firebase fetch failed, using fallback:', e);
       useEvents(FALLBACK_EVENTS);
     }
   }
