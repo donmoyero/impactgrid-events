@@ -269,6 +269,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('hero',this)"><span class="sb-ico"></span>Hero Slideshow</a>
         <a href="#" onclick="return nav('services',this)"><span class="sb-ico"></span>Services</a>
         <a href="#" onclick="return nav('about',this)"><span class="sb-ico"></span>About Page</a>
+        <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico">📷</span>Portfolio Events</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -681,6 +682,92 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
+
+    <!-- PORTFOLIO EVENTS -->
+    <div class="page" id="page-portfolio">
+      <div class="page-header">
+        <div class="page-title">Portfolio Events</div>
+        <div class="page-sub">Manage the events shown on your public Portfolio page. Each event has a cover image and a gallery people can flip through.</div>
+      </div>
+      <div class="ws-layout">
+        <div>
+          <div class="card">
+            <div class="card-head">
+              <h2>📷 Your Portfolio Events</h2>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="loadPortfolioEvents()">↻ Refresh</button>
+                <button class="btn btn-gold" onclick="openPortfolioModal()">+ Add Event</button>
+              </div>
+            </div>
+            <div class="card-body" id="portfolioEventsList">
+              <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="ws-sticky">
+          <div class="hint-box"><strong>How portfolio events work</strong><br><br>Each entry has a <strong>title</strong>, <strong>category</strong>, <strong>date</strong>, a <strong>cover image URL</strong>, and a list of <strong>photo URLs</strong> (one per line).<br><br>The cover is shown on the portfolio grid and in the big flip-book hero. All photo URLs become pages in the flip-book lightbox.<br><br>Use the <strong>sort order</strong> field to control which event appears first (higher number = shown first).</div>
+          <div class="hint-box hint-warn" style="margin-top:10px;"><strong>Image URLs</strong><br>Paste direct image URLs — use Supabase storage, Unsplash, or any public CDN. The same upload bucket your site already uses works perfectly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO MODAL (Add / Edit) -->
+    <div id="portfolioModal" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.4);">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <h2 style="font-size:15px;font-weight:800;" id="portfolioModalTitle">Add Portfolio Event</h2>
+          <button onclick="closePortfolioModal()" style="font-size:18px;color:var(--text2);background:none;border:none;cursor:pointer;">✕</button>
+        </div>
+        <div style="padding:22px;">
+          <div id="portfolioModalAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
+          <input type="hidden" id="pm-id"/>
+          <div class="field-group" style="margin-bottom:12px;">
+            <div class="field-label">Event Title *</div>
+            <input type="text" id="pm-title" placeholder="e.g. Summer Social 2026"/>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div class="field-group">
+              <div class="field-label">Category *</div>
+              <select id="pm-category" style="width:100%;">
+                <option value="social">Social Event</option>
+                <option value="portrait">Portrait Session</option>
+                <option value="content">Content Creation</option>
+                <option value="wedding">Wedding</option>
+                <option value="corporate">Corporate</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Date Label *</div>
+              <input type="text" id="pm-date" placeholder="e.g. May 2026"/>
+            </div>
+          </div>
+          <div class="field-group" style="margin-bottom:12px;">
+            <div class="field-label">Short Description</div>
+            <textarea id="pm-desc" rows="2" placeholder="One or two sentences about this event…"></textarea>
+          </div>
+          <div class="field-group" style="margin-bottom:12px;">
+            <div class="field-label">Cover Image URL *</div>
+            <input type="url" id="pm-cover" placeholder="https://…"/>
+            <div class="field-hint">Shown as the card thumbnail and in the hero flip-book</div>
+          </div>
+          <div class="field-group" style="margin-bottom:12px;">
+            <div class="field-label">Photo URLs — one per line *</div>
+            <textarea id="pm-photos" rows="6" placeholder="https://…&#10;https://…&#10;https://…"></textarea>
+            <div class="field-hint">Each URL becomes a page in the flip-book lightbox</div>
+          </div>
+          <div class="field-group" style="margin-bottom:20px;">
+            <div class="field-label">Sort Order</div>
+            <input type="number" id="pm-sort" value="0" min="0"/>
+            <div class="field-hint">Higher number = shown first on the portfolio page</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-gold" style="flex:1;justify-content:center;" onclick="savePortfolioEvent()">Save Event</button>
+            <button class="btn btn-ghost" onclick="closePortfolioModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- SERVICES -->
     <div class="page" id="page-services">
@@ -2449,8 +2536,145 @@ var _origNav = window.nav;
 window.nav = function(page, el){
   var result = _origNav ? _origNav(page, el) : false;
   if(page === 'services') setTimeout(loadServices, 50);
+  if(page === 'portfolio') setTimeout(loadPortfolioEvents, 50);
   return result;
 };
+
+/* ════════════════════════════════════════
+   PORTFOLIO EVENTS ADMIN
+════════════════════════════════════════ */
+async function loadPortfolioEvents() {
+  var el = document.getElementById('portfolioEventsList');
+  if (!el) return;
+  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  try {
+    var sb = getSupabase();
+    var res = await sb.from('portfolio_events').select('*').order('sort_order', {ascending: false});
+    if (res.error) throw res.error;
+    var rows = res.data || [];
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-ico">📷</div><div class="empty-txt">No portfolio events yet. Add your first one!</div></div>';
+      return;
+    }
+    el.innerHTML = '<div class="table-wrap"><table class="tbl"><thead><tr><th>Cover</th><th>Title</th><th>Category</th><th>Date</th><th>Photos</th><th>Order</th><th>Active</th><th></th></tr></thead><tbody>' +
+      rows.map(function(ev) {
+        return '<tr>' +
+          '<td><img src="' + esc(ev.cover||'') + '" style="width:52px;height:38px;object-fit:cover;border-radius:6px;display:block;" onerror="this.style.display=\'none\'"/></td>' +
+          '<td style="font-weight:600;max-width:180px;">' + esc(ev.title||'') + '</td>' +
+          '<td><span class="pill pill-active">' + esc(ev.category||'') + '</span></td>' +
+          '<td>' + esc(ev.date||'') + '</td>' +
+          '<td style="color:var(--text3);">' + ((ev.photos||[]).length) + ' photos</td>' +
+          '<td style="color:var(--text3);">' + (ev.sort_order||0) + '</td>' +
+          '<td><div class="toggle' + (ev.is_active ? ' on' : '') + '" onclick="togglePortfolioEvent(\'' + ev.id + '\',' + !!ev.is_active + ')"></div></td>' +
+          '<td style="display:flex;gap:6px;align-items:center;">' +
+            '<button class="btn btn-ghost btn-sm" onclick="openPortfolioModal(' + JSON.stringify(JSON.stringify(ev)).slice(1,-1) + ')"> Edit</button>' +
+            '<button class="btn btn-red btn-sm" onclick="deletePortfolioEvent(\'' + ev.id + '\')">Delete</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('') + '</tbody></table></div>';
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">Error: ' + esc(e.message) + '<br><br>Make sure the <code>portfolio_events</code> table exists in Supabase.</div></div>';
+  }
+}
+
+function openPortfolioModal(jsonStr) {
+  var modal = document.getElementById('portfolioModal');
+  modal.style.display = 'flex';
+  document.getElementById('portfolioModalAlert').style.display = 'none';
+  if (jsonStr) {
+    try {
+      var ev = JSON.parse(jsonStr);
+      document.getElementById('portfolioModalTitle').textContent = 'Edit Portfolio Event';
+      document.getElementById('pm-id').value = ev.id || '';
+      document.getElementById('pm-title').value = ev.title || '';
+      document.getElementById('pm-category').value = ev.category || 'social';
+      document.getElementById('pm-date').value = ev.date || '';
+      document.getElementById('pm-desc').value = ev.description || '';
+      document.getElementById('pm-cover').value = ev.cover || '';
+      document.getElementById('pm-photos').value = (ev.photos || []).join('\n');
+      document.getElementById('pm-sort').value = ev.sort_order || 0;
+    } catch(e) {}
+  } else {
+    document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio Event';
+    document.getElementById('pm-id').value = '';
+    document.getElementById('pm-title').value = '';
+    document.getElementById('pm-category').value = 'social';
+    document.getElementById('pm-date').value = '';
+    document.getElementById('pm-desc').value = '';
+    document.getElementById('pm-cover').value = '';
+    document.getElementById('pm-photos').value = '';
+    document.getElementById('pm-sort').value = '0';
+  }
+}
+
+function closePortfolioModal() {
+  document.getElementById('portfolioModal').style.display = 'none';
+}
+
+function showPortfolioAlert(msg, ok) {
+  var el = document.getElementById('portfolioModalAlert');
+  el.style.display = 'block';
+  el.style.background = ok ? 'var(--green-dim)' : 'var(--red-dim)';
+  el.style.color = ok ? 'var(--green)' : 'var(--red)';
+  el.textContent = msg;
+}
+
+async function savePortfolioEvent() {
+  var id = document.getElementById('pm-id').value.trim();
+  var title = document.getElementById('pm-title').value.trim();
+  var category = document.getElementById('pm-category').value;
+  var date = document.getElementById('pm-date').value.trim();
+  var description = document.getElementById('pm-desc').value.trim();
+  var cover = document.getElementById('pm-cover').value.trim();
+  var photosRaw = document.getElementById('pm-photos').value.trim();
+  var sort_order = parseInt(document.getElementById('pm-sort').value) || 0;
+
+  if (!title) { showPortfolioAlert('Event title is required.'); return; }
+  if (!cover) { showPortfolioAlert('Cover image URL is required.'); return; }
+  if (!photosRaw) { showPortfolioAlert('At least one photo URL is required.'); return; }
+
+  var photos = photosRaw.split('\n').map(function(u){ return u.trim(); }).filter(Boolean);
+
+  var payload = { title: title, category: category, date: date, description: description, cover: cover, photos: photos, sort_order: sort_order, is_active: true };
+
+  try {
+    var sb = getSupabase();
+    var res;
+    if (id) {
+      res = await sb.from('portfolio_events').update(payload).eq('id', id);
+    } else {
+      res = await sb.from('portfolio_events').insert(payload);
+    }
+    if (res.error) throw res.error;
+    showPortfolioAlert('Saved!', true);
+    setTimeout(function() { closePortfolioModal(); loadPortfolioEvents(); }, 700);
+  } catch(e) {
+    showPortfolioAlert('Error: ' + (e.message || 'Save failed'));
+  }
+}
+
+async function togglePortfolioEvent(id, current) {
+  try {
+    var sb = getSupabase();
+    await sb.from('portfolio_events').update({ is_active: !current }).eq('id', id);
+    loadPortfolioEvents();
+  } catch(e) { toast('','Toggle failed', e.message||''); }
+}
+
+async function deletePortfolioEvent(id) {
+  if (!confirm('Delete this portfolio event? This cannot be undone.')) return;
+  try {
+    var sb = getSupabase();
+    var res = await sb.from('portfolio_events').delete().eq('id', id);
+    if (res.error) throw res.error;
+    toast('','Event deleted','Removed from portfolio');
+    loadPortfolioEvents();
+  } catch(e) { toast('','Delete failed', e.message||''); }
+}
+
+document.getElementById('portfolioModal').addEventListener('click', function(e) {
+  if (e.target === this) closePortfolioModal();
+});
 
 /* Close modal on backdrop click */
 document.getElementById('svcModal').addEventListener('click', function(e){
