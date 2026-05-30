@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
 
-  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -20,468 +19,328 @@
   </script>
 
   <style>
-    :root {
-      --pf-display: 'Fraunces', Georgia, serif;
-    }
+    :root { --pf: 'Fraunces', Georgia, serif; }
 
-    /* ── BIG BOOK HERO ──────────────────────── */
-    .pf-hero {
+    /* ═══════════════════════════════════════
+       PAGE WRAPPER
+    ═══════════════════════════════════════ */
+    .pf-page {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 80px 40px 0;
-      text-align: center;
+      padding: 80px 24px 100px;
     }
-    .pf-hero-label {
+
+    .pf-label {
       font-family: var(--fm);
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
-    .pf-hero-title {
-      font-family: var(--pf-display);
-      font-size: clamp(44px, 6vw, 82px);
+    .pf-title {
+      font-family: var(--pf);
+      font-size: clamp(38px, 5.5vw, 72px);
       font-weight: 300;
-      line-height: 1.02;
+      line-height: 1.04;
       letter-spacing: -0.03em;
       color: var(--text);
-      margin-bottom: 60px;
+      text-align: center;
+      margin-bottom: 64px;
     }
-    .pf-hero-title em {
-      font-style: italic;
-      color: var(--gold);
+    .pf-title em { font-style: italic; color: var(--gold); }
+
+    /* ═══════════════════════════════════════
+       BOOK SCENE
+    ═══════════════════════════════════════ */
+    .book-scene {
+      perspective: 2400px;
+      width: min(1000px, 96vw);
+      margin: 0 auto;
+      position: relative;
     }
 
-    /* ── HERO BOOK STAGE ────────────────────── */
-    .pf-hero-book-wrap {
-      position: relative;
-      width: min(760px, 90vw);
-      margin: 0 auto;
-    }
-    /* Glowing platform shadow */
-    .pf-hero-book-wrap::after {
+    /* Glow under the book */
+    .book-scene::after {
       content: '';
       position: absolute;
-      bottom: -30px;
+      bottom: -20px;
       left: 50%;
       transform: translateX(-50%);
-      width: 70%;
-      height: 40px;
-      background: radial-gradient(ellipse at center, var(--gold-glo) 0%, transparent 70%);
-      filter: blur(10px);
+      width: 55%;
+      height: 50px;
+      background: radial-gradient(ellipse, var(--gold-glo) 0%, transparent 70%);
+      filter: blur(14px);
+      pointer-events: none;
     }
 
-    .pf-hero-book-stage {
-      perspective: 2000px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-
-    .pf-hero-book {
+    .book-root {
       position: relative;
-      width: min(760px, 90vw);
-      height: min(500px, 59vw);
-      transform-style: preserve-3d;
-    }
-
-    .pf-hero-page {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      transform-origin: left center;
-      transition: transform 0.7s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-      cursor: pointer;
-    }
-    .pf-hero-page.flipped { transform: rotateY(-180deg); }
-
-    .pf-hero-front, .pf-hero-back {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      overflow: hidden;
-      border-radius: 3px 16px 16px 3px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.55), 6px 0 18px rgba(0,0,0,0.3);
-    }
-    .pf-hero-back {
-      transform: rotateY(180deg);
-      border-radius: 16px 3px 3px 16px;
-      box-shadow: -6px 0 18px rgba(0,0,0,0.3), 0 32px 80px rgba(0,0,0,0.55);
-    }
-    .pf-hero-front img, .pf-hero-back img {
       width: 100%;
+      /* 2:3 aspect per page, two pages side by side */
+      aspect-ratio: 2 / 0.72;
+      transform-style: preserve-3d;
+    }
+
+    /* ── FIXED LEFT & RIGHT HALVES ── */
+    /* These are the "resting" pages always visible */
+    .book-half {
+      position: absolute;
+      top: 0;
+      width: 50%;
       height: 100%;
+      overflow: hidden;
+    }
+    .book-half-left {
+      left: 0;
+      border-radius: 6px 0 0 6px;
+      box-shadow: -6px 8px 40px rgba(0,0,0,0.45), -2px 0 8px rgba(0,0,0,0.2);
+      background: #1a1410;
+    }
+    .book-half-right {
+      right: 0;
+      border-radius: 0 6px 6px 0;
+      box-shadow: 6px 8px 40px rgba(0,0,0,0.45), 2px 0 8px rgba(0,0,0,0.2);
+      background: #1a1410;
+    }
+    .book-half img {
+      width: 100%; height: 100%;
       object-fit: cover;
       display: block;
     }
-    /* Cover overlay */
-    .pf-hero-front-ov {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: 32px 36px;
-    }
-    .pf-hero-back-ov {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      justify-content: flex-end;
-      padding: 32px 36px;
-    }
-    .pf-hero-ev-title {
-      font-family: var(--pf-display);
-      font-size: clamp(18px, 2.4vw, 28px);
-      font-weight: 300;
-      color: #fff;
-      margin-bottom: 6px;
-      line-height: 1.15;
-    }
-    .pf-hero-ev-tag {
-      font-family: var(--fm);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-    .pf-hero-page-num {
+
+    /* Page number badges */
+    .book-pg-num {
       position: absolute;
       bottom: 14px;
-      right: 20px;
       font-family: var(--fm);
       font-size: 11px;
-      color: rgba(255,255,255,0.65);
-      background: rgba(0,0,0,0.4);
+      color: rgba(255,255,255,0.55);
+      background: rgba(0,0,0,0.35);
       padding: 3px 10px;
       border-radius: 100px;
       backdrop-filter: blur(4px);
-    }
-    .pf-hero-back .pf-hero-page-num { right: auto; left: 20px; }
-    .pf-hero-crease {
-      position: absolute;
-      top: 0; right: 0;
-      width: 22px; height: 100%;
-      background: linear-gradient(to left, rgba(0,0,0,0.3), transparent);
       pointer-events: none;
     }
-    .pf-hero-back-crease {
-      right: auto; left: 0;
-      background: linear-gradient(to right, rgba(0,0,0,0.3), transparent);
-    }
-    .pf-hero-back-blank {
-      width: 100%; height: 100%;
-      background: #0d0d0d;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 12px;
-    }
-    .pf-hero-back-icon { font-size: 36px; color: var(--gold); opacity: 0.5; }
-    .pf-hero-back-text {
-      font-family: var(--fm); font-size: 11px;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
-    }
+    .book-half-left .book-pg-num  { left: 18px; }
+    .book-half-right .book-pg-num { right: 18px; }
 
-    /* ── HERO BOOK CONTROLS ─────────────────── */
-    .pf-hero-controls {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-top: 60px;
-      margin-bottom: 20px;
+    /* Event label overlay bottom-left / bottom-right */
+    .book-ev-ov {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, transparent 50%);
+      pointer-events: none;
     }
-    .pf-hero-btn {
-      padding: 10px 26px;
-      border-radius: 100px;
-      border: 1px solid var(--border2);
-      background: var(--card);
-      color: var(--text2);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: var(--fb);
+    .book-ev-info {
+      position: absolute;
+      bottom: 36px;
+      left: 24px;
+      pointer-events: none;
     }
-    .pf-hero-btn:hover:not(:disabled) {
-      border-color: var(--gold-glo);
-      color: var(--gold);
-    }
-    .pf-hero-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .pf-hero-counter {
-      font-family: var(--pf-display);
-      font-size: 16px;
-      font-weight: 400;
-      font-style: italic;
-      color: var(--text3);
-      min-width: 60px;
-      text-align: center;
-    }
-
-    /* ── EVENT DOTS NAV ─────────────────────── */
-    .pf-ev-dots {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 72px;
-    }
-    .pf-ev-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--border2);
-      border: none; cursor: pointer;
-      transition: all 0.25s; padding: 0;
-    }
-    .pf-ev-dot.active {
-      background: var(--gold);
-      transform: scale(1.5);
-    }
-
-    /* ── EVENT LIST BELOW ───────────────────── */
-    .pf-divider-label {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 0 40px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .pf-divider-label span {
+    .book-ev-info.right { left: auto; right: 24px; text-align: right; }
+    .book-ev-tag {
       font-family: var(--fm);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.13em;
       text-transform: uppercase;
-      color: var(--text3);
-      flex-shrink: 0;
-    }
-    .pf-divider-line {
-      flex: 1; height: 1px;
-      background: var(--border);
-    }
-
-    .pf-events {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 0 40px 80px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .pf-event-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    .pf-event-card:hover {
-      border-color: var(--gold-glo);
-      transform: translateY(-4px);
-      box-shadow: var(--sh2);
-    }
-    .pf-event-thumb {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      display: block;
-      filter: brightness(0.88);
-      transition: filter 0.4s, transform 0.5s;
-    }
-    .pf-event-card:hover .pf-event-thumb {
-      filter: brightness(1);
-      transform: scale(1.03);
-    }
-    .pf-event-thumb-wrap {
-      overflow: hidden;
-      position: relative;
-    }
-    .pf-event-thumb-ov {
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,0.45);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .pf-event-card:hover .pf-event-thumb-ov { opacity: 1; }
-    .pf-event-thumb-ov-txt {
-      color: #fff; font-size: 13px; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,0.5);
-      padding: 10px 20px; border-radius: 100px;
-    }
-    .pf-event-body { padding: 22px 24px 24px; }
-    .pf-event-meta {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-    }
-    .pf-event-tag {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 10px; border-radius: 100px;
-      font-family: var(--fm); font-size: 9px; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--gold-dim); border: 1px solid var(--gold-glo);
       color: var(--gold);
+      margin-bottom: 4px;
     }
-    .pf-event-date { font-size: 11px; color: var(--text3); font-family: var(--fm); }
-    .pf-event-title {
-      font-family: var(--pf-display);
-      font-size: clamp(18px, 1.8vw, 22px);
-      font-weight: 400; color: var(--text); line-height: 1.2; margin-bottom: 8px;
-    }
-    .pf-event-desc {
-      font-size: 13.5px; color: var(--text2); font-weight: 300; line-height: 1.65;
-    }
-    .pf-event-count {
-      display: flex; align-items: center; gap: 5px; margin-top: 14px;
-      font-size: 12px; color: var(--text3); font-family: var(--fm);
-    }
-    .pf-event-line {
-      width: 28px; height: 2px; background: var(--gold);
-      border-radius: 2px; margin-top: 16px; opacity: 0.4;
-      transition: width 0.35s ease, opacity 0.35s ease;
-    }
-    .pf-event-card:hover .pf-event-line { width: 52px; opacity: 1; }
-
-    .pf-empty {
-      grid-column: 1 / -1; text-align: center;
-      padding: 80px 20px; color: var(--text3);
+    .book-ev-name {
+      font-family: var(--pf);
+      font-size: clamp(13px, 1.6vw, 20px);
+      font-weight: 300;
+      color: #fff;
+      line-height: 1.2;
     }
 
-    /* ── FLIP BOOK LIGHTBOX ─────────────────── */
-    .fp-lightbox {
-      display: none;
-      position: fixed; inset: 0; z-index: 2000;
-      background: rgba(0,0,0,0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      align-items: center; justify-content: center;
-      flex-direction: column; gap: 24px; padding: 24px;
+    /* ── SPINE ── */
+    .book-spine {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 100%;
+      z-index: 50;
+      pointer-events: none;
+      /* dark groove */
+      background: linear-gradient(to right,
+        rgba(0,0,0,0.55) 0%,
+        rgba(0,0,0,0.15) 30%,
+        rgba(255,255,255,0.04) 50%,
+        rgba(0,0,0,0.15) 70%,
+        rgba(0,0,0,0.55) 100%
+      );
     }
-    .fp-lightbox.open { display: flex; }
-    .fp-lightbox-header {
-      position: absolute; top: 0; left: 0; right: 0;
-      padding: 20px 28px;
-      display: flex; align-items: center; justify-content: space-between; z-index: 10;
-    }
-    .fp-lightbox-title {
-      font-family: var(--pf-display); font-size: 18px;
-      font-weight: 300; color: rgba(255,255,255,0.9); font-style: italic;
-    }
-    .fp-close {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-      color: #fff; font-size: 16px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s; font-family: var(--fb);
-    }
-    .fp-close:hover { background: rgba(255,255,255,0.2); }
-    .fp-stage {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 28px; margin-top: 64px; width: 100%;
-    }
-    .fp-book-wrap { position: relative; perspective: 1800px; }
-    .fp-book {
-      position: relative;
-      width: min(520px, 85vw);
-      height: min(390px, 64vw);
-      transform-style: preserve-3d;
-    }
-    .fp-page {
-      position: absolute; inset: 0;
+
+    /* ── FLIPPING PAGE ── */
+    /* This sits on top and animates */
+    .flip-leaf {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
       transform-style: preserve-3d;
       transform-origin: left center;
-      transition: transform 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-      cursor: pointer;
+      transition: transform 0.75s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+      z-index: 30;
+      pointer-events: none;
     }
-    .fp-page.flipped { transform: rotateY(-180deg); }
-    .fp-front, .fp-back {
-      position: absolute; inset: 0;
+    .flip-leaf.from-right {
+      left: 50%;
+      transform-origin: left center;
+    }
+    .flip-leaf.flipping-fwd {
+      animation: flipFwd 0.75s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
+    }
+    .flip-leaf.flipping-back {
+      animation: flipBack 0.75s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
+    }
+
+    @keyframes flipFwd {
+      0%   { transform: rotateY(0deg); left: 50%; transform-origin: left center; }
+      100% { transform: rotateY(-180deg); left: 50%; transform-origin: left center; }
+    }
+    @keyframes flipBack {
+      0%   { transform: rotateY(-180deg); left: 0%; transform-origin: right center; }
+      100% { transform: rotateY(0deg); left: 0%; transform-origin: right center; }
+    }
+
+    .flip-leaf-face, .flip-leaf-back {
+      position: absolute;
+      inset: 0;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       overflow: hidden;
-      border-radius: 2px 12px 12px 2px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 4px 0 12px rgba(0,0,0,0.3);
     }
-    .fp-back {
+    .flip-leaf-face {
+      border-radius: 0 4px 4px 0;
+      box-shadow: 6px 0 20px rgba(0,0,0,0.3);
+    }
+    .flip-leaf-back {
       transform: rotateY(180deg);
-      border-radius: 12px 2px 2px 12px;
-      box-shadow: -4px 0 12px rgba(0,0,0,0.3), 0 20px 60px rgba(0,0,0,0.6);
+      border-radius: 6px 0 0 6px;
+      box-shadow: -6px 0 20px rgba(0,0,0,0.3);
     }
-    .fp-front img, .fp-back img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .fp-crease {
-      position: absolute; top: 0; right: 0; width: 18px; height: 100%;
-      background: linear-gradient(to left, rgba(0,0,0,0.25), transparent);
+    .flip-leaf-face img, .flip-leaf-back img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    /* page-turn shadow / curl shading */
+    .flip-leaf-face::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to left, rgba(0,0,0,0.28) 0%, transparent 35%);
       pointer-events: none;
     }
-    .back-crease {
-      right: auto; left: 0;
-      background: linear-gradient(to right, rgba(0,0,0,0.25), transparent);
+    .flip-leaf-back::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.28) 0%, transparent 35%);
+      pointer-events: none;
     }
-    .fp-page-num {
-      position: absolute; bottom: 12px; right: 16px;
-      font-family: var(--fm); font-size: 11px;
-      color: rgba(255,255,255,0.7);
-      background: rgba(0,0,0,0.4); padding: 3px 9px;
-      border-radius: 100px; backdrop-filter: blur(4px);
-    }
-    .fp-back .fp-page-num { right: auto; left: 16px; }
-    .fp-back-blank {
-      width: 100%; height: 100%; background: #0d0d0d;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 10px;
-    }
-    .fp-back-icon { font-size: 28px; color: var(--gold); opacity: 0.6; }
-    .fp-back-text {
-      font-family: var(--fm); font-size: 11px;
-      letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.3);
-    }
-    .fp-controls { display: flex; align-items: center; gap: 20px; }
-    .fp-btn {
-      padding: 9px 22px; border-radius: 100px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s; font-family: var(--fb);
-    }
-    .fp-btn:hover:not(:disabled) {
-      background: rgba(255,255,255,0.14);
-      border-color: rgba(255,255,255,0.35); color: #fff;
-    }
-    .fp-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .fp-dots {
-      display: flex; gap: 6px; align-items: center;
-      max-width: 200px; flex-wrap: wrap; justify-content: center;
-    }
-    .fp-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.25); border: none;
-      cursor: pointer; transition: all 0.2s; padding: 0;
-    }
-    .fp-dot.active { background: var(--gold); transform: scale(1.4); }
 
-    /* ── RESPONSIVE ─────────────────────────── */
-    @media (max-width: 1100px) {
-      .pf-events { grid-template-columns: repeat(2, 1fr); }
+    /* ── CLICK ZONES ── */
+    .book-click-left,
+    .book-click-right {
+      position: absolute;
+      top: 0; width: 50%; height: 100%;
+      z-index: 40;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    @media (max-width: 768px) {
-      .pf-events { grid-template-columns: 1fr; padding: 0 20px 60px; }
-      .pf-hero { padding: 60px 20px 0; }
-      .pf-hero-controls { gap: 14px; }
-      .pf-hero-book { height: 59vw; }
-      .pf-divider-label { padding: 0 20px 24px; }
-      .fp-book { width: 85vw; height: 64vw; }
+    .book-click-left  { left: 0; }
+    .book-click-right { right: 0; }
+
+    .book-arrow {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: rgba(255,255,255,0.7);
+      transition: all 0.2s;
+      opacity: 0;
+    }
+    .book-click-left:hover  .book-arrow,
+    .book-click-right:hover .book-arrow { opacity: 1; background: rgba(255,255,255,0.16); }
+    .book-click-left.disabled,
+    .book-click-right.disabled { cursor: default; }
+    .book-click-left.disabled  .book-arrow,
+    .book-click-right.disabled .book-arrow { display: none; }
+
+    /* ── BOOK STATUS BAR ── */
+    .book-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 36px;
+    }
+    .book-status-label {
+      font-family: var(--pf);
+      font-size: 15px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text2);
+      min-width: 160px;
+      text-align: center;
+    }
+    .book-status-dots {
+      display: flex; gap: 7px; align-items: center;
+    }
+    .book-status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--border2);
+      border: none; cursor: pointer; padding: 0;
+      transition: all 0.25s;
+    }
+    .book-status-dot.active {
+      background: var(--gold);
+      transform: scale(1.45);
+    }
+
+    /* ── HINT TEXT ── */
+    .book-hint {
+      margin-top: 20px;
+      font-family: var(--fm);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    /* ── LOADING / EMPTY ── */
+    .book-loading {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--card);
+      border-radius: 6px;
+      font-family: var(--fm);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .pf-page { padding: 60px 12px 80px; }
+      .pf-title { margin-bottom: 44px; }
+      .book-ev-name { font-size: 12px; }
+      .book-ev-info { bottom: 26px; left: 14px; }
+      .book-ev-info.right { left: auto; right: 14px; }
+      .book-arrow { width: 34px; height: 34px; font-size: 14px; }
     }
   </style>
 </head>
@@ -497,79 +356,92 @@
   <script>renderNav('portfolio.html');</script>
 
   <div class="page-wrap">
+    <div class="pf-page">
 
-    <!-- BIG BOOK HERO -->
-    <section class="pf-hero">
-      <div class="pf-hero-label">Our Work</div>
-      <h1 class="pf-hero-title">ImpactGrid Events<br><em>Portfolio</em></h1>
+      <div class="pf-label">Our Work</div>
+      <h1 class="pf-title">ImpactGrid Events<br><em>Portfolio</em></h1>
 
-      <!-- Hero flipbook stage -->
-      <div class="pf-hero-book-wrap">
-        <div class="pf-hero-book-stage">
-          <div class="pf-hero-book" id="heroBook">
-            <!-- Pages injected by JS -->
+      <!-- THE BOOK -->
+      <div class="book-scene" id="bookScene">
+
+        <div class="book-root" id="bookRoot">
+          <!-- Loading state -->
+          <div class="book-loading" id="bookLoading">Loading portfolio…</div>
+
+          <!-- Left fixed half (shows "previous right page" or cover) -->
+          <div class="book-half book-half-left" id="bookLeft">
+            <img id="bookLeftImg" src="" alt=""/>
+            <div class="book-ev-ov"></div>
+            <div class="book-ev-info" id="bookLeftInfo"></div>
+            <div class="book-pg-num" id="bookLeftNum"></div>
+          </div>
+
+          <!-- Right fixed half (shows current right page) -->
+          <div class="book-half book-half-right" id="bookRight">
+            <img id="bookRightImg" src="" alt=""/>
+            <div class="book-ev-ov"></div>
+            <div class="book-ev-info right" id="bookRightInfo"></div>
+            <div class="book-pg-num" id="bookRightNum"></div>
+          </div>
+
+          <!-- Spine -->
+          <div class="book-spine"></div>
+
+          <!-- Flip leaf (cloned in JS during animation) -->
+          <div class="flip-leaf" id="flipLeaf" style="display:none;">
+            <div class="flip-leaf-face"><img id="flipFaceImg" src="" alt=""/></div>
+            <div class="flip-leaf-back"><img id="flipBackImg" src="" alt=""/></div>
+          </div>
+
+          <!-- Click zones -->
+          <div class="book-click-left" id="clickLeft" onclick="bookFlip(-1)">
+            <div class="book-arrow">←</div>
+          </div>
+          <div class="book-click-right" id="clickRight" onclick="bookFlip(1)">
+            <div class="book-arrow">→</div>
           </div>
         </div>
+
+        <!-- Status bar below book -->
+        <div class="book-status">
+          <div class="book-status-label" id="bookStatusLabel"></div>
+          <div class="book-status-dots" id="bookDots"></div>
+        </div>
+
+        <div class="book-hint">← Flip the pages →  &nbsp;·&nbsp;  Click anywhere on the book</div>
       </div>
 
-      <!-- Controls -->
-      <div class="pf-hero-controls">
-        <button class="pf-hero-btn" id="heroBtnPrev" onclick="heroStep(-1)" disabled>← Prev</button>
-        <div class="pf-hero-counter" id="heroCounter">1 / 1</div>
-        <button class="pf-hero-btn" id="heroBtnNext" onclick="heroStep(1)">Next →</button>
-      </div>
-
-      <!-- Event dots -->
-      <div class="pf-ev-dots" id="heroDots"></div>
-    </section>
-
-    <!-- ALL EVENTS GRID -->
-    <div class="pf-divider-label">
-      <span>All Events</span>
-      <div class="pf-divider-line"></div>
-    </div>
-
-    <div class="pf-events" id="eventsGrid">
-      <!-- Populated by JS -->
-    </div>
-
-  </div><!-- /.page-wrap -->
-
-  <!-- FLIP BOOK LIGHTBOX (opens when card clicked) -->
-  <div class="fp-lightbox" id="fpLightbox" role="dialog" aria-modal="true">
-    <div class="fp-lightbox-header">
-      <div class="fp-lightbox-title" id="fpLightboxTitle">Gallery</div>
-      <button class="fp-close" id="fpCloseBtn" aria-label="Close gallery">✕</button>
-    </div>
-    <div class="fp-stage" id="fpStage">
-      <div class="fp-book-wrap">
-        <div class="fp-book" id="fpBook"></div>
-      </div>
-      <div class="fp-controls">
-        <button class="fp-btn fp-btn-prev" id="fpBtnPrev" onclick="fpStep(-1)" aria-label="Previous" disabled>← Prev</button>
-        <div class="fp-dots" id="fpDots"></div>
-        <button class="fp-btn fp-btn-next" id="fpBtnNext" onclick="fpStep(1)" aria-label="Next">Next →</button>
-      </div>
     </div>
   </div>
 
-  <!-- Footer -->
   <div id="ig-footer"></div>
   <script>renderFooter();</script>
 
   <script>
   /* ════════════════════════════════════════
-     PORTFOLIO — big book hero + event grid + lightbox
+     PORTFOLIO BOOK ENGINE
+     
+     Model: one "spread" = two facing photos.
+     Each event's photos are split into spreads:
+       spread 0 → photos[0] (right) + cover photo left side
+       spread 1 → photos[0] left + photos[1] right
+       spread 2 → photos[1] left + photos[2] right …
+     
+     When user flips forward:
+       - animate: right page peels left
+       - left becomes old right, right advances
+     When user flips back:
+       - animate: left page peels right
   ════════════════════════════════════════ */
 
   var FALLBACK_EVENTS = [
     {
       id: 'e1',
       title: 'Summer Social — Outdoor Gathering',
-      description: 'Candid photography and content creation for a vibrant community outdoor event in Manchester.',
-      category: 'social',
+      description: 'Candid photography for a vibrant community event in Manchester.',
+      category: 'Social Event',
       date: 'May 2026',
-      cover: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&q=80&fit=crop',
+      cover: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900&q=85&fit=crop',
       photos: [
         'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900&q=85&fit=crop',
         'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=900&q=85&fit=crop',
@@ -582,10 +454,10 @@
     {
       id: 'e2',
       title: 'Editorial Portrait Session',
-      description: 'Styled portrait and fashion photography with a creative editorial concept and branded content delivery.',
-      category: 'portrait',
+      description: 'Styled portrait and fashion photography with branded content delivery.',
+      category: 'Portrait Session',
       date: 'Dec 2025',
-      cover: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80&fit=crop',
+      cover: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85&fit=crop',
       photos: [
         'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85&fit=crop',
         'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900&q=85&fit=crop',
@@ -595,288 +467,248 @@
     }
   ];
 
-  function esc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+  /* ── Build a flat list of page-images from all events ── */
+  /* Page 0 = special cover page (first event cover, full spread)
+     Then each photo is one page in sequence, with events interleaved */
+  var allPages = []; // {url, label, sublabel, isFirst}
   var allEvents = [];
+  var spreadIdx = 0;   // current left page index (0 = cover left)
+  var totalPages = 0;
+  var isFlipping = false;
 
-  /* ── HERO BOOK STATE ── */
-  var _hIdx = 0;
-  var _hFlipping = false;
-
-  function buildHeroBook(events) {
-    var book = document.getElementById('heroBook');
-    var dots = document.getElementById('heroDots');
-    if (!book || !events.length) return;
-
-    book.innerHTML = events.map(function(ev, i) {
-      var nextEv = events[i + 1];
-      return (
-        '<div class="pf-hero-page" id="hPage' + i + '" style="z-index:' + (events.length - i) + '" onclick="heroClick(' + i + ')">' +
-          '<div class="pf-hero-front">' +
-            '<img src="' + esc(ev.cover) + '" alt="' + esc(ev.title) + '" loading="' + (i < 1 ? 'eager' : 'lazy') + '"/>' +
-            '<div class="pf-hero-front-ov">' +
-              '<div class="pf-hero-ev-tag">' + esc(ev.category) + ' · ' + esc(ev.date) + '</div>' +
-              '<div class="pf-hero-ev-title">' + esc(ev.title) + '</div>' +
-            '</div>' +
-            '<div class="pf-hero-page-num">' + (i+1) + ' / ' + events.length + '</div>' +
-            '<div class="pf-hero-crease"></div>' +
-          '</div>' +
-          '<div class="pf-hero-back">' +
-            (nextEv
-              ? '<img src="' + esc(nextEv.cover) + '" alt="' + esc(nextEv.title) + '" loading="lazy"/>' +
-                '<div class="pf-hero-back-ov">' +
-                  '<div style="text-align:right;">' +
-                    '<div class="pf-hero-ev-tag">' + esc(nextEv.category) + ' · ' + esc(nextEv.date) + '</div>' +
-                    '<div class="pf-hero-ev-title">' + esc(nextEv.title) + '</div>' +
-                  '</div>' +
-                '</div>' +
-                '<div class="pf-hero-page-num" style="left:20px;right:auto;">' + (i+2) + ' / ' + events.length + '</div>' +
-                '<div class="pf-hero-crease pf-hero-back-crease"></div>'
-              : '<div class="pf-hero-back-blank"><div class="pf-hero-back-icon">✦</div><div class="pf-hero-back-text">End of Portfolio</div></div>'
-            ) +
-          '</div>' +
-        '</div>'
-      );
-    }).join('');
-
-    dots.innerHTML = events.map(function(_, i) {
-      return '<button class="pf-ev-dot' + (i === 0 ? ' active' : '') + '" onclick="heroGoto(' + i + ')" aria-label="Event ' + (i+1) + '"></button>';
-    }).join('');
-
-    updateHeroControls();
-  }
-
-  function updateHeroControls() {
-    var pb = document.getElementById('heroBtnPrev');
-    var nb = document.getElementById('heroBtnNext');
-    var ct = document.getElementById('heroCounter');
-    if (pb) pb.disabled = _hIdx === 0;
-    if (nb) nb.disabled = _hIdx >= allEvents.length - 1;
-    if (ct) ct.textContent = (_hIdx + 1) + ' / ' + allEvents.length;
-    document.querySelectorAll('.pf-ev-dot').forEach(function(d, j) {
-      d.classList.toggle('active', j === _hIdx);
+  function buildPages(events) {
+    allPages = [];
+    events.forEach(function(ev) {
+      var photos = ev.photos || [];
+      photos.forEach(function(url, i) {
+        allPages.push({
+          url: url,
+          label: ev.title,
+          sublabel: ev.category + '  ·  ' + ev.date,
+          isFirst: i === 0
+        });
+      });
     });
+    totalPages = allPages.length;
   }
 
-  function heroClick(i) {
-    /* clicking the page flips forward, or opens gallery if already last */
-    if (_hIdx < allEvents.length - 1) heroStep(1);
-    else openGallery(allEvents[_hIdx].id);
+  /* ── Render the static left/right halves for spreadIdx ── */
+  /* Left shows page[spreadIdx-1] (or blank for cover)
+     Right shows page[spreadIdx] */
+  function renderSpread(idx) {
+    var leftImg  = document.getElementById('bookLeftImg');
+    var rightImg = document.getElementById('bookRightImg');
+    var leftInfo  = document.getElementById('bookLeftInfo');
+    var rightInfo = document.getElementById('bookRightInfo');
+    var leftNum  = document.getElementById('bookLeftNum');
+    var rightNum = document.getElementById('bookRightNum');
+
+    /* LEFT page = idx - 1 */
+    if (idx === 0) {
+      /* Cover: show first photo on both sides or a dark cover */
+      var firstPg = allPages[0] || null;
+      leftImg.src  = firstPg ? firstPg.url : '';
+      leftImg.style.opacity = firstPg ? '1' : '0';
+      setInfo(leftInfo, firstPg, false);
+      leftNum.textContent = '';
+    } else {
+      var lpg = allPages[idx - 1];
+      leftImg.src = lpg ? lpg.url : '';
+      leftImg.style.opacity = lpg ? '1' : '0';
+      setInfo(leftInfo, lpg, false);
+      leftNum.textContent = lpg ? (idx) + ' / ' + totalPages : '';
+    }
+
+    /* RIGHT page = idx */
+    var rpg = allPages[idx];
+    if (rpg) {
+      rightImg.src = rpg.url;
+      rightImg.style.opacity = '1';
+      setInfo(rightInfo, rpg, true);
+      rightNum.textContent = (idx + 1) + ' / ' + totalPages;
+    } else {
+      /* End of book */
+      rightImg.src = '';
+      rightImg.style.opacity = '0';
+      rightInfo.innerHTML = '';
+      rightNum.textContent = '';
+    }
+
+    updateStatus(idx);
+    updateClickZones(idx);
   }
 
-  function heroGoto(i) {
-    if (_hFlipping || i === _hIdx) return;
-    _hFlipping = true;
-    var dir = i > _hIdx ? 1 : -1;
-    var steps = Math.abs(i - _hIdx);
-    function flipOne() {
-      if (steps-- <= 0) { _hFlipping = false; return; }
-      var cur = _hIdx;
-      if (dir > 0) {
-        var pg = document.getElementById('hPage' + cur);
-        if (pg) { pg.classList.add('flipped'); pg.style.zIndex = allEvents.length - cur; }
-        _hIdx++;
-      } else {
-        _hIdx--;
-        var pg2 = document.getElementById('hPage' + _hIdx);
-        if (pg2) { pg2.classList.remove('flipped'); pg2.style.zIndex = allEvents.length - _hIdx; }
+  function setInfo(el, pg, right) {
+    if (!pg) { el.innerHTML = ''; return; }
+    if (pg.isFirst) {
+      el.innerHTML =
+        '<div class="book-ev-tag">' + esc(pg.sublabel) + '</div>' +
+        '<div class="book-ev-name">' + esc(pg.label) + '</div>';
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  function updateStatus(idx) {
+    var lbl = document.getElementById('bookStatusLabel');
+    var dots = document.getElementById('bookDots');
+    /* Which event are we currently on? */
+    var pg = allPages[idx] || allPages[idx - 1];
+    if (pg) {
+      lbl.textContent = pg.label;
+    } else {
+      lbl.textContent = '';
+    }
+    /* Dots = one per event */
+    /* Figure out which event the current spread is from */
+    var evIdx = 0;
+    if (allEvents.length) {
+      var count = 0;
+      for (var e = 0; e < allEvents.length; e++) {
+        count += (allEvents[e].photos || []).length;
+        if (idx < count) { evIdx = e; break; }
+        evIdx = e;
       }
-      updateHeroControls();
-      if (steps > 0) setTimeout(flipOne, 130);
-      else setTimeout(function() { _hFlipping = false; }, 700);
     }
-    flipOne();
-  }
-
-  function heroStep(d) {
-    heroGoto(Math.max(0, Math.min(_hIdx + d, allEvents.length - 1)));
-  }
-
-  /* ── EVENT CARDS GRID ── */
-  function renderEvents(events) {
-    var grid = document.getElementById('eventsGrid');
-    if (!grid) return;
-    if (!events.length) {
-      grid.innerHTML = '<div class="pf-empty"><div style="font-size:40px;margin-bottom:14px">📷</div><div style="font-size:15px">No events yet — check back soon.</div></div>';
-      return;
-    }
-    grid.innerHTML = events.map(function(ev, i) {
-      var photoCount = (ev.photos || []).length;
-      return (
-        '<div class="pf-event-card anim-fade-up" onclick="openGallery(\'' + esc(ev.id) + '\')">' +
-          '<div class="pf-event-thumb-wrap">' +
-            '<img class="pf-event-thumb" src="' + esc(ev.cover) + '" alt="' + esc(ev.title) + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '"/>' +
-            '<div class="pf-event-thumb-ov"><span class="pf-event-thumb-ov-txt">Open Gallery ↗</span></div>' +
-          '</div>' +
-          '<div class="pf-event-body">' +
-            '<div class="pf-event-meta">' +
-              '<span class="pf-event-tag">' + esc(ev.category) + '</span>' +
-              '<span class="pf-event-date">' + esc(ev.date) + '</span>' +
-            '</div>' +
-            '<h2 class="pf-event-title">' + esc(ev.title) + '</h2>' +
-            '<p class="pf-event-desc">' + esc(ev.description) + '</p>' +
-            '<div class="pf-event-count">📷 ' + photoCount + ' photo' + (photoCount !== 1 ? 's' : '') + '</div>' +
-            '<div class="pf-event-line"></div>' +
-          '</div>' +
-        '</div>'
-      );
+    dots.innerHTML = allEvents.map(function(_, i) {
+      return '<button class="book-status-dot' + (i === evIdx ? ' active' : '') + '" onclick="jumpToEvent(' + i + ')" aria-label="Event ' + (i+1) + '"></button>';
     }).join('');
-    initAnim();
   }
 
-  /* ── LOAD FROM SUPABASE ── */
+  function updateClickZones(idx) {
+    document.getElementById('clickLeft').classList.toggle('disabled', idx <= 0);
+    document.getElementById('clickRight').classList.toggle('disabled', idx >= totalPages - 1);
+  }
+
+  /* ── Jump to the first photo of an event ── */
+  function jumpToEvent(evIdx) {
+    var target = 0;
+    for (var i = 0; i < evIdx; i++) {
+      target += (allEvents[i].photos || []).length;
+    }
+    if (target === spreadIdx) return;
+    spreadIdx = target;
+    renderSpread(spreadIdx);
+  }
+
+  /* ── Flip animation ── */
+  function bookFlip(dir) {
+    if (isFlipping) return;
+    var newIdx = spreadIdx + dir;
+    if (newIdx < 0 || newIdx > totalPages - 1) return;
+
+    isFlipping = true;
+
+    var leaf = document.getElementById('flipLeaf');
+    var faceImg = document.getElementById('flipFaceImg');
+    var backImg = document.getElementById('flipBackImg');
+
+    if (dir > 0) {
+      /* Forward: right page peels to left */
+      /* Face = current right page, Back = next right page */
+      var curPg  = allPages[spreadIdx];
+      var nextPg = allPages[newIdx];
+
+      faceImg.src = curPg ? curPg.url : '';
+      backImg.src = nextPg ? nextPg.url : '';
+
+      leaf.style.left = '50%';
+      leaf.style.transformOrigin = 'left center';
+      leaf.style.transform = 'rotateY(0deg)';
+      leaf.style.display = 'block';
+
+      /* Immediately update underlying pages so they show through */
+      /* Left will show old right (page being turned) — keep until flip done */
+      /* Right will show new page */
+      setTimeout(function() {
+        leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
+        leaf.style.transform = 'rotateY(-180deg)';
+      }, 16);
+
+      setTimeout(function() {
+        spreadIdx = newIdx;
+        renderSpread(spreadIdx);
+        leaf.style.display = 'none';
+        leaf.style.transition = '';
+        leaf.style.transform = '';
+        isFlipping = false;
+      }, 780);
+
+    } else {
+      /* Backward: left page flips back to right */
+      var curLeftPg = allPages[spreadIdx - 1];
+      var prevPg    = allPages[newIdx - 1];
+
+      /* Face (seen from left side after flip) = prev left page
+         Back (seen from right before flip starts) = current left */
+      faceImg.src = prevPg    ? prevPg.url    : '';
+      backImg.src = curLeftPg ? curLeftPg.url : '';
+
+      leaf.style.left = '0%';
+      leaf.style.transformOrigin = 'right center';
+      leaf.style.transform = 'rotateY(-180deg)';
+      leaf.style.display = 'block';
+
+      setTimeout(function() {
+        leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
+        leaf.style.transform = 'rotateY(0deg)';
+      }, 16);
+
+      setTimeout(function() {
+        spreadIdx = newIdx;
+        renderSpread(spreadIdx);
+        leaf.style.display = 'none';
+        leaf.style.transition = '';
+        leaf.style.transform = '';
+        isFlipping = false;
+      }, 780);
+    }
+  }
+
+  /* ── Touch / keyboard ── */
+  var _tx = 0;
+  document.getElementById('bookRoot').addEventListener('touchstart', function(e){ _tx = e.touches[0].clientX; }, {passive:true});
+  document.getElementById('bookRoot').addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - _tx;
+    if (Math.abs(dx) > 44) bookFlip(dx < 0 ? 1 : -1);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight') bookFlip(1);
+    if (e.key === 'ArrowLeft')  bookFlip(-1);
+  });
+
+  /* ── Load events ── */
   async function loadEvents() {
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if (!sb) { allEvents = FALLBACK_EVENTS; init(); return; }
+      if (!sb) { useEvents(FALLBACK_EVENTS); return; }
       var res = await sb
         .from('portfolio_events')
         .select('id,title,description,category,date,cover,photos,sort_order')
         .eq('is_active', true)
         .order('sort_order', { ascending: false });
       if (res.error) throw res.error;
-      allEvents = (res.data && res.data.length) ? res.data : FALLBACK_EVENTS;
-      init();
+      useEvents((res.data && res.data.length) ? res.data : FALLBACK_EVENTS);
     } catch(e) {
       console.warn('Portfolio fetch failed, using fallback:', e);
-      allEvents = FALLBACK_EVENTS;
-      init();
+      useEvents(FALLBACK_EVENTS);
     }
   }
 
-  function init() {
-    buildHeroBook(allEvents);
-    renderEvents(allEvents);
-  }
-
-  /* ── LIGHTBOX FLIP BOOK ── */
-  var _fpIdx = 0, _fpTotal = 0, _fpFlipping = false, _fpCurrentEvent = null;
-
-  function openGallery(eventId) {
-    var ev = allEvents.find(function(e) { return e.id === eventId; });
-    if (!ev || !ev.photos || !ev.photos.length) return;
-    _fpCurrentEvent = ev;
-    _fpIdx = 0;
-    _fpTotal = ev.photos.length;
-    _fpFlipping = false;
-    document.getElementById('fpLightboxTitle').textContent = ev.title;
-    var book = document.getElementById('fpBook');
-    book.innerHTML = ev.photos.map(function(url, i) {
-      var nextUrl = ev.photos[i + 1] || '';
-      return (
-        '<div class="fp-page" id="fpPage' + i + '" style="z-index:' + (_fpTotal - i) + '">' +
-          '<div class="fp-front">' +
-            '<img src="' + esc(url) + '" alt="Photo ' + (i+1) + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '"/>' +
-            '<div class="fp-page-num">' + (i+1) + ' / ' + _fpTotal + '</div>' +
-            '<div class="fp-crease"></div>' +
-          '</div>' +
-          '<div class="fp-back">' +
-            (nextUrl
-              ? '<img src="' + esc(nextUrl) + '" alt="Photo ' + (i+2) + '" loading="lazy"/>' +
-                '<div class="fp-page-num">' + (i+2) + ' / ' + _fpTotal + '</div>' +
-                '<div class="fp-crease back-crease"></div>'
-              : '<div class="fp-back-blank"><div class="fp-back-icon">✦</div><div class="fp-back-text">End of Gallery</div></div>'
-            ) +
-          '</div>' +
-        '</div>'
-      );
-    }).join('');
-    document.getElementById('fpDots').innerHTML = ev.photos.map(function(_, i) {
-      return '<button class="fp-dot' + (i === 0 ? ' active' : '') + '" onclick="fpGoto(' + i + ')" aria-label="Photo ' + (i+1) + '"></button>';
-    }).join('');
-    document.getElementById('fpBtnPrev').disabled = true;
-    document.getElementById('fpBtnNext').disabled = _fpTotal <= 1;
-    document.getElementById('fpLightbox').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeLightbox() {
-    document.getElementById('fpLightbox').classList.remove('open');
-    document.body.style.overflow = '';
-    _fpCurrentEvent = null;
-  }
-
-  document.getElementById('fpCloseBtn').addEventListener('click', closeLightbox);
-  document.getElementById('fpLightbox').addEventListener('click', function(e) {
-    if (e.target === this) closeLightbox();
-  });
-
-  function fpGoto(i) {
-    if (_fpFlipping || i === _fpIdx) return;
-    _fpFlipping = true;
-    var dir = i > _fpIdx ? 1 : -1;
-    var steps = Math.abs(i - _fpIdx);
-    function flipOne() {
-      if (steps-- <= 0) { _fpFlipping = false; return; }
-      var cur = _fpIdx;
-      var pg = document.getElementById('fpPage' + cur);
-      if (dir > 0) {
-        if (pg) { pg.classList.add('flipped'); pg.style.zIndex = (_fpTotal - cur); }
-        _fpIdx++;
-      } else {
-        _fpIdx--;
-        var pg2 = document.getElementById('fpPage' + _fpIdx);
-        if (pg2) { pg2.classList.remove('flipped'); pg2.style.zIndex = (_fpTotal - _fpIdx); }
-      }
-      document.querySelectorAll('.fp-dot').forEach(function(d, j) { d.classList.toggle('active', j === _fpIdx); });
-      var pb = document.getElementById('fpBtnPrev');
-      var nb = document.getElementById('fpBtnNext');
-      if (pb) pb.disabled = _fpIdx === 0;
-      if (nb) nb.disabled = _fpIdx >= _fpTotal - 1;
-      if (steps > 0) setTimeout(flipOne, 120);
-      else setTimeout(function() { _fpFlipping = false; }, 700);
-    }
-    flipOne();
-  }
-
-  function fpStep(d) { fpGoto(Math.max(0, Math.min(_fpIdx + d, _fpTotal - 1))); }
-
-  document.addEventListener('keydown', function(e) {
-    if (!document.getElementById('fpLightbox').classList.contains('open')) return;
-    if (e.key === 'ArrowLeft') fpStep(-1);
-    if (e.key === 'ArrowRight') fpStep(1);
-    if (e.key === 'Escape') closeLightbox();
-  });
-
-  var _fpTx = 0;
-  var fpStageEl = document.getElementById('fpStage');
-  fpStageEl.addEventListener('touchstart', function(e) { _fpTx = e.touches[0].clientX; }, { passive: true });
-  fpStageEl.addEventListener('touchend', function(e) {
-    var dx = e.changedTouches[0].clientX - _fpTx;
-    if (Math.abs(dx) > 50) fpStep(dx < 0 ? 1 : -1);
-  });
-
-  /* Hero swipe */
-  var _hTx = 0;
-  var heroStageEl = document.getElementById('heroBook');
-  heroStageEl.addEventListener('touchstart', function(e) { _hTx = e.touches[0].clientX; }, { passive: true });
-  heroStageEl.addEventListener('touchend', function(e) {
-    var dx = e.changedTouches[0].clientX - _hTx;
-    if (Math.abs(dx) > 40) heroStep(dx < 0 ? 1 : -1);
-  });
-
-  function initAnim() {
-    var els = document.querySelectorAll('.anim-fade-up:not(.visible)');
-    if (!els.length) return;
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function(entries) {
-        entries.forEach(function(e) {
-          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
-        });
-      }, { threshold: 0.12 });
-      els.forEach(function(el) { io.observe(el); });
-    } else {
-      els.forEach(function(el) { el.classList.add('visible'); });
-    }
+  function useEvents(events) {
+    allEvents = events;
+    buildPages(events);
+    document.getElementById('bookLoading').style.display = 'none';
+    spreadIdx = 0;
+    renderSpread(0);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { loadEvents(); initAnim(); });
+    document.addEventListener('DOMContentLoaded', loadEvents);
   } else {
     loadEvents();
-    initAnim();
   }
   </script>
 
