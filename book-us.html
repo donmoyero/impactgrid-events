@@ -320,6 +320,49 @@ var today        = new Date(); today.setHours(0,0,0,0);
 var calYear      = today.getFullYear();
 var calMonth     = today.getMonth();
 var selectedDate = null;
+
+/* ── Pre-select service from URL param (?service=Photography etc.) ── */
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var svc = params.get('service');
+  if (!svc) return;
+
+  /* Map service title keywords → bk-type option values */
+  var map = [
+    { keys: ['wedding'],                value: 'Wedding'   },
+    { keys: ['corporate','business'],   value: 'Corporate' },
+    { keys: ['portrait'],               value: 'Portrait'  },
+    { keys: ['social','party','content','creation'], value: 'Social' },
+    { keys: ['gallery','download','preview','online'], value: 'Other' },
+  ];
+  var lower = svc.toLowerCase();
+  var matched = '';
+  map.forEach(function(m) {
+    m.keys.forEach(function(k) { if (lower.indexOf(k) !== -1) matched = m.value; });
+  });
+
+  /* Wait for DOM then apply */
+  function applyService() {
+    var sel = document.getElementById('bk-type');
+    if (!sel) return;
+    if (matched) sel.value = matched;
+
+    /* Show a subtle banner above the calendar */
+    var banner = document.createElement('div');
+    banner.style.cssText = 'background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--gold);font-weight:600;margin-bottom:18px;';
+    banner.textContent = '✦ Booking: ' + svc + ' — pick a date below to continue';
+    var wrap = document.querySelector('.page-wrap') || document.body;
+    var cal = document.querySelector('.cal-wrap') || wrap.firstElementChild;
+    if (cal && cal.parentNode) cal.parentNode.insertBefore(banner, cal);
+    else wrap.insertBefore(banner, wrap.firstElementChild);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyService);
+  } else {
+    applyService();
+  }
+})();
 var blockedDates = [];
 
 var MONTH_NAMES = ['January','February','March','April','May','June',
