@@ -710,7 +710,13 @@ If you have any questions, just reply to this email.
           <div class="card" id="pfPhotosCard">
             <div class="card-head">
               <h2>Your Portfolio Photos</h2>
-              <button class="btn btn-ghost btn-sm" onclick="pfLoadPhotos()">↻ Refresh</button>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-ghost btn-sm" id="pfSelectToggleBtn" onclick="pfToggleSelectMode()" style="display:none;">Select</button>
+                <button class="btn btn-ghost btn-sm" id="pfSelectAllBtn" onclick="pfSelectAll()" style="display:none;">Select All</button>
+                <button class="btn btn-sm" id="pfDeleteSelectedBtn" onclick="pfDeleteSelected()" style="display:none;background:var(--red);color:#fff;border:none;">Delete Selected (<span id="pfSelectedCount">0</span>)</button>
+                <button class="btn btn-ghost btn-sm" id="pfCancelSelectBtn" onclick="pfCancelSelect()" style="display:none;">Cancel</button>
+                <button class="btn btn-ghost btn-sm" onclick="pfLoadPhotos()">↻ Refresh</button>
+              </div>
             </div>
             <div class="card-body" id="pfPhotosList">
               <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
@@ -2504,9 +2510,15 @@ window.nav = function(page, el){
    Storage: Cloudinary  ·  DB: Firebase (portfolio_photos)
 ════════════════════════════════════════ */
 
+var _pfSelectMode = false;
+var _pfSelected   = new Set();
+
 async function pfLoadPhotos() {
   var el = document.getElementById('pfPhotosList');
   if (!el) return;
+  _pfSelectMode = false;
+  _pfSelected.clear();
+  pfUpdateSelectUI();
   el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try {
     if (!db) throw new Error('Firebase not ready — refresh.');
@@ -2515,21 +2527,111 @@ async function pfLoadPhotos() {
     var rows = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
     if (!rows.length) {
       el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No photos yet. Drop some in above!</div></div>';
+      document.getElementById('pfSelectToggleBtn').style.display = 'none';
       return;
     }
-    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;">' +
+    document.getElementById('pfSelectToggleBtn').style.display = '';
+    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;" id="pfPhotosGrid">' +
       rows.map(function(p) {
         var safeId  = esc(p.id);
         var safeCid = esc(p.cloudinary_id || '');
-        return '<div style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid var(--border);">' +
+        return '<div id="pfcard-' + safeId + '" data-id="' + safeId + '" data-cid="' + safeCid + '" onclick="pfCardClick(this)" style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:2px solid var(--border);cursor:pointer;transition:border-color .15s;">' +
           '<img src="' + esc(p.url) + '" style="width:100%;height:100px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--bg3)\'" />' +
-          '<button data-id="' + safeId + '" data-cid="' + safeCid + '" onclick="pfDeletePhoto(this.dataset.id,this.dataset.cid)" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;line-height:1;">x</button>' +
+          '<div class="pf-check" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;font-size:22px;color:#fff;">&#10003;</div>' +
+          '<button data-id="' + safeId + '" data-cid="' + safeCid + '" onclick="event.stopPropagation();pfDeletePhoto(this.dataset.id,this.dataset.cid)" class="pf-del-btn" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;line-height:1;">x</button>' +
         '</div>';
       }).join('') +
     '</div>';
   } catch(e) {
     el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
   }
+}
+
+function pfCardClick(card) {
+  if (!_pfSelectMode) return;
+  var id = card.dataset.id;
+  if (_pfSelected.has(id)) {
+    _pfSelected.delete(id);
+    card.style.borderColor = 'var(--border)';
+    card.querySelector('.pf-check').style.display = 'none';
+  } else {
+    _pfSelected.add(id);
+    card.style.borderColor = 'var(--gold)';
+    card.querySelector('.pf-check').style.display = 'flex';
+  }
+  document.getElementById('pfSelectedCount').textContent = _pfSelected.size;
+}
+
+function pfToggleSelectMode() {
+  _pfSelectMode = true;
+  _pfSelected.clear();
+  document.getElementById('pfSelectedCount').textContent = '0';
+  document.getElementById('pfSelectToggleBtn').style.display  = 'none';
+  document.getElementById('pfSelectAllBtn').style.display     = '';
+  document.getElementById('pfDeleteSelectedBtn').style.display = '';
+  document.getElementById('pfCancelSelectBtn').style.display  = '';
+  /* hide individual delete buttons */
+  document.querySelectorAll('.pf-del-btn').forEach(function(b){ b.style.display = 'none'; });
+}
+
+function pfCancelSelect() {
+  _pfSelectMode = false;
+  _pfSelected.clear();
+  pfUpdateSelectUI();
+  /* reset card styles */
+  document.querySelectorAll('#pfPhotosGrid [data-id]').forEach(function(card){
+    card.style.borderColor = 'var(--border)';
+    card.querySelector('.pf-check').style.display = 'none';
+  });
+  document.querySelectorAll('.pf-del-btn').forEach(function(b){ b.style.display = ''; });
+}
+
+function pfSelectAll() {
+  document.querySelectorAll('#pfPhotosGrid [data-id]').forEach(function(card){
+    var id = card.dataset.id;
+    _pfSelected.add(id);
+    card.style.borderColor = 'var(--gold)';
+    card.querySelector('.pf-check').style.display = 'flex';
+  });
+  document.getElementById('pfSelectedCount').textContent = _pfSelected.size;
+}
+
+function pfUpdateSelectUI() {
+  document.getElementById('pfSelectToggleBtn').style.display   = _pfSelectMode ? 'none' : '';
+  document.getElementById('pfSelectAllBtn').style.display      = _pfSelectMode ? '' : 'none';
+  document.getElementById('pfDeleteSelectedBtn').style.display = _pfSelectMode ? '' : 'none';
+  document.getElementById('pfCancelSelectBtn').style.display   = _pfSelectMode ? '' : 'none';
+}
+
+async function pfDeleteSelected() {
+  if (!_pfSelected.size) return;
+  if (!confirm('Delete ' + _pfSelected.size + ' photo' + (_pfSelected.size > 1 ? 's' : '') + '?')) return;
+  var ids = Array.from(_pfSelected);
+  var grid = document.getElementById('pfPhotosGrid');
+  var failed = 0;
+  for (var i = 0; i < ids.length; i++) {
+    var id   = ids[i];
+    var card = document.getElementById('pfcard-' + id);
+    var cid  = card ? card.dataset.cid : '';
+    try {
+      if (cid) {
+        await fetch(EVENTS_API + '/api/delete-photo', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publicId: cid })
+        });
+      }
+      await deleteDoc(doc(db, 'portfolio_photos', id));
+      if (card) card.remove();
+    } catch(e) { failed++; }
+  }
+  _pfSelected.clear();
+  _pfSelectMode = false;
+  pfUpdateSelectUI();
+  document.querySelectorAll('.pf-del-btn').forEach(function(b){ b.style.display = ''; });
+  document.getElementById('pfSelectedCount').textContent = '0';
+  toast('', failed ? failed + ' failed to delete' : 'Deleted successfully', '');
+  /* if grid is now empty reload to show empty state */
+  if (!document.querySelectorAll('#pfPhotosGrid [data-id]').length) pfLoadPhotos();
 }
 
 function pfHandleDrop(files) {
@@ -2598,10 +2700,15 @@ async function pfDeletePhoto(id, cloudinaryId) {
   } catch(e) { toast('', 'Delete failed', e.message); }
 }
 
-window.pfLoadPhotos   = pfLoadPhotos;
-window.pfHandleDrop   = pfHandleDrop;
-window.pfHandleInput  = pfHandleInput;
-window.pfDeletePhoto  = pfDeletePhoto;
+window.pfLoadPhotos        = pfLoadPhotos;
+window.pfHandleDrop        = pfHandleDrop;
+window.pfHandleInput       = pfHandleInput;
+window.pfDeletePhoto       = pfDeletePhoto;
+window.pfCardClick         = pfCardClick;
+window.pfToggleSelectMode  = pfToggleSelectMode;
+window.pfCancelSelect      = pfCancelSelect;
+window.pfSelectAll         = pfSelectAll;
+window.pfDeleteSelected    = pfDeleteSelected;
 /* Close modal on backdrop click */
 document.getElementById('svcModal').addEventListener('click', function(e){
   if(e.target === this) closeSvcModal();
