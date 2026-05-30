@@ -222,23 +222,23 @@ tr:hover td{background:var(--bg2);}
     <div class="topbar-logo-mark" style="display:none;">IG</div>
     ImpactGrid
   </a>
-  <button class="mobile-menu-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
+  <button class="mobile-menu-btn" id="menuBtn" onclick="toggleSidebar()"></button>
   <div class="topbar-div"></div>
   <div class="admin-badge"> Admin Workstation</div>
   <div class="topbar-right">
     <span class="topbar-user" id="topbarUser"></span>
     <button class="topbar-btn" id="themeToggleBtn" onclick="toggleAdminTheme()" title="Toggle light/dark"></button>
     <a href="index.html" target="_blank" class="topbar-btn"> View Site</a>
-    <button class="topbar-btn topbar-btn-red" onclick="igLogout()">⎋ Sign Out</button>
+    <button class="topbar-btn topbar-btn-red" onclick="igLogout()"> Sign Out</button>
   </div>
 </div>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="shell">
   <aside class="sidebar" id="mainSidebar">
     <div class="sb-brand">
-      <div class="sb-brand-icon">⚙</div>
+      <div class="sb-brand-icon"></div>
       <div style="flex:1;"><div class="sb-brand-title">Admin Panel</div><div class="sb-brand-sub">ImpactGrid Group</div></div>
-      <button onclick="closeSidebar()" class="mobile-menu-btn" style="font-size:14px;margin-left:auto;">✕</button>
+      <button onclick="closeSidebar()" class="mobile-menu-btn" style="font-size:14px;margin-left:auto;"></button>
     </div>
     <div class="sb-section">
       <div class="sb-section-label">Workstation</div>
@@ -269,7 +269,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('hero',this)"><span class="sb-ico"></span>Hero Slideshow</a>
         <a href="#" onclick="return nav('services',this)"><span class="sb-ico"></span>Services</a>
         <a href="#" onclick="return nav('about',this)"><span class="sb-ico"></span>About Page</a>
-        <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico">📷</span>Portfolio Events</a>
+        <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico"></span>Portfolio Events</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -281,7 +281,7 @@ tr:hover td{background:var(--bg2);}
     <div class="sb-spacer"></div>
     <div class="sb-footer">
       <a href="index.html" class="sb-back">← Back to Site</a>
-      <button class="sb-logout" onclick="igLogout()"><span>⎋</span> Sign Out</button>
+      <button class="sb-logout" onclick="igLogout()"><span></span> Sign Out</button>
     </div>
   </aside>
   <div class="main">
@@ -303,8 +303,8 @@ tr:hover td{background:var(--bg2);}
       <div class="page-header"><div class="page-title">Homepage Content</div><div class="page-sub">Edit section titles, subtitles, CTA text, and ecosystem card copy.</div></div>
       <div class="ws-layout">
         <div>
-          <div class="card"><div class="card-head"><h2> Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()"> Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div></div>
-          <div class="card"><div class="card-head"><h2> Ecosystem Cards</h2><button class="btn btn-gold" onclick="saveEcoCards()"> Save</button></div><div class="card-body" id="ecoEditor"><div class="empty"><div class="empty-ico">⏳</div></div></div></div>
+          <div class="card"><div class="card-head"><h2> Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()"> Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div></div></div>
+          <div class="card"><div class="card-head"><h2> Ecosystem Cards</h2><button class="btn btn-gold" onclick="saveEcoCards()"> Save</button></div><div class="card-body" id="ecoEditor"><div class="empty"><div class="empty-ico"></div></div></div></div>
         </div>
         <div class="ws-sticky">
           <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds.</div>
@@ -336,7 +336,7 @@ tr:hover td{background:var(--bg2);}
             <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Exactly 5 images. First image spans both rows on the left. Drag to reorder or drop files to upload.</p>
             <!-- drop zone -->
             <div class="upload-zone" id="hgDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hgFileIn').click()" ondragover="onDragOver(event,'hgDropZone')" ondragleave="onDragLeave(event,'hgDropZone')" ondrop="onDropSection(event,'hgDropZone','heroGridList','hero_grid',5)">
-              <div class="upload-zone-ico">☁</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop images here or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP · up to 5 images</div>
               <input type="file" id="hgFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'heroGridList','hero_grid',5)"/>
@@ -367,7 +367,7 @@ tr:hover td{background:var(--bg2);}
           <div style="padding:20px;">
             <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Add as many images as you like. They scroll continuously in two rows. Drag to reorder.</p>
             <div class="upload-zone" id="gsDropZone" style="margin-bottom:14px;" onclick="document.getElementById('gsFileIn').click()" ondragover="onDragOver(event,'gsDropZone')" ondragleave="onDragLeave(event,'gsDropZone')" ondrop="onDropSection(event,'gsDropZone','galleryStripList','gallery_strip',99)">
-              <div class="upload-zone-ico">☁</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop images here or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files</div>
               <input type="file" id="gsFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'galleryStripList','gallery_strip',99)"/>
@@ -399,7 +399,7 @@ tr:hover td{background:var(--bg2);}
           <div style="padding:20px;">
             <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Single image displayed beside the workflow steps.</p>
             <div class="upload-zone" id="hiDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hiFileIn').click()" ondragover="onDragOver(event,'hiDropZone')" ondragleave="onDragLeave(event,'hiDropZone')" ondrop="onDropSection(event,'hiDropZone','howImageList','how_image',1)">
-              <div class="upload-zone-ico">☁</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop an image here or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP · 1 image</div>
               <input type="file" id="hiFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleSectionFiles(event,'howImageList','how_image',1)"/>
@@ -424,7 +424,7 @@ tr:hover td{background:var(--bg2);}
     <!-- UPDATES -->
     <div class="page" id="page-updates">
       <div class="page-header"><div class="page-title">Updates Section</div><div class="page-sub">Edit the "ImpactGrid — Latest Updates" section on the homepage.</div></div>
-      <div class="card"><div class="card-head"><h2> Update Cards</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addUpdateCard()">+ Add Card</button><button class="btn btn-gold" onclick="saveUpdateCards()"> Save All</button></div></div><div class="card-body" id="updateCardsEditor"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div>
+      <div class="card"><div class="card-head"><h2> Update Cards</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addUpdateCard()">+ Add Card</button><button class="btn btn-gold" onclick="saveUpdateCards()"> Save All</button></div></div><div class="card-body" id="updateCardsEditor"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div></div>
     </div>
     <!-- TESTIMONIALS -->
     <div class="page" id="page-testimonials">
@@ -435,7 +435,7 @@ tr:hover td{background:var(--bg2);}
             <div class="field-group" style="margin-bottom:10px;"><div class="field-label">Section Heading</div><input type="text" id="trust-title-input" placeholder="e.g. The platform speaks for itself"/></div>
             <div class="field-group" style="margin-bottom:0;"><div class="field-label">Label Tag</div><input type="text" id="trust-label-input" placeholder="e.g. What People Say"/></div>
           </div>
-          <div class="testimonial-list" id="testimonialList"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div>
+          <div class="testimonial-list" id="testimonialList"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div>
         </div>
       </div>
     </div>
@@ -445,7 +445,7 @@ tr:hover td{background:var(--bg2);}
       <div class="card"><div class="card-head"><h2> Ticker Items</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTickerRow()">+ Add</button><button class="btn btn-gold" onclick="saveTicker()"> Save All</button></div></div>
         <div class="card-body">
           <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Click the coloured tag to cycle between New / Live / Soon.</p>
-          <div id="tickerList"><div class="empty"><div class="empty-ico">⏳</div></div></div>
+          <div id="tickerList"><div class="empty"><div class="empty-ico"></div></div></div>
           <div style="margin-top:16px;"><div class="field-label" style="margin-bottom:8px;">Preview</div>
             <div class="ticker-preview-strip"><div class="tp-badge"><div class="tp-dot"></div>ImpactGrid</div><div class="tp-text" id="tickerPreview">—</div></div>
           </div>
@@ -487,14 +487,14 @@ tr:hover td{background:var(--bg2);}
         <div class="card">
           <div class="card-head"><h2> Device Types</h2></div>
           <div class="card-body" id="act-devices">
-            <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
           </div>
         </div>
         <!-- Location breakdown -->
         <div class="card">
           <div class="card-head"><h2> Visitor Locations</h2></div>
           <div class="card-body" id="act-locations">
-            <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
           </div>
         </div>
       </div>
@@ -506,7 +506,7 @@ tr:hover td{background:var(--bg2);}
           <span style="font-size:11px;color:var(--text3);">Most recent first</span>
         </div>
         <div class="card-body table-wrap" id="act-visit-log">
-          <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+          <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
         </div>
       </div>
 
@@ -517,7 +517,7 @@ tr:hover td{background:var(--bg2);}
           <span style="font-size:11px;color:var(--text3);">Every photo download recorded from event galleries</span>
         </div>
         <div class="card-body table-wrap" id="act-downloads-log">
-          <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+          <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
         </div>
       </div>
 
@@ -525,7 +525,7 @@ tr:hover td{background:var(--bg2);}
     <!-- ALL EVENTS -->
     <div class="page" id="page-events">
       <div class="page-header"><div class="page-title">Events</div><div class="page-sub">All ImpactGrid photo events.</div></div>
-      <div class="card"><div class="card-head"><h2> All Events</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button><button class="btn btn-gold" onclick="nav('createevent',null)"> Create Event</button></div></div><div class="card-body table-wrap" id="eventsList"><div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div></div></div>
+      <div class="card"><div class="card-head"><h2> All Events</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button><button class="btn btn-gold" onclick="nav('createevent',null)"> Create Event</button></div></div><div class="card-body table-wrap" id="eventsList"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div></div>
     </div>
     <!-- CREATE EVENT -->
     <div class="page" id="page-createevent">
@@ -675,7 +675,7 @@ If you have any questions, just reply to this email.
       <div class="ws-layout">
         <div>
           <div class="card"><div class="card-head"><h2> Select Event</h2></div><div class="card-body"><div class="field-group"><div class="field-label">Event</div><select id="upload-event-select" onchange="onUploadEventChange()"><option value="">— Select an event —</option></select></div><div id="upload-event-info" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:4px;"><div style="font-size:12px;color:var(--text2);" id="upload-event-meta"></div></div></div></div>
-          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2> Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico">☁</div><div class="upload-zone-title">Drop photos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
+          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2> Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico"></div><div class="upload-zone-title">Drop photos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
           <div class="card" id="upload-photos-list-card" style="display:none;"><div class="card-head"><h2> Event Photos</h2><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button></div><div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">No photos yet.</div></div></div></div>
         </div>
         <div class="ws-sticky"><div class="hint-box"><strong>Upload tips</strong><br><br>You can upload multiple photos at once.<br><br>Photos are stored in the event bucket and are available immediately in the gallery after upload.</div></div>
@@ -692,14 +692,14 @@ If you have any questions, just reply to this email.
       <div class="ws-layout">
         <div>
           <div class="card">
-            <div class="card-head"><h2>📸 Upload Photos</h2></div>
+            <div class="card-head"><h2> Upload Photos</h2></div>
             <div class="card-body">
               <div class="upload-zone" id="pfDropZone"
                 onclick="document.getElementById('pfFileIn').click()"
                 ondragover="onDragOver(event,'pfDropZone')"
                 ondragleave="onDragLeave(event,'pfDropZone')"
                 ondrop="onDrop(event,'pfDropZone',pfHandleDrop)">
-                <div class="upload-zone-ico">📸</div>
+                <div class="upload-zone-ico"></div>
                 <div class="upload-zone-title">Drop photos here or click to browse</div>
                 <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div>
                 <input type="file" id="pfFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="pfHandleInput(event)"/>
@@ -713,7 +713,7 @@ If you have any questions, just reply to this email.
               <button class="btn btn-ghost btn-sm" onclick="pfLoadPhotos()">↻ Refresh</button>
             </div>
             <div class="card-body" id="pfPhotosList">
-              <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+              <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
             </div>
           </div>
         </div>
@@ -722,7 +722,7 @@ If you have any questions, just reply to this email.
             <strong>How it works</strong><br><br>
             Drop in as many photos as you like. Each one uploads to Cloudinary and saves to Firebase instantly.<br><br>
             They appear in the flip-book on the portfolio page in the order uploaded — newest first.<br><br>
-            Click <strong>✕</strong> on any photo to remove it.
+            Click <strong></strong> on any photo to remove it.
           </div>
         </div>
       </div>
@@ -745,7 +745,7 @@ If you have any questions, just reply to this email.
               </div>
             </div>
             <div class="card-body table-wrap" id="servicesList">
-              <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+              <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
             </div>
           </div>
         </div>
@@ -798,7 +798,7 @@ If you have any questions, just reply to this email.
                   ondragover="onDragOver(event,'abStoryImgZone')"
                   ondragleave="onDragLeave(event,'abStoryImgZone')"
                   ondrop="onDropAboutImg(event,'story')">
-                  <div class="upload-zone-ico">☁</div>
+                  <div class="upload-zone-ico"></div>
                   <div class="upload-zone-title">Drop an image or click to upload</div>
                   <div class="upload-zone-sub">JPG · PNG · WebP · Shown beside your story text</div>
                   <input type="file" id="abStoryImgFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleAboutImgFile(event,'story')"/>
@@ -823,7 +823,7 @@ If you have any questions, just reply to this email.
             </div>
             <div class="card-body">
               <div id="teamMembersList" style="display:flex;flex-direction:column;gap:14px;">
-                <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
           </div>
@@ -839,7 +839,7 @@ If you have any questions, just reply to this email.
             </div>
             <div class="card-body">
               <div id="pillarsList" style="display:flex;flex-direction:column;gap:10px;">
-                <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
           </div>
@@ -890,7 +890,7 @@ If you have any questions, just reply to this email.
               ondragover="onDragOver(event,'svcImgZone')"
               ondragleave="onDragLeave(event,'svcImgZone')"
               ondrop="onDropSvcImg(event)">
-              <div class="upload-zone-ico">☁</div>
+              <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop an image or click to upload</div>
               <div class="upload-zone-sub">JPG · PNG · WebP</div>
               <input type="file" id="svcImgFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleSvcImgFile(event)"/>
@@ -1017,7 +1017,7 @@ If you have any questions, just reply to this email.
         <div>
           <!-- Filter tabs -->
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
-            <button id="rev-tab-pending"  onclick="setReviewFilter('pending')"  style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);transition:all .2s;">⏳ Pending <span id="rev-count-pending" style="font-size:11px;opacity:.6;">0</span></button>
+            <button id="rev-tab-pending"  onclick="setReviewFilter('pending')"  style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);transition:all .2s;"> Pending <span id="rev-count-pending" style="font-size:11px;opacity:.6;">0</span></button>
             <button id="rev-tab-approved" onclick="setReviewFilter('approved')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;"> Approved <span id="rev-count-approved" style="font-size:11px;opacity:.6;">0</span></button>
             <button id="rev-tab-all"      onclick="setReviewFilter('all')"      style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;"> All <span id="rev-count-all" style="font-size:11px;opacity:.6;">0</span></button>
           </div>
@@ -1064,14 +1064,14 @@ If you have any questions, just reply to this email.
         <h2>All Bookings</h2>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:#07090f;">All</button>
-          <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)">⏳ Pending</button>
+          <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)"> Pending</button>
           <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)"> Confirmed</button>
           <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)"> Rejected</button>
           <button class="btn btn-ghost btn-sm" onclick="loadBookings()">↻ Refresh</button>
         </div>
       </div>
       <div class="card-body table-wrap" id="bookingsList">
-        <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+        <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
       </div>
     </div>
 
@@ -1210,7 +1210,7 @@ function toggleAdminTheme(){
   var isDark=document.documentElement.getAttribute('data-theme')==='dark';
   var newTheme=isDark?'light':'dark';
   document.documentElement.setAttribute('data-theme',newTheme);
-  document.getElementById('themeToggleBtn').textContent=newTheme==='dark'?'☀':'🌙';
+  document.getElementById('themeToggleBtn').textContent=newTheme==='dark'?'':'';
   try{localStorage.setItem('ig_theme',newTheme);}catch(e){}
 }
 function initAdminTheme(){
@@ -1218,7 +1218,7 @@ function initAdminTheme(){
     var saved=localStorage.getItem('ig_theme')||'light';
     document.documentElement.setAttribute('data-theme',saved);
     var btn=document.getElementById('themeToggleBtn');
-    if(btn) btn.textContent=saved==='dark'?'☀':'🌙';
+    if(btn) btn.textContent=saved==='dark'?'':'';
   }catch(e){}
 }
 
@@ -1405,8 +1405,8 @@ async function loadHeroSlides(){
         '<div class="slide-meta">'+(isVideo?' Video':' Image')+(s.caption?' · has caption':' · no caption')+'</div></div>'+
         '<div class="slide-actions">'+
           '<div class="toggle'+(s.active?' on':'')+'" onclick="toggleSlide(\''+s.id+'\','+s.active+')"></div>'+
-          '<button class="btn btn-ghost btn-icon" onclick="openHeroCaption(heroSlides.find(function(x){return x.id===\''+s.id+'\'}))">✕</button>'+
-          '<button class="btn btn-red btn-icon btn-sm" title="Delete" onclick="deleteSlide(\''+s.id+'\',\''+esc(s.storage_path||'')+'\')">✕</button>'+
+          '<button class="btn btn-ghost btn-icon" onclick="openHeroCaption(heroSlides.find(function(x){return x.id===\''+s.id+'\'}))"></button>'+
+          '<button class="btn btn-red btn-icon btn-sm" title="Delete" onclick="deleteSlide(\''+s.id+'\',\''+esc(s.storage_path||'')+'\')"></button>'+
         '</div></div>';
     }).join('');
   }catch(e){el.innerHTML='<div class="empty"><div class="empty-txt">Error: '+esc(e.message)+'</div></div>';}
@@ -1447,7 +1447,7 @@ function openHeroCaption(slide){
     '<div class="caption-preview-box" id="capPreviewBox">'+buildCapPreview(slide)+'</div>'+
     '<div style="display:flex;gap:8px;margin-top:4px;">'+
       '<button class="btn btn-gold" style="flex:1;" onclick="saveCaption(\''+slide.id+'\')"> Save Caption</button>'+
-      '<button class="btn btn-red btn-icon" onclick="deleteSlide(\''+slide.id+'\',\''+esc(slide.storage_path||'')+'\')">✕</button>'+
+      '<button class="btn btn-red btn-icon" onclick="deleteSlide(\''+slide.id+'\',\''+esc(slide.storage_path||'')+'\')"></button>'+
     '</div>';
 }
 function resetCaptionPanel(){document.getElementById('heroCaptionInner').innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text3);"><div style="font-size:28px;margin-bottom:10px;"></div><div style="font-size:12px;">Select a slide to edit.</div></div>';}
@@ -1494,7 +1494,7 @@ function renderUpdateCards(){
         '<input type="text" value="'+esc(c.badge||'')+'" placeholder="Badge text" style="flex:1;" oninput="updateCards['+i+'].badge=this.value"/>'+
         '<input type="text" value="'+esc(c.num||'')+'" placeholder="No." style="width:56px;" oninput="updateCards['+i+'].num=this.value"/>'+
         '<input type="text" value="'+esc(c.color||'#c97e08')+'" placeholder="#colour" style="width:90px;" oninput="updateCards['+i+'].color=this.value"/>'+
-        '<button class="btn btn-red btn-icon btn-sm" onclick="removeUpdateCard('+i+')">✕</button></div>'+
+        '<button class="btn btn-red btn-icon btn-sm" onclick="removeUpdateCard('+i+')"></button></div>'+
       '<div class="field-group" style="margin-bottom:10px;"><div class="field-label">Title</div><input type="text" value="'+esc(c.title||'')+'" oninput="updateCards['+i+'].title=this.value"/></div>'+
       '<div class="field-group" style="margin-bottom:10px;"><div class="field-label">Description</div><textarea rows="2" oninput="updateCards['+i+'].desc=this.value">'+esc(c.desc||'')+'</textarea></div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'+
@@ -1550,7 +1550,7 @@ function renderTestimonials(){
       '</div>'+
       '<div style="display:flex;align-items:center;gap:6px;">'+
         '<div class="toggle'+(t.active!==false?' on':'')+'" onclick="testimonials['+i+'].active=!testimonials['+i+'].active;renderTestimonials()"></div>'+
-        '<button class="btn btn-red btn-icon btn-sm" onclick="testimonials.splice('+i+',1);renderTestimonials()">✕</button>'+
+        '<button class="btn btn-red btn-icon btn-sm" onclick="testimonials.splice('+i+',1);renderTestimonials()"></button>'+
       '</div></div>'+
       '<div class="field-group" style="margin-bottom:8px;"><div class="field-label">Quote</div><textarea rows="3" oninput="testimonials['+i+'].quote=this.value">'+esc(t.quote||'')+'</textarea></div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr 60px;gap:8px;">'+
@@ -1838,7 +1838,7 @@ function renderVisitLog(visits){
 async function loadDownloadsLog(eventId){
   var el = document.getElementById('act-downloads-log');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try{
     var dlSnap;
     try{
@@ -1996,14 +1996,14 @@ async function sendMail(){
   }catch(e){
     toast('','Failed to send', e.message);
   }finally{
-    if(btn){ btn.disabled=false; btn.textContent='✉ Send Email'; }
+    if(btn){ btn.disabled=false; btn.textContent=' Send Email'; }
   }
 }
 
 async function loadInbox(){
   var el = document.getElementById('mail-inbox-list');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try{
     var { data, error } = await getSupabase()
       .from('admin_mail_inbox')
@@ -2068,7 +2068,7 @@ function replyTo(){
 async function loadSent(){
   var el = document.getElementById('mail-sent-list');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div></div>';
   try{
     var { data, error } = await getSupabase()
       .from('admin_mail_sent')
@@ -2217,7 +2217,7 @@ function makeSectionRow(url, index, key, max){
     + '<div class="slide-actions">'
     +   '<button class="btn btn-ghost btn-icon" title="Move up"   onclick="moveSectionRow(this,\'up\')"  >↑</button>'
     +   '<button class="btn btn-ghost btn-icon" title="Move down" onclick="moveSectionRow(this,\'down\')" >↓</button>'
-    +   '<button class="btn btn-red  btn-icon" title="Remove"     onclick="removeSectionRow(this)"        >✕</button>'
+    +   '<button class="btn btn-red  btn-icon" title="Remove"     onclick="removeSectionRow(this)"        ></button>'
     + '</div>';
   return row;
 }
@@ -2261,7 +2261,7 @@ async function saveSectionList(containerId, key, label){
   } catch(e){
     toast('','Save failed', e.message || 'Check Supabase connection');
   } finally {
-    if(btn){ btn.disabled = false; btn.textContent = '✓ Save '+(label.split(' ')[0]||''); }
+    if(btn){ btn.disabled = false; btn.textContent = ' Save '+(label.split(' ')[0]||''); }
   }
 }
 
@@ -2440,7 +2440,7 @@ async function saveService(){
     var msg = e.message || (e.details ? e.details : '') || 'Unknown error';
     if(e.code) msg = e.code + ': ' + msg;
     _svcAlert('Save failed: ' + msg);
-    btn.disabled = false; btn.textContent = '✓ Save Service';
+    btn.disabled = false; btn.textContent = ' Save Service';
   }
 }
 
@@ -2507,26 +2507,26 @@ window.nav = function(page, el){
 async function pfLoadPhotos() {
   var el = document.getElementById('pfPhotosList');
   if (!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try {
     if (!db) throw new Error('Firebase not ready — refresh.');
     var q    = query(collection(db, 'portfolio_photos'), orderBy('created_at', 'desc'));
     var snap = await getDocs(q);
     var rows = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
     if (!rows.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico">📸</div><div class="empty-txt">No photos yet. Drop some in above!</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No photos yet. Drop some in above!</div></div>';
       return;
     }
     el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;">' +
       rows.map(function(p) {
         return '<div style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid var(--border);">' +
-          '<img src="' + esc(p.url) + '" style="width:100%;height:100px;object-fit:cover;display:block;" onerror="this.style.background=''var(--bg3)''" />' +
-          '<button onclick="pfDeletePhoto(\''+ p.id +'\',\''+ esc(p.cloudinary_id||'')+'\')" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;line-height:1;">✕</button>' +
+          '<img src="' + esc(p.url) + '" style="width:100%;height:100px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--bg3)\'" />' +
+          '<button onclick="pfDeletePhoto(\'' + p.id + '\',\'' + esc(p.cloudinary_id || '') + '\')" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;line-height:1;"></button>' +
         '</div>';
       }).join('') +
     '</div>';
   } catch(e) {
-    el.innerHTML = '<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
   }
 }
 
@@ -2547,7 +2547,7 @@ async function pfUploadFiles(files) {
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
     var allowed = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowed.includes(file.type)) { toast('⚠️', 'Skipped ' + file.name, 'Unsupported type'); continue; }
+    if (!allowed.includes(file.type)) { toast('', 'Skipped ' + file.name, 'Unsupported type'); continue; }
 
     var rowId = 'pfprog-' + i;
     prog.innerHTML += '<div id="' + rowId + '" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:6px;">' +
@@ -2572,12 +2572,12 @@ async function pfUploadFiles(files) {
         cloudinary_id: result.public_id,
         created_at:    serverTimestamp()
       });
-      setStatus('✅ Done', 100, 'var(--green)');
+      setStatus(' Done', 100, 'var(--green)');
     } catch(err) {
-      setStatus('⚠️ ' + err.message, 100, 'var(--red)');
+      setStatus(' ' + err.message, 100, 'var(--red)');
     }
   }
-  toast('✅', 'Upload complete!', files.length + ' photo' + (files.length > 1 ? 's' : '') + ' added');
+  toast('', 'Upload complete!', files.length + ' photo' + (files.length > 1 ? 's' : '') + ' added');
   pfLoadPhotos();
 }
 
@@ -2591,9 +2591,9 @@ async function pfDeletePhoto(id, cloudinaryId) {
       });
     }
     await deleteDoc(doc(db, 'portfolio_photos', id));
-    toast('🗑️', 'Photo removed', '');
+    toast('', 'Photo removed', '');
     pfLoadPhotos();
-  } catch(e) { toast('⚠️', 'Delete failed', e.message); }
+  } catch(e) { toast('', 'Delete failed', e.message); }
 }
 
 window.pfLoadPhotos   = pfLoadPhotos;
@@ -2699,7 +2699,7 @@ function renderTeamEditor(members) {
           '<div class="field-group" style="margin-bottom:0;">' +
             '<div class="field-label">Photo</div>' +
             '<div class="upload-zone" style="margin-bottom:8px;" onclick="document.getElementById(\'tm-file-'+i+'\').click()" ondragover="onDragOver(event,\'tm-dz-'+i+'\')" ondragleave="onDragLeave(event,\'tm-dz-'+i+'\')" ondrop="onDropTeamPhoto(event,'+i+')" id="tm-dz-'+i+'">' +
-              '<div class="upload-zone-ico" style="font-size:20px;">☁</div>' +
+              '<div class="upload-zone-ico" style="font-size:20px;"></div>' +
               '<div class="upload-zone-title" style="font-size:12px;">Drop photo or click to upload</div>' +
               '<input type="file" id="tm-file-'+i+'" accept="image/jpeg,image/png,image/webp" onchange="handleTeamPhotoFile(event,'+i+')"/>' +
             '</div>' +
@@ -2787,7 +2787,7 @@ function renderPillarsEditor(pillars) {
       '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;" id="pillarRow'+i+'">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
           '<div style="font-size:13px;font-weight:700;">' + (p.icon||'') + ' Pillar ' + (i+1) + '</div>' +
-          '<button class="btn btn-red btn-sm" onclick="removePillar('+i+')">✕ Remove</button>' +
+          '<button class="btn btn-red btn-sm" onclick="removePillar('+i+')"> Remove</button>' +
         '</div>' +
         '<div class="form-grid" style="margin-bottom:8px;">' +
           '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Icon / Emoji</div><input type="text" id="pl-icon-'+i+'" value="'+_esc(p.icon)+'" placeholder="" style="max-width:80px;"/></div>' +
@@ -2922,7 +2922,7 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 async function loadBookings() {
   var el = document.getElementById('bookingsList');
   if (!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try {
     var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
     var res  = await fetch(API + '/api/bookings');
@@ -2956,7 +2956,7 @@ function renderBookingsTable(data) {
   var el = document.getElementById('bookingsList');
   if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No bookings found.</div></div>'; return; }
   var STATUS_PILL = {
-    pending  : '<span class="pill" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);">⏳ Pending</span>',
+    pending  : '<span class="pill" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);"> Pending</span>',
     confirmed: '<span class="pill pill-active"> Confirmed</span>',
     rejected : '<span class="pill pill-rejected"> Rejected</span>'
   };
@@ -3022,7 +3022,7 @@ function openConfirmModal(id) {
   document.getElementById('modal-package-notes').value = '';
   document.getElementById('modalAlert').style.display  = 'none';
   var btn = document.getElementById('confirmSendBtn');
-  btn.disabled=false; btn.textContent='✓ Confirm & Send →';
+  btn.disabled=false; btn.textContent=' Confirm & Send →';
   modalUpdateTotals();
   var modal = document.getElementById('confirmModal');
   modal.style.display='flex';
@@ -3107,7 +3107,7 @@ async function confirmBooking(){
           :'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
   }
   var btn=document.getElementById('confirmSendBtn');
-  btn.disabled=true; btn.textContent='⏳ Creating event…';
+  btn.disabled=true; btn.textContent=' Creating event…';
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
 
   try {
@@ -3128,7 +3128,7 @@ async function confirmBooking(){
       watermark_enabled:true, created_at:serverTimestamp()
     });
 
-    btn.textContent='⏳ Confirming & emailing…';
+    btn.textContent=' Confirming & emailing…';
     var eventUrl='https://impactgridgroup.com/event.html?event='+slug+'&code='+code;
     var res=await fetch(API+'/api/booking-confirm',{
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -3141,12 +3141,12 @@ async function confirmBooking(){
     if(!isNaN(num)) localStorage.setItem('ig_last_inv_num',String(num));
 
     showModalAlert(' Event created! Code: '+code+' · Confirmation email sent to '+b.email, true);
-    btn.textContent='✓ Done';
+    btn.textContent=' Done';
     toast('','Booking confirmed!',evName+' · '+b.email);
     setTimeout(function(){ closeConfirmModal(); loadBookings(); if(window.loadEvents) loadEvents(); if(window.loadStats) loadStats(); },2000);
   } catch(e){
     showModalAlert('Error: '+e.message, false);
-    btn.disabled=false; btn.textContent='✓ Confirm & Send →';
+    btn.disabled=false; btn.textContent=' Confirm & Send →';
   }
 }
 
