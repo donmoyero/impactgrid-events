@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -8,41 +8,18 @@
 <style>
 /* ── PAGE-SPECIFIC: booking page only ── */
 
-/* Hero */
-.bk-hero {
-  padding: 100px 32px 72px;
-  text-align: center;
-  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(240,180,41,.12), transparent);
-  position: relative; overflow: hidden;
+/* Page heading */
+.bk-page-title {
+  padding: 60px 24px 0;
+  max-width: 1000px;
+  margin: 0 auto;
 }
-.bk-hero::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(240,180,41,.06) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(240,180,41,.04) 0%, transparent 40%);
+.bk-page-title h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  line-height: 1.05;
 }
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--fm); font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold-glo);
-  padding: 5px 14px; border-radius: 100px; margin-bottom: 24px;
-}
-.hero-eyebrow::before { content: '●'; font-size: 7px; animation: pulse 2s infinite; }
-.hero-title {
-  font-size: clamp(42px, 7vw, 78px); font-weight: 900;
-  line-height: 1.0; letter-spacing: -.04em; margin-bottom: 20px;
-}
-.hero-title span { color: var(--gold); }
-.hero-sub {
-  font-size: 17px; color: var(--text2); max-width: 520px; margin: 0 auto 40px; line-height: 1.7;
-}
-.hero-scroll-hint {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; color: var(--text3); letter-spacing: .06em;
-  animation: fadeUp 1s ease .8s both;
-}
-.scroll-arrow { animation: bounce 1.8s infinite; }
-@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
 
 /* Booking layout */
 .bk-section { max-width: 1000px; margin: 0 auto; padding: 60px 24px; }
@@ -192,14 +169,7 @@ textarea { resize: vertical; min-height: 80px; }
 }
 .btn-back:hover { color: var(--text); border-color: var(--gold); }
 
-/* Why grid */
-.why-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 36px; }
-@media(max-width:640px) { .why-grid { grid-template-columns: 1fr; } }
-.why-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); padding: 24px; transition: all .25s; }
-.why-card:hover { border-color: var(--gold-glo); transform: translateY(-3px); box-shadow: var(--sh2); }
-.why-icon  { font-size: 28px; margin-bottom: 14px; }
-.why-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-.why-desc  { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
 </style>
 </head>
 <body>
@@ -207,21 +177,13 @@ textarea { resize: vertical; min-height: 80px; }
 <!-- nav.js injects the left-rail nav here -->
 <div id="ig-nav"></div>
 
-<!-- HERO -->
-<section class="bk-hero">
-  <div class="hero-eyebrow">Now Booking 2025 &amp; 2026</div>
-  <h1 class="hero-title">Let's Capture<br><span>Your Moment</span></h1>
-  <p class="hero-sub">Professional photography &amp; videography for weddings, corporate events, portraits and more. Pick a date and tell us about your event.</p>
-  <div class="hero-scroll-hint">
-    <span class="scroll-arrow">↓</span> Select a date to get started
-  </div>
-</section>
+<!-- PAGE TITLE -->
+<div class="bk-page-title">
+  <h1>Book a Session</h1>
+</div>
 
 <!-- BOOKING SECTION -->
 <section class="bk-section" id="booking">
-  <div class="section-label">Book a Session</div>
-  <h2 class="section-title">Check Availability</h2>
-  <p class="section-sub">Choose an available date then fill in your details — we'll confirm within 24 hours.</p>
 
   <!-- Main booking UI -->
   <div id="bookingUI">
@@ -332,29 +294,6 @@ textarea { resize: vertical; min-height: 80px; }
       <p class="success-sub">Thanks — we've received your booking request and will confirm within 24 hours. Check your inbox for a confirmation email.</p>
       <div class="success-detail" id="successDetail"></div>
       <button class="btn-back" onclick="resetBooking()">← Make another booking</button>
-    </div>
-  </div>
-</section>
-
-<!-- WHY US -->
-<section class="bk-section" style="padding-top:0;">
-  <div class="section-label">Why ImpactGrid</div>
-  <h2 class="section-title">Moments Worth Keeping</h2>
-  <div class="why-grid">
-    <div class="why-card">
-      <div class="why-icon">📸</div>
-      <div class="why-title">Face Recognition Gallery</div>
-      <div class="why-desc">Guests find their own photos instantly using our AI face recognition — no searching through hundreds of images.</div>
-    </div>
-    <div class="why-card">
-      <div class="why-icon">⚡</div>
-      <div class="why-title">Same-Day Gallery</div>
-      <div class="why-desc">Photos are uploaded and available to guests while the event is still happening. Live memories, live sharing.</div>
-    </div>
-    <div class="why-card">
-      <div class="why-icon">🔒</div>
-      <div class="why-title">Private &amp; Secure</div>
-      <div class="why-desc">Galleries are access-code protected. Only your guests see your photos. Everything auto-expires after 30 days.</div>
     </div>
   </div>
 </section>
