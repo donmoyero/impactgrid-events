@@ -333,6 +333,92 @@
       text-transform: uppercase;
     }
 
+    /* ── EVENT PICKER GRID ── */
+    .pf-events-label {
+      font-family: var(--fm);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .pf-events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      width: min(1000px, 96vw);
+      margin: 0 auto 64px;
+    }
+    .pf-event-card {
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.22s;
+      background: var(--card);
+      box-shadow: var(--sh);
+    }
+    .pf-event-card:hover {
+      border-color: var(--gold-glo);
+      transform: translateY(-3px);
+      box-shadow: var(--sh2);
+    }
+    .pf-event-card.active {
+      border-color: var(--gold);
+    }
+    .pf-event-card-img {
+      width: 100%;
+      aspect-ratio: 3/2;
+      object-fit: cover;
+      display: block;
+    }
+    .pf-event-card-body {
+      padding: 10px 12px;
+    }
+    .pf-event-card-cat {
+      font-family: var(--fm);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .pf-event-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+    .pf-event-card-date {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* ── CLOSE BOOK BUTTON ── */
+    .book-close-btn {
+      display: none;
+      margin: 20px auto 0;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      font-family: var(--fb);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .book-close-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .book-close-btn.visible { display: block; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       .pf-page { padding: 60px 12px 80px; }
@@ -341,14 +427,15 @@
       .book-ev-info { bottom: 26px; left: 14px; }
       .book-ev-info.right { left: auto; right: 14px; }
       .book-arrow { width: 34px; height: 34px; font-size: 14px; }
+      .pf-events-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
     }
   </style>
 </head>
 <body>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="plan-config.js"></script>
-  <script src="supabase-config.js"></script>
+  <!-- Firebase (same setup as admin) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="auth.js"></script>
 
   <div id="ig-nav"></div>
@@ -361,8 +448,17 @@
       <div class="pf-label">Our Work</div>
       <h1 class="pf-title">ImpactGrid Events<br><em>Portfolio</em></h1>
 
-      <!-- THE BOOK -->
-      <div class="book-scene" id="bookScene">
+      <!-- EVENT PICKER GRID -->
+      <div id="pfEventsGrid" style="width:100%;">
+        <div class="pf-events-label">Select an event to explore</div>
+        <div class="pf-events-grid" id="pfEventCards">
+          <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:13px;">Loading events…</div>
+        </div>
+      </div>
+
+      <!-- THE BOOK (hidden until an event is chosen) -->
+      <div id="pfBookWrap" style="display:none;width:100%;">
+        <div class="book-scene" id="bookScene">
 
         <div class="book-root" id="bookRoot">
           <!-- Loading state -->
@@ -409,7 +505,9 @@
         </div>
 
         <div class="book-hint">← Flip the pages →  &nbsp;·&nbsp;  Click anywhere on the book</div>
-      </div>
+        <button class="book-close-btn visible" id="bookCloseBtn" onclick="closeBook()">✕ Close &amp; pick another event</button>
+      </div><!-- /.book-scene -->
+      </div><!-- /#pfBookWrap -->
 
     </div>
   </div>
@@ -420,19 +518,10 @@
   <script>
   /* ════════════════════════════════════════
      PORTFOLIO BOOK ENGINE
-     
-     Model: one "spread" = two facing photos.
-     Each event's photos are split into spreads:
-       spread 0 → photos[0] (right) + cover photo left side
-       spread 1 → photos[0] left + photos[1] right
-       spread 2 → photos[1] left + photos[2] right …
-     
-     When user flips forward:
-       - animate: right page peels left
-       - left becomes old right, right advances
-     When user flips back:
-       - animate: left page peels right
+     Storage: Cloudinary  ·  DB: Firebase Firestore
   ════════════════════════════════════════ */
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   var FALLBACK_EVENTS = [
     {
@@ -467,17 +556,106 @@
     }
   ];
 
-  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-  /* ── Build a flat list of page-images from all events ── */
-  /* Page 0 = special cover page (first event cover, full spread)
-     Then each photo is one page in sequence, with events interleaved */
-  var allPages = []; // {url, label, sublabel, isFirst}
-  var allEvents = [];
-  var spreadIdx = 0;   // current left page index (0 = cover left)
+  /* ── Book state ── */
+  var allPages   = [];
+  var allEvents  = [];
+  var spreadIdx  = 0;
   var totalPages = 0;
   var isFlipping = false;
+  var _activeEventId = null;
 
+  /* ════════════════════════════════════════
+     FIREBASE INIT (config fetched from backend)
+  ════════════════════════════════════════ */
+  var _db = null;
+  fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
+    .then(function(r){ return r.json(); })
+    .then(function(cfg){
+      if(!firebase.apps.length){ firebase.initializeApp(cfg); }
+      _db = firebase.firestore();
+      loadPortfolioEvents();
+    })
+    .catch(function(){
+      /* Firebase unavailable — show fallback */
+      renderEventGrid(FALLBACK_EVENTS);
+    });
+
+  /* ════════════════════════════════════════
+     LOAD EVENTS FROM FIREBASE
+  ════════════════════════════════════════ */
+  async function loadPortfolioEvents() {
+    try {
+      if(!_db) throw new Error('Firebase not ready');
+      var snap = await _db.collection('portfolio_events')
+        .where('is_active', '==', true)
+        .orderBy('created_at', 'desc')
+        .get();
+      var rows = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+      renderEventGrid(rows.length ? rows : FALLBACK_EVENTS);
+    } catch(e) {
+      console.warn('Portfolio Firebase fetch failed, using fallback:', e);
+      renderEventGrid(FALLBACK_EVENTS);
+    }
+  }
+
+  /* ════════════════════════════════════════
+     EVENT PICKER GRID
+  ════════════════════════════════════════ */
+  function renderEventGrid(events) {
+    allEvents = events;
+    var container = document.getElementById('pfEventCards');
+    if (!events.length) {
+      container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:13px;">No portfolio events yet.</div>';
+      return;
+    }
+    container.innerHTML = events.map(function(ev, i) {
+      return '<div class="pf-event-card" id="pf-card-' + esc(ev.id) + '" onclick="openEvent(' + i + ')">' +
+        '<img class="pf-event-card-img" src="' + esc(ev.cover||'') + '" alt="' + esc(ev.title) + '" onerror="this.style.background=\'var(--bg3)\';this.style.minHeight=\'120px\'"/>' +
+        '<div class="pf-event-card-body">' +
+          '<div class="pf-event-card-cat">' + esc(ev.category||'') + '</div>' +
+          '<div class="pf-event-card-title">' + esc(ev.title||'') + '</div>' +
+          '<div class="pf-event-card-date">' + esc(ev.date||'') + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ── Open a specific event in the book ── */
+  function openEvent(evIdx) {
+    var ev = allEvents[evIdx];
+    if (!ev) return;
+
+    /* Highlight selected card */
+    document.querySelectorAll('.pf-event-card').forEach(function(c){ c.classList.remove('active'); });
+    var card = document.getElementById('pf-card-' + ev.id);
+    if (card) card.classList.add('active');
+
+    _activeEventId = ev.id;
+
+    /* Build pages just for this event */
+    buildPages([ev]);
+    spreadIdx  = 0;
+
+    /* Show book, scroll to it */
+    document.getElementById('pfBookWrap').style.display = 'block';
+    renderSpread(0);
+
+    setTimeout(function(){
+      document.getElementById('pfBookWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
+
+  /* ── Close book and return to grid view ── */
+  function closeBook() {
+    document.getElementById('pfBookWrap').style.display = 'none';
+    document.querySelectorAll('.pf-event-card').forEach(function(c){ c.classList.remove('active'); });
+    _activeEventId = null;
+    document.getElementById('pfEventsGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ════════════════════════════════════════
+     BOOK ENGINE
+  ════════════════════════════════════════ */
   function buildPages(events) {
     allPages = [];
     events.forEach(function(ev) {
@@ -494,20 +672,15 @@
     totalPages = allPages.length;
   }
 
-  /* ── Render the static left/right halves for spreadIdx ── */
-  /* Left shows page[spreadIdx-1] (or blank for cover)
-     Right shows page[spreadIdx] */
   function renderSpread(idx) {
-    var leftImg  = document.getElementById('bookLeftImg');
-    var rightImg = document.getElementById('bookRightImg');
+    var leftImg   = document.getElementById('bookLeftImg');
+    var rightImg  = document.getElementById('bookRightImg');
     var leftInfo  = document.getElementById('bookLeftInfo');
     var rightInfo = document.getElementById('bookRightInfo');
-    var leftNum  = document.getElementById('bookLeftNum');
-    var rightNum = document.getElementById('bookRightNum');
+    var leftNum   = document.getElementById('bookLeftNum');
+    var rightNum  = document.getElementById('bookRightNum');
 
-    /* LEFT page = idx - 1 */
     if (idx === 0) {
-      /* Cover: show first photo on both sides or a dark cover */
       var firstPg = allPages[0] || null;
       leftImg.src  = firstPg ? firstPg.url : '';
       leftImg.style.opacity = firstPg ? '1' : '0';
@@ -521,7 +694,6 @@
       leftNum.textContent = lpg ? (idx) + ' / ' + totalPages : '';
     }
 
-    /* RIGHT page = idx */
     var rpg = allPages[idx];
     if (rpg) {
       rightImg.src = rpg.url;
@@ -529,7 +701,6 @@
       setInfo(rightInfo, rpg, true);
       rightNum.textContent = (idx + 1) + ' / ' + totalPages;
     } else {
-      /* End of book */
       rightImg.src = '';
       rightImg.style.opacity = '0';
       rightInfo.innerHTML = '';
@@ -552,28 +723,13 @@
   }
 
   function updateStatus(idx) {
-    var lbl = document.getElementById('bookStatusLabel');
+    var lbl  = document.getElementById('bookStatusLabel');
     var dots = document.getElementById('bookDots');
-    /* Which event are we currently on? */
-    var pg = allPages[idx] || allPages[idx - 1];
-    if (pg) {
-      lbl.textContent = pg.label;
-    } else {
-      lbl.textContent = '';
-    }
-    /* Dots = one per event */
-    /* Figure out which event the current spread is from */
-    var evIdx = 0;
-    if (allEvents.length) {
-      var count = 0;
-      for (var e = 0; e < allEvents.length; e++) {
-        count += (allEvents[e].photos || []).length;
-        if (idx < count) { evIdx = e; break; }
-        evIdx = e;
-      }
-    }
-    dots.innerHTML = allEvents.map(function(_, i) {
-      return '<button class="book-status-dot' + (i === evIdx ? ' active' : '') + '" onclick="jumpToEvent(' + i + ')" aria-label="Event ' + (i+1) + '"></button>';
+    var pg   = allPages[idx] || allPages[idx - 1];
+    lbl.textContent = pg ? pg.label : '';
+    /* For a single-event book, dots show photo position */
+    dots.innerHTML = allPages.map(function(_, i) {
+      return '<button class="book-status-dot' + (i === idx ? ' active' : '') + '" onclick="jumpToPage(' + i + ')" aria-label="Photo ' + (i+1) + '"></button>';
     }).join('');
   }
 
@@ -582,18 +738,12 @@
     document.getElementById('clickRight').classList.toggle('disabled', idx >= totalPages - 1);
   }
 
-  /* ── Jump to the first photo of an event ── */
-  function jumpToEvent(evIdx) {
-    var target = 0;
-    for (var i = 0; i < evIdx; i++) {
-      target += (allEvents[i].photos || []).length;
-    }
-    if (target === spreadIdx) return;
-    spreadIdx = target;
+  function jumpToPage(idx) {
+    if (idx === spreadIdx || isFlipping) return;
+    spreadIdx = idx;
     renderSpread(spreadIdx);
   }
 
-  /* ── Flip animation ── */
   function bookFlip(dir) {
     if (isFlipping) return;
     var newIdx = spreadIdx + dir;
@@ -601,67 +751,50 @@
 
     isFlipping = true;
 
-    var leaf = document.getElementById('flipLeaf');
+    var leaf    = document.getElementById('flipLeaf');
     var faceImg = document.getElementById('flipFaceImg');
     var backImg = document.getElementById('flipBackImg');
 
     if (dir > 0) {
-      /* Forward: right page peels to left */
-      /* Face = current right page, Back = next right page */
       var curPg  = allPages[spreadIdx];
       var nextPg = allPages[newIdx];
-
-      faceImg.src = curPg ? curPg.url : '';
+      faceImg.src = curPg  ? curPg.url  : '';
       backImg.src = nextPg ? nextPg.url : '';
-
-      leaf.style.left = '50%';
+      leaf.style.left            = '50%';
       leaf.style.transformOrigin = 'left center';
-      leaf.style.transform = 'rotateY(0deg)';
-      leaf.style.display = 'block';
-
-      /* Immediately update underlying pages so they show through */
-      /* Left will show old right (page being turned) — keep until flip done */
-      /* Right will show new page */
+      leaf.style.transform       = 'rotateY(0deg)';
+      leaf.style.display         = 'block';
       setTimeout(function() {
         leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
-        leaf.style.transform = 'rotateY(-180deg)';
+        leaf.style.transform  = 'rotateY(-180deg)';
       }, 16);
-
       setTimeout(function() {
         spreadIdx = newIdx;
         renderSpread(spreadIdx);
-        leaf.style.display = 'none';
+        leaf.style.display    = 'none';
         leaf.style.transition = '';
-        leaf.style.transform = '';
+        leaf.style.transform  = '';
         isFlipping = false;
       }, 780);
-
     } else {
-      /* Backward: left page flips back to right */
       var curLeftPg = allPages[spreadIdx - 1];
       var prevPg    = allPages[newIdx - 1];
-
-      /* Face (seen from left side after flip) = prev left page
-         Back (seen from right before flip starts) = current left */
       faceImg.src = prevPg    ? prevPg.url    : '';
       backImg.src = curLeftPg ? curLeftPg.url : '';
-
-      leaf.style.left = '0%';
+      leaf.style.left            = '0%';
       leaf.style.transformOrigin = 'right center';
-      leaf.style.transform = 'rotateY(-180deg)';
-      leaf.style.display = 'block';
-
+      leaf.style.transform       = 'rotateY(-180deg)';
+      leaf.style.display         = 'block';
       setTimeout(function() {
         leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
-        leaf.style.transform = 'rotateY(0deg)';
+        leaf.style.transform  = 'rotateY(0deg)';
       }, 16);
-
       setTimeout(function() {
         spreadIdx = newIdx;
         renderSpread(spreadIdx);
-        leaf.style.display = 'none';
+        leaf.style.display    = 'none';
         leaf.style.transition = '';
-        leaf.style.transform = '';
+        leaf.style.transform  = '';
         isFlipping = false;
       }, 780);
     }
@@ -677,39 +810,8 @@
   document.addEventListener('keydown', function(e){
     if (e.key === 'ArrowRight') bookFlip(1);
     if (e.key === 'ArrowLeft')  bookFlip(-1);
+    if (e.key === 'Escape')     closeBook();
   });
-
-  /* ── Load events ── */
-  async function loadEvents() {
-    try {
-      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if (!sb) { useEvents(FALLBACK_EVENTS); return; }
-      var res = await sb
-        .from('portfolio_events')
-        .select('id,title,description,category,date,cover,photos,sort_order')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: false });
-      if (res.error) throw res.error;
-      useEvents((res.data && res.data.length) ? res.data : FALLBACK_EVENTS);
-    } catch(e) {
-      console.warn('Portfolio fetch failed, using fallback:', e);
-      useEvents(FALLBACK_EVENTS);
-    }
-  }
-
-  function useEvents(events) {
-    allEvents = events;
-    buildPages(events);
-    document.getElementById('bookLoading').style.display = 'none';
-    spreadIdx = 0;
-    renderSpread(0);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadEvents);
-  } else {
-    loadEvents();
-  }
   </script>
 
 </body>
