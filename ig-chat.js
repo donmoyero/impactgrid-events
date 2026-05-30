@@ -429,7 +429,7 @@
       <div id="ig-chat-header">
         <div id="ig-chat-avatar">⚡</div>
         <div id="ig-chat-header-info">
-          <div id="ig-chat-header-name">ImpactGrid</div>
+          <div id="ig-chat-header-name">Dijo</div>
           <div id="ig-chat-header-status">Online · Usually replies instantly</div>
         </div>
         <div id="ig-chat-codename-badge">${codename}</div>
@@ -580,11 +580,7 @@
 
     hasGreeted = true;
     setTimeout(function () {
-      addMessage(
-        `Hey ${codename}! 👋 I'm Spark — ImpactGrid's AI. Looking to book something or just browsing?`,
-        'bot',
-        ['Book an event', 'See what you offer', 'Pricing info', 'Just looking']
-      );
+      addMessage('Hey ' + codename + '! 👋 How are you?', 'bot');
     }, 400);
   }
 
@@ -600,6 +596,13 @@
       setTimeout(function () { inputEl.focus(); }, 300);
     }
   }
+
+  /* ── Auto-open after 5s if not already opened ── */
+  setTimeout(function () {
+    if (!isOpen && history.length === 0) {
+      toggleChat();
+    }
+  }, 5000);
 
   /* ── Show unread dot after delay if not opened ── */
   setTimeout(function () {
