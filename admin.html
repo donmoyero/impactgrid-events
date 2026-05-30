@@ -3225,7 +3225,7 @@ async function confirmBooking(){
     // Step 1 — confirm booking + create event server-side
     var res=await fetch(API+'/api/booking-confirm',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({bookingId:b.id, packageNotes:packageNotes, invoice:invoice})
+      body:JSON.stringify({bookingId:b.id, packageNotes:packageNotes, invoice:invoice, skipConfirmEmail:true})
     });
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Backend error');
@@ -3233,15 +3233,15 @@ async function confirmBooking(){
     var num=parseInt(invoice.invoice_number.replace(/\D/g,''),10);
     if(!isNaN(num)) localStorage.setItem('ig_last_inv_num',String(num));
 
-    // Step 2 — send invoice as PDF attachment
+    // Step 2 — send invoice as PDF attachment (combined with confirmation)
     btn.textContent=' Sending invoice…';
     var invoiceHtml=generateInvoiceHtml(invoice, b.email);
     await fetch(API+'/api/send-invoice',{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         to: b.email,
-        subject: 'Invoice '+invoice.invoice_number+' — Impact Grid Events',
-        message: 'Dear '+b.name+',\n\nThank you for your booking. Please find your invoice attached.\n\nKind regards,\nImpact Grid Events',
+        subject: 'Booking Confirmed + Invoice '+invoice.invoice_number+' — Impact Grid Events',
+        message: 'Dear '+b.name+',\n\nGreat news! Your booking for a '+( b.event_type||'event')+' on '+(b.event_date||'your chosen date')+' has been confirmed.\n\nPlease find your invoice ('+invoice.invoice_number+') attached for £'+parseFloat(invoice.total||0).toFixed(2)+'.\n\nWe will be in touch with further details as your event date approaches.\n\nKind regards,\nImpact Grid Events',
         invoiceHtml: invoiceHtml,
         invoiceNumber: invoice.invoice_number,
         bizName: 'Impact Grid Events'
