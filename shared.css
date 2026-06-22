@@ -34,11 +34,11 @@
   --text2: #4a5068;
   --text3: #9099b8;
 
-  /* Gold accent */
-  --gold:     #ffe600;
-  --gold2:    #ffed4a;
-  --gold-dim: rgba(255,230,0,0.10);
-  --gold-glo: rgba(255,230,0,0.28);
+  /* Gold accent — warm amber matched to logo mark */
+  --gold:     #c9920a;
+  --gold2:    #e6a820;
+  --gold-dim: rgba(201,146,10,0.10);
+  --gold-glo: rgba(201,146,10,0.28);
 
   /* Blue */
   --blue:     #2d6edb;
@@ -57,9 +57,9 @@
   --purple:     #7c3aed;
   --purple-dim: rgba(124,58,237,0.08);
 
-  /* Brand (ImpactGrid IG colours — moved from inline HTML) */
-  --brand-primary: #f5e400;
-  --brand-dark:    #0e0e0c;
+  /* Brand */
+  --brand-primary: #c9920a;
+  --brand-dark:    #080808;
 
   /* Typography */
   --fd: 'Syne', sans-serif;
@@ -73,30 +73,29 @@
   --r:           12px;
   --r2:          20px;
 
-  /* Shadows */
   --sh:      0 4px 24px rgba(0,0,0,0.06);
   --sh2:     0 16px 48px rgba(0,0,0,0.10);
-  --sh-gold: 0 8px 28px rgba(255,230,0,0.22);
+  --sh-gold: 0 8px 28px rgba(201,146,10,0.22);
 }
 
 [data-theme="dark"] {
-  --bg:    #0c0a07;
-  --bg2:   #141008;
-  --bg3:   #1c1610;
-  --card:  #1a1510;
-  --card2: #221c14;
+  --bg:    #080808;
+  --bg2:   #0f0f0f;
+  --bg3:   #161616;
+  --card:  #111111;
+  --card2: #181818;
 
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
+  --border:  rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
 
-  --text:  #eef0f6;
-  --text2: #8a91a8;
-  --text3: #4a5068;
+  --text:  #f0ece4;
+  --text2: #857f74;
+  --text3: #4a4640;
 
-  --gold:     #ffe600;
-  --gold2:    #ffed4a;
-  --gold-dim: rgba(255,230,0,0.10);
-  --gold-glo: rgba(255,230,0,0.28);
+  --gold:     #d4a017;
+  --gold2:    #e6b830;
+  --gold-dim: rgba(212,160,23,0.12);
+  --gold-glo: rgba(212,160,23,0.30);
 
   --blue:     #4f8ef7;
   --blue2:    #7eb3ff;
@@ -113,9 +112,9 @@
 
   /* Brand colours intentionally unchanged in dark mode */
 
-  --sh:      0 4px 24px rgba(0,0,0,0.30);
-  --sh2:     0 16px 64px rgba(0,0,0,0.45);
-  --sh-gold: 0 8px 28px rgba(255,230,0,0.25);
+  --sh:      0 4px 24px rgba(0,0,0,0.45);
+  --sh2:     0 16px 64px rgba(0,0,0,0.65);
+  --sh-gold: 0 8px 28px rgba(212,160,23,0.28);
 }
 
 /* ════════════════════════════════════════════════════
@@ -125,9 +124,8 @@
 html { scroll-behavior: smooth; }
 body {
   background:
-    radial-gradient(ellipse 80% 40% at 50% 0%,   rgba(255,230,0,0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 55% 35% at 100% 100%, rgba(255,230,0,0.09) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 30% at 0%   80%,  rgba(160,90,0,0.07)  0%, transparent 55%),
+    radial-gradient(ellipse 70% 35% at 50% 0%,   rgba(201,146,10,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(201,146,10,0.04) 0%, transparent 55%),
     var(--bg);
   background-attachment: fixed;
   color: var(--text);
@@ -592,17 +590,17 @@ body::after {
    backwards compat — refactor pages to .btn-primary over time. */
 .btn-primary, .btn-gold,
 .btn-hero-gold, .btn-cta-gold {
-  background: linear-gradient(135deg, #ffe600 0%, var(--gold) 40%, var(--gold2) 100%);
-  color: #0d1017; border: none;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.18), 0 4px 16px rgba(255,230,0,0.28), inset 0 1px 0 rgba(255,255,255,0.22);
+  background: linear-gradient(135deg, #b07d08 0%, #c9920a 45%, #e6a820 100%);
+  color: #ffffff; border: none;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.22), 0 4px 16px rgba(201,146,10,0.30), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 [data-theme="dark"] .btn-primary,
 [data-theme="dark"] .btn-gold,
 [data-theme="dark"] .btn-hero-gold,
 [data-theme="dark"] .btn-cta-gold {
-  color: #07090f;
-  background: linear-gradient(135deg, #ffe600 0%, #ffed4a 50%, #ffe600 100%);
-  box-shadow: 0 2px 0 rgba(0,0,0,0.35), 0 4px 20px rgba(255,230,0,0.32), inset 0 1px 0 rgba(255,255,255,0.28);
+  color: #ffffff;
+  background: linear-gradient(135deg, #c9920a 0%, #e6a820 50%, #c9920a 100%);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.40), 0 4px 20px rgba(212,160,23,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
 }
 .btn-primary::after, .btn-gold::after,
 .btn-hero-gold::after, .btn-cta-gold::after {
