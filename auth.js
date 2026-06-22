@@ -16,15 +16,22 @@
 // ═══════════════════════════════════════════════════════════
 
 // ── Supabase client init ─────────────────────────────────────────────────
-// Client is created by ig-supabase.js (which must load before auth.js).
+// Client is created by supabase-config.js (which must load before auth.js).
 // auth.js never creates its own client — it calls getSupabase() instead.
+// Deferred init: retries until the SDK is ready (handles slow CDN loads).
 (function () {
-  if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-    console.error("[Auth] Supabase SDK not loaded — check script tag order");
-    return;
+  function tryInit() {
+    if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+      if (typeof getSupabase === 'function') getSupabase();
+    } else {
+      setTimeout(tryInit, 50);
+    }
   }
-  // Trigger ig-supabase.js singleton creation if not done yet
-  if (typeof getSupabase === 'function') getSupabase();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryInit);
+  } else {
+    tryInit();
+  }
 })();
 
 // ── State ────────────────────────────────────────────────────────────────
