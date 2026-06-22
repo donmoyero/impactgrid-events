@@ -34,11 +34,11 @@
   --text2: #4a5068;
   --text3: #9099b8;
 
-  /* Gold accent — warm amber matched to logo mark */
-  --gold:     #c9920a;
-  --gold2:    #e6a820;
-  --gold-dim: rgba(201,146,10,0.10);
-  --gold-glo: rgba(201,146,10,0.28);
+  /* Dark yellow accent — matched to logo's exact hue, deepened for contrast */
+  --gold:     #aa9803;
+  --gold2:    #c8b304;
+  --gold-dim: rgba(170,152,3,0.10);
+  --gold-glo: rgba(170,152,3,0.28);
 
   /* Blue */
   --blue:     #2d6edb;
@@ -58,7 +58,7 @@
   --purple-dim: rgba(124,58,237,0.08);
 
   /* Brand */
-  --brand-primary: #c9920a;
+  --brand-primary: #aa9803;
   --brand-dark:    #080808;
 
   /* Typography */
@@ -75,7 +75,7 @@
 
   --sh:      0 4px 24px rgba(0,0,0,0.06);
   --sh2:     0 16px 48px rgba(0,0,0,0.10);
-  --sh-gold: 0 8px 28px rgba(201,146,10,0.22);
+  --sh-gold: 0 8px 28px rgba(170,152,3,0.22);
 }
 
 [data-theme="dark"] {
@@ -92,10 +92,10 @@
   --text2: #857f74;
   --text3: #4a4640;
 
-  --gold:     #d4a017;
-  --gold2:    #e6b830;
-  --gold-dim: rgba(212,160,23,0.12);
-  --gold-glo: rgba(212,160,23,0.30);
+  --gold:     #c8b304;
+  --gold2:    #dcc504;
+  --gold-dim: rgba(200,179,4,0.12);
+  --gold-glo: rgba(200,179,4,0.30);
 
   --blue:     #4f8ef7;
   --blue2:    #7eb3ff;
@@ -114,7 +114,7 @@
 
   --sh:      0 4px 24px rgba(0,0,0,0.45);
   --sh2:     0 16px 64px rgba(0,0,0,0.65);
-  --sh-gold: 0 8px 28px rgba(212,160,23,0.28);
+  --sh-gold: 0 8px 28px rgba(200,179,4,0.28);
 }
 
 /* ════════════════════════════════════════════════════
@@ -124,8 +124,8 @@
 html { scroll-behavior: smooth; }
 body {
   background:
-    radial-gradient(ellipse 70% 35% at 50% 0%,   rgba(201,146,10,0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(201,146,10,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 35% at 50% 0%,   rgba(170,152,3,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(170,152,3,0.04) 0%, transparent 55%),
     var(--bg);
   background-attachment: fixed;
   color: var(--text);
@@ -590,17 +590,17 @@ body::after {
    backwards compat — refactor pages to .btn-primary over time. */
 .btn-primary, .btn-gold,
 .btn-hero-gold, .btn-cta-gold {
-  background: linear-gradient(135deg, #b07d08 0%, #c9920a 45%, #e6a820 100%);
+  background: linear-gradient(135deg, #8c7e03 0%, #aa9803 45%, #c8b304 100%);
   color: #ffffff; border: none;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.22), 0 4px 16px rgba(201,146,10,0.30), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.22), 0 4px 16px rgba(170,152,3,0.30), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 [data-theme="dark"] .btn-primary,
 [data-theme="dark"] .btn-gold,
 [data-theme="dark"] .btn-hero-gold,
 [data-theme="dark"] .btn-cta-gold {
   color: #ffffff;
-  background: linear-gradient(135deg, #c9920a 0%, #e6a820 50%, #c9920a 100%);
-  box-shadow: 0 2px 0 rgba(0,0,0,0.40), 0 4px 20px rgba(212,160,23,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+  background: linear-gradient(135deg, #c8b304 0%, #dcc504 50%, #c8b304 100%);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.40), 0 4px 20px rgba(200,179,4,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
 }
 .btn-primary::after, .btn-gold::after,
 .btn-hero-gold::after, .btn-cta-gold::after {
