@@ -841,8 +841,8 @@
     .nl-input::placeholder { color: var(--text3); }
     .nl-btn {
       flex-shrink: 0;
-      background: var(--ix-accent);
-      color: #1a1209;
+      background: #000;
+      color: #fff;
       border: none;
       padding: 15px 22px;
       font-size: 13px;
@@ -853,7 +853,7 @@
       transition: background .2s, opacity .2s;
       white-space: nowrap;
     }
-    .nl-btn:hover { background: #e0c07a; }
+    .nl-btn:hover { background: #222; }
     .nl-btn:disabled { opacity: .55; cursor: not-allowed; }
     .nl-msg {
       font-size: 13px;
@@ -1035,7 +1035,6 @@
         <button class="nl-btn" id="nlBtn" onclick="submitNewsletter()">Send It</button>
       </div>
       <div class="nl-msg" id="nlMsg"></div>
-      <p class="nl-note">No spam &nbsp;·&nbsp; Reply within 24 hours &nbsp;·&nbsp; <a href="contact.html" style="color:#000;text-decoration:underline;">Or book directly →</a></p>
     </div>
   </section>
 
