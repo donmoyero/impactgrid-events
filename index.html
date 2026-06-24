@@ -909,25 +909,25 @@
     </div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <div class="hero-eyebrow">Impact Grid Events — Manchester</div>
+      <div class="hero-eyebrow" id="heroEyebrow">Impact Grid Events — Manchester</div>
       <h1 class="hero-headline">
-        We capture your event.<br><em>Your guests keep it.</em>
+        <span id="heroHeadline1">We capture your event.</span><br><em id="heroHeadline2">Your guests keep it.</em>
       </h1>
-      <p class="hero-sub">
+      <p class="hero-sub" id="heroSub">
         Professional photography, high-quality content creation, and organised online galleries — delivered fast, so every guest walks away with their moment.
       </p>
       <div class="hero-actions">
-        <a href="book-us.html" class="hero-btn-primary">
+        <a href="book-us.html" class="hero-btn-primary" id="heroBtn1">
           <span class="hero-btn-inner">
-            <span class="hero-btn-text">Book Us for Your Event</span>
+            <span class="hero-btn-text" id="heroBtn1Text">Book Us for Your Event</span>
             <span class="hero-btn-arrow">→</span>
           </span>
         </a>
-        <a href="services.html" class="hero-btn-secondary">
-          <span>See What We Offer</span>
+        <a href="services.html" class="hero-btn-secondary" id="heroBtn2">
+          <span id="heroBtn2Text">See What We Offer</span>
         </a>
       </div>
-      <p class="hero-note">Based in Manchester &nbsp;·&nbsp; Covering UK events &nbsp;·&nbsp; events@impactgridgroup.com</p>
+      <p class="hero-note" id="heroNote">Based in Manchester &nbsp;·&nbsp; Covering UK events &nbsp;·&nbsp; events@impactgridgroup.com</p>
     </div>
   </section>
 
@@ -981,15 +981,15 @@
       <div class="quotes-grid">
         <div class="quote-card">
           <div class="quote-stars">★★★★★</div>
-          <p class="quote-text">"Great photography needs great delivery. We bring the creative eye and the systems to make sure nothing is lost after the last song plays."</p>
+          <p class="quote-text" id="whyCard1">"Great photography needs great delivery. We bring the creative eye and the systems to make sure nothing is lost after the last song plays."</p>
         </div>
         <div class="quote-card">
           <div class="quote-stars">★★★★★</div>
-          <p class="quote-text">"Poor delivery ruins good photography. Our gallery systems let guests find their photos fast — no chasing, no waiting."</p>
+          <p class="quote-text" id="whyCard2">"Poor delivery ruins good photography. Our gallery systems let guests find their photos fast — no chasing, no waiting."</p>
         </div>
         <div class="quote-card">
           <div class="quote-stars">★★★★★</div>
-          <p class="quote-text">"Since December we've covered live events, built delivery systems that work, and earned strong feedback. We're just getting started."</p>
+          <p class="quote-text" id="whyCard3">"Since December we've covered live events, built delivery systems that work, and earned strong feedback. We're just getting started."</p>
         </div>
       </div>
     </div>
@@ -1002,25 +1002,25 @@
         <span class="trust-icon icon-green-fill">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="trust-label">100% Satisfaction<br>Guarantee</span>
+        <span class="trust-label" id="trustBadge1">100% Satisfaction<br>Guarantee</span>
       </div>
       <div class="trust-item">
         <span class="trust-icon icon-gold-fill">
           <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M1 7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3h3.5a1 1 0 0 1 .8.4l2.2 3a1 1 0 0 1 .5.85V17a1 1 0 0 1-1 1h-1.2a2.5 2.5 0 0 1-4.6 0H8.8a2.5 2.5 0 0 1-4.6 0H3a1 1 0 0 1-1-1z"/><circle cx="6.5" cy="18.5" r="1.6" fill="#fff"/><circle cx="17.5" cy="18.5" r="1.6" fill="#fff"/></svg>
         </span>
-        <span class="trust-label">Fast, Reliable<br>Delivery</span>
+        <span class="trust-label" id="trustBadge2">Fast, Reliable<br>Delivery</span>
       </div>
       <div class="trust-item">
         <span class="trust-icon icon-green-fill">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l8 3.5v6c0 5-3.5 8.5-8 10.5C7.5 19.5 4 16 4 11V5.5L12 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="trust-label">Secure Online<br>Booking</span>
+        <span class="trust-label" id="trustBadge3">Secure Online<br>Booking</span>
       </div>
       <div class="trust-item">
         <span class="trust-icon icon-gold-circle">
           <svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M12 4.5l2.3 4.9 5.3.7-3.9 3.7.95 5.3L12 16.6l-4.65 2.5.95-5.3-3.9-3.7 5.3-.7z"/></svg>
         </span>
-        <span class="trust-label">Verified Client<br>Reviews</span>
+        <span class="trust-label" id="trustBadge4">Verified Client<br>Reviews</span>
       </div>
     </div>
   </section>
@@ -1181,6 +1181,54 @@
       }
     }
 
+    /* ── Inject a plain text value into an element, falling back to default ── */
+    function setText(id, val, defaultVal){
+      var el = document.getElementById(id);
+      if(!el) return;
+      if(val && val.trim()) el.textContent = val.trim();
+      else if(defaultVal !== undefined) el.textContent = defaultVal;
+    }
+    function setHtml(id, val, defaultVal){
+      var el = document.getElementById(id);
+      if(!el) return;
+      if(val && val.trim()) el.innerHTML = val.trim();
+      else if(defaultVal !== undefined) el.innerHTML = defaultVal;
+    }
+    function setAttr(id, attr, val){
+      var el = document.getElementById(id);
+      if(el && val && val.trim()) el.setAttribute(attr, val.trim());
+    }
+
+    function renderTextContent(kv){
+      // Hero
+      setText('heroEyebrow',         kv['hero_eyebrow']);
+      setText('heroHeadline1',       kv['hero_headline_line1']);
+      setText('heroHeadline2',       kv['hero_headline_line2']);
+      setText('heroSub',             kv['hero_sub']);
+      setText('heroBtn1Text',        kv['hero_btn1_text']);
+      setAttr('heroBtn1',  'href',   kv['hero_btn1_href']);
+      setText('heroBtn2Text',        kv['hero_btn2_text']);
+      setAttr('heroBtn2',  'href',   kv['hero_btn2_href']);
+      // hero_note may contain &nbsp; — use innerHTML
+      setHtml('heroNote',            kv['hero_note']);
+      // Why Us cards
+      setText('whyCard1',            kv['why_card1']);
+      setText('whyCard2',            kv['why_card2']);
+      setText('whyCard3',            kv['why_card3']);
+      // Trust badges — may contain <br>
+      setHtml('trustBadge1',         kv['trust_badge1']);
+      setHtml('trustBadge2',         kv['trust_badge2']);
+      setHtml('trustBadge3',         kv['trust_badge3']);
+      setHtml('trustBadge4',         kv['trust_badge4']);
+    }
+
+    var TEXT_KEYS = [
+      'hero_eyebrow','hero_headline_line1','hero_headline_line2','hero_sub',
+      'hero_btn1_text','hero_btn1_href','hero_btn2_text','hero_btn2_href','hero_note',
+      'why_card1','why_card2','why_card3',
+      'trust_badge1','trust_badge2','trust_badge3','trust_badge4'
+    ];
+
     async function loadHomepageImages(){
       try {
         var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
@@ -1188,16 +1236,27 @@
           renderHero(null); renderGallery(null); renderWhoCards(null); renderHowImage(null);
           return;
         }
-        var res = await sb.from('site_content').select('key,value')
-          .in('key',['gallery_strip','hero_grid','who_cards','how_image']);
+        var allKeys = ['gallery_strip','hero_grid','who_cards','how_image'].concat(TEXT_KEYS);
+        var res = await sb.from('site_content').select('key,value').in('key', allKeys);
         var rows = (res && res.data) ? res.data : [];
-        var kv = {};
-        rows.forEach(function(r){ try{ kv[r.key] = JSON.parse(r.value); }catch(e){ kv[r.key] = null; } });
 
-        renderHero(kv['hero_grid'] || null);
-        renderGallery(kv['gallery_strip'] || null);
-        renderWhoCards(kv['who_cards'] || null);
-        renderHowImage(kv['how_image'] || null);
+        // Image keys: values are JSON arrays
+        var imgKv = {};
+        // Text keys: values are plain strings
+        var txtKv = {};
+        rows.forEach(function(r){
+          if(['gallery_strip','hero_grid','who_cards','how_image'].indexOf(r.key) !== -1){
+            try{ imgKv[r.key] = JSON.parse(r.value); }catch(e){ imgKv[r.key] = null; }
+          } else {
+            txtKv[r.key] = r.value || '';
+          }
+        });
+
+        renderHero(imgKv['hero_grid'] || null);
+        renderGallery(imgKv['gallery_strip'] || null);
+        renderWhoCards(imgKv['who_cards'] || null);
+        renderHowImage(imgKv['how_image'] || null);
+        renderTextContent(txtKv);
       } catch(e) {
         renderHero(null); renderGallery(null); renderWhoCards(null); renderHowImage(null);
       }
