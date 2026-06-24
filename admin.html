@@ -267,6 +267,7 @@ tr:hover td{background:var(--bg2);}
       <div class="sb-section-label"> Website</div>
       <nav class="sb-nav">
         <a href="#" onclick="return nav('hero',this)"><span class="sb-ico"></span>Hero Slideshow</a>
+        <a href="#" onclick="return nav('homepage',this)"><span class="sb-ico"></span>Homepage Text</a>
         <a href="#" onclick="return nav('services',this)"><span class="sb-ico"></span>Services</a>
         <a href="#" onclick="return nav('about',this)"><span class="sb-ico"></span>About Page</a>
         <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico"></span>Portfolio Events</a>
@@ -306,14 +307,13 @@ tr:hover td{background:var(--bg2);}
     </div>
     <!-- HOMEPAGE CONTENT -->
     <div class="page" id="page-homepage">
-      <div class="page-header"><div class="page-title">Homepage Content</div><div class="page-sub">Edit section titles, subtitles, CTA text, and ecosystem card copy.</div></div>
+      <div class="page-header"><div class="page-title">Homepage Text</div><div class="page-sub">Edit the hero headline, "How We Work" steps, review quotes, trust badge labels, and newsletter heading.</div></div>
       <div class="ws-layout">
         <div>
           <div class="card"><div class="card-head"><h2> Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()"> Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div></div></div>
-          <div class="card"><div class="card-head"><h2> Ecosystem Cards</h2><button class="btn btn-gold" onclick="saveEcoCards()"> Save</button></div><div class="card-body" id="ecoEditor"><div class="empty"><div class="empty-ico"></div></div></div></div>
         </div>
         <div class="ws-sticky">
-          <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds.</div>
+          <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds. For the trust badge labels, use a line break where you want the text to wrap onto a second line.</div>
           <a href="index.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Homepage</a>
         </div>
       </div>
