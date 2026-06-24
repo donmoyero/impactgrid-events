@@ -74,7 +74,19 @@
       display: block;
       filter: brightness(0.92);
     }
-    /* Gold accent corner removed */
+    /* Gold accent corner */
+    .ab-story-img-wrap::before {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: -1px;
+      width: 80px;
+      height: 80px;
+      background: var(--gold);
+      opacity: 0.15;
+      border-radius: 0 20px 0 0;
+      z-index: 1;
+    }
     .ab-story-img-placeholder {
       width: 100%;
       height: 100%;
@@ -124,13 +136,13 @@
     .ab-pillar {
       background: var(--card);
       border: 1px solid var(--border);
-      border-left: 3px solid var(--text);
+      border-left: 3px solid var(--gold);
       border-radius: 20px;
       padding: 32px 36px;
       transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
     }
     .ab-pillar:hover {
-      border-color: var(--border2);
+      border-color: var(--gold-glo);
       transform: translateY(-3px);
       box-shadow: var(--sh2);
     }
@@ -152,32 +164,119 @@
     .ab-pillar-line {
       width: 28px;
       height: 2px;
-      background: var(--text);
+      background: var(--gold);
       border-radius: 2px;
       margin-top: 20px;
-      opacity: 0.15;
+      opacity: 0.4;
       transition: width 0.35s ease, opacity 0.35s ease;
     }
-    .ab-pillar:hover .ab-pillar-line { width: 52px; opacity: 0.4; }
+    .ab-pillar:hover .ab-pillar-line { width: 52px; opacity: 1; }
 
     /* ── TEAM SECTION ────────────────────── */
-    .ab-team {\n      max-width: 1100px;\n      margin: 0 auto;\n      padding: 80px 40px;\n    }
+    .ab-team {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
     .ab-team-header { margin-bottom: 48px; }
-    .ab-team-title {\n      font-family: var(--fb);\n      font-size: clamp(28px, 3.2vw, 42px);\n      font-weight: 900;\n      line-height: 1.07;\n      letter-spacing: -0.025em;\n      color: var(--text);\n      margin-top: 0;\n    }
-    .ab-team-grid {\n      display: grid;\n      grid-template-columns: repeat(2, 1fr);\n      gap: 24px;\n    }
-    .ab-member {\n      background: var(--card);\n      border: 1px solid var(--border);\n      border-radius: 24px;\n      overflow: hidden;\n      display: flex;\n      flex-direction: row;\n      align-items: center;\n      gap: 28px;\n      padding: 32px 36px;\n      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;\n    }
-    .ab-member:hover {\n      border-color: var(--border2);\n      transform: translateY(-4px);\n      box-shadow: var(--sh2);\n    }
-    /* Round face avatar */
-    .ab-member-avatar {\n      width: 96px;\n      height: 96px;\n      border-radius: 50%;\n      overflow: hidden;\n      flex-shrink: 0;\n      background: var(--bg2);\n      border: 2px solid var(--border);\n    }
-    .ab-member-photo {\n      width: 100%;\n      height: 100%;\n      object-fit: cover;\n      object-position: center top;\n      display: block;\n      filter: brightness(0.95);\n      transition: filter 0.4s;\n    }
-    .ab-member:hover .ab-member-photo { filter: brightness(1); }
-    .ab-member-photo-placeholder {\n      width: 100%;\n      height: 100%;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      font-size: 38px;\n    }
-    .ab-member-body { flex: 1; min-width: 0; }
-    .ab-member-name {\n      font-family: var(--ab-display);\n      font-size: clamp(20px, 2vw, 26px);\n      font-weight: 400;\n      color: var(--text);\n      margin-bottom: 4px;\n      line-height: 1.1;\n    }
-    .ab-member-role {\n      font-family: var(--fm);\n      font-size: 10px;\n      font-weight: 700;\n      letter-spacing: 0.12em;\n      text-transform: uppercase;\n      color: var(--text3);\n      margin-bottom: 12px;\n    }
-    .ab-member-bio {\n      font-size: 14px;\n      font-weight: 300;\n      color: var(--text2);\n      line-height: 1.72;\n    }
-    .ab-member-line {\n      width: 28px;\n      height: 2px;\n      background: var(--text);\n      border-radius: 2px;\n      margin-top: 16px;\n      opacity: 0.15;\n      transition: width 0.35s ease, opacity 0.35s ease;\n    }
-    .ab-member:hover .ab-member-line { width: 52px; opacity: 0.4; }
+    .ab-team-title {
+      font-family: var(--fb);
+      font-size: clamp(28px, 3.2vw, 42px);
+      font-weight: 900;
+      line-height: 1.07;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-top: 0;
+    }
+    .ab-team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .ab-member {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 32px 36px;
+      text-align: center;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .ab-member:hover {
+      border-color: var(--gold-glo);
+      transform: translateY(-4px);
+      box-shadow: var(--sh2);
+    }
+    /* Round avatar */
+    .ab-member-photo-wrap {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--bg2);
+      border: 3px solid var(--gold);
+      flex-shrink: 0;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .ab-member-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      filter: brightness(0.92);
+      transition: filter 0.4s, transform 0.5s;
+    }
+    .ab-member:hover .ab-member-photo { filter: brightness(1); transform: scale(1.05); }
+    .ab-member-photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      background: var(--bg2);
+    }
+    .ab-member-body { width: 100%; }
+    .ab-member-name {
+      font-family: var(--ab-display);
+      font-size: clamp(20px, 2vw, 26px);
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.1;
+    }
+    .ab-member-role {
+      font-family: var(--fm);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .ab-member-bio {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.82;
+      text-align: left;
+    }
+    .ab-member-line {
+      width: 28px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-top: 20px;
+      opacity: 0.4;
+      transition: width 0.35s ease, opacity 0.35s ease;
+    }
+    .ab-member:hover .ab-member-line { width: 52px; opacity: 1; }
 
     /* ── CTA ─────────────────────────────── */
     .ab-cta {
@@ -196,7 +295,7 @@
       color: var(--text);
       margin: 16px 0 18px;
     }
-    .ab-cta-title em { font-style: italic; color: var(--text); }
+    .ab-cta-title em { font-style: italic; color: var(--gold); }
     .ab-cta-sub {
       font-size: 16px;
       color: var(--text2);
@@ -233,12 +332,13 @@
       .ab-story-img-wrap { aspect-ratio: 16/9; }
       .ab-pillars { grid-template-columns: 1fr; }
       .ab-team-grid { grid-template-columns: 1fr; }
+      .ab-member { padding: 32px 24px 28px; }
       .ab-header { padding: 72px 20px 48px; }
       .ab-why { padding: 56px 20px; }
       .ab-team { padding: 56px 20px; }
       .ab-cta { padding: 72px 20px; }
       .ab-pillar { padding: 24px; }
-      .ab-member-body { padding: 22px 24px 26px; }
+      .ab-member-photo-wrap { width: 110px; height: 110px; }
     }
   </style>
 </head>
