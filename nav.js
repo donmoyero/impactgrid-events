@@ -311,7 +311,7 @@
           '</div>' +
           '<div class="footer-bot">' +
             '<span>© 2026 ImpactGrid Group Ltd. All rights reserved.</span>' +
-            '<div class="footer-legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="login.html" style="opacity:0.35;font-size:11px;" id="footerAdminLink">Admin</a></div>' +
+            '<div class="footer-legal"><a href="login.html" style="opacity:0.35;font-size:11px;" id="footerAdminLink">Admin</a></div>' +
             '<button class="footer-tbtn" onclick="toggleTheme()" id="footerTBtn" aria-label="Toggle dark/light mode">Dark mode</button>' +
           '</div>' +
         '</div>' +
