@@ -1501,6 +1501,7 @@ async function uploadHeroFile(file){
 
 async function loadHeroSlides(){
   var el=document.getElementById('heroSlideList');
+  if(!el) return; /* element only exists on the old slideshow tab — safe no-op */
   el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try{
     var {data}=await getSupabase().from('site_slides').select('*').order('sort_order',{ascending:true});
