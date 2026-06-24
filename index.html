@@ -497,30 +497,33 @@
       line-height: 1.15;
     }
 
-    /* ── HOW WE WORK — clipped mosaic ─────────────── */
+    /* ── HOW WE WORK — absolute mosaic ────────────── */
     .how {
       background: var(--ix-surface);
       border-top: 1px solid var(--ix-border);
       border-bottom: 1px solid var(--ix-border);
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 40px;
-      height: 480px;         /* fixed height — clips photos top & bottom */
+      height: 520px;
       overflow: hidden;
-      padding: 0 24px;
+      padding: 0;
     }
 
+    /* Centre text */
     .how-inner {
+      position: relative;
+      z-index: 3;
+      width: 300px;
       flex-shrink: 0;
-      width: 280px;
-      z-index: 2;
+      text-align: center;
     }
 
     .steps { display: flex; flex-direction: column; gap: 0; }
 
     .step {
-      padding: 15px 0;
+      padding: 14px 0;
       border-bottom: 1px solid var(--ix-border);
       transition: opacity 0.2s;
     }
@@ -537,64 +540,53 @@
       letter-spacing: -0.02em;
       line-height: 1.3;
       margin: 0;
+      text-align: left;
     }
 
     .how .section-label {
       display: block;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+      text-align: left;
     }
 
-    /* ── Photo panels: flex row of columns ── */
+    /* ── Absolute photo panels ── */
     .how-photos {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      flex-shrink: 0;
-      /* taller than the container so top+bottom get clipped */
-      height: 620px;
-      margin-top: -70px;   /* push up so clipping happens at both ends */
+      position: absolute;
+      top: 0; bottom: 0;
     }
+    .how-photos-left  { left: 0; width: 340px; }
+    .how-photos-right { right: 0; width: 340px; }
 
-    /* Each column is a vertical stack */
-    .how-col {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 120px;
-    }
-
+    /* Individual photos — absolutely placed to match reference */
     .how-photo {
-      width: 120px;
-      flex-shrink: 0;
+      position: absolute;
       object-fit: cover;
       border-radius: 10px;
-      display: block;
     }
 
-    /* Left columns: subtle stagger so it's not a staircase */
-    .how-photos-left .how-col:nth-child(1) { margin-top: 0; }
-    .how-photos-left .how-col:nth-child(2) { margin-top: 40px; }
+    /* ── LEFT side photos ──
+       Reference breakdown:
+       - top row: 2 small side-by-side, cut at top (~-30px)
+       - middle: 1 tall left, 1 tall right
+       - bottom: 1 photo alone, cut at bottom
+    */
+    .how-photos-left .p1 { width: 120px; height: 200px; top: -30px;  left: 170px; }
+    .how-photos-left .p2 { width: 150px; height: 180px; top: -30px;  left: 10px;  border-radius: 0 10px 10px 0; }
+    .how-photos-left .p3 { width: 120px; height: 230px; top: 145px;  left: 10px; }
+    .how-photos-left .p4 { width: 155px; height: 240px; top: 110px;  left: 145px; }
+    .how-photos-left .p5 { width: 120px; height: 195px; top: 340px;  left: 10px; }
 
-    /* Right columns */
-    .how-photos-right .how-col:nth-child(1) { margin-top: 20px; }
-    .how-photos-right .how-col:nth-child(2) { margin-top: -20px; }
-    .how-photos-right .how-col:nth-child(3) { margin-top: 50px; }
-
-    /* Photo heights — vary per photo for organic feel */
-    .how-photos-left  .how-col:nth-child(1) .how-photo:nth-child(1) { height: 195px; }
-    .how-photos-left  .how-col:nth-child(1) .how-photo:nth-child(2) { height: 170px; }
-    .how-photos-left  .how-col:nth-child(1) .how-photo:nth-child(3) { height: 185px; }
-    .how-photos-left  .how-col:nth-child(2) .how-photo:nth-child(1) { height: 220px; }
-    .how-photos-left  .how-col:nth-child(2) .how-photo:nth-child(2) { height: 175px; }
-    .how-photos-left  .how-col:nth-child(2) .how-photo:nth-child(3) { height: 160px; }
-
-    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(1) { height: 210px; }
-    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(2) { height: 170px; }
-    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(3) { height: 185px; }
-    .how-photos-right .how-col:nth-child(2) .how-photo:nth-child(1) { height: 180px; }
-    .how-photos-right .how-col:nth-child(2) .how-photo:nth-child(2) { height: 200px; }
-    .how-photos-right .how-col:nth-child(3) .how-photo:nth-child(1) { height: 190px; }
-    .how-photos-right .how-col:nth-child(3) .how-photo:nth-child(2) { height: 175px; }
+    /* ── RIGHT side photos ──
+       Reference breakdown:
+       - top right: 1 photo cut at top, far right edge
+       - middle: 2 large photos side by side
+       - bottom: 2 photos side by side, cut at bottom
+    */
+    .how-photos-right .p1 { width: 130px; height: 180px; top: -25px; right: 0;    border-radius: 10px 0 0 10px; }
+    .how-photos-right .p2 { width: 155px; height: 250px; top: 120px; right: 170px; }
+    .how-photos-right .p3 { width: 155px; height: 250px; top: 120px; right: 0; }
+    .how-photos-right .p4 { width: 155px; height: 185px; top: 345px; right: 170px; }
+    .how-photos-right .p5 { width: 155px; height: 185px; top: 345px; right: 0; }
 
     /* ── COMPETITOR TABLE ─────────────────────────── */
     .compare {
@@ -833,7 +825,7 @@
       .bento { grid-template-columns: 1fr; }
       .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
       .who-grid { grid-template-columns: 1fr 1fr; }
-      .how { flex-direction: column; height: auto; padding: 56px 20px; overflow: visible; }
+      .how { height: auto; padding: 56px 20px; overflow: visible; }
       .how-photos-left, .how-photos-right { display: none; }
       .how-inner { width: 100%; }
       .quotes-grid { grid-template-columns: 1fr; }
@@ -909,16 +901,11 @@
   <section class="how full-bleed" id="how">
 
     <div class="how-photos how-photos-left">
-      <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event 1" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 2" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816514965-1.png" alt="Event 3" loading="lazy"/>
-      </div>
-      <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event 4" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event 5" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 6" loading="lazy"/>
-      </div>
+      <img class="how-photo p1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event 1" loading="lazy"/>
+      <img class="how-photo p2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event 2" loading="lazy"/>
+      <img class="how-photo p3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 3" loading="lazy"/>
+      <img class="how-photo p4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event 4" loading="lazy"/>
+      <img class="how-photo p5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816514965-1.png" alt="Event 5" loading="lazy"/>
     </div>
 
     <div class="how-inner">
@@ -932,19 +919,11 @@
     </div>
 
     <div class="how-photos how-photos-right">
-      <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event 7" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event 8" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 9" loading="lazy"/>
-      </div>
-      <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event 10" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 11" loading="lazy"/>
-      </div>
-      <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event 12" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event 13" loading="lazy"/>
-      </div>
+      <img class="how-photo p1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event 6" loading="lazy"/>
+      <img class="how-photo p2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event 7" loading="lazy"/>
+      <img class="how-photo p3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event 8" loading="lazy"/>
+      <img class="how-photo p4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 9" loading="lazy"/>
+      <img class="how-photo p5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 10" loading="lazy"/>
     </div>
 
   </section>
