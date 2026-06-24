@@ -38,20 +38,20 @@
       font-weight: 700;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--text);
       margin-bottom: 16px;
     }
     .pf-title {
-      font-family: var(--pf);
-      font-size: clamp(38px, 5.5vw, 72px);
-      font-weight: 300;
+      font-family: var(--fb);
+      font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 900;
       line-height: 1.04;
       letter-spacing: -0.03em;
       color: var(--text);
       text-align: center;
       margin-bottom: 64px;
     }
-    .pf-title em { font-style: italic; color: var(--gold); }
+    .pf-title em { font-style: italic; color: var(--text); }
 
     /* ═══════════════════════════════════════
        BOOK SCENE
@@ -72,7 +72,7 @@
       transform: translateX(-50%);
       width: 55%;
       height: 50px;
-      background: radial-gradient(ellipse, var(--gold-glo) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(0,0,0,0.18) 0%, transparent 70%);
       filter: blur(14px);
       pointer-events: none;
     }
@@ -149,7 +149,7 @@
       font-weight: 700;
       letter-spacing: 0.13em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: rgba(255,255,255,0.6);
       margin-bottom: 4px;
     }
     .book-ev-name {
@@ -308,7 +308,7 @@
       transition: all 0.25s;
     }
     .book-status-dot.active {
-      background: var(--gold);
+      background: var(--text);
       transform: scale(1.45);
     }
 
@@ -359,8 +359,7 @@
   <div class="page-wrap">
     <div class="pf-page">
 
-      <div class="pf-label">Our Work</div>
-      <h1 class="pf-title">ImpactGrid Events<br><em>Portfolio</em></h1>
+      <h1 class="pf-title">Portfolio</h1>
 
       <!-- THE BOOK -->
       <div class="book-scene" id="bookScene">
