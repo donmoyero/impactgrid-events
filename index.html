@@ -330,9 +330,41 @@
       max-width: 480px;
     }
 
+    /* ── TRUST BADGES ──────────────────────────────── */
+    .trust-strip {
+      padding: 36px 40px;
+      border-bottom: 1px solid var(--ix-border);
+    }
+    .trust-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #000;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .trust-item svg {
+      width: 22px;
+      height: 22px;
+      color: #000;
+      flex-shrink: 0;
+    }
+
     /* ── GALLERY STRIP ─────────────────────────────── */
     .gallery-strip {
       padding: 0;
+      padding-bottom: 60px;
       overflow: hidden;
     }
     .gallery-row {
@@ -341,7 +373,6 @@
       height: 200px;
       animation: drift 50s linear infinite;
     }
-    .gallery-row:nth-child(2) { animation-direction: reverse; animation-duration: 42s; margin-top: 4px; }
     @keyframes drift {
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }
@@ -690,8 +721,8 @@
 
     .quote-stars {
       color: #000;
-      font-size: 13px;
-      letter-spacing: 2px;
+      font-size: 16px;
+      letter-spacing: 3px;
     }
     .quote-text {
       font-family: var(--ix-display);
@@ -884,14 +915,32 @@
     </div>
   </section>
 
+  <!-- TRUST BADGES -->
+  <section class="trust-strip">
+    <div class="trust-inner">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 12.5l2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>100% Satisfaction Guarantee</span>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="7" width="14" height="9" rx="1"/><path d="M15 10h3.5L21 13v3h-6z"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>
+        <span>Fast, Reliable Delivery</span>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 3.5v6c0 5-3.5 8.5-8 10.5C7.5 19.5 4 16 4 11V5.5L12 2z"/><path d="M9 12l2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Secure Online Booking</span>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 17.3l-5.6 3 1.1-6.2-4.5-4.4 6.2-.9L12 3l2.8 5.8 6.2.9-4.5 4.4 1.1 6.2z" stroke-linejoin="round"/></svg>
+        <span>Verified Client Reviews</span>
+      </div>
+    </div>
+  </section>
 
 
   <!-- GALLERY STRIP -->
   <div class="gallery-strip full-bleed">
     <div class="gallery-row" id="galleryRow1">
-      <!-- loaded dynamically from Supabase site_content -->
-    </div>
-    <div class="gallery-row" id="galleryRow2">
       <!-- loaded dynamically from Supabase site_content -->
     </div>
   </div>
@@ -937,34 +986,16 @@
     <div class="testimonials-inner">
       <div class="quotes-grid">
         <div class="quote-card">
+          <div class="quote-stars">★★★★★</div>
           <p class="quote-text">"Great photography needs great delivery. We bring the creative eye and the systems to make sure nothing is lost after the last song plays."</p>
-          <div class="quote-author">
-            <div style="width:40px;height:40px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#000;flex-shrink:0;">TJ</div>
-            <div>
-              <div class="quote-name">TJ</div>
-              <div class="quote-role">Creative Director, Impact Grid Events</div>
-            </div>
-          </div>
         </div>
         <div class="quote-card">
+          <div class="quote-stars">★★★★★</div>
           <p class="quote-text">"Poor delivery ruins good photography. Our gallery systems let guests find their photos fast — no chasing, no waiting."</p>
-          <div class="quote-author">
-            <div style="width:40px;height:40px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#000;flex-shrink:0;">D</div>
-            <div>
-              <div class="quote-name">Dara</div>
-              <div class="quote-role">Founder, Impact Grid Events</div>
-            </div>
-          </div>
         </div>
         <div class="quote-card">
+          <div class="quote-stars">★★★★★</div>
           <p class="quote-text">"Since December we've covered live events, built delivery systems that work, and earned strong feedback. We're just getting started."</p>
-          <div class="quote-author">
-            <div style="width:40px;height:40px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#000;flex-shrink:0;">IG</div>
-            <div>
-              <div class="quote-name">Impact Grid Events</div>
-              <div class="quote-role">Manchester, United Kingdom</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -1089,19 +1120,13 @@
 
     function renderGallery(urls){
       var list = (urls && urls.length) ? urls : DEFAULT_GALLERY;
-      var half = Math.ceil(list.length / 2);
-      var row1 = list.slice(0, half);
-      var row2 = list.slice(half);
-      if(!row2.length) row2 = row1.slice();
       function makeImgs(arr){
         return arr.map(function(url){
           return '<img class="gallery-img" src="'+url+'" alt="ImpactGrid portfolio" loading="lazy"/>';
         }).join('');
       }
       var r1 = document.getElementById('galleryRow1');
-      var r2 = document.getElementById('galleryRow2');
-      if(r1) r1.innerHTML = makeImgs(row1);
-      if(r2) r2.innerHTML = makeImgs(row2);
+      if(r1) r1.innerHTML = makeImgs(list.concat(list));
     }
 
     function renderWhoCards(urls){
