@@ -533,7 +533,7 @@
       font-family: var(--ix-display);
       font-size: 13px;
       font-weight: 300;
-      color: var(--ix-accent);
+      color: var(--text);
       min-width: 28px;
       padding-top: 4px;
       letter-spacing: 0.06em;
@@ -553,37 +553,30 @@
       font-weight: 300;
     }
 
-    .how-visual {
-      position: relative;
+    .how .section-label { color: var(--text); }
+    .how .section-title em { font-style: italic; color: var(--text); }
+
+    .how-mosaic {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 10px;
+      height: 100%;
+      min-height: 460px;
     }
-    .how-img {
+    .how-mosaic-img {
       width: 100%;
-      border-radius: 14px;
-      aspect-ratio: 4/5;
+      height: 100%;
       object-fit: cover;
-      opacity: 0.8;
-    }
-    .how-badge {
-      position: absolute;
-      bottom: -20px;
-      left: -20px;
-      background: var(--ix-accent);
-      color: var(--bg);
       border-radius: 12px;
-      padding: 18px 22px;
-      font-size: 13px;
-      font-weight: 500;
-      max-width: 220px;
-      line-height: 1.4;
-      box-shadow: var(--sh2);
-    }
-    .how-badge strong {
       display: block;
-      font-family: var(--ix-display);
-      font-size: 28px;
-      font-weight: 400;
-      margin-bottom: 4px;
     }
+    .how-mosaic-img:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3; }
+    .how-mosaic-img:nth-child(2) { grid-column: 3 / 4; grid-row: 1 / 2; }
+    .how-mosaic-img:nth-child(3) { grid-column: 3 / 4; grid-row: 2 / 3; }
+    .how-mosaic-img:nth-child(4) { grid-column: 1 / 2; grid-row: 3 / 4; }
+    .how-mosaic-img:nth-child(5) { grid-column: 2 / 3; grid-row: 3 / 4; }
+    .how-mosaic-img:nth-child(6) { grid-column: 3 / 4; grid-row: 3 / 4; }
 
     /* ── COMPETITOR TABLE ─────────────────────────── */
     .compare {
@@ -823,7 +816,7 @@
       .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
       .who-grid { grid-template-columns: 1fr 1fr; }
       .how-inner { grid-template-columns: 1fr; gap: 48px; }
-      .how-visual { display: none; }
+      .how-mosaic { display: none; }
       .quotes-grid { grid-template-columns: 1fr; }
       .who { padding: 72px 20px; }
       .compare { padding: 72px 20px; }
@@ -928,12 +921,13 @@
           </div>
         </div>
       </div>
-      <div class="how-visual">
-        <img class="how-img" id="howImage" src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80&fit=crop" alt="Event photography" />
-        <div class="how-badge">
-          <strong>Fast.</strong>
-          Galleries live before your guests leave
-        </div>
+      <div class="how-visual how-mosaic" id="howMosaic">
+        <img class="how-mosaic-img" id="howImg0" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event photography 1" />
+        <img class="how-mosaic-img" id="howImg1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event photography 2" />
+        <img class="how-mosaic-img" id="howImg2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event photography 3" />
+        <img class="how-mosaic-img" id="howImg3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event photography 4" />
+        <img class="how-mosaic-img" id="howImg4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event photography 5" />
+        <img class="how-mosaic-img" id="howImg5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event photography 6" />
       </div>
     </div>
   </section>
@@ -1089,7 +1083,14 @@
       {type:'Education',name:'Proms & Graduations'},
       {type:'Creator', name:'Content Creators'}
     ];
-    var DEFAULT_HOW = 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80&fit=crop';
+    var DEFAULT_HOW = [
+      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png',
+      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png',
+      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png',
+      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg',
+      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png',
+      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png'
+    ];
 
     function renderHero(urls){
       var el = document.getElementById('heroImagesGrid');
@@ -1134,10 +1135,14 @@
     }
 
     function renderHowImage(urls){
-      var el = document.getElementById('howImage');
+      var el = document.getElementById('howMosaic');
       if(!el) return;
-      var url = (urls && urls.length) ? urls[0] : DEFAULT_HOW;
-      el.src = url;
+      var list = (urls && urls.length) ? urls : DEFAULT_HOW;
+      for(var i = 0; i < 6; i++){
+        var img = document.getElementById('howImg' + i);
+        if(!img) continue;
+        img.src = list[i] || list[i % list.length] || DEFAULT_HOW[i];
+      }
     }
 
     async function loadHomepageImages(){
