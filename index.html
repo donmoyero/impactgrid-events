@@ -523,8 +523,8 @@
 
     .step {
       display: flex;
-      gap: 24px;
-      padding: 32px 0;
+      gap: 0;
+      padding: 28px 0;
       border-bottom: 1px solid var(--ix-border);
       cursor: pointer;
       transition: opacity 0.2s;
@@ -532,29 +532,18 @@
     .step:last-child { border-bottom: none; }
     .step:hover { opacity: 0.85; }
 
-    .step-num {
-      font-family: var(--ix-display);
-      font-size: 13px;
-      font-weight: 300;
-      color: var(--text);
-      min-width: 28px;
-      padding-top: 4px;
-      letter-spacing: 0.06em;
-    }
+    .step-num { display: none; }
 
     .step-text h3 {
       font-family: var(--ix-display);
-      font-size: 20px;
-      font-weight: 400;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-    .step-text p {
-      font-size: 14px;
-      color: var(--ix-mid);
-      line-height: 1.65;
+      font-size: clamp(20px, 2.5vw, 28px);
       font-weight: 300;
+      color: var(--text);
+      margin-bottom: 0;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
     }
+    .step-text p { display: none; }
 
     .how .section-label { color: var(--text); }
     .how .section-title em { font-style: italic; color: var(--text); }
@@ -895,34 +884,25 @@
     </div>
     <div class="how-inner">
       <div class="steps">
-        <div class="section-label">How it works</div>
-        <h2 class="section-title" style="margin-bottom: 44px;">Book us. Show up.<br><em>We handle the rest.</em></h2>
+        <div class="section-label">How We Work</div>
         <div class="step">
-          <div class="step-num">01</div>
           <div class="step-text">
             <h3>Book Your Event</h3>
-            <p>Tell us the date, location, and what you need. We'll confirm availability and lock you in — no complicated contracts.</p>
           </div>
         </div>
         <div class="step">
-          <div class="step-num">02</div>
           <div class="step-text">
-            <h3>We Show Up & Shoot</h3>
-            <p>TJ leads on the ground — professional photography and content creation throughout your event, so you never have to think about it.</p>
+            <h3>We Show Up &amp; Shoot</h3>
           </div>
         </div>
         <div class="step">
-          <div class="step-num">03</div>
           <div class="step-text">
             <h3>We Build Your Gallery</h3>
-            <p>Every photo is organised into a clean online gallery. Guests get a private link — they can preview and download their shots in minutes.</p>
           </div>
         </div>
         <div class="step">
-          <div class="step-num">04</div>
           <div class="step-text">
             <h3>You Keep the Memories</h3>
-            <p>High-resolution files, fast delivery, no chasing. Your event is captured and delivered the way it deserves to be.</p>
           </div>
         </div>
       </div>
