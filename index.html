@@ -497,21 +497,27 @@
       line-height: 1.15;
     }
 
-    /* ── HOW WE WORK — mosaic layout ──────────────── */
+    /* ── HOW WE WORK — staggered mosaic ───────────── */
     .how {
       background: var(--ix-surface);
       border-top: 1px solid var(--ix-border);
       border-bottom: 1px solid var(--ix-border);
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      display: flex;
       align-items: center;
-      gap: 32px;
-      padding: 80px 40px;
+      justify-content: center;
+      gap: 48px;
+      padding: 0;
+      overflow: hidden;
+      min-height: 500px;
     }
+
+    /* Centre text column */
     .how-inner {
-      width: 280px;
       flex-shrink: 0;
+      width: 300px;
       text-align: center;
+      z-index: 2;
+      padding: 60px 0;
     }
 
     .steps {
@@ -519,104 +525,80 @@
       flex-direction: column;
       gap: 0;
     }
-
     .step {
-      display: flex;
-      gap: 0;
-      padding: 18px 0;
+      padding: 16px 0;
       border-bottom: 1px solid var(--ix-border);
       transition: opacity 0.2s;
     }
     .step:last-child { border-bottom: none; }
-    .step:hover { opacity: 0.75; }
+    .step:hover { opacity: 0.7; }
     .step-num { display: none; }
+    .step-text p { display: none; }
 
     .step-text h3 {
       font-family: var(--ix-display);
-      font-size: clamp(16px, 1.6vw, 20px);
+      font-size: 18px;
       font-weight: 300;
       color: var(--text);
-      margin-bottom: 0;
-      line-height: 1.25;
       letter-spacing: -0.02em;
+      line-height: 1.3;
       text-align: left;
+      margin: 0;
     }
-    .step-text p { display: none; }
 
     .how .section-label {
-      color: var(--text);
-      margin-bottom: 28px;
+      color: var(--ix-accent);
       display: block;
+      margin-bottom: 20px;
       text-align: left;
     }
 
-    /* ── Mosaic photo grids ── */
+    /* ── Staggered photo columns ── */
     .how-photos {
-      display: grid;
-      gap: 8px;
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+      align-items: flex-start;
+      height: 500px;
+      overflow: hidden;
     }
 
-    /* Left: tall photo left col spanning 2 rows, 2 stacked right, 2 bottom */
-    .how-photos-left {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 130px 130px 130px;
-      width: 260px;
-    }
-    .how-photos-left .how-photo:nth-child(1) {
-      grid-column: 1 / 2;
-      grid-row: 1 / 3;
-    }
-    .how-photos-left .how-photo:nth-child(2) {
-      grid-column: 2 / 3;
-      grid-row: 1 / 2;
-    }
-    .how-photos-left .how-photo:nth-child(3) {
-      grid-column: 2 / 3;
-      grid-row: 2 / 3;
-    }
-    .how-photos-left .how-photo:nth-child(4) {
-      grid-column: 1 / 2;
-      grid-row: 3 / 4;
-    }
-    .how-photos-left .how-photo:nth-child(5) {
-      grid-column: 2 / 3;
-      grid-row: 3 / 4;
-    }
-
-    /* Right: 2 top, tall right col spanning 2 rows, 2 bottom */
-    .how-photos-right {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 130px 130px 130px;
-      width: 260px;
-    }
-    .how-photos-right .how-photo:nth-child(1) {
-      grid-column: 1 / 2;
-      grid-row: 1 / 2;
-    }
-    .how-photos-right .how-photo:nth-child(2) {
-      grid-column: 2 / 3;
-      grid-row: 1 / 3;
-    }
-    .how-photos-right .how-photo:nth-child(3) {
-      grid-column: 1 / 2;
-      grid-row: 2 / 3;
-    }
-    .how-photos-right .how-photo:nth-child(4) {
-      grid-column: 1 / 2;
-      grid-row: 3 / 4;
-    }
-    .how-photos-right .how-photo:nth-child(5) {
-      grid-column: 2 / 3;
-      grid-row: 3 / 4;
+    /* Each sub-column inside the photo panel */
+    .how-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .how-photo {
-      width: 100%;
-      height: 100%;
+      width: 130px;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 12px;
       display: block;
+      flex-shrink: 0;
     }
+
+    /* Left panel: 3 columns with vertical offsets */
+    .how-photos-left .how-col:nth-child(1) { margin-top: -60px; }
+    .how-photos-left .how-col:nth-child(2) { margin-top:  30px; }
+    .how-photos-left .how-col:nth-child(3) { margin-top: -20px; }
+
+    /* Right panel: 3 columns with different offsets */
+    .how-photos-right .how-col:nth-child(1) { margin-top:  20px; }
+    .how-photos-right .how-col:nth-child(2) { margin-top: -40px; }
+    .how-photos-right .how-col:nth-child(3) { margin-top:  50px; }
+
+    /* Photo heights — vary them for the organic feel */
+    .how-photos-left .how-col:nth-child(1) .how-photo:nth-child(1) { height: 200px; }
+    .how-photos-left .how-col:nth-child(1) .how-photo:nth-child(2) { height: 160px; }
+    .how-photos-left .how-col:nth-child(1) .how-photo:nth-child(3) { height: 180px; }
+    .how-photos-left .how-col:nth-child(2) .how-photo:nth-child(1) { height: 170px; }
+    .how-photos-left .how-col:nth-child(2) .how-photo:nth-child(2) { height: 200px; }
+    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(1) { height: 180px; }
+    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(2) { height: 160px; }
+    .how-photos-right .how-col:nth-child(2) .how-photo:nth-child(1) { height: 160px; }
+    .how-photos-right .how-col:nth-child(2) .how-photo:nth-child(2) { height: 200px; }
+    .how-photos-right .how-col:nth-child(3) .how-photo:nth-child(1) { height: 190px; }
 
     /* ── COMPETITOR TABLE ─────────────────────────── */
     .compare {
@@ -855,9 +837,9 @@
       .bento { grid-template-columns: 1fr; }
       .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
       .who-grid { grid-template-columns: 1fr 1fr; }
-      .how { grid-template-columns: 1fr; gap: 0; padding: 56px 20px; }
+      .how { flex-direction: column; min-height: auto; padding: 56px 20px; }
       .how-photos-left, .how-photos-right { display: none; }
-      .how-inner { width: 100%; }
+      .how-inner { width: 100%; padding: 0; }
       .quotes-grid { grid-template-columns: 1fr; }
       .who { padding: 72px 20px; }
       .compare { padding: 72px 20px; }
@@ -929,37 +911,46 @@
 
   <!-- HOW WE WORK -->
   <section class="how full-bleed" id="how">
+
+    <!-- LEFT: 3 staggered columns, 5 photos -->
     <div class="how-photos how-photos-left">
-      <img class="how-photo" id="howImg0" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event photography 1" loading="lazy"/>
-      <img class="how-photo" id="howImg1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event photography 2" loading="lazy"/>
-      <img class="how-photo" id="howImg2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event photography 3" loading="lazy"/>
-      <img class="how-photo" id="howImg3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event photography 4" loading="lazy"/>
-      <img class="how-photo" id="howImg4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event photography 5" loading="lazy"/>
+      <div class="how-col">
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event 1" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 2" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816514965-1.png" alt="Event 3" loading="lazy"/>
+      </div>
+      <div class="how-col">
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event 4" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event 5" loading="lazy"/>
+      </div>
     </div>
+
+    <!-- CENTRE: label + step list -->
     <div class="how-inner">
       <div class="steps">
         <div class="section-label">How We Work</div>
-        <div class="step">
-          <div class="step-text"><h3>Book Your Event</h3></div>
-        </div>
-        <div class="step">
-          <div class="step-text"><h3>We Show Up &amp; Shoot</h3></div>
-        </div>
-        <div class="step">
-          <div class="step-text"><h3>We Build Your Gallery</h3></div>
-        </div>
-        <div class="step">
-          <div class="step-text"><h3>You Keep the Memories</h3></div>
-        </div>
+        <div class="step"><div class="step-text"><h3>Book Your Event</h3></div></div>
+        <div class="step"><div class="step-text"><h3>We Show Up &amp; Shoot</h3></div></div>
+        <div class="step"><div class="step-text"><h3>We Build Your Gallery</h3></div></div>
+        <div class="step"><div class="step-text"><h3>You Keep the Memories</h3></div></div>
       </div>
     </div>
+
+    <!-- RIGHT: 3 staggered columns, 5 photos -->
     <div class="how-photos how-photos-right">
-      <img class="how-photo" id="howImg5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event photography 6" loading="lazy"/>
-      <img class="how-photo" id="howImg6" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event photography 7" loading="lazy"/>
-      <img class="how-photo" id="howImg7" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event photography 8" loading="lazy"/>
-      <img class="how-photo" id="howImg8" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event photography 9" loading="lazy"/>
-      <img class="how-photo" id="howImg9" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816514965-1.png" alt="Event photography 10" loading="lazy"/>
+      <div class="how-col">
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event 6" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event 7" loading="lazy"/>
+      </div>
+      <div class="how-col">
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event 8" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 9" loading="lazy"/>
+      </div>
+      <div class="how-col">
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 10" loading="lazy"/>
+      </div>
     </div>
+
   </section>
 
 
