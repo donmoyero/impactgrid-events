@@ -134,7 +134,7 @@
       font-weight: 500;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--ix-accent);
+      color: #F5F3EF;
       margin-bottom: 28px;
     }
     .hero-eyebrow::before,
@@ -143,22 +143,22 @@
       display: block;
       width: 28px;
       height: 1px;
-      background: var(--ix-accent);
+      background: #F5F3EF;
       opacity: 0.5;
     }
 
     .hero-headline {
       font-family: var(--ix-display);
       font-size: clamp(46px, 7vw, 88px);
-      font-weight: 300;
+      font-weight: 700;
       line-height: 1.03;
       letter-spacing: -0.03em;
-      color: #F5F3EF;
+      color: #fff;
       margin-bottom: 28px;
     }
     .hero-headline em {
-      font-style: italic;
-      color: var(--ix-accent);
+      font-style: normal;
+      color: #fff;
     }
 
     .hero-sub {
@@ -183,20 +183,20 @@
       display: inline-flex;
       align-items: center;
       text-decoration: none;
-      background: linear-gradient(135deg, #f0b429 0%, #ffd166 50%, #f0b429 100%);
-      background-size: 200% 100%;
-      background-position: 0% 0%;
-      color: #07090f;
+      background: rgba(245,243,239,0.06);
+      color: rgba(245,243,239,0.92);
       font-family: var(--fd, sans-serif);
       font-size: 13px;
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       border-radius: 100px;
       padding: 0;
-      border: none;
-      box-shadow: 0 4px 24px rgba(240,180,41,0.35), 0 1px 0 rgba(255,255,255,0.15) inset;
-      transition: background-position 0.4s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      border: 1px solid rgba(245,243,239,0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
       overflow: hidden;
     }
     .hero-btn-primary::before {
@@ -204,12 +204,13 @@
       position: absolute;
       inset: 0;
       border-radius: 100px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+      background: none;
       pointer-events: none;
     }
     .hero-btn-primary:hover {
-      background-position: 100% 0%;
-      box-shadow: 0 8px 32px rgba(240,180,41,0.55), 0 1px 0 rgba(255,255,255,0.2) inset;
+      background: rgba(245,243,239,0.14);
+      border-color: rgba(245,243,239,0.5);
+      color: #fff;
       transform: translateY(-2px);
     }
     .hero-btn-inner {
