@@ -332,33 +332,55 @@
 
     /* ── TRUST BADGES ──────────────────────────────── */
     .trust-strip {
-      padding: 36px 40px;
-      border-bottom: 1px solid var(--ix-border);
+      padding: 70px 40px;
+      border-top: 1px solid var(--ix-border);
     }
     .trust-inner {
       max-width: 1100px;
       margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 36px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
     }
     .trust-item {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
-      color: #000;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.01em;
-      white-space: nowrap;
+      text-align: center;
+      gap: 16px;
+      padding: 32px 16px;
+      border: 1px solid var(--ix-border);
+      border-radius: 14px;
+      background: var(--ix-surface);
+      transition: border-color 0.3s, transform 0.3s;
     }
-    .trust-item svg {
-      width: 22px;
-      height: 22px;
-      color: #000;
+    .trust-item:hover { border-color: var(--gold); transform: translateY(-3px); }
+    .trust-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold);
       flex-shrink: 0;
+    }
+    .trust-icon svg {
+      width: 26px;
+      height: 26px;
+      color: var(--gold);
+    }
+    .trust-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      color: #000;
+      text-transform: uppercase;
+    }
+    @media (max-width: 700px) {
+      .trust-inner { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* ── GALLERY STRIP ─────────────────────────────── */
@@ -915,28 +937,6 @@
     </div>
   </section>
 
-  <!-- TRUST BADGES -->
-  <section class="trust-strip">
-    <div class="trust-inner">
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 12.5l2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>100% Satisfaction Guarantee</span>
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="7" width="14" height="9" rx="1"/><path d="M15 10h3.5L21 13v3h-6z"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>
-        <span>Fast, Reliable Delivery</span>
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 3.5v6c0 5-3.5 8.5-8 10.5C7.5 19.5 4 16 4 11V5.5L12 2z"/><path d="M9 12l2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>Secure Online Booking</span>
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 17.3l-5.6 3 1.1-6.2-4.5-4.4 6.2-.9L12 3l2.8 5.8 6.2.9-4.5 4.4 1.1 6.2z" stroke-linejoin="round"/></svg>
-        <span>Verified Client Reviews</span>
-      </div>
-    </div>
-  </section>
-
 
   <!-- GALLERY STRIP -->
   <div class="gallery-strip full-bleed">
@@ -997,6 +997,36 @@
           <div class="quote-stars">★★★★★</div>
           <p class="quote-text">"Since December we've covered live events, built delivery systems that work, and earned strong feedback. We're just getting started."</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BADGES -->
+  <section class="trust-strip">
+    <div class="trust-inner">
+      <div class="trust-item">
+        <span class="trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 12.5l2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="trust-label">100% Satisfaction<br>Guarantee</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="7" width="14" height="9" rx="1"/><path d="M15 10h3.5L21 13v3h-6z"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>
+        </span>
+        <span class="trust-label">Fast, Reliable<br>Delivery</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l8 3.5v6c0 5-3.5 8.5-8 10.5C7.5 19.5 4 16 4 11V5.5L12 2z"/><path d="M9 12l2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="trust-label">Secure Online<br>Booking</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 17.3l-5.6 3 1.1-6.2-4.5-4.4 6.2-.9L12 3l2.8 5.8 6.2.9-4.5 4.4 1.1 6.2z" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="trust-label">Verified Client<br>Reviews</span>
       </div>
     </div>
   </section>
