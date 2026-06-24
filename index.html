@@ -497,7 +497,7 @@
       line-height: 1.15;
     }
 
-    /* ── HOW WE WORK — staggered mosaic ───────────── */
+    /* ── HOW WE WORK — clipped mosaic ─────────────── */
     .how {
       background: var(--ix-surface);
       border-top: 1px solid var(--ix-border);
@@ -505,100 +505,96 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 48px;
-      padding: 0;
+      gap: 40px;
+      height: 480px;         /* fixed height — clips photos top & bottom */
       overflow: hidden;
-      min-height: 500px;
+      padding: 0 24px;
     }
 
-    /* Centre text column */
     .how-inner {
       flex-shrink: 0;
-      width: 300px;
-      text-align: center;
+      width: 280px;
       z-index: 2;
-      padding: 60px 0;
     }
 
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
+    .steps { display: flex; flex-direction: column; gap: 0; }
+
     .step {
-      padding: 16px 0;
+      padding: 15px 0;
       border-bottom: 1px solid var(--ix-border);
       transition: opacity 0.2s;
     }
     .step:last-child { border-bottom: none; }
-    .step:hover { opacity: 0.7; }
+    .step:hover { opacity: 0.65; }
     .step-num { display: none; }
     .step-text p { display: none; }
 
     .step-text h3 {
       font-family: var(--ix-display);
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 300;
       color: var(--text);
       letter-spacing: -0.02em;
       line-height: 1.3;
-      text-align: left;
       margin: 0;
     }
 
     .how .section-label {
-      color: var(--ix-accent);
       display: block;
-      margin-bottom: 20px;
-      text-align: left;
+      margin-bottom: 18px;
     }
 
-    /* ── Staggered photo columns ── */
+    /* ── Photo panels: flex row of columns ── */
     .how-photos {
       display: flex;
+      flex-direction: row;
       gap: 10px;
       flex-shrink: 0;
-      align-items: flex-start;
-      height: 500px;
-      overflow: hidden;
+      /* taller than the container so top+bottom get clipped */
+      height: 620px;
+      margin-top: -70px;   /* push up so clipping happens at both ends */
     }
 
-    /* Each sub-column inside the photo panel */
+    /* Each column is a vertical stack */
     .how-col {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      width: 120px;
     }
 
     .how-photo {
-      width: 130px;
-      object-fit: cover;
-      border-radius: 12px;
-      display: block;
+      width: 120px;
       flex-shrink: 0;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
     }
 
-    /* Left panel: 3 columns with vertical offsets */
-    .how-photos-left .how-col:nth-child(1) { margin-top: -60px; }
-    .how-photos-left .how-col:nth-child(2) { margin-top:  30px; }
-    .how-photos-left .how-col:nth-child(3) { margin-top: -20px; }
+    /* Left columns: subtle stagger so it's not a staircase */
+    .how-photos-left .how-col:nth-child(1) { margin-top: 0; }
+    .how-photos-left .how-col:nth-child(2) { margin-top: 40px; }
 
-    /* Right panel: 3 columns with different offsets */
-    .how-photos-right .how-col:nth-child(1) { margin-top:  20px; }
-    .how-photos-right .how-col:nth-child(2) { margin-top: -40px; }
-    .how-photos-right .how-col:nth-child(3) { margin-top:  50px; }
+    /* Right columns */
+    .how-photos-right .how-col:nth-child(1) { margin-top: 20px; }
+    .how-photos-right .how-col:nth-child(2) { margin-top: -20px; }
+    .how-photos-right .how-col:nth-child(3) { margin-top: 50px; }
 
-    /* Photo heights — vary them for the organic feel */
-    .how-photos-left .how-col:nth-child(1) .how-photo:nth-child(1) { height: 200px; }
-    .how-photos-left .how-col:nth-child(1) .how-photo:nth-child(2) { height: 160px; }
-    .how-photos-left .how-col:nth-child(1) .how-photo:nth-child(3) { height: 180px; }
-    .how-photos-left .how-col:nth-child(2) .how-photo:nth-child(1) { height: 170px; }
-    .how-photos-left .how-col:nth-child(2) .how-photo:nth-child(2) { height: 200px; }
-    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(1) { height: 180px; }
-    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(2) { height: 160px; }
-    .how-photos-right .how-col:nth-child(2) .how-photo:nth-child(1) { height: 160px; }
+    /* Photo heights — vary per photo for organic feel */
+    .how-photos-left  .how-col:nth-child(1) .how-photo:nth-child(1) { height: 195px; }
+    .how-photos-left  .how-col:nth-child(1) .how-photo:nth-child(2) { height: 170px; }
+    .how-photos-left  .how-col:nth-child(1) .how-photo:nth-child(3) { height: 185px; }
+    .how-photos-left  .how-col:nth-child(2) .how-photo:nth-child(1) { height: 220px; }
+    .how-photos-left  .how-col:nth-child(2) .how-photo:nth-child(2) { height: 175px; }
+    .how-photos-left  .how-col:nth-child(2) .how-photo:nth-child(3) { height: 160px; }
+
+    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(1) { height: 210px; }
+    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(2) { height: 170px; }
+    .how-photos-right .how-col:nth-child(1) .how-photo:nth-child(3) { height: 185px; }
+    .how-photos-right .how-col:nth-child(2) .how-photo:nth-child(1) { height: 180px; }
     .how-photos-right .how-col:nth-child(2) .how-photo:nth-child(2) { height: 200px; }
     .how-photos-right .how-col:nth-child(3) .how-photo:nth-child(1) { height: 190px; }
+    .how-photos-right .how-col:nth-child(3) .how-photo:nth-child(2) { height: 175px; }
 
     /* ── COMPETITOR TABLE ─────────────────────────── */
     .compare {
@@ -837,9 +833,9 @@
       .bento { grid-template-columns: 1fr; }
       .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
       .who-grid { grid-template-columns: 1fr 1fr; }
-      .how { flex-direction: column; min-height: auto; padding: 56px 20px; }
+      .how { flex-direction: column; height: auto; padding: 56px 20px; overflow: visible; }
       .how-photos-left, .how-photos-right { display: none; }
-      .how-inner { width: 100%; padding: 0; }
+      .how-inner { width: 100%; }
       .quotes-grid { grid-template-columns: 1fr; }
       .who { padding: 72px 20px; }
       .compare { padding: 72px 20px; }
@@ -912,7 +908,6 @@
   <!-- HOW WE WORK -->
   <section class="how full-bleed" id="how">
 
-    <!-- LEFT: 3 staggered columns, 5 photos -->
     <div class="how-photos how-photos-left">
       <div class="how-col">
         <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event 1" loading="lazy"/>
@@ -922,10 +917,10 @@
       <div class="how-col">
         <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event 4" loading="lazy"/>
         <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event 5" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 6" loading="lazy"/>
       </div>
     </div>
 
-    <!-- CENTRE: label + step list -->
     <div class="how-inner">
       <div class="steps">
         <div class="section-label">How We Work</div>
@@ -936,18 +931,19 @@
       </div>
     </div>
 
-    <!-- RIGHT: 3 staggered columns, 5 photos -->
     <div class="how-photos how-photos-right">
       <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event 6" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event 7" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event 7" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event 8" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 9" loading="lazy"/>
       </div>
       <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event 8" loading="lazy"/>
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 9" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event 10" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 11" loading="lazy"/>
       </div>
       <div class="how-col">
-        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 10" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event 12" loading="lazy"/>
+        <img class="how-photo" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event 13" loading="lazy"/>
       </div>
     </div>
 
