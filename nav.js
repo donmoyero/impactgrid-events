@@ -306,7 +306,7 @@
               '<p>Capturing moments &amp; delivering experiences. Manchester, UK.</p>' +
             '</div>' +
             '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="about.html">About</a><a href="book-us.html">Book Us</a></div>' +
-            '<div class="fc"><h4>Contact</h4><a href="mailto:events@impactgridgroup.com">events@impactgridgroup.com</a><a href="tel:07427703623">07427 703623</a></div>' +
+            '<div class="fc"><h4>Contact</h4><a href="mailto:events@impactgridgroup.com">events@impactgridgroup.com</a><a href="tel:07469016509">07469 016509</a></div>' +
             '<div class="fc"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>' +
           '</div>' +
           '<div class="footer-bot">' +
