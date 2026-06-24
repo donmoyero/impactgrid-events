@@ -502,14 +502,17 @@
       background: var(--ix-surface);
       border-top: 1px solid var(--ix-border);
       border-bottom: 1px solid var(--ix-border);
+      display: grid;
+      grid-template-columns: minmax(140px, 1fr) minmax(0, 620px) minmax(140px, 1fr);
+      align-items: center;
+      gap: 24px;
+      padding: 90px 0;
     }
     .how-inner {
-      max-width: 1100px;
+      max-width: 620px;
+      width: 100%;
       margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 100px;
-      align-items: center;
+      padding: 0 24px;
     }
 
     .steps {
@@ -556,27 +559,26 @@
     .how .section-label { color: var(--text); }
     .how .section-title em { font-style: italic; color: var(--text); }
 
-    .how-mosaic {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: repeat(3, 1fr);
-      gap: 10px;
+    .how-photos {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 22px;
       height: 100%;
-      min-height: 460px;
+      justify-content: center;
     }
-    .how-mosaic-img {
+    .how-photo {
       width: 100%;
-      height: 100%;
       object-fit: cover;
       border-radius: 12px;
       display: block;
     }
-    .how-mosaic-img:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3; }
-    .how-mosaic-img:nth-child(2) { grid-column: 3 / 4; grid-row: 1 / 2; }
-    .how-mosaic-img:nth-child(3) { grid-column: 3 / 4; grid-row: 2 / 3; }
-    .how-mosaic-img:nth-child(4) { grid-column: 1 / 2; grid-row: 3 / 4; }
-    .how-mosaic-img:nth-child(5) { grid-column: 2 / 3; grid-row: 3 / 4; }
-    .how-mosaic-img:nth-child(6) { grid-column: 3 / 4; grid-row: 3 / 4; }
+    .how-photos-left  .how-photo:nth-child(1) { height: 170px; }
+    .how-photos-left  .how-photo:nth-child(2) { height: 130px; }
+    .how-photos-left  .how-photo:nth-child(3) { height: 220px; }
+    .how-photos-right .how-photo:nth-child(1) { height: 210px; }
+    .how-photos-right .how-photo:nth-child(2) { height: 150px; }
+    .how-photos-right .how-photo:nth-child(3) { height: 160px; }
 
     /* ── COMPETITOR TABLE ─────────────────────────── */
     .compare {
@@ -815,8 +817,8 @@
       .bento { grid-template-columns: 1fr; }
       .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
       .who-grid { grid-template-columns: 1fr 1fr; }
-      .how-inner { grid-template-columns: 1fr; gap: 48px; }
-      .how-mosaic { display: none; }
+      .how { grid-template-columns: 1fr; gap: 0; }
+      .how-photos { display: none; }
       .quotes-grid { grid-template-columns: 1fr; }
       .who { padding: 72px 20px; }
       .compare { padding: 72px 20px; }
@@ -887,7 +889,12 @@
 
 
   <!-- HOW IT WORKS -->
-  <section class="how" id="how">
+  <section class="how full-bleed" id="how">
+    <div class="how-photos how-photos-left">
+      <img class="how-photo" id="howImg0" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event photography 1" loading="lazy"/>
+      <img class="how-photo" id="howImg1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event photography 2" loading="lazy"/>
+      <img class="how-photo" id="howImg2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event photography 3" loading="lazy"/>
+    </div>
     <div class="how-inner">
       <div class="steps">
         <div class="section-label">How it works</div>
@@ -921,14 +928,11 @@
           </div>
         </div>
       </div>
-      <div class="how-visual how-mosaic" id="howMosaic">
-        <img class="how-mosaic-img" id="howImg0" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event photography 1" />
-        <img class="how-mosaic-img" id="howImg1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event photography 2" />
-        <img class="how-mosaic-img" id="howImg2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event photography 3" />
-        <img class="how-mosaic-img" id="howImg3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event photography 4" />
-        <img class="how-mosaic-img" id="howImg4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event photography 5" />
-        <img class="how-mosaic-img" id="howImg5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event photography 6" />
-      </div>
+    </div>
+    <div class="how-photos how-photos-right">
+      <img class="how-photo" id="howImg3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event photography 4" loading="lazy"/>
+      <img class="how-photo" id="howImg4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event photography 5" loading="lazy"/>
+      <img class="how-photo" id="howImg5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event photography 6" loading="lazy"/>
     </div>
   </section>
 
@@ -1135,8 +1139,8 @@
     }
 
     function renderHowImage(urls){
-      var el = document.getElementById('howMosaic');
-      if(!el) return;
+      var first = document.getElementById('howImg0');
+      if(!first) return;
       var list = (urls && urls.length) ? urls : DEFAULT_HOW;
       for(var i = 0; i < 6; i++){
         var img = document.getElementById('howImg' + i);
