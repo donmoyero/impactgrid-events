@@ -226,16 +226,16 @@
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--gold);
-      background: var(--gold-dim);
-      border: 1px solid var(--gold-glo);
+      color: #fff;
+      background: #000;
+      border: 1px solid #000;
       border-radius: 100px;
       padding: 7px 16px;
-      transition: background 0.2s, transform 0.2s;
+      transition: background 0.2s, transform 0.2s, opacity 0.2s;
     }
     .sv-card:hover .sv-book-btn {
-      background: var(--gold);
-      color: #07090f;
+      background: #222;
+      color: #fff;
       transform: translateX(3px);
     }
 
@@ -262,7 +262,7 @@
 
     <!-- PAGE HEADER -->
     <header class="sv-header">
-      <h1 class="sv-headline anim-fade-up"><strong>What We Do</strong></h1>
+      <h1 class="sv-headline anim-fade-up"><strong>Our Services</strong></h1>
     </header>
 
     <!-- DIVIDER -->
@@ -294,26 +294,26 @@
 
   var FALLBACK_SERVICES = [
     {
-      id:'f1', title:'Professional Photography',
-      description:'High-quality event photography from an experienced creative. We capture the moments that matter — candid, posed, and everything in between.',
+      id:'f1', title:'Event Photography',
+      description:'Sharp, candid shots from every angle. We capture the energy of your event — the moments that matter, delivered fast.',
       image_url:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80&fit=crop',
       sort_order:0
     },
     {
-      id:'f2', title:'High-Quality Content Creation',
-      description:'Beyond photos — we create polished content ready for social media, print, or internal use. Clips, highlights, and branded assets delivered fast.',
+      id:'f2', title:'Content Creation',
+      description:'Clips, highlights, and branded assets — polished and ready for social. No waiting around.',
       image_url:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80&fit=crop',
       sort_order:10
     },
     {
-      id:'f3', title:'Organised Online Galleries',
-      description:'Every photo is sorted into a clean, branded online gallery. Guests browse and download their shots in seconds — no app, no login required.',
+      id:'f3', title:'Online Galleries',
+      description:'Every photo sorted into a clean, branded gallery. Guests browse and download in seconds — no app, no login.',
       image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop',
       sort_order:20
     },
     {
-      id:'f4', title:'Easy Preview & Download Systems',
-      description:'We build the digital infrastructure around your event. Guests get a private link, preview their photos instantly, and download in full resolution.',
+      id:'f4', title:'Preview & Download',
+      description:'Guests get a private link, preview their photos instantly, and download in full resolution. Simple.',
       image_url:'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80&fit=crop',
       sort_order:30
     }
@@ -368,7 +368,7 @@
           '<div class="sv-card-line"></div>' +
           priceBlock +
           '<div style="margin-top:20px;">' +
-            '<span class="sv-book-btn">Book This Service →</span>' +
+            '<span class="sv-book-btn">Book Now →</span>' +
           '</div>' +
         '</div>' +
       '</div>';
