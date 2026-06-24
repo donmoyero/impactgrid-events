@@ -86,10 +86,14 @@
   let isOpen      = false;
   let isTyping    = false;
   let hasGreeted  = false;
+  let isReturning = false; /* true if visitor has chat history from a previous session */
 
   try {
     const saved = localStorage.getItem(HISTORY_KEY);
-    if (saved) history = JSON.parse(saved);
+    if (saved) {
+      history = JSON.parse(saved);
+      isReturning = history.length > 0; /* returning if they have prior history */
+    }
   } catch (e) {}
 
   function saveHistory() {
@@ -533,6 +537,7 @@
         body: JSON.stringify({
           message    : text,
           codename   : codename,
+          isReturning: isReturning,
           history    : history.slice(-10), /* last 5 turns */
           behaviour  : {
             page          : behaviour.page,
@@ -579,13 +584,26 @@
     }
 
     hasGreeted = true;
-    setTimeout(function () {
-      addMessage(
-        `Hey ${codename}! 👋 I'm Spark — ImpactGrid's AI. Looking to book something or just browsing?`,
-        'bot',
-        ['Book an event', 'See what you offer', 'Pricing info', 'Just looking']
-      );
-    }, 400);
+
+    if (isReturning) {
+      /* Returning visitor */
+      setTimeout(function () {
+        addMessage(
+          'Welcome back, ' + codename + '! 👋 Good to see you again — ready to pick up where we left off?',
+          'bot',
+          ['Continue my enquiry', 'Start fresh', 'Pricing info', 'Just browsing']
+        );
+      }, 400);
+    } else {
+      /* First-time visitor */
+      setTimeout(function () {
+        addMessage(
+          'Hey ' + codename + '! 👋 I’m Dijo — ImpactGrid’s AI. Looking to book something or just browsing?',
+          'bot',
+          ['Book an event', 'See what you offer', 'Pricing info', 'Just looking']
+        );
+      }, 400);
+    }
   }
 
   /* ── Toggle chat ── */
@@ -601,12 +619,12 @@
     }
   }
 
-  /* ── Show unread dot after delay if not opened ── */
+  /* ── Show unread dot — sooner for returning visitors ── */
   setTimeout(function () {
     if (!isOpen && history.length === 0) {
       unreadDot.style.display = 'flex';
     }
-  }, 8000);
+  }, isReturning ? 5000 : 9000);
 
   /* ── Events ── */
   bubbleBtn.addEventListener('click', toggleChat);
