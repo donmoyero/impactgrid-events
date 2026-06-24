@@ -403,18 +403,49 @@ tr:hover td{background:var(--bg2);}
         </div>
         <div id="sec-howimage" style="display:none;border-top:1px solid var(--border);">
           <div style="padding:20px;">
-            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Up to 6 images shown in the mosaic beside the workflow steps.</p>
-            <div class="upload-zone" id="hiDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hiFileIn').click()" ondragover="onDragOver(event,'hiDropZone')" ondragleave="onDragLeave(event,'hiDropZone')" ondrop="onDropSection(event,'hiDropZone','howImageList','how_image',6)">
+            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Up to 10 images shown in the mosaic beside the workflow steps (5 left, 5 right).</p>
+            <div class="upload-zone" id="hiDropZone" style="margin-bottom:14px;" onclick="document.getElementById('hiFileIn').click()" ondragover="onDragOver(event,'hiDropZone')" ondragleave="onDragLeave(event,'hiDropZone')" ondrop="onDropSection(event,'hiDropZone','howImageList','how_image',10)">
               <div class="upload-zone-ico"></div>
               <div class="upload-zone-title">Drop images here or click to upload</div>
-              <div class="upload-zone-sub">JPG · PNG · WebP · up to 6 images</div>
-              <input type="file" id="hiFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'howImageList','how_image',6)"/>
+              <div class="upload-zone-sub">JPG · PNG · WebP · up to 10 images</div>
+              <input type="file" id="hiFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'howImageList','how_image',10)"/>
             </div>
             <div id="hiUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
             <div id="howImageList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('howImageList','how_image',6)">+ Add URL</button>
+              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('howImageList','how_image',10)">+ Add URL</button>
               <button class="btn btn-gold" onclick="saveSectionList('howImageList','how_image','How it works images')"> Save Images</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--  SECTION 6: WHO IT'S FOR CARDS  -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-whocards')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">🎭</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">"Who It's For" Cards</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px;">Background images for the 6 audience cards (Sport, Social, Corporate, etc.)</div>
+            </div>
+          </div>
+          <span id="chev-whocards" style="font-size:11px;color:var(--text3);transition:transform .2s;"></span>
+        </div>
+        <div id="sec-whocards" style="display:none;border-top:1px solid var(--border);">
+          <div style="padding:20px;">
+            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Exactly 6 images — one per card in the order: Sport, Social, Corporate, Live Music, Education, Creator.</p>
+            <div class="upload-zone" id="wcDropZone" style="margin-bottom:14px;" onclick="document.getElementById('wcFileIn').click()" ondragover="onDragOver(event,'wcDropZone')" ondragleave="onDragLeave(event,'wcDropZone')" ondrop="onDropSection(event,'wcDropZone','whoCardsList','who_cards',6)">
+              <div class="upload-zone-ico"></div>
+              <div class="upload-zone-title">Drop images here or click to upload</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP · exactly 6 images</div>
+              <input type="file" id="wcFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'whoCardsList','who_cards',6)"/>
+            </div>
+            <div id="wcUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
+            <div id="whoCardsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('whoCardsList','who_cards',6)">+ Add URL</button>
+              <button class="btn btn-gold" onclick="saveSectionList('whoCardsList','who_cards','Who It\'s For cards')"> Save Cards</button>
             </div>
           </div>
         </div>
@@ -1352,10 +1383,30 @@ function onDropMulti(e,id){e.preventDefault();document.getElementById(id).classL
 
 /*  HOMEPAGE CONTENT  */
 var CONTENT_DEFS=[
-  {section:' Ecosystem Section',fields:[{key:'ecosystem_title',label:'Section Title',type:'text'},{key:'ecosystem_sub',label:'Section Subtitle',type:'textarea'}]},
-  {section:' Use Cases Section',fields:[{key:'usecases_title',label:'Section Title',type:'text'},{key:'usecases_sub',label:'Section Subtitle',type:'textarea'}]},
-  {section:' CTA Banner',fields:[{key:'cta_title',label:'Banner Heading',type:'text'},{key:'cta_subtitle',label:'Banner Subtitle',type:'textarea'}]},
-  {section:' Testimonials Section',fields:[{key:'trust_title',label:'Section Heading',type:'text'},{key:'trust_label',label:'Label Tag',type:'text'}]}
+  {section:'🎯 Hero Section',fields:[
+    {key:'hero_eyebrow',label:'Eyebrow (small text above headline)',type:'text'},
+    {key:'hero_headline_line1',label:'Headline — Line 1',type:'text'},
+    {key:'hero_headline_line2',label:'Headline — Line 2 (italic)',type:'text'},
+    {key:'hero_sub',label:'Subtitle paragraph',type:'textarea'},
+    {key:'hero_btn1_text',label:'Primary button text',type:'text'},
+    {key:'hero_btn1_href',label:'Primary button link',type:'text'},
+    {key:'hero_btn2_text',label:'Secondary button text',type:'text'},
+    {key:'hero_btn2_href',label:'Secondary button link',type:'text'},
+    {key:'hero_note',label:'Small note below buttons',type:'text'}
+  ]},
+  {section:'💬 Why Us Cards',fields:[
+    {key:'why_card1',label:'Card 1 text',type:'textarea'},
+    {key:'why_card2',label:'Card 2 text',type:'textarea'},
+    {key:'why_card3',label:'Card 3 text',type:'textarea'}
+  ]},
+  {section:'🏅 Trust Badges',fields:[
+    {key:'trust_badge1',label:'Badge 1 label',type:'text'},
+    {key:'trust_badge2',label:'Badge 2 label',type:'text'},
+    {key:'trust_badge3',label:'Badge 3 label',type:'text'},
+    {key:'trust_badge4',label:'Badge 4 label',type:'text'}
+  ]},
+  {section:'📣 CTA Banner',fields:[{key:'cta_title',label:'Banner Heading',type:'text'},{key:'cta_subtitle',label:'Banner Subtitle',type:'textarea'}]},
+  {section:'⭐ Testimonials Section',fields:[{key:'trust_title',label:'Section Heading',type:'text'},{key:'trust_label',label:'Label Tag',type:'text'}]}
 ];
 var ECO_CARDS=[
   {prefix:'eco_consulting',label:' Consulting'},{prefix:'eco_analytics',label:' Analytics'},
@@ -2135,10 +2186,10 @@ function toggleSection(id){
 /* Load ALL homepage sections when the hero page opens */
 async function loadAllHomepageSections(){
   loadHeroSlides();
-  var keys = ['hero_grid','gallery_strip','how_image'];
-  var defaults = { hero_grid: DEFAULT_HERO_GRID, gallery_strip: DEFAULT_GALLERY_STRIP, how_image: DEFAULT_HOW_IMAGE };
-  var listIds  = { hero_grid: 'heroGridList', gallery_strip: 'galleryStripList', how_image: 'howImageList' };
-  var maxes    = { hero_grid: 5, gallery_strip: 99, how_image: 6 };
+  var keys = ['hero_grid','gallery_strip','how_image','who_cards'];
+  var defaults = { hero_grid: DEFAULT_HERO_GRID, gallery_strip: DEFAULT_GALLERY_STRIP, how_image: DEFAULT_HOW_IMAGE, who_cards: [] };
+  var listIds  = { hero_grid: 'heroGridList', gallery_strip: 'galleryStripList', how_image: 'howImageList', who_cards: 'whoCardsList' };
+  var maxes    = { hero_grid: 5, gallery_strip: 99, how_image: 10, who_cards: 6 };
 
   /* Show cached/defaults immediately */
   keys.forEach(function(k){
@@ -2280,7 +2331,7 @@ function handleSectionFiles(e, listId, key, max){
 
 async function uploadSectionFiles(files, listId, key, max){
   var el = document.getElementById(listId);
-  var progId = { heroGridList:'hgUploadProg', galleryStripList:'gsUploadProg', howImageList:'hiUploadProg' }[listId];
+  var progId = { heroGridList:'hgUploadProg', galleryStripList:'gsUploadProg', howImageList:'hiUploadProg', whoCardsList:'wcUploadProg' }[listId];
   var prog = progId ? document.getElementById(progId) : null;
 
   /* Check limit */
