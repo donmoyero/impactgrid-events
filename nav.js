@@ -71,12 +71,12 @@
      ⚠ Replace these placeholder URLs with your real profile links. */
   var SOCIAL_LINKS = [
     {
-      href : 'https://instagram.com/impactgridgroup',
+      href : 'https://www.instagram.com/impactgridevents',
       label: 'Instagram',
       icon : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" stroke="none"/></svg>'
     },
     {
-      href : 'https://www.tiktok.com/@impactgridgroup',
+      href : 'https://www.tiktok.com/@impactgridevents',
       label: 'TikTok',
       icon : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v10.5a4 4 0 1 1-4-4"/><path d="M16 4c0 2.8 2.2 5 5 5"/></svg>'
     },
