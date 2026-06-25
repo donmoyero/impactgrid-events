@@ -96,6 +96,14 @@
 .legend-blocked  { background: repeating-linear-gradient(-45deg,var(--red-dim),var(--red-dim) 2px,transparent 2px,transparent 6px); border: 1px solid var(--red-glo); }
 .legend-today    { background: var(--bg3); border: 1px solid var(--border2); position: relative; }
 .legend-today::after { content: ''; position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--gold); }
+.cal-day--booked { pointer-events: none; }
+.cal-day--booked::after {
+  content: ''; position: absolute; inset: 3px; border-radius: 7px;
+  background: rgba(240,180,41,0.18);
+  border: 1px solid rgba(240,180,41,0.45);
+}
+.cal-day--booked span { opacity: .55; }
+.legend-booked { background: rgba(240,180,41,0.18); border: 1px solid rgba(240,180,41,0.45); }
 
 /* Form card */
 .form-card {
@@ -211,6 +219,7 @@ textarea { resize: vertical; min-height: 80px; }
             <div class="cal-legend-item"><div class="cal-legend-dot legend-sel"></div>Selected</div>
             <div class="cal-legend-item"><div class="cal-legend-dot legend-blocked"></div>Unavailable</div>
             <div class="cal-legend-item"><div class="cal-legend-dot legend-today"></div>Today</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-booked"></div>Booked</div>
           </div>
         </div>
       </div>
@@ -423,16 +432,22 @@ var selectedDate = null;
   }
 })();
 var blockedDates = [];
+var bookedDates  = [];
 
 var MONTH_NAMES = ['January','February','March','April','May','June',
   'July','August','September','October','November','December'];
 
 async function loadBlockedDates() {
   try {
-    const res  = await fetch(EVENTS_API + '/api/blocked-dates');
-    const data = await res.json();
-    blockedDates = data.dates || [];
-  } catch(e) { blockedDates = []; }
+    const [blockedRes, bookedRes] = await Promise.all([
+      fetch(EVENTS_API + '/api/blocked-dates'),
+      fetch(EVENTS_API + '/api/booked-dates')
+    ]);
+    const blockedData = await blockedRes.json();
+    const bookedData  = await bookedRes.json();
+    blockedDates = blockedData.dates || [];
+    bookedDates  = bookedData.dates  || [];
+  } catch(e) { blockedDates = []; bookedDates = []; }
   renderCalendar();
 }
 
@@ -460,18 +475,20 @@ function renderCalendar() {
     var dateStr = isoDate(dateObj);
     var isPast  = dateObj < today;
     var isToday = dateObj.getTime() === today.getTime();
-    var isBlock = blockedDates.includes(dateStr);
-    var isSel   = (dateStr === selectedDate);
+    var isBlock  = blockedDates.includes(dateStr);
+    var isBooked = bookedDates.includes(dateStr);
+    var isSel    = (dateStr === selectedDate);
 
     var cls = 'cal-day';
-    if (isPast)        cls += ' cal-day--past';
-    else if (isBlock)  cls += ' cal-day--blocked';
-    if (isToday)       cls += ' cal-day--today';
-    if (isSel)         cls += ' cal-day--selected';
+    if (isPast)         cls += ' cal-day--past';
+    else if (isBlock)   cls += ' cal-day--blocked';
+    else if (isBooked)  cls += ' cal-day--booked';
+    if (isToday)        cls += ' cal-day--today';
+    if (isSel)          cls += ' cal-day--selected';
 
     cell.className = cls;
     cell.innerHTML = '<span>' + d + '</span>';
-    if (!isPast && !isBlock) {
+    if (!isPast && !isBlock && !isBooked) {
       cell.onclick = (function(ds){ return function(){ selectDate(ds); }; })(dateStr);
     }
     grid.appendChild(cell);
