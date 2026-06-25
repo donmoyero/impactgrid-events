@@ -21,6 +21,7 @@
   const API_URL   = 'https://impactgrid-events-api.onrender.com/api/chat';
   const STORAGE_KEY = 'ig_chat_codename';
   const HISTORY_KEY = 'ig_chat_history';
+  const COLLECTED_KEY = 'ig_chat_collected';
 
   /* ── Cute codename generator ── */
   const ADJECTIVES = [
@@ -83,6 +84,7 @@
   /* ── Chat state ── */
   const codename  = getOrCreateCodename();
   let history     = [];
+  let collected   = {}; /* booking details gathered so far this session */
   let isOpen      = false;
   let isTyping    = false;
   let hasGreeted  = false;
@@ -94,6 +96,11 @@
       history = JSON.parse(saved);
       isReturning = history.length > 0; /* returning if they have prior history */
     }
+  } catch (e) {}
+
+  try {
+    const savedCollected = localStorage.getItem(COLLECTED_KEY);
+    if (savedCollected) collected = JSON.parse(savedCollected) || {};
   } catch (e) {}
 
   function saveHistory() {
@@ -539,6 +546,7 @@
           codename   : codename,
           isReturning: isReturning,
           history    : history.slice(-10), /* last 5 turns */
+          collected  : collected,
           behaviour  : {
             page          : behaviour.page,
             timeOnPage    : behaviour.timeOnPage,
@@ -550,6 +558,11 @@
 
       const data = await res.json();
       hideTyping();
+
+      if (data.collected) {
+        collected = data.collected;
+        try { localStorage.setItem(COLLECTED_KEY, JSON.stringify(collected)); } catch (e) {}
+      }
 
       if (data.reply) {
         addMessage(data.reply, 'bot', data.chips || []);
