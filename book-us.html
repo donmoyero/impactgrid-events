@@ -105,6 +105,62 @@
 .cal-day--booked span { opacity: .55; }
 .legend-booked { background: rgba(240,180,41,0.18); border: 1px solid rgba(240,180,41,0.45); }
 
+/* ── Calendar: black & white override ──
+   Scoped to .cal-card only — rest of the site keeps its normal colors. ── */
+.cal-btn:hover { border-color: #07090f; color: #07090f; }
+[data-theme="dark"] .cal-btn:hover { border-color: #fff; color: #fff; }
+
+.cal-day--today::before { background: #07090f; }
+[data-theme="dark"] .cal-day--today::before { background: #fff; }
+
+.cal-day--selected {
+  background: #07090f !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
+}
+[data-theme="dark"] .cal-day--selected {
+  background: #fff !important;
+  color: #07090f !important;
+  box-shadow: 0 4px 16px rgba(255,255,255,0.25) !important;
+}
+
+.cal-day--blocked::after {
+  background: repeating-linear-gradient(-45deg, rgba(7,9,15,0.14), rgba(7,9,15,0.14) 2px, transparent 2px, transparent 7px);
+  border: 1px solid rgba(7,9,15,0.4);
+}
+[data-theme="dark"] .cal-day--blocked::after {
+  background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.16), rgba(255,255,255,0.16) 2px, transparent 2px, transparent 7px);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+.cal-day--booked::after {
+  background: rgba(7,9,15,0.08);
+  border: 1px solid rgba(7,9,15,0.3);
+}
+[data-theme="dark"] .cal-day--booked::after {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.legend-sel      { background: #07090f; }
+[data-theme="dark"] .legend-sel { background: #fff; }
+
+.legend-blocked  {
+  background: repeating-linear-gradient(-45deg, rgba(7,9,15,0.14), rgba(7,9,15,0.14) 2px, transparent 2px, transparent 6px);
+  border: 1px solid rgba(7,9,15,0.4);
+}
+[data-theme="dark"] .legend-blocked {
+  background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.16), rgba(255,255,255,0.16) 2px, transparent 2px, transparent 6px);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+.legend-booked   { background: rgba(7,9,15,0.08); border: 1px solid rgba(7,9,15,0.3); }
+[data-theme="dark"] .legend-booked { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); }
+
+.legend-today::after { background: #07090f; }
+[data-theme="dark"] .legend-today::after { background: #fff; }
+
+
 /* Form card */
 .form-card {
   background: var(--card); border: 1px solid var(--border);
