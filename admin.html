@@ -1185,9 +1185,12 @@ If you have any questions, just reply to this email.
       <div class="cal-card">
         <div class="cal-head">
           <div class="cal-month" id="bkCalMonth">Loading…</div>
-          <div class="cal-nav">
-            <button class="cal-btn" id="bkCalPrev" onclick="changeBkCalMonth(-1)" title="Previous month">‹</button>
-            <button class="cal-btn" id="bkCalNext" onclick="changeBkCalMonth(1)"  title="Next month">›</button>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn btn-ghost btn-sm" id="bkCalMultiBtn" onclick="toggleBkCalMultiSelect()">Select Multiple</button>
+            <div class="cal-nav">
+              <button class="cal-btn" id="bkCalPrev" onclick="changeBkCalMonth(-1)" title="Previous month">‹</button>
+              <button class="cal-btn" id="bkCalNext" onclick="changeBkCalMonth(1)"  title="Next month">›</button>
+            </div>
           </div>
         </div>
         <div class="cal-body">
@@ -1207,7 +1210,7 @@ If you have any questions, just reply to this email.
         </div>
       </div>
       <div class="ws-sticky" id="calDayPanel">
-        <div class="hint-box">
+        <div class="hint-box" id="bkCalDefaultHint">
           <strong> Booking Calendar</strong><br><br>
           Click any date to see who&#39;s booked, cancel a confirmed booking, block a date as unavailable, or unblock it again.<br><br>
           This mirrors exactly what guests see on the Book Us page.
@@ -1218,12 +1221,21 @@ If you have any questions, just reply to this email.
     <div class="card">
       <div class="card-head">
         <h2>All Bookings</h2>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:#07090f;">All</button>
-          <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)"> Pending</button>
-          <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)"> Confirmed</button>
-          <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)"> Rejected</button>
-          <button class="btn btn-ghost btn-sm" onclick="loadBookings()">↻ Refresh</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="bkFilterBar">
+            <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:#07090f;">All</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)"> Pending</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)"> Confirmed</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)"> Rejected</button>
+            <button class="btn btn-ghost btn-sm" onclick="bkToggleSelectMode()">Select</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadBookings()">↻ Refresh</button>
+          </div>
+          <div style="display:none;gap:8px;flex-wrap:wrap;align-items:center;" id="bkSelectBar">
+            <span style="font-size:12px;color:var(--text3);"><span id="bkSelectedCount">0</span> selected</span>
+            <button class="btn btn-ghost btn-sm" onclick="bkSelectAllConfirmed()">Select All Confirmed</button>
+            <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="bkBulkUnbook()"> Unbook Selected</button>
+            <button class="btn btn-ghost btn-sm" onclick="bkExitSelectMode()">Done</button>
+          </div>
         </div>
       </div>
       <div class="card-body table-wrap" id="bookingsList">
@@ -3142,6 +3154,9 @@ function loadGalleryImagesPage(){ loadAllHomepageSections(); }
 var _allBookings    = [];
 var _currentBooking = null;
 var _modalLineCount = 0;
+var _bkSelectMode   = false;
+var _bkSelected      = new Set();
+var _bkCurrentView   = [];
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -3178,7 +3193,57 @@ function filterBookings(status, btn) {
   renderBookingsTable(filtered);
 }
 
+/* ── Bulk select mode for the bookings table (unbook multiple at once) ── */
+function bkToggleSelectMode(){
+  _bkSelectMode = true;
+  _bkSelected.clear();
+  var fb=document.getElementById('bkFilterBar'), sb=document.getElementById('bkSelectBar');
+  if(fb) fb.style.display='none';
+  if(sb) sb.style.display='flex';
+  renderBookingsTable(_bkCurrentView.length ? _bkCurrentView : _allBookings);
+}
+function bkExitSelectMode(){
+  _bkSelectMode = false;
+  _bkSelected.clear();
+  var fb=document.getElementById('bkFilterBar'), sb=document.getElementById('bkSelectBar');
+  if(fb) fb.style.display='flex';
+  if(sb) sb.style.display='none';
+  renderBookingsTable(_bkCurrentView.length ? _bkCurrentView : _allBookings);
+}
+function bkSelectAllConfirmed(){
+  _bkCurrentView.forEach(function(b){ if(b.status==='confirmed') _bkSelected.add(b.id); });
+  renderBookingsTable(_bkCurrentView);
+}
+function bkToggleRowSelect(checkbox, id){
+  if(checkbox.checked) _bkSelected.add(id); else _bkSelected.delete(id);
+  var tr = checkbox.closest('tr');
+  if(tr) tr.style.background = checkbox.checked ? 'var(--gold-dim)' : '';
+  updateBkSelectedCountUI();
+}
+function updateBkSelectedCountUI(){
+  var el = document.getElementById('bkSelectedCount');
+  if(el) el.textContent = _bkSelected.size;
+}
+async function bkBulkUnbook(){
+  var ids = Array.from(_bkSelected);
+  if(!ids.length){ toast('','Nothing selected','Tick at least one confirmed booking'); return; }
+  if(!confirm('Cancel ' + ids.length + ' confirmed booking' + (ids.length>1?'s':'') + ' and notify each client by email?')) return;
+  var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+  var ok=0, fail=0;
+  for(var i=0;i<ids.length;i++){
+    try {
+      var res  = await fetch(API+'/api/booking-reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:ids[i]})});
+      var data = await res.json();
+      if(data.success) ok++; else fail++;
+    } catch(e){ fail++; }
+  }
+  toast('', ok + ' booking' + (ok!==1?'s':'') + ' cancelled', fail ? fail+' failed' : 'Dates freed up');
+  bkExitSelectMode();
+  await loadBookings();
+}
+
 function renderBookingsTable(data) {
+  _bkCurrentView = data;
   var el = document.getElementById('bookingsList');
   if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No bookings found.</div></div>'; return; }
   var STATUS_PILL = {
@@ -3186,11 +3251,24 @@ function renderBookingsTable(data) {
     confirmed: '<span class="pill pill-active"> Confirmed</span>',
     rejected : '<span class="pill pill-rejected"> Rejected</span>'
   };
-  el.innerHTML = '<table><thead><tr><th>Name</th><th>Date</th><th>Event Type</th><th>Location</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>'
+  var selHeadCell = _bkSelectMode ? '<th style="width:30px;"></th>' : '';
+  el.innerHTML = '<table><thead><tr>'+selHeadCell+'<th>Name</th><th>Date</th><th>Event Type</th><th>Location</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>'
     + data.map(function(b){
         var pill      = STATUS_PILL[b.status] || STATUS_PILL.pending;
         var submitted = b.created_at ? new Date(b.created_at).toLocaleDateString('en-GB') : '—';
-        return '<tr>'
+        var selCell = '';
+        var rowBg = '';
+        if(_bkSelectMode){
+          if(b.status==='confirmed'){
+            var checked = _bkSelected.has(b.id) ? 'checked' : '';
+            selCell = '<td><input type="checkbox" '+checked+' onchange="bkToggleRowSelect(this,\''+b.id+'\')" style="width:16px;height:16px;cursor:pointer;"/></td>';
+            if(_bkSelected.has(b.id)) rowBg=' style="background:var(--gold-dim);"';
+          } else {
+            selCell = '<td></td>';
+          }
+        }
+        return '<tr'+rowBg+'>'
+          + selCell
           + '<td style="font-weight:700;">' + esc(b.name) + '<br><span style="font-size:10px;color:var(--text3);font-weight:400;">' + esc(b.email) + '</span></td>'
           + '<td style="font-family:var(--fm);font-size:12px;color:var(--gold);">' + esc(b.event_date||'—') + '</td>'
           + '<td><span class="pill pill-applied" style="font-size:9px;">' + esc(b.event_type||'—') + '</span></td>'
@@ -3206,6 +3284,7 @@ function renderBookingsTable(data) {
           + '</div></td></tr>';
       }).join('')
     + '</tbody></table>';
+  updateBkSelectedCountUI();
 }
 
 function viewBookingDetail(id) {
@@ -3627,7 +3706,10 @@ async function unblockDate(dateStr){
 ════════════════════════════════════════ */
 var _blockedDatesFull = [];
 var bkCalToday = null, bkCalYear = null, bkCalMonth = null, bkSelectedCalDate = null;
+var bkCalMultiMode = false;
+var bkMultiSelected = new Set();
 var BK_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var BK_CAL_DEFAULT_PANEL = '<div class="hint-box" id="bkCalDefaultHint"><strong> Booking Calendar</strong><br><br>Click any date to see who&#39;s booked, cancel a confirmed booking, block a date as unavailable, or unblock it again.<br><br>This mirrors exactly what guests see on the Book Us page.</div>';
 
 function initBkCal(){
   if(bkCalYear===null){
@@ -3680,7 +3762,7 @@ function renderBookingCalendar(){
     var isToday = dateObj.getTime()===bkCalToday.getTime();
     var isBooked = Object.prototype.hasOwnProperty.call(bookedMap,dateStr);
     var isBlocked = !isBooked && Object.prototype.hasOwnProperty.call(blockedMap,dateStr);
-    var isSel = dateStr===bkSelectedCalDate;
+    var isSel = bkCalMultiMode ? bkMultiSelected.has(dateStr) : dateStr===bkSelectedCalDate;
 
     var cell=document.createElement('div');
     var cls='cal-day';
@@ -3697,9 +3779,117 @@ function renderBookingCalendar(){
 }
 
 function onBkCalDayClick(dateStr){
+  if(bkCalMultiMode){
+    initBkCal();
+    var dateObj=new Date(dateStr+'T00:00:00');
+    if(dateObj < bkCalToday){ toast('','Can\'t select a past date',''); return; }
+    var bookedMap={};
+    (_allBookings||[]).forEach(function(b){ if(b.status==='confirmed' && b.event_date) bookedMap[b.event_date]=true; });
+    if(bookedMap[dateStr]){ toast('','Already booked','Cancel that booking first to free this date'); return; }
+    if(bkMultiSelected.has(dateStr)) bkMultiSelected.delete(dateStr);
+    else bkMultiSelected.add(dateStr);
+    renderBookingCalendar();
+    renderBkCalMultiPanel();
+    return;
+  }
   bkSelectedCalDate=dateStr;
   renderBookingCalendar();
   renderCalDayPanel(dateStr);
+}
+
+/* ── Multi-select mode: select several dates, then bulk block/unblock ── */
+function toggleBkCalMultiSelect(){
+  bkCalMultiMode = !bkCalMultiMode;
+  bkMultiSelected.clear();
+  bkSelectedCalDate = null;
+  var btn=document.getElementById('bkCalMultiBtn');
+  if(btn){
+    btn.textContent = bkCalMultiMode ? 'Exit Multi-Select' : 'Select Multiple';
+    btn.style.background = bkCalMultiMode ? 'var(--gold)' : '';
+    btn.style.color = bkCalMultiMode ? '#07090f' : '';
+  }
+  renderBookingCalendar();
+  if(bkCalMultiMode) renderBkCalMultiPanel();
+  else {
+    var panel=document.getElementById('calDayPanel');
+    if(panel) panel.innerHTML = BK_CAL_DEFAULT_PANEL;
+  }
+}
+
+function renderBkCalMultiPanel(){
+  var panel=document.getElementById('calDayPanel');
+  if(!panel) return;
+  var blockedMap={};
+  (_blockedDatesFull||[]).forEach(function(d){ var ds=d.date||d; blockedMap[ds]=true; });
+  var toBlock=[], toUnblock=[];
+  bkMultiSelected.forEach(function(ds){ if(blockedMap[ds]) toUnblock.push(ds); else toBlock.push(ds); });
+  toBlock.sort(); toUnblock.sort();
+
+  var html='<div class="hint-box" style="margin-bottom:0;">'
+    +'<div style="font-size:13px;font-weight:800;margin-bottom:8px;"> Multi-Select Mode</div>'
+    +'<div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Click dates on the calendar to select them. Booked dates can&#39;t be selected here — cancel the booking first.</div>';
+
+  if(!bkMultiSelected.size){
+    html+='<div style="font-size:12px;color:var(--text3);margin-bottom:12px;">No dates selected yet.</div>';
+  } else {
+    html+='<div style="font-size:12px;font-weight:700;margin-bottom:10px;">'+bkMultiSelected.size+' date'+(bkMultiSelected.size!==1?'s':'')+' selected</div>';
+    if(toBlock.length){
+      html+='<div class="field-group" style="margin-bottom:8px;">'
+        +'<div class="field-label">Reason for '+toBlock.length+' new unavailable date'+(toBlock.length!==1?'s':'')+' <span style="font-weight:400;color:var(--text3);font-size:10px;">(optional)</span></div>'
+        +'<input type="text" id="calMultiBlockReason" placeholder="e.g. Annual leave"/>'
+        +'</div>'
+        +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;margin-bottom:8px;" onclick="bkCalMultiBlock()"> Mark '+toBlock.length+' Date'+(toBlock.length!==1?'s':'')+' Unavailable</button>';
+    }
+    if(toUnblock.length){
+      html+='<button class="btn btn-sm" style="width:100%;justify-content:center;background:var(--green-dim);color:var(--green);border:1px solid rgba(15,168,118,.2);margin-bottom:8px;" onclick="bkCalMultiUnblock()"> Unblock '+toUnblock.length+' Date'+(toUnblock.length!==1?'s':'')+'</button>';
+    }
+  }
+  html+='<button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" onclick="toggleBkCalMultiSelect()">Done — Exit Multi-Select</button>'
+    +'</div>';
+  panel.innerHTML=html;
+}
+
+async function bkCalMultiBlock(){
+  var blockedMap={};
+  (_blockedDatesFull||[]).forEach(function(d){ var ds=d.date||d; blockedMap[ds]=true; });
+  var toBlock=Array.from(bkMultiSelected).filter(function(ds){ return !blockedMap[ds]; });
+  if(!toBlock.length) return;
+  var reasonInput=document.getElementById('calMultiBlockReason');
+  var reason=reasonInput?reasonInput.value.trim():'';
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  var ok=0, fail=0;
+  for(var i=0;i<toBlock.length;i++){
+    try {
+      var res=await fetch(API+'/api/block-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:toBlock[i],reason:reason})});
+      var data=await res.json();
+      if(data.success) ok++; else fail++;
+    } catch(e){ fail++; }
+  }
+  toast('', ok+' date'+(ok!==1?'s':'')+' marked unavailable', fail?fail+' failed':'');
+  bkMultiSelected.clear();
+  await loadBlockedDatesList();
+  renderBkCalMultiPanel();
+}
+
+async function bkCalMultiUnblock(){
+  var blockedMap={};
+  (_blockedDatesFull||[]).forEach(function(d){ var ds=d.date||d; blockedMap[ds]=true; });
+  var toUnblock=Array.from(bkMultiSelected).filter(function(ds){ return blockedMap[ds]; });
+  if(!toUnblock.length) return;
+  if(!confirm('Unblock '+toUnblock.length+' date'+(toUnblock.length!==1?'s':'')+'?')) return;
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  var ok=0, fail=0;
+  for(var i=0;i<toUnblock.length;i++){
+    try {
+      var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:toUnblock[i]})});
+      var data=await res.json();
+      if(data.success) ok++; else fail++;
+    } catch(e){ fail++; }
+  }
+  toast('', ok+' date'+(ok!==1?'s':'')+' unblocked', fail?fail+' failed':'');
+  bkMultiSelected.clear();
+  await loadBlockedDatesList();
+  renderBkCalMultiPanel();
 }
 
 function renderCalDayPanel(dateStr){
@@ -3801,6 +3991,14 @@ window.onBkCalDayClick         = onBkCalDayClick;
 window.blockDateFromCalendar   = blockDateFromCalendar;
 window.unblockDateFromCalendar = unblockDateFromCalendar;
 window.cancelConfirmedBooking  = cancelConfirmedBooking;
+window.toggleBkCalMultiSelect  = toggleBkCalMultiSelect;
+window.bkCalMultiBlock         = bkCalMultiBlock;
+window.bkCalMultiUnblock       = bkCalMultiUnblock;
+window.bkToggleSelectMode      = bkToggleSelectMode;
+window.bkExitSelectMode        = bkExitSelectMode;
+window.bkSelectAllConfirmed    = bkSelectAllConfirmed;
+window.bkToggleRowSelect       = bkToggleRowSelect;
+window.bkBulkUnbook            = bkBulkUnbook;
 
 window.loadBookings      = loadBookings;
 window.filterBookings    = filterBookings;
