@@ -66,6 +66,22 @@
     'book-us.html':   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
   };
 
+  /* Social links — shown at the bottom of the nav-links list (desktop)
+     and as an icon row in the mobile sidebar.
+     ⚠ Replace these placeholder URLs with your real profile links. */
+  var SOCIAL_LINKS = [
+    {
+      href : 'https://instagram.com/impactgridgroup',
+      label: 'Instagram',
+      icon : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" stroke="none"/></svg>'
+    },
+    {
+      href : 'https://www.tiktok.com/@impactgridgroup',
+      label: 'TikTok',
+      icon : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v10.5a4 4 0 1 1-4-4"/><path d="M16 4c0 2.8 2.2 5 5 5"/></svg>'
+    },
+  ];
+
   function renderNav(activePage) {
 
     var desktopLinks = NAV_LINKS.map(function(l) {
@@ -88,6 +104,22 @@
       var cls = l.href === activePage ? ' class="active"' : '';
       var id  = l.id ? ' id="' + l.id + '"' : '';
       return '<a href="' + l.href + '"' + cls + id + ' onclick="closeSidebar()">' + l.label + '</a>';
+    }).join('');
+
+    /* ── Social links: same icon+label markup as the main nav items,
+       so they inherit the exact same desktop styling/expand behaviour.
+       Mobile gets its own small icon row instead. ── */
+    var socialDesktopLinks = SOCIAL_LINKS.map(function(s) {
+      return '<li><a href="' + s.href + '" target="_blank" rel="noopener noreferrer" aria-label="' + s.label + '">' +
+               '<span class="nav-icon" aria-hidden="true">' + s.icon + '</span>' +
+               '<span class="nav-label">' + s.label + '</span>' +
+             '</a></li>';
+    }).join('');
+
+    var socialMobileLinks = SOCIAL_LINKS.map(function(s) {
+      return '<a href="' + s.href + '" target="_blank" rel="noopener noreferrer" aria-label="' + s.label + '" class="mob-social-link">' +
+               s.icon +
+             '</a>';
     }).join('');
 
     var html =
@@ -127,6 +159,10 @@
       '.nav .nav-links a .nav-label{opacity:0;transition:opacity 0.15s ease;pointer-events:none;}' +
       '.nav.expanded .nav-links a .nav-label{opacity:1;pointer-events:auto;}' +
       '.nav .nav-icon{font-size:17px;flex-shrink:0;width:22px;text-align:center;}' +
+      '.nav .nav-divider{height:1px;background:var(--border);margin:8px 11px 6px;list-style:none;padding:0;flex-shrink:0;}' +
+      '.mob-social{display:flex;gap:10px;padding:14px 20px 6px;}' +
+      '.mob-social-link{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:var(--bg2);color:var(--text2);transition:all .2s;flex-shrink:0;}' +
+      '.mob-social-link:hover{background:var(--gold-dim);color:var(--gold);}' +
       '.nav-bottom{display:flex;flex-direction:column;gap:8px;padding:16px 8px 0;margin-top:auto;border-top:1px solid var(--border);overflow:hidden;}' +
       '.nav-bottom>*{opacity:0;pointer-events:none;transition:opacity 0.15s ease;}' +
       '.nav.expanded .nav-bottom>*{opacity:1;pointer-events:auto;}' +
@@ -168,6 +204,8 @@
 
         '<ul class="nav-links">' +
           desktopLinks +
+          '<li class="nav-divider" aria-hidden="true"></li>' +
+          socialDesktopLinks +
         '</ul>' +
 
 
@@ -222,6 +260,7 @@
           '</div>' +
         '</div>' +
         '<div class="mob-nav">' + mobileLinks + '</div>' +
+        '<div class="mob-social">' + socialMobileLinks + '</div>' +
         '<div class="mob-auth">' +
           /* Guest state — hidden from public */
           '<div class="mob-out" id="mobOut" style="display:none;">' +
