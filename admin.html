@@ -205,6 +205,40 @@ tr:hover td{background:var(--bg2);}
 @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}.quick-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
 @media(max-width:700px){.sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);transition:transform .3s ease;}.sidebar.open{transform:translateX(0);}.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:499;backdrop-filter:blur(2px);}.sidebar-overlay.open{display:block;}.shell{position:relative;}.page{padding:18px 16px;}.mobile-menu-btn{display:flex!important;}.stats-row{grid-template-columns:repeat(2,1fr)!important;}.quick-grid{grid-template-columns:repeat(2,1fr)!important;}}
 @media(min-width:701px){.mobile-menu-btn{display:none!important;}.sidebar-overlay{display:none!important;}}
+
+/* ── Booking Calendar (Bookings page) ── */
+.cal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--sh);}
+.cal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.cal-month{font-family:var(--fd);font-size:16px;font-weight:900;}
+.cal-nav{display:flex;gap:6px;}
+.cal-btn{width:32px;height:32px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cal-btn:hover{border-color:var(--gold);color:var(--gold);}
+.cal-btn:disabled{cursor:not-allowed;}
+.cal-body{padding:16px 20px 20px;}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:8px;}
+.cal-dow-cell{text-align:center;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:4px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;position:relative;}
+.cal-day:hover:not(.cal-day--other){background:var(--bg3);border-color:var(--border2);}
+.cal-day--other{color:var(--text3);pointer-events:none;opacity:.3;}
+.cal-day--past{color:var(--text3);opacity:.45;}
+.cal-day--blocked::after{content:'';position:absolute;inset:3px;border-radius:7px;background:repeating-linear-gradient(-45deg,var(--red-dim),var(--red-dim) 2px,transparent 2px,transparent 7px);border:1px solid var(--red-glo);}
+.cal-day--blocked span{opacity:.55;}
+.cal-day--today::before{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold);}
+.cal-day--selected{background:linear-gradient(135deg,var(--gold),var(--gold2)) !important;color:#fff !important;font-weight:700;border-color:transparent !important;box-shadow:var(--sh-gold);}
+[data-theme="dark"] .cal-day--selected{color:#07090f !important;}
+.cal-day--booked::after{content:'';position:absolute;inset:3px;border-radius:7px;background:rgba(15,168,118,0.14);border:1px solid rgba(15,168,118,0.4);}
+.cal-day--booked span{opacity:.85;font-weight:700;}
+.cal-legend{display:flex;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.cal-legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text3);}
+.cal-legend-dot{width:12px;height:12px;border-radius:4px;}
+.legend-avail{background:var(--bg3);border:1px solid var(--border2);}
+.legend-sel{background:linear-gradient(135deg,var(--gold),var(--gold2));}
+.legend-blocked{background:repeating-linear-gradient(-45deg,var(--red-dim),var(--red-dim) 2px,transparent 2px,transparent 6px);border:1px solid var(--red-glo);}
+.legend-booked{background:rgba(15,168,118,0.14);border:1px solid rgba(15,168,118,0.4);}
+.legend-today{background:var(--bg3);border:1px solid var(--border2);position:relative;}
+.legend-today::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:var(--gold);}
+@media(max-width:1100px){.cal-grid .cal-day{font-size:12px;}}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
@@ -1147,6 +1181,40 @@ If you have any questions, just reply to this email.
       <div class="stat-card"><div class="stat-label" style="color:var(--red);">Rejected</div><div class="stat-val" id="bk-stat-rejected" style="color:var(--red);">—</div></div>
     </div>
 
+    <div class="ws-layout" style="margin-bottom:20px;">
+      <div class="cal-card">
+        <div class="cal-head">
+          <div class="cal-month" id="bkCalMonth">Loading…</div>
+          <div class="cal-nav">
+            <button class="cal-btn" id="bkCalPrev" onclick="changeBkCalMonth(-1)" title="Previous month">‹</button>
+            <button class="cal-btn" id="bkCalNext" onclick="changeBkCalMonth(1)"  title="Next month">›</button>
+          </div>
+        </div>
+        <div class="cal-body">
+          <div class="cal-dow">
+            <div class="cal-dow-cell">Su</div><div class="cal-dow-cell">Mo</div>
+            <div class="cal-dow-cell">Tu</div><div class="cal-dow-cell">We</div>
+            <div class="cal-dow-cell">Th</div><div class="cal-dow-cell">Fr</div>
+            <div class="cal-dow-cell">Sa</div>
+          </div>
+          <div class="cal-grid" id="bkCalGrid"></div>
+          <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-avail"></div>Available</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-booked"></div>Booked</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-blocked"></div>Unavailable</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot legend-today"></div>Today</div>
+          </div>
+        </div>
+      </div>
+      <div class="ws-sticky" id="calDayPanel">
+        <div class="hint-box">
+          <strong> Booking Calendar</strong><br><br>
+          Click any date to see who&#39;s booked, cancel a confirmed booking, block a date as unavailable, or unblock it again.<br><br>
+          This mirrors exactly what guests see on the Book Us page.
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-head">
         <h2>All Bookings</h2>
@@ -1166,7 +1234,7 @@ If you have any questions, just reply to this email.
     <div class="card">
       <div class="card-head">
         <h2> Block Dates</h2>
-        <span style="font-size:11px;color:var(--text3);">Blocked dates show as unavailable on the Book Us page</span>
+        <span style="font-size:11px;color:var(--text3);">Quick-add a date without browsing the calendar above</span>
       </div>
       <div class="card-body">
         <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;">
@@ -3100,7 +3168,7 @@ async function loadBookings() {
   } catch(e) {
     el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
   }
-  loadBlockedDatesList();
+  await loadBlockedDatesList();
 }
 
 function filterBookings(status, btn) {
@@ -3133,6 +3201,7 @@ function renderBookingsTable(data) {
           + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')"> Confirm</button>' : '')
           + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')"> Reject</button>' : '')
           + (b.status==='confirmed' ? '<button class="btn btn-sm" style="border:1px solid var(--gold);color:var(--gold);" onclick="resendInvoice(\'' + b.id + '\')"> Invoice</button>' : '')
+          + (b.status==='confirmed' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="cancelConfirmedBooking(\'' + b.id + '\')"> Cancel</button>' : '')
           + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')"> View</button>'
           + '</div></td></tr>';
       }).join('')
@@ -3498,23 +3567,29 @@ function _bkRandomCode(){
 }
 
 async function loadBlockedDatesList(){
-  var el=document.getElementById('blockedDatesList'); if(!el) return;
+  var el=document.getElementById('blockedDatesList');
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try {
     var res=await fetch(API+'/api/blocked-dates');
     var data=await res.json();
     var dates=data.dates_full||data.dates||[];
-    if(!dates.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No dates blocked.</div></div>'; return; }
-    el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px;">'
-      +dates.map(function(d){
-          var dateStr=d.date||d; var reason=d.reason||'';
-          return '<div style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--red-dim);border:1px solid var(--red-glo);border-radius:100px;font-size:12px;">'
-            +'<span style="font-family:var(--fm);color:var(--red);">'+esc(dateStr)+'</span>'
-            +(reason?'<span style="color:var(--text3);">—</span><span style="color:var(--text2);">'+esc(reason)+'</span>':'')
-            +'<button onclick="unblockDate(\''+esc(dateStr)+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;" title="Unblock"></button>'
-            +'</div>';
-        }).join('')+'</div>';
-  } catch(e){ el.innerHTML='<div class="empty"><div class="empty-txt">Error loading dates.</div></div>'; }
+    _blockedDatesFull = dates;
+    if(el){
+      if(!dates.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No dates blocked.</div></div>'; }
+      else {
+        el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+          +dates.map(function(d){
+              var dateStr=d.date||d; var reason=d.reason||'';
+              return '<div style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--red-dim);border:1px solid var(--red-glo);border-radius:100px;font-size:12px;">'
+                +'<span style="font-family:var(--fm);color:var(--red);">'+esc(dateStr)+'</span>'
+                +(reason?'<span style="color:var(--text3);">—</span><span style="color:var(--text2);">'+esc(reason)+'</span>':'')
+                +'<button onclick="unblockDate(\''+esc(dateStr)+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;" title="Unblock"></button>'
+                +'</div>';
+            }).join('')+'</div>';
+      }
+    }
+  } catch(e){ _blockedDatesFull=[]; if(el) el.innerHTML='<div class="empty"><div class="empty-txt">Error loading dates.</div></div>'; }
+  renderBookingCalendar();
 }
 
 async function blockDate(){
@@ -3544,6 +3619,188 @@ async function unblockDate(dateStr){
     loadBlockedDatesList();
   } catch(e){ toast('','Error',e.message); }
 }
+
+/* ════════════════════════════════════════
+   BOOKING CALENDAR — admin view of book-us.html's calendar
+   Booked = confirmed bookings (from _allBookings)
+   Blocked = manual unavailable dates (from _blockedDatesFull)
+════════════════════════════════════════ */
+var _blockedDatesFull = [];
+var bkCalToday = null, bkCalYear = null, bkCalMonth = null, bkSelectedCalDate = null;
+var BK_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function initBkCal(){
+  if(bkCalYear===null){
+    var t=new Date(); t.setHours(0,0,0,0);
+    bkCalToday=t; bkCalYear=t.getFullYear(); bkCalMonth=t.getMonth();
+  }
+}
+function isoDateBk(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+function changeBkCalMonth(dir){
+  initBkCal();
+  bkCalMonth+=dir;
+  if(bkCalMonth<0){ bkCalMonth=11; bkCalYear--; }
+  if(bkCalMonth>11){ bkCalMonth=0; bkCalYear++; }
+  renderBookingCalendar();
+}
+
+function renderBookingCalendar(){
+  initBkCal();
+  var monthEl=document.getElementById('bkCalMonth');
+  var grid=document.getElementById('bkCalGrid');
+  if(!monthEl||!grid) return; /* calendar not on screen */
+
+  monthEl.textContent = BK_MONTH_NAMES[bkCalMonth]+' '+bkCalYear;
+  var prevBtn=document.getElementById('bkCalPrev');
+  if(prevBtn){
+    var atCurrent = (bkCalYear===bkCalToday.getFullYear() && bkCalMonth===bkCalToday.getMonth());
+    prevBtn.disabled = atCurrent;
+    prevBtn.style.opacity = atCurrent ? '.3' : '1';
+  }
+
+  var bookedMap={}; /* dateStr -> booking */
+  (_allBookings||[]).forEach(function(b){ if(b.status==='confirmed' && b.event_date) bookedMap[b.event_date]=b; });
+  var blockedMap={}; /* dateStr -> reason */
+  (_blockedDatesFull||[]).forEach(function(d){ var ds=d.date||d; blockedMap[ds]=d.reason||''; });
+
+  var firstDay=new Date(bkCalYear,bkCalMonth,1).getDay();
+  var daysInMonth=new Date(bkCalYear,bkCalMonth+1,0).getDate();
+  grid.innerHTML='';
+
+  for(var i=0;i<firstDay;i++){
+    var blank=document.createElement('div');
+    blank.className='cal-day cal-day--other';
+    grid.appendChild(blank);
+  }
+  for(var dd=1; dd<=daysInMonth; dd++){
+    var dateObj=new Date(bkCalYear,bkCalMonth,dd);
+    var dateStr=isoDateBk(dateObj);
+    var isPast = dateObj < bkCalToday;
+    var isToday = dateObj.getTime()===bkCalToday.getTime();
+    var isBooked = Object.prototype.hasOwnProperty.call(bookedMap,dateStr);
+    var isBlocked = !isBooked && Object.prototype.hasOwnProperty.call(blockedMap,dateStr);
+    var isSel = dateStr===bkSelectedCalDate;
+
+    var cell=document.createElement('div');
+    var cls='cal-day';
+    if(isPast) cls+=' cal-day--past';
+    if(isBooked) cls+=' cal-day--booked';
+    else if(isBlocked) cls+=' cal-day--blocked';
+    if(isToday) cls+=' cal-day--today';
+    if(isSel) cls+=' cal-day--selected';
+    cell.className=cls;
+    cell.innerHTML='<span>'+dd+'</span>';
+    cell.onclick=(function(ds){ return function(){ onBkCalDayClick(ds); }; })(dateStr);
+    grid.appendChild(cell);
+  }
+}
+
+function onBkCalDayClick(dateStr){
+  bkSelectedCalDate=dateStr;
+  renderBookingCalendar();
+  renderCalDayPanel(dateStr);
+}
+
+function renderCalDayPanel(dateStr){
+  var panel=document.getElementById('calDayPanel');
+  if(!panel) return;
+  initBkCal();
+  var dateObj=new Date(dateStr+'T00:00:00');
+  var displayDate=dateObj.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var isPast = dateObj < bkCalToday;
+
+  var booking=(_allBookings||[]).find(function(b){ return b.status==='confirmed' && b.event_date===dateStr; });
+  var blockedEntry=(_blockedDatesFull||[]).find(function(d){ return (d.date||d)===dateStr; });
+
+  var html='<div class="hint-box" style="margin-bottom:0;">'
+    +'<div style="font-size:13px;font-weight:800;margin-bottom:10px;">'+displayDate+'</div>';
+
+  if(booking){
+    html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px;">This date is <strong style="color:var(--green);">booked</strong> — confirmed event.</div>'
+      +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px;font-size:12px;">'
+      +'<div style="font-weight:700;">'+esc(booking.name)+'</div>'
+      +'<div style="color:var(--text3);margin-top:2px;">'+esc(booking.email)+'</div>'
+      +'<div style="margin-top:6px;">'+esc(booking.event_type||'—')+(booking.location?' · '+esc(booking.location):'')+'</div>'
+      +(booking.guest_count?'<div style="color:var(--text3);margin-top:2px;">Guests: '+esc(booking.guest_count)+'</div>':'')
+      +'</div>'
+      +'<button class="btn btn-sm" style="width:100%;justify-content:center;background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);margin-bottom:6px;" onclick="cancelConfirmedBooking(\''+booking.id+'\')"> Cancel &amp; Unbook This Date</button>'
+      +'<button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" onclick="viewBookingDetail(\''+booking.id+'\')">View Full Details</button>';
+  } else if(blockedEntry){
+    var reason=blockedEntry.reason||'';
+    html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px;">This date is <strong style="color:var(--red);">unavailable</strong> — hidden from guests on the Book Us page.</div>'
+      +(reason?'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px;font-size:12px;color:var(--text2);">'+esc(reason)+'</div>':'')
+      +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;" onclick="unblockDateFromCalendar(\''+dateStr+'\')"> Unblock This Date</button>';
+  } else if(isPast){
+    html+='<div style="font-size:12px;color:var(--text3);">This date has passed — no action available.</div>';
+  } else {
+    html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px;">This date is currently <strong style="color:var(--text);">available</strong> on the Book Us page.</div>'
+      +'<div class="field-group" style="margin-bottom:10px;">'
+      +'<div class="field-label">Reason <span style="font-weight:400;color:var(--text3);font-size:10px;">(optional, internal only)</span></div>'
+      +'<input type="text" id="calBlockReason" placeholder="e.g. Already booked elsewhere"/>'
+      +'</div>'
+      +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;" onclick="blockDateFromCalendar(\''+dateStr+'\')"> Mark as Unavailable</button>';
+  }
+
+  html+='</div>';
+  panel.innerHTML=html;
+}
+
+async function blockDateFromCalendar(dateStr){
+  var reasonInput=document.getElementById('calBlockReason');
+  var reason=reasonInput?reasonInput.value.trim():'';
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try {
+    var res=await fetch(API+'/api/block-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateStr,reason:reason})});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Failed');
+    toast('','Date marked unavailable',dateStr);
+    await loadBlockedDatesList();
+    renderCalDayPanel(dateStr);
+  } catch(e){ toast('','Error',e.message); }
+}
+
+async function unblockDateFromCalendar(dateStr){
+  if(!confirm('Unblock '+dateStr+'? It will become available again on the Book Us page.')) return;
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try {
+    var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateStr})});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Failed');
+    toast('','Date unblocked',dateStr);
+    await loadBlockedDatesList();
+    renderCalDayPanel(dateStr);
+  } catch(e){ toast('','Error',e.message); }
+}
+
+/* Cancels a confirmed booking, freeing the date back up. Reuses the existing
+   /api/booking-reject endpoint (the only "remove this booking" endpoint the
+   backend exposes) — so the client will get the same email/notification a
+   rejected pending request would get. If you'd rather guests get cancellation-
+   specific wording for bookings that were already confirmed, that needs a
+   small change on the Render API side (a distinct /api/booking-cancel route
+   with its own email copy) — happy to help wire that up too if you add it. */
+async function cancelConfirmedBooking(id){
+  var b=(_allBookings||[]).find(function(x){ return x.id===id; });
+  if(!b) return;
+  if(!confirm('Cancel this confirmed booking for '+b.name+' on '+(b.event_date||'')+'?\n\nThis frees up the date on the calendar. The client will be notified by email.')) return;
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try {
+    var res=await fetch(API+'/api/booking-reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Failed');
+    var freedDate=b.event_date;
+    toast('','Booking cancelled',b.name+' · '+(freedDate||'')+' is free again');
+    await loadBookings();
+    if(freedDate) renderCalDayPanel(freedDate);
+  } catch(e){ toast('','Cancel failed',e.message); }
+}
+
+window.changeBkCalMonth        = changeBkCalMonth;
+window.onBkCalDayClick         = onBkCalDayClick;
+window.blockDateFromCalendar   = blockDateFromCalendar;
+window.unblockDateFromCalendar = unblockDateFromCalendar;
+window.cancelConfirmedBooking  = cancelConfirmedBooking;
 
 window.loadBookings      = loadBookings;
 window.filterBookings    = filterBookings;
