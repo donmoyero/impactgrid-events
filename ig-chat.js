@@ -276,38 +276,6 @@
       color: var(--text, #eef0f6);
     }
 
-    /* Quick reply chips */
-    .ig-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-      align-self: flex-start;
-      max-width: 100%;
-    }
-    .ig-chip {
-      font-size: 11.5px;
-      font-weight: 600;
-      font-family: 'DM Sans', sans-serif;
-      padding: 5px 11px;
-      border-radius: 999px;
-      border: 1px solid var(--border2, rgba(0,0,0,0.13));
-      background: var(--card, #fff);
-      color: var(--text2, #4a5068);
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-    .ig-chip:hover {
-      border-color: #ffe600;
-      color: #ffe600;
-      background: rgba(255,230,0,0.07);
-    }
-    [data-theme="dark"] .ig-chip {
-      background: var(--card, #1a1510);
-      color: var(--text2, #8a91a8);
-    }
-
     /* Typing indicator */
     .ig-typing {
       display: flex;
@@ -475,7 +443,7 @@
   const unreadDot  = document.getElementById('ig-chat-unread');
 
   /* ── Render a message ── */
-  function addMessage(text, role, chips) {
+  function addMessage(text, role) {
     const msg = document.createElement('div');
     msg.className = `ig-msg ${role}`;
 
@@ -483,22 +451,6 @@
     bubble.className = 'ig-msg-bubble';
     bubble.textContent = text;
     msg.appendChild(bubble);
-
-    if (chips && chips.length) {
-      const chipsEl = document.createElement('div');
-      chipsEl.className = 'ig-chips';
-      chips.forEach(function (label) {
-        const chip = document.createElement('button');
-        chip.className = 'ig-chip';
-        chip.textContent = label;
-        chip.addEventListener('click', function () {
-          chipsEl.remove();
-          sendMessage(label);
-        });
-        chipsEl.appendChild(chip);
-      });
-      msg.appendChild(chipsEl);
-    }
 
     messagesEl.appendChild(msg);
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -565,7 +517,7 @@
       }
 
       if (data.reply) {
-        addMessage(data.reply, 'bot', data.chips || []);
+        addMessage(data.reply, 'bot');
       } else {
         addMessage("Sorry, something went wrong. Try again in a sec!", 'bot');
       }
@@ -603,8 +555,7 @@
       setTimeout(function () {
         addMessage(
           'Welcome back, ' + codename + '! 👋 Good to see you again — ready to pick up where we left off?',
-          'bot',
-          ['Continue my enquiry', 'Start fresh', 'Pricing info', 'Just browsing']
+          'bot'
         );
       }, 400);
     } else {
@@ -612,8 +563,7 @@
       setTimeout(function () {
         addMessage(
           'Hey ' + codename + '! 👋 I’m Dijo — ImpactGrid’s AI. Looking to book something or just browsing?',
-          'bot',
-          ['Book an event', 'See what you offer', 'Pricing info', 'Just looking']
+          'bot'
         );
       }, 400);
     }
