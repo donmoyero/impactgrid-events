@@ -163,6 +163,9 @@
       '.mob-social{display:flex;gap:10px;padding:14px 20px 6px;}' +
       '.mob-social-link{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:var(--bg2);color:var(--text2);transition:all .2s;flex-shrink:0;}' +
       '.mob-social-link:hover{background:var(--gold-dim);color:var(--gold);}' +
+      '.f-social{display:flex;gap:8px;margin-top:14px;}' +
+      '.f-social-link{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:var(--bg2);color:var(--text2);transition:all .2s;flex-shrink:0;}' +
+      '.f-social-link:hover{background:var(--gold-dim);color:var(--gold);}' +
       '.nav-bottom{display:flex;flex-direction:column;gap:8px;padding:16px 8px 0;margin-top:auto;border-top:1px solid var(--border);overflow:hidden;}' +
       '.nav-bottom>*{opacity:0;pointer-events:none;transition:opacity 0.15s ease;}' +
       '.nav.expanded .nav-bottom>*{opacity:1;pointer-events:auto;}' +
@@ -343,6 +346,13 @@
                 'ImpactGrid' +
               '</div>' +
               '<p>Capturing moments &amp; delivering experiences. Manchester, UK.</p>' +
+              '<div class="f-social">' +
+                SOCIAL_LINKS.map(function(s) {
+                  return '<a href="' + s.href + '" target="_blank" rel="noopener noreferrer" aria-label="' + s.label + '" class="f-social-link">' +
+                           s.icon +
+                         '</a>';
+                }).join('') +
+              '</div>' +
             '</div>' +
             '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="about.html">About</a><a href="book-us.html">Book Us</a></div>' +
             '<div class="fc"><h4>Contact</h4><a href="mailto:events@impactgridgroup.com">events@impactgridgroup.com</a><a href="tel:07469016509">07469 016509</a></div>' +
