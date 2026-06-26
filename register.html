@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — ImpactGrid</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .rg-wrap{max-width:520px;margin:0 auto;padding:48px 20px 80px;}
+  .rg-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:28px;}
+  .rg-title{font-size:24px;font-weight:800;margin:0 0 6px;}
+  .rg-sub{color:var(--text3);font-size:14px;margin:0 0 24px;}
+  .rg-field{margin-bottom:16px;}
+  .rg-field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;}
+  .rg-field input,.rg-field select{width:100%;padding:11px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:14px;}
+  .rg-check{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text2);margin:18px 0;}
+  .rg-check input{margin-top:3px;}
+  .rg-submit{width:100%;padding:13px;border-radius:10px;border:none;background:var(--gold);color:#1a1a1a;font-weight:700;font-size:15px;cursor:pointer;}
+  .rg-submit:disabled{opacity:.5;cursor:not-allowed;}
+  .rg-error{background:rgba(214,40,40,.1);color:#D62828;padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:16px;}
+  .rg-success{text-align:center;padding:20px 0;}
+  .rg-code{font-size:32px;font-weight:900;letter-spacing:2px;color:var(--gold);margin:14px 0;}
+  .rg-loading,.rg-closed{text-align:center;padding:40px 0;color:var(--text3);}
+</style>
+</head>
+<body>
+
+<div id="ig-nav"></div>
+
+<div class="rg-wrap">
+  <div class="rg-card" id="rgCard">
+    <div class="rg-loading">Loading…</div>
+  </div>
+</div>
+
+<div id="ig-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="nav.js"></script>
+<script src="register.js"></script>
+<script>
+  if (typeof renderNav === 'function') renderNav('register.html');
+  if (typeof renderFooter === 'function') renderFooter();
+  REG.init();
+</script>
+</body>
+</html>
