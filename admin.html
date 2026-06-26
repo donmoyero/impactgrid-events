@@ -1011,6 +1011,7 @@ If you have any questions, just reply to this email.
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
             <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);"> Compose</button>
             <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);"> Sent</button>
+            <button id="mail-tab-vouchers-btn" onclick="switchMailTab('vouchers')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);"> Vouchers</button>
           </div>
 
           <!-- COMPOSE -->
@@ -1046,6 +1047,73 @@ If you have any questions, just reply to this email.
               <div class="card-head"><h2> Sent</h2><button class="btn btn-ghost btn-sm" onclick="loadSent()">↻ Refresh</button></div>
               <div class="card-body" id="mail-sent-list">
                 <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VOUCHERS -->
+          <div id="mail-tab-vouchers" style="display:none;">
+            <div class="card">
+              <div class="card-head">
+                <h2> Voucher Campaigns</h2>
+                <button class="btn btn-gold btn-sm" onclick="VT.showCreateForm()">+ New Campaign</button>
+              </div>
+              <div class="card-body">
+
+                <div id="vtCreateForm" style="display:none;margin-bottom:16px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                    <div class="field-group">
+                      <div class="field-label">Campaign name</div>
+                      <input type="text" id="vtName" class="form-input" placeholder="Lagos Market Test Run"/>
+                    </div>
+                    <div class="field-group">
+                      <div class="field-label">Code prefix</div>
+                      <input type="text" id="vtPrefix" class="form-input" placeholder="LAGOS" maxlength="12" style="text-transform:uppercase;"/>
+                    </div>
+                    <div class="field-group">
+                      <div class="field-label">URL slug</div>
+                      <input type="text" id="vtSlug" class="form-input" placeholder="lagos-market"/>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px;display:flex;gap:10px;">
+                    <button class="btn btn-gold btn-sm" onclick="VT.createCampaign()">Create</button>
+                    <button class="btn btn-ghost btn-sm" onclick="VT.hideCreateForm()">Cancel</button>
+                  </div>
+                </div>
+
+                <div id="vtCampaignList">
+                  <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading campaigns…</div></div>
+                </div>
+
+                <div id="vtRegistrationsCard" style="display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                    <h2 id="vtRegTitle" style="font-size:15px;margin:0;">Registrations</h2>
+                    <button class="btn btn-ghost btn-sm" onclick="VT.exportCSV()">Export CSV</button>
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12.5px;" id="vtRegTable">
+                      <thead>
+                        <tr style="color:var(--text3);text-transform:uppercase;font-size:10.5px;">
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Code</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Name</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Phone</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Email</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Household</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Products</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Spend</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Freq</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Heard via</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Consent</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Redeemed</th>
+                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody id="vtRegBody"></tbody>
+                    </table>
+                    <div class="empty" id="vtRegEmpty" style="display:none;"><div class="empty-txt">No registrations yet.</div></div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -2131,7 +2199,7 @@ var _mailTab = 'compose';
 
 function switchMailTab(tab){
   _mailTab = tab;
-  ['compose','sent'].forEach(function(t){
+  ['compose','sent','vouchers'].forEach(function(t){
     document.getElementById('mail-tab-'+t).style.display = t===tab ? '' : 'none';
     var btn = document.getElementById('mail-tab-'+t+'-btn');
     if(btn){
@@ -2140,7 +2208,8 @@ function switchMailTab(tab){
       btn.style.boxShadow   = t===tab ? 'var(--sh)'    : 'none';
     }
   });
-  if(tab==='sent')  loadSent();
+  if(tab==='sent')     loadSent();
+  if(tab==='vouchers') VT.init();
 }
 
 function clearCompose(){
@@ -2224,6 +2293,196 @@ async function loadSent(){
     el.innerHTML = '<div class="empty"><div class="empty-txt">Error: '+esc(e.message)+'</div></div>';
   }
 }
+
+/*
+   VOUCHER CAMPAIGNS  (Mail → Vouchers tab)
+ */
+var VT = (function(){
+  var _campaigns      = [];
+  var _activeCampaign = null;
+  var _activeRegs     = [];
+
+  function _slugify(s){
+    return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  }
+
+  async function init(){
+    await loadCampaigns();
+  }
+
+  function showCreateForm(){
+    document.getElementById('vtCreateForm').style.display = 'block';
+    var slugInput = document.getElementById('vtSlug');
+    var nameInput = document.getElementById('vtName');
+    if(!slugInput.dataset.bound){
+      nameInput.addEventListener('input', function(){
+        if(!slugInput.dataset.touched) slugInput.value = _slugify(nameInput.value);
+      });
+      slugInput.addEventListener('input', function(){ slugInput.dataset.touched = '1'; });
+      slugInput.dataset.bound = '1';
+    }
+  }
+
+  function hideCreateForm(){
+    document.getElementById('vtCreateForm').style.display = 'none';
+    document.getElementById('vtName').value   = '';
+    document.getElementById('vtPrefix').value = '';
+    document.getElementById('vtSlug').value   = '';
+  }
+
+  async function createCampaign(){
+    var name   = document.getElementById('vtName').value.trim();
+    var prefix = document.getElementById('vtPrefix').value.trim().toUpperCase();
+    var slug   = document.getElementById('vtSlug').value.trim() || _slugify(name);
+
+    if(!name || !prefix || !slug){
+      toast('','Missing details','Fill in name, prefix, and slug');
+      return;
+    }
+
+    var { error } = await getSupabase().from('campaigns').insert({
+      name: name, prefix: prefix, slug: slug, active: true
+    });
+
+    if(error){
+      toast('','Could not create campaign', error.message);
+      return;
+    }
+
+    toast('','Campaign created', name);
+    hideCreateForm();
+    await loadCampaigns();
+  }
+
+  async function loadCampaigns(){
+    var listEl = document.getElementById('vtCampaignList');
+    if(!listEl) return;
+
+    var { data, error } = await getSupabase()
+      .from('campaigns')
+      .select('*')
+      .order('created_at', { ascending:false });
+
+    if(error){
+      listEl.innerHTML = '<div class="empty"><div class="empty-txt">Could not load campaigns: '+esc(error.message)+'</div></div>';
+      return;
+    }
+
+    _campaigns = data || [];
+
+    if(!_campaigns.length){
+      listEl.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No campaigns yet — create one above.</div></div>';
+      return;
+    }
+
+    listEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">' + _campaigns.map(function(c){
+      var publicUrl = location.origin + '/register.html?c=' + encodeURIComponent(c.slug);
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border);border-radius:var(--r);flex-wrap:wrap;">'
+        + '<div style="min-width:220px;flex:1;">'
+        + '<div style="font-weight:600;font-size:13.5px;">'+esc(c.name)
+        + ' <span style="font-size:10.5px;padding:2px 8px;border-radius:20px;margin-left:4px;background:'+(c.active?'var(--green-dim)':'var(--bg3)')+';color:'+(c.active?'var(--green)':'var(--text3)')+';">'+(c.active?'Active':'Paused')+'</span></div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Prefix: '+esc(c.prefix)+' · Issued so far: '+(c.next_seq-1)+'</div>'
+        + '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;">'
+        + '<input readonly value="'+esc(publicUrl)+'" style="flex:1;min-width:160px;font-family:var(--fm);font-size:11px;padding:6px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text2);">'
+        + '<button class="btn btn-ghost btn-sm" onclick="VT.copyLink(this)" data-url="'+esc(publicUrl)+'">Copy</button>'
+        + '</div></div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+        + '<button class="btn btn-ghost btn-sm" onclick="VT.viewRegistrations(\''+c.id+'\')">View entries</button>'
+        + '<button class="btn btn-ghost btn-sm" onclick="VT.toggleActive(\''+c.id+'\', '+(!c.active)+')">'+(c.active?'Pause':'Resume')+'</button>'
+        + '</div></div>';
+    }).join('') + '</div>';
+  }
+
+  async function toggleActive(id, newState){
+    await getSupabase().from('campaigns').update({ active:newState }).eq('id', id);
+    await loadCampaigns();
+  }
+
+  function copyLink(btn){
+    var url = btn.getAttribute('data-url');
+    navigator.clipboard.writeText(url).then(function(){
+      var old = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(function(){ btn.textContent = old; }, 1500);
+    });
+  }
+
+  async function viewRegistrations(campaignId){
+    _activeCampaign = _campaigns.find(function(c){ return c.id === campaignId; });
+    document.getElementById('vtRegistrationsCard').style.display = 'block';
+    document.getElementById('vtRegTitle').textContent = 'Registrations — ' + (_activeCampaign ? _activeCampaign.name : '');
+
+    var { data, error } = await getSupabase()
+      .from('voucher_registrations')
+      .select('*')
+      .eq('campaign_id', campaignId)
+      .order('created_at', { ascending:false });
+
+    var body  = document.getElementById('vtRegBody');
+    var empty = document.getElementById('vtRegEmpty');
+
+    if(error){
+      body.innerHTML = '';
+      empty.style.display = 'block';
+      empty.innerHTML = '<div class="empty-txt">Could not load: '+esc(error.message)+'</div>';
+      return;
+    }
+
+    _activeRegs = data || [];
+
+    if(!_activeRegs.length){
+      body.innerHTML = '';
+      empty.style.display = 'block';
+      empty.innerHTML = '<div class="empty-txt">No registrations yet.</div>';
+      return;
+    }
+
+    empty.style.display = 'none';
+    body.innerHTML = _activeRegs.map(function(r){
+      return '<tr>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--fm);">'+esc(r.voucher_code)+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.full_name)+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.phone)+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.email)+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+(r.household_size||'')+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.products_interested||'')+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.expected_spend||'')+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.attend_frequency||'')+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.heard_about||'')+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+(r.consent?'Yes':'No')+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+(r.redeemed?'Yes':'No')+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;">'+new Date(r.created_at).toLocaleDateString('en-GB')+'</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  function exportCSV(){
+    if(!_activeRegs.length){ toast('','Nothing to export','No registrations loaded'); return; }
+
+    var headers = ['Voucher Code','Full Name','Phone','Email','Household Size','Products Interested','Expected Spend','Attend Frequency','Heard About','Consent','Redeemed','Date'];
+    var rows = _activeRegs.map(function(r){
+      return [r.voucher_code, r.full_name, r.phone, r.email, r.household_size||'', r.products_interested||'', r.expected_spend||'', r.attend_frequency||'', r.heard_about||'', r.consent?'Yes':'No', r.redeemed?'Yes':'No', new Date(r.created_at).toISOString()]
+        .map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
+    });
+    var csv  = headers.join(',') + '\n' + rows.join('\n');
+    var blob = new Blob([csv], { type:'text/csv' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (_activeCampaign ? _activeCampaign.slug : 'registrations') + '.csv';
+    a.click();
+  }
+
+  return {
+    init: init,
+    showCreateForm: showCreateForm,
+    hideCreateForm: hideCreateForm,
+    createCampaign: createCampaign,
+    toggleActive: toggleActive,
+    copyLink: copyLink,
+    viewRegistrations: viewRegistrations,
+    exportCSV: exportCSV
+  };
+})();
 
 /*  HOMEPAGE IMAGES MANAGER  */
 
