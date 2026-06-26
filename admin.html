@@ -1080,16 +1080,6 @@ If you have any questions, just reply to this email.
                       <input type="text" id="vtSlug" class="form-input" placeholder="lagos-market"/>
                     </div>
                   </div>
-                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px;">
-                    <div class="field-group">
-                      <div class="field-label">Client email <span style="color:var(--text3);font-weight:400;">(account created automatically)</span></div>
-                      <input type="email" id="vtClientEmail" class="form-input" placeholder="client@theirbusiness.com"/>
-                    </div>
-                    <div class="field-group">
-                      <div class="field-label">Client / business name <span style="color:var(--text3);font-weight:400;">(for your reference)</span></div>
-                      <input type="text" id="vtClientLabel" class="form-input" placeholder="Lagos Market Ltd"/>
-                    </div>
-                  </div>
                   <div style="margin-top:12px;display:flex;gap:10px;">
                     <button class="btn btn-gold btn-sm" onclick="VT.createCampaign()">Create</button>
                     <button class="btn btn-ghost btn-sm" onclick="VT.hideCreateForm()">Cancel</button>
@@ -2395,8 +2385,6 @@ var VT = (function(){
   var _activeCampaign = null;
   var _activeRegs     = [];
 
-  var BACKEND_URL = 'https://impactgrid-dijo.onrender.com';
-
   function _slugify(s){
     return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
   }
@@ -2420,58 +2408,23 @@ var VT = (function(){
 
   function hideCreateForm(){
     document.getElementById('vtCreateForm').style.display = 'none';
-    document.getElementById('vtName').value        = '';
-    document.getElementById('vtPrefix').value      = '';
-    document.getElementById('vtSlug').value        = '';
-    document.getElementById('vtClientEmail').value = '';
-    document.getElementById('vtClientLabel').value = '';
+    document.getElementById('vtName').value   = '';
+    document.getElementById('vtPrefix').value = '';
+    document.getElementById('vtSlug').value   = '';
   }
 
   async function createCampaign(){
-    var name        = document.getElementById('vtName').value.trim();
-    var prefix      = document.getElementById('vtPrefix').value.trim().toUpperCase();
-    var slug        = document.getElementById('vtSlug').value.trim() || _slugify(name);
-    var clientEmail = document.getElementById('vtClientEmail').value.trim();
-    var clientLabel = document.getElementById('vtClientLabel').value.trim();
+    var name   = document.getElementById('vtName').value.trim();
+    var prefix = document.getElementById('vtPrefix').value.trim().toUpperCase();
+    var slug   = document.getElementById('vtSlug').value.trim() || _slugify(name);
 
     if(!name || !prefix || !slug){
       toast('','Missing details','Fill in name, prefix, and slug');
       return;
     }
 
-    var ownerId = null;
-    var loginCode = null;
-
-    if(clientEmail){
-      try{
-        var sess = await getSupabase().auth.getSession();
-        var token = sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
-        if(!token){ toast('','Not logged in','Please log in again'); return; }
-
-        var resp = await fetch(BACKEND_URL + '/api/clients/create-login', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
-          body: JSON.stringify({ email: clientEmail, label: clientLabel })
-        });
-        var result = await resp.json();
-
-        if(!resp.ok){
-          toast('','Could not set up client login', result.error || 'Unknown error');
-          return;
-        }
-
-        ownerId  = result.userId;
-        loginCode = result.code;
-      }catch(e){
-        toast('','Could not reach backend', e.message);
-        return;
-      }
-    }
-
     var { error } = await getSupabase().from('campaigns').insert({
-      name: name, prefix: prefix, slug: slug, active: true,
-      owner_id: ownerId, owner_label: clientLabel || null,
-      owner_email: clientEmail || null
+      name: name, prefix: prefix, slug: slug, active: true
     });
 
     if(error){
@@ -2479,35 +2432,9 @@ var VT = (function(){
       return;
     }
 
+    toast('','Campaign created', name);
     hideCreateForm();
     await loadCampaigns();
-
-    if(loginCode){
-      try{
-        await fetch(EVENTS_API + '/api/send-mail', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify({
-            to: clientEmail,
-            subject: 'Your dashboard access for ' + name,
-            body: 'Hi' + (clientLabel ? ' ' + clientLabel : '') + ',\n\n'
-              + 'Your campaign "' + name + '" has been created and your registration form is live.\n\n'
-              + 'You can view and export your registrations any time here:\n'
-              + location.origin + '/client-dashboard.html\n\n'
-              + 'Login details:\n'
-              + 'Email: ' + clientEmail + '\n'
-              + 'Login code: ' + loginCode + '\n\n'
-              + 'Keep this code safe — treat it like a password.\n\n'
-              + '— ImpactGrid'
-          })
-        });
-        toast('','Campaign created & client notified', clientEmail);
-      }catch(mailErr){
-        toast('','Campaign created — email failed', 'Share the code manually: ' + loginCode);
-      }
-    } else {
-      toast('','Campaign created', name);
-    }
   }
 
   async function loadCampaigns(){
@@ -2537,7 +2464,7 @@ var VT = (function(){
         + '<div style="min-width:220px;flex:1;">'
         + '<div style="font-weight:600;font-size:13.5px;">'+esc(c.name)
         + ' <span style="font-size:10.5px;padding:2px 8px;border-radius:20px;margin-left:4px;background:'+(c.active?'var(--green-dim)':'var(--bg3)')+';color:'+(c.active?'var(--green)':'var(--text3)')+';">'+(c.active?'Active':'Paused')+'</span></div>'
-        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Prefix: '+esc(c.prefix)+' · Issued so far: '+(c.next_seq-1)+(c.owner_label ? ' · Client: '+esc(c.owner_label) : (c.owner_id ? ' · Client assigned' : ' · No client assigned'))+'</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Prefix: '+esc(c.prefix)+' · Issued so far: '+(c.next_seq-1)+'</div>'
         + '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;">'
         + '<input readonly value="'+esc(publicUrl)+'" style="flex:1;min-width:160px;font-family:var(--fm);font-size:11px;padding:6px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text2);">'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.copyLink(this)" data-url="'+esc(publicUrl)+'">Copy</button>'
@@ -2545,7 +2472,6 @@ var VT = (function(){
         + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.viewRegistrations(\''+c.id+'\')">View entries</button>'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.openDesignEditor(\''+c.id+'\')">Customize Page</button>'
-        + (c.owner_label ? '<button class="btn btn-ghost btn-sm" onclick="VT.resetClientCode(\''+c.id+'\')">Reset Client Code</button>' : '')
         + '<button class="btn btn-ghost btn-sm" onclick="VT.toggleActive(\''+c.id+'\', '+(!c.active)+')">'+(c.active?'Pause':'Resume')+'</button>'
         + '</div></div>';
     }).join('') + '</div>';
@@ -2554,55 +2480,6 @@ var VT = (function(){
   async function toggleActive(id, newState){
     await getSupabase().from('campaigns').update({ active:newState }).eq('id', id);
     await loadCampaigns();
-  }
-
-  async function resetClientCode(campaignId){
-    var c = _campaigns.find(function(x){ return x.id === campaignId; });
-    if(!c || !c.owner_email){ toast('','No client email on file for this campaign'); return; }
-
-    if(!confirm('Generate a new login code for ' + c.owner_email + '? Their old code will stop working.')) return;
-
-    try{
-      var sess  = await getSupabase().auth.getSession();
-      var token = sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
-      if(!token){ toast('','Not logged in','Please log in again'); return; }
-
-      var resp = await fetch(BACKEND_URL + '/api/clients/regenerate-code', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
-        body: JSON.stringify({ email: c.owner_email })
-      });
-      var result = await resp.json();
-
-      if(!resp.ok){
-        toast('','Could not reset code', result.error || 'Unknown error');
-        return;
-      }
-
-      try{
-        await fetch(EVENTS_API + '/api/send-mail', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify({
-            to: c.owner_email,
-            subject: 'Your dashboard login code has been reset',
-            body: 'Hi' + (c.owner_label ? ' ' + c.owner_label : '') + ',\n\n'
-              + 'Your login code for ' + (c.name || 'your campaign dashboard') + ' has been reset.\n\n'
-              + 'You can view and export your registrations here:\n'
-              + location.origin + '/client-dashboard.html\n\n'
-              + 'Email: ' + c.owner_email + '\n'
-              + 'New login code: ' + result.code + '\n\n'
-              + 'Your old code no longer works.\n\n'
-              + '— ImpactGrid'
-          })
-        });
-        toast('','New code emailed to client', c.owner_email);
-      }catch(mailErr){
-        alert('Code reset but the email failed to send.\n\nNew code for ' + c.owner_email + ':\n' + result.code + '\n\nShare it manually.');
-      }
-    }catch(e){
-      toast('','Could not reach backend', e.message);
-    }
   }
 
   function openDesignEditor(campaignId){
@@ -2808,7 +2685,6 @@ var VT = (function(){
     hideCreateForm: hideCreateForm,
     createCampaign: createCampaign,
     toggleActive: toggleActive,
-    resetClientCode: resetClientCode,
     copyLink: copyLink,
     viewRegistrations: viewRegistrations,
     exportCSV: exportCSV,
