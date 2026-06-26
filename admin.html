@@ -239,6 +239,11 @@ tr:hover td{background:var(--bg2);}
 .legend-today{background:var(--bg3);border:1px solid var(--border2);position:relative;}
 .legend-today::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:var(--gold);}
 @media(max-width:1100px){.cal-grid .cal-day{font-size:12px;}}
+.vt-dropzone{border:2px dashed var(--border);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg2);}
+.vt-dropzone:hover{border-color:var(--gold);background:var(--gold-dim);}
+.vt-dropzone.vt-dz-over{border-color:var(--gold);background:var(--gold-dim);}
+.vt-dz-text{font-size:11.5px;color:var(--text3);}
+.vt-dz-uploading{opacity:.6;pointer-events:none;}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
@@ -1094,18 +1099,33 @@ If you have any questions, just reply to this email.
 
                   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
                     <div class="field-group">
-                      <div class="field-label">Background image URL</div>
-                      <input type="text" id="vtBgImage" class="form-input" placeholder="https://res.cloudinary.com/.../background.jpg"/>
+                      <div class="field-label">Background image</div>
+                      <div class="vt-dropzone" id="vtBgDropzone" ondragover="VT.dzDragOver(event,this)" ondragleave="VT.dzDragLeave(event,this)" ondrop="VT.dzDrop(event,'vtBgImage','vtBgPreview')" onclick="document.getElementById('vtBgFile').click()">
+                        <input type="file" id="vtBgFile" accept="image/*" style="display:none;" onchange="VT.handleFileInput(event,'vtBgImage','vtBgPreview')">
+                        <img id="vtBgPreview" style="display:none;max-width:100%;max-height:70px;border-radius:6px;margin-bottom:6px;">
+                        <div class="vt-dz-text">Drag &amp; drop or click to upload</div>
+                      </div>
+                      <input type="hidden" id="vtBgImage">
                       <div class="field-hint">Covers the full page behind the form</div>
                     </div>
                     <div class="field-group">
-                      <div class="field-label">Header image URL</div>
-                      <input type="text" id="vtHeaderImage" class="form-input" placeholder="Logo or banner image"/>
+                      <div class="field-label">Header image</div>
+                      <div class="vt-dropzone" id="vtHeaderDropzone" ondragover="VT.dzDragOver(event,this)" ondragleave="VT.dzDragLeave(event,this)" ondrop="VT.dzDrop(event,'vtHeaderImage','vtHeaderPreview')" onclick="document.getElementById('vtHeaderFile').click()">
+                        <input type="file" id="vtHeaderFile" accept="image/*" style="display:none;" onchange="VT.handleFileInput(event,'vtHeaderImage','vtHeaderPreview')">
+                        <img id="vtHeaderPreview" style="display:none;max-width:100%;max-height:70px;border-radius:6px;margin-bottom:6px;">
+                        <div class="vt-dz-text">Drag &amp; drop or click to upload</div>
+                      </div>
+                      <input type="hidden" id="vtHeaderImage">
                       <div class="field-hint">Shown above the headline</div>
                     </div>
                     <div class="field-group">
-                      <div class="field-label">Footer image URL</div>
-                      <input type="text" id="vtFooterImage" class="form-input" placeholder="Logo, sponsor strip, etc."/>
+                      <div class="field-label">Footer image</div>
+                      <div class="vt-dropzone" id="vtFooterDropzone" ondragover="VT.dzDragOver(event,this)" ondragleave="VT.dzDragLeave(event,this)" ondrop="VT.dzDrop(event,'vtFooterImage','vtFooterPreview')" onclick="document.getElementById('vtFooterFile').click()">
+                        <input type="file" id="vtFooterFile" accept="image/*" style="display:none;" onchange="VT.handleFileInput(event,'vtFooterImage','vtFooterPreview')">
+                        <img id="vtFooterPreview" style="display:none;max-width:100%;max-height:70px;border-radius:6px;margin-bottom:6px;">
+                        <div class="vt-dz-text">Drag &amp; drop or click to upload</div>
+                      </div>
+                      <input type="hidden" id="vtFooterImage">
                       <div class="field-hint">Shown at the bottom of the page</div>
                     </div>
                     <div class="field-group">
