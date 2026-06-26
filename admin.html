@@ -2483,7 +2483,28 @@ var VT = (function(){
     await loadCampaigns();
 
     if(loginCode){
-      alert('Campaign created!\n\nClient login details:\nEmail: ' + clientEmail + '\nLogin code: ' + loginCode + '\n\nShare these with the client so they can log in to client-dashboard.html. This code will not be shown again — copy it now.');
+      try{
+        await fetch(EVENTS_API + '/api/send-mail', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            to: clientEmail,
+            subject: 'Your dashboard access for ' + name,
+            body: 'Hi' + (clientLabel ? ' ' + clientLabel : '') + ',\n\n'
+              + 'Your campaign "' + name + '" has been created and your registration form is live.\n\n'
+              + 'You can view and export your registrations any time here:\n'
+              + location.origin + '/client-dashboard.html\n\n'
+              + 'Login details:\n'
+              + 'Email: ' + clientEmail + '\n'
+              + 'Login code: ' + loginCode + '\n\n'
+              + 'Keep this code safe — treat it like a password.\n\n'
+              + '— ImpactGrid'
+          })
+        });
+        toast('','Campaign created & client notified', clientEmail);
+      }catch(mailErr){
+        toast('','Campaign created — email failed', 'Share the code manually: ' + loginCode);
+      }
     } else {
       toast('','Campaign created', name);
     }
@@ -2558,7 +2579,27 @@ var VT = (function(){
         return;
       }
 
-      alert('New login code for ' + c.owner_email + ':\n\n' + result.code + '\n\nShare this with the client — their old code no longer works.');
+      try{
+        await fetch(EVENTS_API + '/api/send-mail', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            to: c.owner_email,
+            subject: 'Your dashboard login code has been reset',
+            body: 'Hi' + (c.owner_label ? ' ' + c.owner_label : '') + ',\n\n'
+              + 'Your login code for ' + (c.name || 'your campaign dashboard') + ' has been reset.\n\n'
+              + 'You can view and export your registrations here:\n'
+              + location.origin + '/client-dashboard.html\n\n'
+              + 'Email: ' + c.owner_email + '\n'
+              + 'New login code: ' + result.code + '\n\n'
+              + 'Your old code no longer works.\n\n'
+              + '— ImpactGrid'
+          })
+        });
+        toast('','New code emailed to client', c.owner_email);
+      }catch(mailErr){
+        alert('Code reset but the email failed to send.\n\nNew code for ' + c.owner_email + ':\n' + result.code + '\n\nShare it manually.');
+      }
     }catch(e){
       toast('','Could not reach backend', e.message);
     }
