@@ -10,13 +10,28 @@
 
 /* Firebase config is fetched securely from the backend — API key never exposed in frontend code */
 var db;
+var _dbReady = false;
+var _dbReadyCallbacks = [];
+
+function onDbReady(fn){ if(_dbReady){ fn(); } else { _dbReadyCallbacks.push(fn); } }
+
 fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
   .then(function(r){ return r.json(); })
   .then(function(firebaseConfig){
     if(!firebase.apps.length){ firebase.initializeApp(firebaseConfig); }
     db = firebase.firestore();
+    _dbReady = true;
+    _dbReadyCallbacks.forEach(function(fn){ fn(); });
+    _dbReadyCallbacks = [];
   })
-  .catch(function(err){ console.error('Failed to load Firebase config:', err); });
+  .catch(function(err){
+    console.error('Failed to load Firebase config:', err);
+    var alertEl = document.getElementById('createEventAlert');
+    if(alertEl){
+      alertEl.textContent = '\u26a0\ufe0f Could not connect to database. Check your internet connection and refresh the page.';
+      alertEl.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);';
+    }
+  });
 
 /* Firestore helpers to replace the ES-module named imports */
 var collection      = function(db, col)       { return db.collection(col); };
@@ -262,6 +277,8 @@ async function igCreateEvent(){
         ? 'background:var(--green-dim);border:1px solid rgba(15,168,118,.25);color:var(--green);'
         : 'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
   }
+
+  if(!db){ showAlert("⚠️ Database not ready yet. Please wait a moment and try again.", false); return; }
 
   if(!name){ showAlert('Event name is required.', false); return; }
   if(!code){ generateCode(); code = document.getElementById('ev-code').value; }
