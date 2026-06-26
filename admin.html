@@ -1082,7 +1082,7 @@ If you have any questions, just reply to this email.
                   </div>
                   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px;">
                     <div class="field-group">
-                      <div class="field-label">Client email <span style="color:var(--text3);font-weight:400;">(must already have an account)</span></div>
+                      <div class="field-label">Client email <span style="color:var(--text3);font-weight:400;">(account created automatically)</span></div>
                       <input type="email" id="vtClientEmail" class="form-input" placeholder="client@theirbusiness.com"/>
                     </div>
                     <div class="field-group">
@@ -2395,6 +2395,8 @@ var VT = (function(){
   var _activeCampaign = null;
   var _activeRegs     = [];
 
+  var BACKEND_URL = 'https://impactgrid-dijo.onrender.com';
+
   function _slugify(s){
     return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
   }
@@ -2438,24 +2440,38 @@ var VT = (function(){
     }
 
     var ownerId = null;
-    if(clientEmail){
-      var { data: foundId, error: lookupErr } = await getSupabase()
-        .rpc('admin_get_user_id_by_email', { p_email: clientEmail });
+    var loginCode = null;
 
-      if(lookupErr){
-        toast('','Could not look up client', lookupErr.message);
+    if(clientEmail){
+      try{
+        var sess = await getSupabase().auth.getSession();
+        var token = sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
+        if(!token){ toast('','Not logged in','Please log in again'); return; }
+
+        var resp = await fetch(BACKEND_URL + '/api/clients/create-login', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+          body: JSON.stringify({ email: clientEmail, label: clientLabel })
+        });
+        var result = await resp.json();
+
+        if(!resp.ok){
+          toast('','Could not set up client login', result.error || 'Unknown error');
+          return;
+        }
+
+        ownerId  = result.userId;
+        loginCode = result.code;
+      }catch(e){
+        toast('','Could not reach backend', e.message);
         return;
       }
-      if(!foundId){
-        toast('','Client not found', 'No account exists for ' + clientEmail + ' — ask them to sign up first, then try again.');
-        return;
-      }
-      ownerId = foundId;
     }
 
     var { error } = await getSupabase().from('campaigns').insert({
       name: name, prefix: prefix, slug: slug, active: true,
-      owner_id: ownerId, owner_label: clientLabel || null
+      owner_id: ownerId, owner_label: clientLabel || null,
+      owner_email: clientEmail || null
     });
 
     if(error){
@@ -2463,9 +2479,14 @@ var VT = (function(){
       return;
     }
 
-    toast('','Campaign created', name);
     hideCreateForm();
     await loadCampaigns();
+
+    if(loginCode){
+      alert('Campaign created!\n\nClient login details:\nEmail: ' + clientEmail + '\nLogin code: ' + loginCode + '\n\nShare these with the client so they can log in to client-dashboard.html. This code will not be shown again — copy it now.');
+    } else {
+      toast('','Campaign created', name);
+    }
   }
 
   async function loadCampaigns(){
@@ -2503,6 +2524,7 @@ var VT = (function(){
         + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.viewRegistrations(\''+c.id+'\')">View entries</button>'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.openDesignEditor(\''+c.id+'\')">Customize Page</button>'
+        + (c.owner_label ? '<button class="btn btn-ghost btn-sm" onclick="VT.resetClientCode(\''+c.id+'\')">Reset Client Code</button>' : '')
         + '<button class="btn btn-ghost btn-sm" onclick="VT.toggleActive(\''+c.id+'\', '+(!c.active)+')">'+(c.active?'Pause':'Resume')+'</button>'
         + '</div></div>';
     }).join('') + '</div>';
@@ -2511,6 +2533,35 @@ var VT = (function(){
   async function toggleActive(id, newState){
     await getSupabase().from('campaigns').update({ active:newState }).eq('id', id);
     await loadCampaigns();
+  }
+
+  async function resetClientCode(campaignId){
+    var c = _campaigns.find(function(x){ return x.id === campaignId; });
+    if(!c || !c.owner_email){ toast('','No client email on file for this campaign'); return; }
+
+    if(!confirm('Generate a new login code for ' + c.owner_email + '? Their old code will stop working.')) return;
+
+    try{
+      var sess  = await getSupabase().auth.getSession();
+      var token = sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
+      if(!token){ toast('','Not logged in','Please log in again'); return; }
+
+      var resp = await fetch(BACKEND_URL + '/api/clients/regenerate-code', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+        body: JSON.stringify({ email: c.owner_email })
+      });
+      var result = await resp.json();
+
+      if(!resp.ok){
+        toast('','Could not reset code', result.error || 'Unknown error');
+        return;
+      }
+
+      alert('New login code for ' + c.owner_email + ':\n\n' + result.code + '\n\nShare this with the client — their old code no longer works.');
+    }catch(e){
+      toast('','Could not reach backend', e.message);
+    }
   }
 
   function openDesignEditor(campaignId){
@@ -2716,6 +2767,7 @@ var VT = (function(){
     hideCreateForm: hideCreateForm,
     createCampaign: createCampaign,
     toggleActive: toggleActive,
+    resetClientCode: resetClientCode,
     copyLink: copyLink,
     viewRegistrations: viewRegistrations,
     exportCSV: exportCSV,
