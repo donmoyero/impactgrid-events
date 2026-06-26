@@ -7,6 +7,7 @@
 var REG = (function () {
 
   var _campaign = null;
+  var _design   = {};
 
   function _client() { return getSupabase(); }
   function _slug()   { return new URLSearchParams(location.search).get('c'); }
@@ -14,6 +15,18 @@ var REG = (function () {
   function _esc(str) {
     return String(str == null ? '' : str)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function _applyPageDesign() {
+    if (_design.background_image) {
+      document.body.style.backgroundImage    = 'url("' + _design.background_image + '")';
+      document.body.style.backgroundSize      = 'cover';
+      document.body.style.backgroundPosition  = 'center';
+      document.body.style.backgroundAttachment = 'fixed';
+    }
+    if (_design.accent_color) {
+      document.documentElement.style.setProperty('--gold', _design.accent_color);
+    }
   }
 
   async function init() {
@@ -33,7 +46,7 @@ var REG = (function () {
 
     var { data, error } = await client
       .from('campaigns')
-      .select('id, slug, name, active')
+      .select('id, slug, name, active, page_design')
       .eq('slug', slug)
       .single();
 
@@ -43,14 +56,28 @@ var REG = (function () {
     }
 
     _campaign = data;
+    _design   = data.page_design || {};
+    _applyPageDesign();
     _renderForm();
   }
 
   function _renderForm() {
     var card = document.getElementById('rgCard');
+
+    var headerImg = _design.header_image
+      ? '<img src="' + _esc(_design.header_image) + '" style="max-width:100%;max-height:90px;display:block;margin:0 auto 18px;">'
+      : '';
+    var headline    = _design.headline    || _campaign.name;
+    var subheadline = _design.subheadline || 'Fill in your details below to register and get your voucher code.';
+    var buttonText  = _design.button_text || 'Get My Voucher Code';
+    var footerImg   = _design.footer_image
+      ? '<img src="' + _esc(_design.footer_image) + '" style="max-width:100%;max-height:60px;display:block;margin:18px auto 0;">'
+      : '';
+
     card.innerHTML =
-      '<h1 class="rg-title">' + _esc(_campaign.name) + '</h1>' +
-      '<p class="rg-sub">Fill in your details below to register and get your voucher code.</p>' +
+      headerImg +
+      '<h1 class="rg-title">' + _esc(headline) + '</h1>' +
+      '<p class="rg-sub">' + _esc(subheadline) + '</p>' +
       '<div id="rgErrorBox"></div>' +
       '<div class="rg-field"><label>Full Name *</label><input id="rgName" required></div>' +
       '<div class="rg-field"><label>Phone Number *</label><input id="rgPhone" type="tel" required></div>' +
@@ -67,7 +94,8 @@ var REG = (function () {
         '<option>Friend/Family</option><option>Word of mouth</option><option>Other</option></select></div>' +
       '<label class="rg-check"><input type="checkbox" id="rgConsent">' +
         '<span>I consent to receive future promotions and updates about this and similar events.</span></label>' +
-      '<button class="rg-submit" id="rgSubmitBtn" onclick="REG.submit()">Get My Voucher Code</button>';
+      '<button class="rg-submit" id="rgSubmitBtn" onclick="REG.submit()">' + _esc(buttonText) + '</button>' +
+      footerImg;
   }
 
   async function submit() {
@@ -105,7 +133,7 @@ var REG = (function () {
 
     if (error) {
       btn.disabled = false;
-      btn.textContent = 'Get My Voucher Code';
+      btn.textContent = _design.button_text || 'Get My Voucher Code';
       errBox.innerHTML = '<div class="rg-error">Could not register: ' + _esc(error.message) + '</div>';
       return;
     }
@@ -115,12 +143,13 @@ var REG = (function () {
 
   function _showSuccess(code) {
     var card = document.getElementById('rgCard');
+    var thankYou = _design.thank_you_message || 'Show this code on arrival to redeem your voucher.';
     card.innerHTML =
       '<div class="rg-success">' +
         '<h1 class="rg-title">You\'re registered! 🎉</h1>' +
-        '<p class="rg-sub">Show this code on arrival to redeem your voucher.</p>' +
+        '<p class="rg-sub">' + _esc(thankYou) + '</p>' +
         '<div class="rg-code">' + _esc(code) + '</div>' +
-        '<p class="rg-sub">We\'ve also noted your details — keep this code safe, you won\'t be able to retrieve it again from this page.</p>' +
+        '<p class="rg-sub">Keep this code safe, you won\'t be able to retrieve it again from this page.</p>' +
       '</div>';
   }
 
