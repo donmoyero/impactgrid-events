@@ -1080,6 +1080,16 @@ If you have any questions, just reply to this email.
                       <input type="text" id="vtSlug" class="form-input" placeholder="lagos-market"/>
                     </div>
                   </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px;">
+                    <div class="field-group">
+                      <div class="field-label">Client email <span style="color:var(--text3);font-weight:400;">(must already have an account)</span></div>
+                      <input type="email" id="vtClientEmail" class="form-input" placeholder="client@theirbusiness.com"/>
+                    </div>
+                    <div class="field-group">
+                      <div class="field-label">Client / business name <span style="color:var(--text3);font-weight:400;">(for your reference)</span></div>
+                      <input type="text" id="vtClientLabel" class="form-input" placeholder="Lagos Market Ltd"/>
+                    </div>
+                  </div>
                   <div style="margin-top:12px;display:flex;gap:10px;">
                     <button class="btn btn-gold btn-sm" onclick="VT.createCampaign()">Create</button>
                     <button class="btn btn-ghost btn-sm" onclick="VT.hideCreateForm()">Cancel</button>
@@ -2408,23 +2418,44 @@ var VT = (function(){
 
   function hideCreateForm(){
     document.getElementById('vtCreateForm').style.display = 'none';
-    document.getElementById('vtName').value   = '';
-    document.getElementById('vtPrefix').value = '';
-    document.getElementById('vtSlug').value   = '';
+    document.getElementById('vtName').value        = '';
+    document.getElementById('vtPrefix').value      = '';
+    document.getElementById('vtSlug').value        = '';
+    document.getElementById('vtClientEmail').value = '';
+    document.getElementById('vtClientLabel').value = '';
   }
 
   async function createCampaign(){
-    var name   = document.getElementById('vtName').value.trim();
-    var prefix = document.getElementById('vtPrefix').value.trim().toUpperCase();
-    var slug   = document.getElementById('vtSlug').value.trim() || _slugify(name);
+    var name        = document.getElementById('vtName').value.trim();
+    var prefix      = document.getElementById('vtPrefix').value.trim().toUpperCase();
+    var slug        = document.getElementById('vtSlug').value.trim() || _slugify(name);
+    var clientEmail = document.getElementById('vtClientEmail').value.trim();
+    var clientLabel = document.getElementById('vtClientLabel').value.trim();
 
     if(!name || !prefix || !slug){
       toast('','Missing details','Fill in name, prefix, and slug');
       return;
     }
 
+    var ownerId = null;
+    if(clientEmail){
+      var { data: foundId, error: lookupErr } = await getSupabase()
+        .rpc('admin_get_user_id_by_email', { p_email: clientEmail });
+
+      if(lookupErr){
+        toast('','Could not look up client', lookupErr.message);
+        return;
+      }
+      if(!foundId){
+        toast('','Client not found', 'No account exists for ' + clientEmail + ' — ask them to sign up first, then try again.');
+        return;
+      }
+      ownerId = foundId;
+    }
+
     var { error } = await getSupabase().from('campaigns').insert({
-      name: name, prefix: prefix, slug: slug, active: true
+      name: name, prefix: prefix, slug: slug, active: true,
+      owner_id: ownerId, owner_label: clientLabel || null
     });
 
     if(error){
@@ -2464,7 +2495,7 @@ var VT = (function(){
         + '<div style="min-width:220px;flex:1;">'
         + '<div style="font-weight:600;font-size:13.5px;">'+esc(c.name)
         + ' <span style="font-size:10.5px;padding:2px 8px;border-radius:20px;margin-left:4px;background:'+(c.active?'var(--green-dim)':'var(--bg3)')+';color:'+(c.active?'var(--green)':'var(--text3)')+';">'+(c.active?'Active':'Paused')+'</span></div>'
-        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Prefix: '+esc(c.prefix)+' · Issued so far: '+(c.next_seq-1)+'</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Prefix: '+esc(c.prefix)+' · Issued so far: '+(c.next_seq-1)+(c.owner_label ? ' · Client: '+esc(c.owner_label) : (c.owner_id ? ' · Client assigned' : ' · No client assigned'))+'</div>'
         + '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;">'
         + '<input readonly value="'+esc(publicUrl)+'" style="flex:1;min-width:160px;font-family:var(--fm);font-size:11px;padding:6px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text2);">'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.copyLink(this)" data-url="'+esc(publicUrl)+'">Copy</button>'
