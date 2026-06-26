@@ -1172,6 +1172,7 @@ If you have any questions, just reply to this email.
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
                     <h2 id="vtRegTitle" style="font-size:15px;margin:0;">Registrations</h2>
                     <button class="btn btn-ghost btn-sm" onclick="VT.exportCSV()">Export CSV</button>
+                    <button class="btn btn-ghost btn-sm" onclick="VT.exportPDF()"> Export PDF</button>
                   </div>
                   <div style="overflow-x:auto;">
                     <table style="width:100%;border-collapse:collapse;font-size:12.5px;" id="vtRegTable">
@@ -2679,6 +2680,62 @@ var VT = (function(){
     a.click();
   }
 
+  function exportPDF(){
+    if(!_activeRegs.length){ toast('','Nothing to export','No registrations loaded'); return; }
+
+    var campName = _activeCampaign ? _activeCampaign.name : 'Voucher Registrations';
+    var dateStr  = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+
+    var headers = ['Voucher Code','Full Name','Phone','Email','H/H Size','Products','Spend','Frequency','Heard About','Consent','Redeemed','Date'];
+
+    var rowsHtml = _activeRegs.map(function(r, i){
+      var bg = i % 2 === 0 ? '#ffffff' : '#f9f9fb';
+      return '<tr style="background:' + bg + ';">'
+        + '<td>' + esc(r.voucher_code||'') + '</td>'
+        + '<td>' + esc(r.full_name||'') + '</td>'
+        + '<td>' + esc(r.phone||'') + '</td>'
+        + '<td>' + esc(r.email||'') + '</td>'
+        + '<td style="text-align:center;">' + esc(r.household_size||'') + '</td>'
+        + '<td>' + esc(r.products_interested||'') + '</td>'
+        + '<td>' + esc(r.expected_spend||'') + '</td>'
+        + '<td>' + esc(r.attend_frequency||'') + '</td>'
+        + '<td>' + esc(r.heard_about||'') + '</td>'
+        + '<td style="text-align:center;">' + (r.consent ? '✓' : '✗') + '</td>'
+        + '<td style="text-align:center;">' + (r.redeemed ? '✓' : '✗') + '</td>'
+        + '<td style="white-space:nowrap;">' + new Date(r.created_at).toLocaleDateString('en-GB') + '</td>'
+        + '</tr>';
+    }).join('');
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>'
+      + '<title>' + esc(campName) + ' — Registrations</title>'
+      + '<style>'
+      + 'body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a2e;margin:0;padding:24px;}'
+      + '.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #f0c000;}'
+      + '.header h1{font-size:18px;font-weight:900;margin:0;letter-spacing:-.02em;}'
+      + '.header .meta{font-size:10px;color:#666;text-align:right;line-height:1.7;}'
+      + '.badge{display:inline-block;background:#f0c000;color:#1a1a2e;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.05em;margin-top:4px;}'
+      + 'table{width:100%;border-collapse:collapse;margin-top:4px;}'
+      + 'th{background:#1a1a2e;color:#f0c000;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:7px 6px;text-align:left;}'
+      + 'td{padding:6px 6px;font-size:10px;border-bottom:1px solid #eee;vertical-align:top;}'
+      + '.footer{margin-top:18px;font-size:9px;color:#999;text-align:center;border-top:1px solid #eee;padding-top:10px;}'
+      + '@media print{body{padding:12px;}@page{margin:12mm;}}'
+      + '</style></head><body>'
+      + '<div class="header">'
+      + '<div><h1>' + esc(campName) + '</h1><div>Voucher Registrations Report</div><span class="badge">ImpactGrid Admin</span></div>'
+      + '<div class="meta">Generated: ' + dateStr + '<br>Total entries: <strong>' + _activeRegs.length + '</strong></div>'
+      + '</div>'
+      + '<table><thead><tr>' + headers.map(function(h){ return '<th>' + h + '</th>'; }).join('') + '</tr></thead>'
+      + '<tbody>' + rowsHtml + '</tbody></table>'
+      + '<div class="footer">ImpactGrid Group &mdash; Confidential &mdash; ' + dateStr + '</div>'
+      + '</body></html>';
+
+    var w = window.open('', '_blank', 'width=1100,height=700');
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(function(){ w.print(); }, 600);
+  }
+
   return {
     init: init,
     showCreateForm: showCreateForm,
@@ -2688,6 +2745,7 @@ var VT = (function(){
     copyLink: copyLink,
     viewRegistrations: viewRegistrations,
     exportCSV: exportCSV,
+    exportPDF: exportPDF,
     openDesignEditor: openDesignEditor,
     closeDesignEditor: closeDesignEditor,
     savePageDesign: savePageDesign,
