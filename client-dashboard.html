@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Campaigns — ImpactGrid</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .cd-wrap{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
+  .cd-head{margin-bottom:24px;}
+  .cd-head h1{font-size:22px;margin:0 0 4px;}
+  .cd-head p{color:var(--text3);font-size:13px;margin:0;}
+  .cd-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;margin-bottom:18px;}
+  .cd-campaign{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border2);border-radius:10px;margin-bottom:10px;flex-wrap:wrap;cursor:pointer;}
+  .cd-campaign:hover{border-color:var(--gold);}
+  .cd-name{font-weight:600;font-size:14px;}
+  .cd-meta{font-size:12px;color:var(--text3);}
+  .cd-badge{font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;}
+  .cd-badge.active{background:rgba(0,135,81,.15);color:#008751;}
+  .cd-badge.paused{background:rgba(214,40,40,.12);color:#D62828;}
+  table.cd-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.cd-table th,table.cd-table td{padding:8px 10px;border-bottom:1px solid var(--border2);text-align:left;white-space:nowrap;}
+  table.cd-table th{color:var(--text3);font-weight:600;font-size:11px;text-transform:uppercase;}
+  .cd-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--text2);font-size:12px;cursor:pointer;}
+  .cd-btn:hover{border-color:var(--gold);color:var(--text);}
+  .cd-empty{color:var(--text3);font-size:13px;padding:30px;text-align:center;}
+  .cd-back{font-size:12px;color:var(--text3);cursor:pointer;margin-bottom:14px;display:inline-block;}
+</style>
+</head>
+<body>
+
+<div id="ig-nav"></div>
+
+<div class="cd-wrap">
+  <div class="cd-head">
+    <h1>My Campaigns</h1>
+    <p>View and export your voucher registration data.</p>
+  </div>
+
+  <div class="cd-card" id="cdCampaignsCard">
+    <div id="cdCampaignList"><div class="cd-empty">Loading…</div></div>
+  </div>
+
+  <div class="cd-card" id="cdRegCard" style="display:none;">
+    <span class="cd-back" onclick="CD.backToList()">← Back to campaigns</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <h2 id="cdRegTitle" style="font-size:16px;margin:0;">Registrations</h2>
+      <button class="cd-btn" onclick="CD.exportCSV()">Export CSV</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="cd-table" id="cdRegTable">
+        <thead>
+          <tr>
+            <th>Code</th><th>Name</th><th>Phone</th><th>Email</th>
+            <th>Household</th><th>Products</th><th>Spend</th><th>Freq</th>
+            <th>Heard via</th><th>Consent</th><th>Redeemed</th><th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="cdRegBody"></tbody>
+      </table>
+      <div class="cd-empty" id="cdRegEmpty" style="display:none;">No registrations yet.</div>
+    </div>
+  </div>
+</div>
+
+<div id="ig-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="nav.js"></script>
+<script src="client-dashboard.js"></script>
+<script>
+  if (typeof renderNav === 'function') renderNav('client-dashboard.html');
+  if (typeof renderFooter === 'function') renderFooter();
+  if (typeof initAuth === 'function') initAuth();
+  CD.init();
+</script>
+</body>
+</html>
