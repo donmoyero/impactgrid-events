@@ -2499,6 +2499,12 @@ var VT = (function(){
     document.getElementById('vtThankYou').value      = d.thank_you_message || '';
     document.getElementById('vtDesignStatus').style.display = 'none';
 
+    [['vtBgImage','vtBgPreview'],['vtHeaderImage','vtHeaderPreview'],['vtFooterImage','vtFooterPreview']].forEach(function(pair){
+      var url = document.getElementById(pair[0]).value;
+      var img = document.getElementById(pair[1]);
+      if(url){ img.src = url; img.style.display = 'block'; } else { img.style.display = 'none'; img.src = ''; }
+    });
+
     var previewBtn = document.getElementById('vtPreviewLink');
     previewBtn.dataset.url = location.origin + '/register.html?c=' + encodeURIComponent(c.slug);
 
@@ -2508,6 +2514,64 @@ var VT = (function(){
 
   function closeDesignEditor(){
     document.getElementById('vtDesignEditor').style.display = 'none';
+  }
+
+  function dzDragOver(ev, zone){
+    ev.preventDefault();
+    zone.classList.add('vt-dz-over');
+  }
+
+  function dzDragLeave(ev, zone){
+    zone.classList.remove('vt-dz-over');
+  }
+
+  async function dzDrop(ev, inputId, previewId){
+    ev.preventDefault();
+    ev.currentTarget.classList.remove('vt-dz-over');
+    var file = ev.dataTransfer.files && ev.dataTransfer.files[0];
+    if(file) await _uploadCampaignImage(file, inputId, previewId, ev.currentTarget);
+  }
+
+  async function handleFileInput(ev, inputId, previewId){
+    var file = ev.target.files && ev.target.files[0];
+    if(file) await _uploadCampaignImage(file, inputId, previewId, ev.target.closest('.vt-dropzone'));
+    ev.target.value = '';
+  }
+
+  async function _uploadCampaignImage(file, inputId, previewId, zoneEl){
+    if(!file.type || file.type.indexOf('image/') !== 0){
+      toast('','Invalid file','Please drop an image file');
+      return;
+    }
+
+    var zoneText = zoneEl ? zoneEl.querySelector('.vt-dz-text') : null;
+    if(zoneEl) zoneEl.classList.add('vt-dz-uploading');
+    if(zoneText) zoneText.textContent = 'Uploading…';
+
+    try{
+      var ext  = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      var path = 'campaigns/' + Date.now() + '-' + Math.random().toString(36).slice(2,8) + '.' + ext;
+
+      var { error: upErr } = await getSupabase()
+        .storage.from('campaign-assets')
+        .upload(path, file, { cacheControl:'3600', upsert:false });
+
+      if(upErr) throw upErr;
+
+      var { data: pub } = getSupabase().storage.from('campaign-assets').getPublicUrl(path);
+      var url = pub.publicUrl;
+
+      document.getElementById(inputId).value = url;
+      var img = document.getElementById(previewId);
+      if(img){ img.src = url; img.style.display = 'block'; }
+
+      if(zoneText) zoneText.textContent = 'Uploaded ✓ — drop to replace';
+    }catch(e){
+      toast('','Upload failed', e.message || 'Check that the campaign-assets bucket exists');
+      if(zoneText) zoneText.textContent = 'Drag & drop or click to upload';
+    }finally{
+      if(zoneEl) zoneEl.classList.remove('vt-dz-uploading');
+    }
   }
 
   async function savePageDesign(){
@@ -2626,7 +2690,11 @@ var VT = (function(){
     exportCSV: exportCSV,
     openDesignEditor: openDesignEditor,
     closeDesignEditor: closeDesignEditor,
-    savePageDesign: savePageDesign
+    savePageDesign: savePageDesign,
+    dzDragOver: dzDragOver,
+    dzDragLeave: dzDragLeave,
+    dzDrop: dzDrop,
+    handleFileInput: handleFileInput
   };
 })();
 
