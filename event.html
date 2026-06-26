@@ -11,13 +11,20 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 /* ── Firebase init for event.html — config fetched securely from backend ── */
-fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
-  .then(function(r){ return r.json(); })
-  .then(function(cfg){
-    if (!firebase.apps.length) firebase.initializeApp(cfg);
-    window._eventsDb = firebase.firestore();
-  })
-  .catch(function(err){ console.error('Failed to load Firebase config:', err); });
+/* Resolve this promise once Firestore is ready */
+window._dbReadyPromise = new Promise(function(resolve, reject){
+  fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
+    .then(function(r){ return r.json(); })
+    .then(function(cfg){
+      if (!firebase.apps.length) firebase.initializeApp(cfg);
+      window._eventsDb = firebase.firestore();
+      resolve(window._eventsDb);
+    })
+    .catch(function(err){
+      console.error('Failed to load Firebase config:', err);
+      reject(err);
+    });
+});
 </script>
 <style>
 /* ══════════════════════════════════════
@@ -1163,6 +1170,10 @@ document.addEventListener('DOMContentLoaded', async function(){
   var code   = params.get('code');
 
   if(!slug){ showError('No event specified in the URL.'); return; }
+
+  /* Wait for Firestore to be ready before querying */
+  try{ await window._dbReadyPromise; }
+  catch(e){ showError('Could not connect to database. Please refresh and try again.'); return; }
 
   try{
     var db = window._eventsDb;
