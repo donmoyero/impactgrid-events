@@ -311,6 +311,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('services',this)"><span class="sb-ico"></span>Services</a>
         <a href="#" onclick="return nav('about',this)"><span class="sb-ico"></span>About Page</a>
         <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico"></span>Portfolio Events</a>
+        <a href="#" onclick="return nav('blog',this)"><span class="sb-ico"></span>Blog</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -810,7 +811,92 @@ If you have any questions, just reply to this email.
         </div>
       </div>
     </div>
-    <!-- SERVICES -->
+    <!-- BLOG -->
+    <div class="page" id="page-blog">
+      <div class="page-header">
+        <div class="page-title">Blog</div>
+        <div class="page-sub">Each post is its own flip-book. Add text, image, or YouTube pages and reorder them — changes go live instantly.</div>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div id="blogListView">
+        <div class="card">
+          <div class="card-head">
+            <h2> All Posts</h2>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm" onclick="loadBlogPosts()">↻ Refresh</button>
+              <button class="btn btn-gold" onclick="blogNewPost()">+ New Post</button>
+            </div>
+          </div>
+          <div class="card-body" id="blogPostsList">
+            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDITOR VIEW -->
+      <div id="blogEditorView" style="display:none;">
+        <div class="ws-layout">
+          <div>
+            <div class="card">
+              <div class="card-head">
+                <h2 id="blogEditorTitle"> Post Details</h2>
+                <button class="btn btn-ghost btn-sm" onclick="blogBackToList()">← Back to list</button>
+              </div>
+              <div class="card-body">
+                <div class="field-group" style="margin-bottom:12px;">
+                  <div class="field-label">Title</div>
+                  <input type="text" id="blogTitleInput" placeholder="Post title">
+                </div>
+
+                <div class="field-group" style="margin-bottom:14px;">
+                  <div class="field-label">Category / tag</div>
+                  <input type="text" id="blogCategoryInput" placeholder="e.g. Journal, Behind the Scenes">
+                </div>
+
+                <div class="field-label">Cover image (shown on the closed book)</div>
+                <div class="upload-zone" id="blogCoverDropZone"
+                  onclick="document.getElementById('blogCoverFileIn').click()"
+                  ondragover="onDragOver(event,'blogCoverDropZone')"
+                  ondragleave="onDragLeave(event,'blogCoverDropZone')"
+                  ondrop="onDrop(event,'blogCoverDropZone',blogUploadCover)">
+                  <div class="upload-zone-ico"></div>
+                  <div class="upload-zone-title">Drop a cover image or click to browse</div>
+                  <div class="upload-zone-sub">JPG · PNG · WebP</div>
+                  <input type="file" id="blogCoverFileIn" accept="image/jpeg,image/png,image/webp" onchange="blogCoverFileChange(event)"/>
+                </div>
+                <div id="blogCoverPreviewWrap" style="margin-top:10px;display:none;">
+                  <img id="blogCoverPreview" style="width:140px;height:auto;border-radius:var(--r);display:block;" />
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h2> Pages</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="btn btn-ghost btn-sm" onclick="blogAddPage('text')">+ Text Page</button>
+                  <button class="btn btn-ghost btn-sm" onclick="blogAddPage('image')">+ Image Page</button>
+                  <button class="btn btn-ghost btn-sm" onclick="blogAddPage('youtube')">+ YouTube Page</button>
+                </div>
+              </div>
+              <div class="card-body" id="blogPagesList">
+                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">No pages yet — add one above.</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="ws-sticky">
+            <div class="hint-box">
+              <strong>How the book works</strong><br><br>
+              Pages flip in the order shown below — use ↑ / ↓ to reorder. Text and image pages can sit side-by-side as a spread on the public blog page.<br><br>
+              YouTube pages just need the video ID (the part after <code>watch?v=</code>) — it shows a thumbnail and only loads the video when clicked.
+            </div>
+            <button class="btn btn-gold" onclick="blogSavePost()" style="display:flex;justify-content:center;margin-top:12px;padding:10px;width:100%;"> Save Post</button>
+            <a href="blog.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:10px;padding:10px;"> Preview Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="page" id="page-services">
       <div class="page-header">
         <div class="page-title">Services</div>
@@ -1599,7 +1685,8 @@ function nav(id,el){
     reviews:'loadEventReviews',
     hero:'loadAllHomepageSections',
     bookings:'loadBookings',
-    vouchers:'initVouchersPage'
+    vouchers:'initVouchersPage',
+    blog:'loadBlogPosts'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
   return false;
@@ -3756,6 +3843,283 @@ window.pfToggleSelectMode  = pfToggleSelectMode;
 window.pfCancelSelect      = pfCancelSelect;
 window.pfSelectAll         = pfSelectAll;
 window.pfDeleteSelected    = pfDeleteSelected;
+
+/* ════════════════════════════════════════
+   BLOG ADMIN
+   Storage: Cloudinary (cover + image pages) · DB: Firebase
+     blog_posts/{id}                 { title, category, coverImage, coverPublicId, pageCount, createdAt, updatedAt }
+     blog_posts/{id}/pages/{pageId}   { type, order, heading, body, url, cloudinaryId, videoId, caption }
+════════════════════════════════════════ */
+
+var blogPosts = [];
+var blogCurrentPost = null;   // { id, title, category, coverImage, coverPublicId, pages:[...] }
+var blogPageSeq = 0;
+
+async function loadBlogPosts() {
+  var el = document.getElementById('blogPostsList');
+  if (!el) return;
+  blogShowList();
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
+  try {
+    if (!db) throw new Error('Firebase not ready — refresh.');
+    var q    = query(collection(db, 'blog_posts'), orderBy('createdAt', 'desc'));
+    var snap = await getDocs(q);
+    blogPosts = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    if (!blogPosts.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No posts yet — click "New Post" to write your first.</div></div>';
+      return;
+    }
+    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">' +
+      blogPosts.map(function(p) {
+        var safeId = esc(p.id);
+        return '<div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);">' +
+          (p.coverImage
+            ? '<img src="' + esc(p.coverImage) + '" style="width:100%;height:110px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
+            : '<div style="width:100%;height:110px;background:var(--bg3);"></div>') +
+          '<div style="padding:12px 14px;">' +
+            '<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">' + esc(p.category || 'Journal') + '</div>' +
+            '<div style="font-size:14px;font-weight:700;margin-bottom:6px;">' + esc(p.title || 'Untitled') + '</div>' +
+            '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">' + (p.pageCount || 0) + ' page' + ((p.pageCount||0) === 1 ? '' : 's') + '</div>' +
+            '<div style="display:flex;gap:6px;">' +
+              '<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="blogEditPost(\'' + safeId + '\')">Edit</button>' +
+              '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="blogDeletePost(\'' + safeId + '\',' + JSON.stringify(p.coverPublicId||'') + ')">Delete</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function blogShowList() {
+  document.getElementById('blogListView').style.display = '';
+  document.getElementById('blogEditorView').style.display = 'none';
+}
+function blogShowEditor() {
+  document.getElementById('blogListView').style.display = 'none';
+  document.getElementById('blogEditorView').style.display = '';
+}
+function blogBackToList() { blogShowList(); }
+
+function blogNewPost() {
+  blogCurrentPost = { id: null, title: '', category: '', coverImage: '', coverPublicId: '', pages: [] };
+  document.getElementById('blogEditorTitle').textContent = ' New Post';
+  document.getElementById('blogTitleInput').value = '';
+  document.getElementById('blogCategoryInput').value = '';
+  document.getElementById('blogCoverPreviewWrap').style.display = 'none';
+  blogRenderPages();
+  blogShowEditor();
+}
+
+async function blogEditPost(id) {
+  try {
+    var post = blogPosts.find(function(p){ return p.id === id; }) || {};
+    var pagesSnap = await getDocs(query(collection(db, 'blog_posts', id, 'pages'), orderBy('order', 'asc')));
+    var pages = pagesSnap.docs.map(function(d){ return Object.assign({ _docId: d.id }, d.data()); });
+    blogCurrentPost = {
+      id: id,
+      title: post.title || '',
+      category: post.category || '',
+      coverImage: post.coverImage || '',
+      coverPublicId: post.coverPublicId || '',
+      pages: pages
+    };
+    document.getElementById('blogEditorTitle').textContent = ' Edit Post';
+    document.getElementById('blogTitleInput').value = blogCurrentPost.title;
+    document.getElementById('blogCategoryInput').value = blogCurrentPost.category;
+    var pv = document.getElementById('blogCoverPreviewWrap');
+    if (blogCurrentPost.coverImage) {
+      document.getElementById('blogCoverPreview').src = blogCurrentPost.coverImage;
+      pv.style.display = '';
+    } else { pv.style.display = 'none'; }
+    blogRenderPages();
+    blogShowEditor();
+  } catch(e) { toast('', 'Could not load post', e.message); }
+}
+
+async function blogDeletePost(id, coverPublicId) {
+  if (!confirm('Delete this post and all its pages? This cannot be undone.')) return;
+  try {
+    var pagesSnap = await getDocs(collection(db, 'blog_posts', id, 'pages'));
+    for (var i = 0; i < pagesSnap.docs.length; i++) {
+      await deleteDoc(doc(db, 'blog_posts', id, 'pages', pagesSnap.docs[i].id));
+    }
+    if (coverPublicId) {
+      try { await fetch(EVENTS_API + '/api/delete-photo', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ publicId: coverPublicId }) }); } catch(e){}
+    }
+    await deleteDoc(doc(db, 'blog_posts', id));
+    toast('', 'Post deleted', '');
+    loadBlogPosts();
+  } catch(e) { toast('', 'Delete failed', e.message); }
+}
+
+/* ── Cover image upload ── */
+function blogCoverFileChange(e) {
+  var f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (f) blogUploadCover(f);
+}
+async function blogUploadCover(file) {
+  if (!blogCurrentPost) return;
+  try {
+    toast('', 'Uploading cover…', '');
+    var result = await uploadToCloudinary(file, 'blog');
+    blogCurrentPost.coverImage = result.secure_url;
+    blogCurrentPost.coverPublicId = result.public_id;
+    document.getElementById('blogCoverPreview').src = result.secure_url;
+    document.getElementById('blogCoverPreviewWrap').style.display = '';
+    toast('', 'Cover updated', '');
+  } catch(e) { toast('', 'Upload failed', e.message); }
+}
+
+/* ── Pages editor ── */
+function blogAddPage(type) {
+  if (!blogCurrentPost) return;
+  blogCurrentPost.pages.push({
+    _localId: 'np' + (blogPageSeq++),
+    type: type,
+    heading: '', body: '',
+    url: '', cloudinaryId: '',
+    videoId: '', caption: ''
+  });
+  blogRenderPages();
+}
+
+function blogDeletePage(idx) {
+  blogCurrentPost.pages.splice(idx, 1);
+  blogRenderPages();
+}
+
+function blogMovePage(idx, dir) {
+  var arr = blogCurrentPost.pages;
+  var newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= arr.length) return;
+  var tmp = arr[idx]; arr[idx] = arr[newIdx]; arr[newIdx] = tmp;
+  blogRenderPages();
+}
+
+function blogUpdatePageField(idx, field, value) {
+  if (blogCurrentPost && blogCurrentPost.pages[idx]) blogCurrentPost.pages[idx][field] = value;
+}
+
+function blogRenderPages() {
+  var el = document.getElementById('blogPagesList');
+  var pages = blogCurrentPost ? blogCurrentPost.pages : [];
+  if (!pages.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No pages yet — add one above.</div></div>';
+    return;
+  }
+  el.innerHTML = pages.map(function(pg, idx) {
+    var typeLabel = pg.type === 'image' ? ' Image' : pg.type === 'youtube' ? ' YouTube' : ' Text';
+    var body = '';
+    if (pg.type === 'text') {
+      body =
+        '<input type="text" placeholder="Heading (optional)" value="' + esc(pg.heading) + '" oninput="blogUpdatePageField(' + idx + ',\'heading\',this.value)" style="margin-bottom:8px;">' +
+        '<textarea placeholder="Page text…" rows="4" oninput="blogUpdatePageField(' + idx + ',\'body\',this.value)">' + esc(pg.body) + '</textarea>';
+    } else if (pg.type === 'image') {
+      body =
+        (pg.url ? '<img src="' + esc(pg.url) + '" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--r);margin-bottom:8px;display:block;">' : '') +
+        '<input type="file" accept="image/jpeg,image/png,image/webp" id="blogPgImgIn-' + idx + '" style="margin-bottom:8px;" onchange="blogPageImageFile(event,' + idx + ')">' +
+        '<input type="text" placeholder="Caption (optional)" value="' + esc(pg.caption) + '" oninput="blogUpdatePageField(' + idx + ',\'caption\',this.value)">';
+    } else {
+      body =
+        '<input type="text" placeholder="YouTube video ID (e.g. dQw4w9WgXcQ)" value="' + esc(pg.videoId) + '" oninput="blogUpdatePageField(' + idx + ',\'videoId\',this.value)" style="margin-bottom:8px;">' +
+        '<input type="text" placeholder="Caption (optional)" value="' + esc(pg.caption) + '" oninput="blogUpdatePageField(' + idx + ',\'caption\',this.value)">';
+    }
+    return '<div style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;background:var(--bg2);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+        '<span class="chip chip-gold">Page ' + (idx + 1) + ' · ' + typeLabel + '</span>' +
+        '<div style="display:flex;gap:4px;">' +
+          '<button class="btn btn-ghost btn-sm" onclick="blogMovePage(' + idx + ',-1)" ' + (idx===0?'disabled':'') + '>↑</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="blogMovePage(' + idx + ',1)" ' + (idx===pages.length-1?'disabled':'') + '>↓</button>' +
+          '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="blogDeletePage(' + idx + ')">Delete</button>' +
+        '</div>' +
+      '</div>' +
+      body +
+    '</div>';
+  }).join('');
+}
+
+async function blogPageImageFile(e, idx) {
+  var f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  try {
+    toast('', 'Uploading image…', '');
+    var result = await uploadToCloudinary(f, 'blog');
+    blogCurrentPost.pages[idx].url = result.secure_url;
+    blogCurrentPost.pages[idx].cloudinaryId = result.public_id;
+    blogRenderPages();
+    toast('', 'Image added', '');
+  } catch(err) { toast('', 'Upload failed', err.message); }
+}
+
+/* ── Save post + pages ── */
+async function blogSavePost() {
+  if (!blogCurrentPost) return;
+  var title = document.getElementById('blogTitleInput').value.trim();
+  var category = document.getElementById('blogCategoryInput').value.trim();
+  if (!title) { toast('', 'Title required', ''); return; }
+  blogCurrentPost.title = title;
+  blogCurrentPost.category = category;
+
+  try {
+    var postRef;
+    if (blogCurrentPost.id) {
+      postRef = doc(db, 'blog_posts', blogCurrentPost.id);
+      await updateDoc(postRef, {
+        title: title, category: category,
+        coverImage: blogCurrentPost.coverImage || '',
+        coverPublicId: blogCurrentPost.coverPublicId || '',
+        pageCount: blogCurrentPost.pages.length,
+        updatedAt: serverTimestamp()
+      });
+      /* wipe and re-write pages to keep ordering simple + reliable */
+      var existing = await getDocs(collection(db, 'blog_posts', blogCurrentPost.id, 'pages'));
+      for (var i = 0; i < existing.docs.length; i++) {
+        await deleteDoc(doc(db, 'blog_posts', blogCurrentPost.id, 'pages', existing.docs[i].id));
+      }
+    } else {
+      postRef = await addDoc(collection(db, 'blog_posts'), {
+        title: title, category: category,
+        coverImage: blogCurrentPost.coverImage || '',
+        coverPublicId: blogCurrentPost.coverPublicId || '',
+        pageCount: blogCurrentPost.pages.length,
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+      });
+      blogCurrentPost.id = postRef.id;
+    }
+
+    for (var p = 0; p < blogCurrentPost.pages.length; p++) {
+      var pg = blogCurrentPost.pages[p];
+      await addDoc(collection(db, 'blog_posts', blogCurrentPost.id, 'pages'), {
+        type: pg.type, order: p,
+        heading: pg.heading || '', body: pg.body || '',
+        url: pg.url || '', cloudinaryId: pg.cloudinaryId || '',
+        videoId: pg.videoId || '', caption: pg.caption || ''
+      });
+    }
+
+    toast('', 'Post saved', '');
+    blogBackToList();
+    loadBlogPosts();
+  } catch(e) { toast('', 'Save failed', e.message); }
+}
+
+window.loadBlogPosts      = loadBlogPosts;
+window.blogNewPost        = blogNewPost;
+window.blogEditPost       = blogEditPost;
+window.blogDeletePost     = blogDeletePost;
+window.blogBackToList     = blogBackToList;
+window.blogCoverFileChange= blogCoverFileChange;
+window.blogAddPage        = blogAddPage;
+window.blogDeletePage     = blogDeletePage;
+window.blogMovePage       = blogMovePage;
+window.blogUpdatePageField= blogUpdatePageField;
+window.blogPageImageFile  = blogPageImageFile;
+window.blogSavePost       = blogSavePost;
 /* Close modal on backdrop click */
 document.getElementById('svcModal').addEventListener('click', function(e){
   if(e.target === this) closeSvcModal();
