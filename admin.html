@@ -3846,9 +3846,9 @@ window.pfDeleteSelected    = pfDeleteSelected;
 
 /* ════════════════════════════════════════
    BLOG ADMIN
-   Storage: Cloudinary (cover + image pages) · DB: Firebase
-     blog_posts/{id}                 { title, category, coverImage, coverPublicId, pageCount, createdAt, updatedAt }
-     blog_posts/{id}/pages/{pageId}   { type, order, heading, body, url, cloudinaryId, videoId, caption }
+   Storage: Cloudinary (cover + image pages) · DB: Supabase (getContentClient())
+     blog_posts  { id, title, category, cover_image, cover_public_id, page_count, created_at, updated_at }
+     blog_pages  { id, post_id, order, type, heading, body, url, cloudinary_id, video_id, caption }
 ════════════════════════════════════════ */
 
 var blogPosts = [];
@@ -3861,10 +3861,10 @@ async function loadBlogPosts() {
   blogShowList();
   el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try {
-    if (!db) throw new Error('Firebase not ready — refresh.');
-    var q    = query(collection(db, 'blog_posts'), orderBy('createdAt', 'desc'));
-    var snap = await getDocs(q);
-    blogPosts = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    var sb = getContentClient();
+    var { data, error } = await sb.from('blog_posts').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    blogPosts = data || [];
     if (!blogPosts.length) {
       el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No posts yet — click "New Post" to write your first.</div></div>';
       return;
@@ -3873,16 +3873,16 @@ async function loadBlogPosts() {
       blogPosts.map(function(p) {
         var safeId = esc(p.id);
         return '<div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);">' +
-          (p.coverImage
-            ? '<img src="' + esc(p.coverImage) + '" style="width:100%;height:110px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
+          (p.cover_image
+            ? '<img src="' + esc(p.cover_image) + '" style="width:100%;height:110px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
             : '<div style="width:100%;height:110px;background:var(--bg3);"></div>') +
           '<div style="padding:12px 14px;">' +
             '<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">' + esc(p.category || 'Journal') + '</div>' +
             '<div style="font-size:14px;font-weight:700;margin-bottom:6px;">' + esc(p.title || 'Untitled') + '</div>' +
-            '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">' + (p.pageCount || 0) + ' page' + ((p.pageCount||0) === 1 ? '' : 's') + '</div>' +
+            '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">' + (p.page_count || 0) + ' page' + ((p.page_count||0) === 1 ? '' : 's') + '</div>' +
             '<div style="display:flex;gap:6px;">' +
               '<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="blogEditPost(\'' + safeId + '\')">Edit</button>' +
-              '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="blogDeletePost(\'' + safeId + '\',' + JSON.stringify(p.coverPublicId||'') + ')">Delete</button>' +
+              '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="blogDeletePost(\'' + safeId + '\',' + JSON.stringify(p.cover_public_id||'') + ')">Delete</button>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -3916,15 +3916,28 @@ function blogNewPost() {
 async function blogEditPost(id) {
   try {
     var post = blogPosts.find(function(p){ return p.id === id; }) || {};
-    var pagesSnap = await getDocs(query(collection(db, 'blog_posts', id, 'pages'), orderBy('order', 'asc')));
-    var pages = pagesSnap.docs.map(function(d){ return Object.assign({ _docId: d.id }, d.data()); });
+    var sb = getContentClient();
+    var { data: pages, error } = await sb.from('blog_pages')
+      .select('*').eq('post_id', id).order('order', { ascending: true });
+    if (error) throw error;
     blogCurrentPost = {
       id: id,
       title: post.title || '',
       category: post.category || '',
-      coverImage: post.coverImage || '',
-      coverPublicId: post.coverPublicId || '',
-      pages: pages
+      coverImage: post.cover_image || '',
+      coverPublicId: post.cover_public_id || '',
+      pages: (pages || []).map(function(pg) {
+        return {
+          _dbId: pg.id,
+          type: pg.type,
+          heading: pg.heading || '',
+          body: pg.body || '',
+          url: pg.url || '',
+          cloudinaryId: pg.cloudinary_id || '',
+          videoId: pg.video_id || '',
+          caption: pg.caption || ''
+        };
+      })
     };
     document.getElementById('blogEditorTitle').textContent = ' Edit Post';
     document.getElementById('blogTitleInput').value = blogCurrentPost.title;
@@ -3942,14 +3955,13 @@ async function blogEditPost(id) {
 async function blogDeletePost(id, coverPublicId) {
   if (!confirm('Delete this post and all its pages? This cannot be undone.')) return;
   try {
-    var pagesSnap = await getDocs(collection(db, 'blog_posts', id, 'pages'));
-    for (var i = 0; i < pagesSnap.docs.length; i++) {
-      await deleteDoc(doc(db, 'blog_posts', id, 'pages', pagesSnap.docs[i].id));
-    }
+    var sb = getContentClient();
+    /* blog_pages has ON DELETE CASCADE so deleting the post removes pages automatically */
     if (coverPublicId) {
       try { await fetch(EVENTS_API + '/api/delete-photo', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ publicId: coverPublicId }) }); } catch(e){}
     }
-    await deleteDoc(doc(db, 'blog_posts', id));
+    var { error } = await sb.from('blog_posts').delete().eq('id', id);
+    if (error) throw error;
     toast('', 'Post deleted', '');
     loadBlogPosts();
   } catch(e) { toast('', 'Delete failed', e.message); }
@@ -4066,40 +4078,54 @@ async function blogSavePost() {
   blogCurrentPost.category = category;
 
   try {
-    var postRef;
-    if (blogCurrentPost.id) {
-      postRef = doc(db, 'blog_posts', blogCurrentPost.id);
-      await updateDoc(postRef, {
-        title: title, category: category,
-        coverImage: blogCurrentPost.coverImage || '',
-        coverPublicId: blogCurrentPost.coverPublicId || '',
-        pageCount: blogCurrentPost.pages.length,
-        updatedAt: serverTimestamp()
-      });
-      /* wipe and re-write pages to keep ordering simple + reliable */
-      var existing = await getDocs(collection(db, 'blog_posts', blogCurrentPost.id, 'pages'));
-      for (var i = 0; i < existing.docs.length; i++) {
-        await deleteDoc(doc(db, 'blog_posts', blogCurrentPost.id, 'pages', existing.docs[i].id));
-      }
+    var sb = getContentClient();
+    var postId = blogCurrentPost.id;
+
+    if (postId) {
+      /* UPDATE existing post */
+      var { error: upErr } = await sb.from('blog_posts').update({
+        title: title,
+        category: category,
+        cover_image: blogCurrentPost.coverImage || '',
+        cover_public_id: blogCurrentPost.coverPublicId || '',
+        page_count: blogCurrentPost.pages.length,
+        updated_at: new Date().toISOString()
+      }).eq('id', postId);
+      if (upErr) throw upErr;
+      /* wipe existing pages — re-insert in order */
+      var { error: delErr } = await sb.from('blog_pages').delete().eq('post_id', postId);
+      if (delErr) throw delErr;
     } else {
-      postRef = await addDoc(collection(db, 'blog_posts'), {
-        title: title, category: category,
-        coverImage: blogCurrentPost.coverImage || '',
-        coverPublicId: blogCurrentPost.coverPublicId || '',
-        pageCount: blogCurrentPost.pages.length,
-        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-      });
-      blogCurrentPost.id = postRef.id;
+      /* INSERT new post */
+      var { data: newPost, error: insErr } = await sb.from('blog_posts').insert({
+        title: title,
+        category: category,
+        cover_image: blogCurrentPost.coverImage || '',
+        cover_public_id: blogCurrentPost.coverPublicId || '',
+        page_count: blogCurrentPost.pages.length
+      }).select('id').single();
+      if (insErr) throw insErr;
+      postId = newPost.id;
+      blogCurrentPost.id = postId;
     }
 
-    for (var p = 0; p < blogCurrentPost.pages.length; p++) {
-      var pg = blogCurrentPost.pages[p];
-      await addDoc(collection(db, 'blog_posts', blogCurrentPost.id, 'pages'), {
-        type: pg.type, order: p,
-        heading: pg.heading || '', body: pg.body || '',
-        url: pg.url || '', cloudinaryId: pg.cloudinaryId || '',
-        videoId: pg.videoId || '', caption: pg.caption || ''
+    /* Insert pages in order */
+    if (blogCurrentPost.pages.length) {
+      var pageRows = blogCurrentPost.pages.map(function(pg, i) {
+        return {
+          post_id: postId,
+          order: i,
+          type: pg.type,
+          heading: pg.heading || '',
+          body: pg.body || '',
+          url: pg.url || '',
+          cloudinary_id: pg.cloudinaryId || '',
+          video_id: pg.videoId || '',
+          caption: pg.caption || ''
+        };
       });
+      var { error: pgErr } = await sb.from('blog_pages').insert(pageRows);
+      if (pgErr) throw pgErr;
     }
 
     toast('', 'Post saved', '');
