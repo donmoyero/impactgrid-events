@@ -300,6 +300,7 @@ tr:hover td{background:var(--bg2);}
       <div class="sb-section-label">Communication</div>
       <nav class="sb-nav">
         <a href="#" onclick="return nav('mail',this)"><span class="sb-ico"></span>Mail</a>
+        <a href="#" onclick="return nav('vouchers',this)"><span class="sb-ico"></span>Impactgrid Form</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -1016,7 +1017,6 @@ If you have any questions, just reply to this email.
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
             <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);"> Compose</button>
             <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);"> Sent</button>
-            <button id="mail-tab-vouchers-btn" onclick="switchMailTab('vouchers')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);"> Vouchers</button>
           </div>
 
           <!-- COMPOSE -->
@@ -1056,8 +1056,19 @@ If you have any questions, just reply to this email.
             </div>
           </div>
 
-          <!-- VOUCHERS -->
-          <div id="mail-tab-vouchers" style="display:none;">
+        </div>
+        <div class="ws-sticky">
+          <div class="hint-box"><strong>Sending</strong><br><br>Emails are sent from <strong>events@impactgridgroup.com</strong> via Resend. Guests see your brand, not a random address.</div>
+
+        </div>
+      </div>
+    </div>
+
+    <!--  IMPACTGRID FORM (VOUCHERS)  -->
+    <div class="page" id="page-vouchers">
+      <div class="page-header"><div class="page-title">Impactgrid Form</div><div class="page-sub">Create voucher registration forms and manage campaign entries</div></div>
+      <div class="ws-layout">
+        <div>
             <div class="card">
               <div class="card-head">
                 <h2> Voucher Campaigns</h2>
@@ -1200,12 +1211,9 @@ If you have any questions, just reply to this email.
 
               </div>
             </div>
-          </div>
-
         </div>
         <div class="ws-sticky">
-          <div class="hint-box"><strong>Sending</strong><br><br>Emails are sent from <strong>events@impactgridgroup.com</strong> via Resend. Guests see your brand, not a random address.</div>
-
+          <div class="hint-box"><strong>Impactgrid Form</strong><br><br>Create a campaign to generate a public registration page. Guests fill in their details and receive a voucher code.</div>
         </div>
       </div>
     </div>
@@ -1569,7 +1577,8 @@ function nav(id,el){
     downloadrequests:'loadDownloadRequests',
     reviews:'loadEventReviews',
     hero:'loadAllHomepageSections',
-    bookings:'loadBookings'
+    bookings:'loadBookings',
+    vouchers:'initVouchersPage'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
   return false;
@@ -2283,7 +2292,7 @@ var _mailTab = 'compose';
 
 function switchMailTab(tab){
   _mailTab = tab;
-  ['compose','sent','vouchers'].forEach(function(t){
+  ['compose','sent'].forEach(function(t){
     document.getElementById('mail-tab-'+t).style.display = t===tab ? '' : 'none';
     var btn = document.getElementById('mail-tab-'+t+'-btn');
     if(btn){
@@ -2293,7 +2302,6 @@ function switchMailTab(tab){
     }
   });
   if(tab==='sent')     loadSent();
-  if(tab==='vouchers') VT.init();
 }
 
 function clearCompose(){
@@ -2379,8 +2387,10 @@ async function loadSent(){
 }
 
 /*
-   VOUCHER CAMPAIGNS  (Mail → Vouchers tab)
+   VOUCHER CAMPAIGNS  (Impactgrid Form page)
  */
+window.initVouchersPage = function(){ if(window.VT) VT.init(); };
+
 var VT = (function(){
   var _campaigns      = [];
   var _activeCampaign = null;
