@@ -1194,9 +1194,12 @@ If you have any questions, just reply to this email.
                       <div class="field-hint">Research forms collect answers only — guests don't receive a voucher code.</div>
                     </div>
 
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
                       <h2 style="font-size:14px;margin:0;">Form Fields</h2>
-                      <button class="btn btn-ghost btn-sm" onclick="VT.addField()">+ Add field</button>
+                      <div style="display:flex;gap:6px;">
+                        <button class="btn btn-ghost btn-sm" onclick="VT.addSection()">+ New Section</button>
+                        <button class="btn btn-ghost btn-sm" onclick="VT.addField()">+ Add Field</button>
+                      </div>
                     </div>
                     <div id="vtFieldsList" style="display:flex;flex-direction:column;gap:8px;"></div>
                     <div class="field-hint" style="margin-top:8px;">These appear on the public registration page in this order. Add custom fields or edit/remove the defaults.</div>
@@ -2439,16 +2442,17 @@ var VT = (function(){
   /* Default field "slots" for a new campaign. Admin can add/edit/remove freely afterwards. */
   function _defaultFields(){
     return [
-      { id:_uid(), key:'full_name',         label:'Full Name',           type:'text',     required:true  },
-      { id:_uid(), key:'phone',             label:'Phone',               type:'tel',      required:true  },
-      { id:_uid(), key:'email',             label:'Email',               type:'email',    required:true  },
-      { id:_uid(), key:'household_size',    label:'Household Size',      type:'number',   required:false },
-      { id:_uid(), key:'products_interested', label:'Products Interested', type:'text',   required:false },
-      { id:_uid(), key:'expected_spend',    label:'Expected Spend',      type:'text',     required:false },
-      { id:_uid(), key:'attend_frequency',  label:'Attend Frequency',    type:'text',     required:false },
-      { id:_uid(), key:'heard_about',       label:'Heard About',         type:'text',     required:false },
-      { id:_uid(), key:'consent',           label:'I consent to be contacted', type:'checkbox', required:true }
+      { id:_uid(), key:'full_name', label:'Full Name', type:'text',  required:true  },
+      { id:_uid(), key:'phone',     label:'Phone',     type:'tel',   required:true  },
+      { id:_uid(), key:'email',     label:'Email',     type:'email', required:true  }
     ];
+  }
+
+  /* ---- Sections support ---- */
+  /* A "section" item has: { id, _isSection:true, label } */
+  function _addSection(){
+    _editingFields.push({ id:_uid(), _isSection:true, label:'New Section' });
+    _renderFieldsEditor();
   }
 
   async function init(){
@@ -2606,7 +2610,34 @@ var VT = (function(){
     var list = document.getElementById('vtFieldsList');
     if(!list) return;
     list.innerHTML = _editingFields.map(function(f, idx){
-      return '<div style="display:flex;gap:8px;align-items:center;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;flex-wrap:wrap;">'
+
+      /* ── Section header ── */
+      if(f._isSection){
+        return '<div style="display:flex;gap:8px;align-items:center;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;margin-top:6px;">'
+          + '<span style="font-size:13px;">📂</span>'
+          + '<input type="text" value="'+esc(f.label)+'" placeholder="Section name" style="flex:1;font-weight:700;font-size:12.5px;padding:6px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);" oninput="VT.updateSectionLabel('+idx+',this.value)">'
+          + '<span style="font-size:10px;font-family:var(--fm);color:var(--text3);white-space:nowrap;padding:0 4px;">SECTION</span>'
+          + '<button class="btn btn-ghost btn-sm" onclick="VT.removeField('+idx+')" title="Remove section">✕</button>'
+          + '</div>';
+      }
+
+      /* ── Regular field ── */
+      var optionsHtml = '';
+      if(f.type === 'select'){
+        var opts = f.options || [];
+        optionsHtml = '<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;padding-left:4px;" id="opts-'+idx+'">'
+          + opts.map(function(o, oi){
+              return '<div style="display:flex;gap:6px;align-items:center;">'
+                + '<input type="text" value="'+esc(o)+'" placeholder="Option '+(oi+1)+'" style="flex:1;padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;" oninput="VT.updateOption('+idx+','+oi+',this.value)">'
+                + '<button class="btn btn-ghost btn-sm" onclick="VT.removeOption('+idx+','+oi+')" title="Remove option" style="width:26px;height:26px;padding:0;font-size:12px;flex-shrink:0;">✕</button>'
+                + '</div>';
+            }).join('')
+          + '<button class="btn btn-ghost btn-sm" onclick="VT.addOption('+idx+')" style="align-self:flex-start;margin-top:2px;font-size:11px;">+ Add option</button>'
+          + '</div>';
+      }
+
+      return '<div style="padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;">'
+        + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
         + '<input type="text" value="'+esc(f.label)+'" placeholder="Field label" style="flex:1;min-width:140px;padding:7px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12.5px;" oninput="VT.updateField('+idx+',\'label\',this.value)">'
         + '<select style="padding:7px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12.5px;" onchange="VT.updateField('+idx+',\'type\',this.value)">'
         + ['text','email','tel','number','textarea','select','checkbox'].map(function(t){
@@ -2615,7 +2646,8 @@ var VT = (function(){
         + '</select>'
         + '<label style="font-size:11px;display:flex;gap:4px;align-items:center;color:var(--text2);white-space:nowrap;"><input type="checkbox" '+(f.required?'checked':'')+' onchange="VT.updateField('+idx+',\'required\',this.checked)" style="margin:0;"> Required</label>'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.removeField('+idx+')" title="Remove field">✕</button>'
-        + (f.type==='select' ? '<input type="text" value="'+esc((f.options||[]).join(', '))+'" placeholder="Options, comma separated" style="flex:1;min-width:200px;padding:7px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12.5px;" oninput="VT.updateField('+idx+',\'optionsRaw\',this.value)">' : '')
+        + '</div>'
+        + optionsHtml
         + '</div>';
     }).join('');
   }
@@ -2633,18 +2665,45 @@ var VT = (function(){
   function updateField(idx, prop, val){
     var f = _editingFields[idx];
     if(!f) return;
-    if(prop === 'optionsRaw'){
-      f.options = val.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
-      return; // no re-render needed, avoids losing input focus
-    }
     f[prop] = val;
     if(prop === 'label'){
-      /* keep a stable key for new custom fields, derived from the label */
       if(!f.key || f.key.indexOf('field_') === 0) f.key = _slugify(val).replace(/-/g,'_') || f.key;
       return; // no re-render, avoids losing focus while typing
     }
-    if(prop === 'required'){ return; } // checkbox state already reflects itself
-    _renderFieldsEditor(); // type change: re-render so the Options input shows/hides correctly
+    if(prop === 'required'){ return; }
+    if(prop === 'type'){
+      // Ensure dropdown starts with at least one empty option
+      if(val === 'select' && (!f.options || !f.options.length)) f.options = [''];
+    }
+    _renderFieldsEditor();
+  }
+
+  function updateSectionLabel(idx, val){
+    if(_editingFields[idx]) _editingFields[idx].label = val;
+    // no re-render to avoid losing focus
+  }
+
+  /* ── Dropdown option helpers ── */
+  function addOption(fieldIdx){
+    var f = _editingFields[fieldIdx];
+    if(!f) return;
+    if(!f.options) f.options = [];
+    f.options.push('');
+    _renderFieldsEditor();
+  }
+
+  function removeOption(fieldIdx, optIdx){
+    var f = _editingFields[fieldIdx];
+    if(!f || !f.options) return;
+    f.options.splice(optIdx, 1);
+    _renderFieldsEditor();
+  }
+
+  function updateOption(fieldIdx, optIdx, val){
+    var f = _editingFields[fieldIdx];
+    if(!f || !f.options) return;
+    f.options[optIdx] = val;
+    // no re-render — focus stays in input
   }
 
   function closeDesignEditor(){
@@ -2998,8 +3057,13 @@ var VT = (function(){
     closeDesignEditor: closeDesignEditor,
     setFormType: setFormType,
     addField: addField,
+    addSection: _addSection,
     removeField: removeField,
     updateField: updateField,
+    updateSectionLabel: updateSectionLabel,
+    addOption: addOption,
+    removeOption: removeOption,
+    updateOption: updateOption,
     savePageDesign: savePageDesign,
     dzDragOver: dzDragOver,
     dzDragLeave: dzDragLeave,
