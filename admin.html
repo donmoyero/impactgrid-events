@@ -2556,8 +2556,17 @@ var VT = (function(){
         + '<button class="btn btn-ghost btn-sm" onclick="VT.viewRegistrations(\''+c.id+'\')">View entries</button>'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.openDesignEditor(\''+c.id+'\')">Customize Page</button>'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.toggleActive(\''+c.id+'\', '+(!c.active)+')">'+(c.active?'Pause':'Resume')+'</button>'
+        + '<button class="btn btn-red btn-sm" onclick="VT.deleteCampaign(\''+c.id+'\',\''+esc(c.name)+'\')">🗑 Delete</button>'
         + '</div></div>';
     }).join('') + '</div>';
+  }
+
+  async function deleteCampaign(id, name){
+    if(!confirm('Delete "'+name+'"?\n\nThis will permanently remove the form and all its registrations. This cannot be undone.')) return;
+    var { error } = await getSupabase().from('campaigns').delete().eq('id', id);
+    if(error){ toast('','Could not delete', error.message); return; }
+    toast('','Form deleted', name);
+    await loadCampaigns();
   }
 
   async function toggleActive(id, newState){
@@ -2862,29 +2871,68 @@ var VT = (function(){
     }).join('');
   }
 
+  /* ── Return the active campaign's field definitions (excluding sections) ── */
+  function _activeFields(){
+    var d = (_activeCampaign && _activeCampaign.page_design) || {};
+    return (d.fields || []).filter(function(f){ return !f._isSection; });
+  }
+
+  /* ── Get a field's value from a registration row ──
+     Checks the named DB column first, then falls back to extra_fields JSON. */
+  function _getVal(reg, field){
+    if(field.type === 'checkbox') return reg[field.key] ? 'Yes' : 'No';
+    var v = reg[field.key];
+    if(v == null && reg.extra_fields){
+      try{ var ex = typeof reg.extra_fields === 'string' ? JSON.parse(reg.extra_fields) : reg.extra_fields; v = ex[field.key]; }catch(e){}
+    }
+    return v == null ? '' : String(v);
+  }
+
   function exportCSV(){
     if(!_activeRegs.length){ toast('','Nothing to export','No registrations loaded'); return; }
 
-    var headers = ['Voucher Code','Full Name','Phone','Email','Household Size','Products Interested','Expected Spend','Attend Frequency','Heard About','Consent','Redeemed','Date'];
+    var fields  = _activeFields();
+    var hasCode = (_activeCampaign && _activeCampaign.page_design && _activeCampaign.page_design.form_type) !== 'research';
+
+    var headers = (hasCode ? ['Voucher Code'] : [])
+      .concat(fields.map(function(f){ return f.label; }))
+      .concat(['Redeemed','Date']);
+
     var rows = _activeRegs.map(function(r){
-      return [r.voucher_code||'—', r.full_name, r.phone, r.email, r.household_size||'', r.products_interested||'', r.expected_spend||'', r.attend_frequency||'', r.heard_about||'', r.consent?'Yes':'No', r.redeemed?'Yes':'No', new Date(r.created_at).toISOString()]
-        .map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
+      var cells = (hasCode ? [r.voucher_code||'—'] : [])
+        .concat(fields.map(function(f){ return _getVal(r, f); }))
+        .concat([r.redeemed ? 'Yes' : 'No', new Date(r.created_at).toISOString()]);
+      return cells.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
     });
+
     var csv  = headers.join(',') + '\n' + rows.join('\n');
     var blob = new Blob([csv], { type:'text/csv' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = URL.createObjectURL(blob);
     a.download = (_activeCampaign ? _activeCampaign.slug : 'registrations') + '.csv';
     a.click();
   }
 
-  /* ---- AI insights (page 2 of the PDF) ---- */
+  /* ── AI insights helpers ── */
 
-  function _tally(regs, field, limit){
+  function _tally(regs, key, limit){
     var counts = {};
     regs.forEach(function(r){
-      var v = (r[field] || '').toString().trim();
-      if(!v) return;
+      var v = (r[key] || '').toString().trim();
+      if(!v || v === 'No') return;
+      counts[v] = (counts[v] || 0) + 1;
+    });
+    return Object.keys(counts)
+      .map(function(k){ return { value:k, count:counts[k] }; })
+      .sort(function(a,b){ return b.count - a.count; })
+      .slice(0, limit || 5);
+  }
+
+  function _tallyField(regs, field, limit){
+    var counts = {};
+    regs.forEach(function(r){
+      var v = _getVal(r, field).trim();
+      if(!v || v === 'No') return;
       counts[v] = (counts[v] || 0) + 1;
     });
     return Object.keys(counts)
@@ -2894,27 +2942,41 @@ var VT = (function(){
   }
 
   function _computeInsightsSummary(regs){
+    var fields    = _activeFields();
     var total     = regs.length;
     var redeemed  = regs.filter(function(r){ return r.redeemed; }).length;
-    var consented = regs.filter(function(r){ return r.consent; }).length;
     var times     = regs.map(function(r){ return new Date(r.created_at).getTime(); }).filter(function(t){ return !isNaN(t); });
+
+    /* Find any checkbox fields to compute consent-style rates */
+    var checkboxFields = fields.filter(function(f){ return f.type === 'checkbox'; });
+    var checkboxRates  = {};
+    checkboxFields.forEach(function(f){
+      var yes = regs.filter(function(r){ return _getVal(r,f) === 'Yes'; }).length;
+      checkboxRates[f.label] = total ? Math.round(yes / total * 100) : 0;
+    });
+
+    /* Tally all select + text fields (skip email/tel/number for AI noise) */
+    var tallyFields = fields.filter(function(f){ return f.type === 'select' || f.type === 'text'; });
+    var fieldTallies = {};
+    tallyFields.forEach(function(f){
+      var tally = _tallyField(regs, f);
+      if(tally.length) fieldTallies[f.label] = tally;
+    });
+
     return {
-      total_registrations: total,
-      redeemed_count: redeemed,
-      redemption_rate_pct: total ? Math.round(redeemed / total * 100) : 0,
-      consent_rate_pct: total ? Math.round(consented / total * 100) : 0,
-      top_products_interested: _tally(regs, 'products_interested'),
-      top_expected_spend: _tally(regs, 'expected_spend'),
-      top_attend_frequency: _tally(regs, 'attend_frequency'),
-      top_heard_about: _tally(regs, 'heard_about'),
-      date_range: times.length ? { from: new Date(Math.min.apply(null, times)).toISOString(), to: new Date(Math.max.apply(null, times)).toISOString() } : null
+      campaign_name:        _activeCampaign ? _activeCampaign.name : '',
+      form_type:            (_activeCampaign && _activeCampaign.page_design && _activeCampaign.page_design.form_type) || 'voucher',
+      total_registrations:  total,
+      redeemed_count:       redeemed,
+      redemption_rate_pct:  total ? Math.round(redeemed / total * 100) : 0,
+      checkbox_rates:       checkboxRates,
+      field_tallies:        fieldTallies,
+      date_range:           times.length ? { from: new Date(Math.min.apply(null,times)).toLocaleDateString('en-GB'), to: new Date(Math.max.apply(null,times)).toLocaleDateString('en-GB') } : null
     };
   }
 
-  /* Calls your backend (NOT the Anthropic API directly — keep API keys server-side).
-     Expects POST EVENTS_API + '/api/voucher-insights' to return:
-       { insights: { summary_text: "...", highlights: ["...","..."], recommendations: ["...","..."] } }
-     If the endpoint isn't set up yet, this fails quietly and the PDF falls back to a stats-only page 2. */
+  /* Calls your backend. Sends the full dynamic summary so the AI knows
+     exactly which fields this form has and can give relevant insights. */
   async function _fetchAIInsights(campaignName, summary){
     try{
       var res = await fetch(EVENTS_API + '/api/voucher-insights', {
@@ -2937,61 +2999,74 @@ var VT = (function(){
     var btnOldText = btn ? btn.textContent : '';
     if(btn){ btn.disabled = true; btn.textContent = 'Generating AI insights…'; }
 
+    var fields   = _activeFields();
     var campName = _activeCampaign ? _activeCampaign.name : 'Registrations';
     var dateStr  = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+    var hasCode  = ((_activeCampaign && _activeCampaign.page_design && _activeCampaign.page_design.form_type) || 'voucher') !== 'research';
     var summary  = _computeInsightsSummary(_activeRegs);
     var ai       = await _fetchAIInsights(campName, summary);
 
     if(btn){ btn.disabled = false; btn.textContent = btnOldText; }
 
-    var headers = ['Voucher Code','Full Name','Phone','Email','H/H Size','Products','Spend','Frequency','Heard About','Consent','Redeemed','Date'];
+    /* ── Page 1: data table ── */
+    var headers = (hasCode ? ['Voucher Code'] : [])
+      .concat(fields.map(function(f){ return f.label; }))
+      .concat(['Redeemed','Date']);
 
     var rowsHtml = _activeRegs.map(function(r, i){
-      var bg = i % 2 === 0 ? '#ffffff' : '#f9f9fb';
-      return '<tr style="background:' + bg + ';">'
-        + '<td>' + esc(r.voucher_code||'—') + '</td>'
-        + '<td>' + esc(r.full_name||'') + '</td>'
-        + '<td>' + esc(r.phone||'') + '</td>'
-        + '<td>' + esc(r.email||'') + '</td>'
-        + '<td style="text-align:center;">' + esc(r.household_size||'') + '</td>'
-        + '<td>' + esc(r.products_interested||'') + '</td>'
-        + '<td>' + esc(r.expected_spend||'') + '</td>'
-        + '<td>' + esc(r.attend_frequency||'') + '</td>'
-        + '<td>' + esc(r.heard_about||'') + '</td>'
-        + '<td style="text-align:center;">' + (r.consent ? '✓' : '✗') + '</td>'
-        + '<td style="text-align:center;">' + (r.redeemed ? '✓' : '✗') + '</td>'
-        + '<td style="white-space:nowrap;">' + new Date(r.created_at).toLocaleDateString('en-GB') + '</td>'
-        + '</tr>';
+      var bg   = i % 2 === 0 ? '#ffffff' : '#f9f9fb';
+      var cells = (hasCode ? ['<td>' + esc(r.voucher_code||'—') + '</td>'] : [])
+        .concat(fields.map(function(f){
+          var v = _getVal(r, f);
+          var center = f.type === 'checkbox' || f.type === 'number';
+          return '<td' + (center?' style="text-align:center;"':'') + '>' + esc(v) + '</td>';
+        }))
+        .concat([
+          '<td style="text-align:center;">' + (r.redeemed ? '✓' : '✗') + '</td>',
+          '<td style="white-space:nowrap;">' + new Date(r.created_at).toLocaleDateString('en-GB') + '</td>'
+        ]);
+      return '<tr style="background:' + bg + ';">' + cells.join('') + '</tr>';
     }).join('');
 
+    /* ── Page 2: insights ── */
     function _list(items){
       return '<ul>' + items.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
     }
     function _tallyRows(items){
-      if(!items.length) return '<div class="muted">No data yet</div>';
-      return '<table class="mini"><tbody>' + items.map(function(it){
-        return '<tr><td>' + esc(it.value) + '</td><td style="text-align:right;">' + it.count + '</td></tr>';
-      }).join('') + '</tbody></table>';
+      if(!items || !items.length) return '<div class="muted">No data</div>';
+      return '<table class="mini"><tbody>'
+        + items.map(function(it){ return '<tr><td>' + esc(it.value) + '</td><td style="text-align:right;font-weight:700;">' + it.count + '</td></tr>'; }).join('')
+        + '</tbody></table>';
     }
 
     var page2Html;
     if(ai){
       page2Html = '<h2>Overview</h2><p>' + esc(ai.summary_text || '') + '</p>'
-        + (ai.highlights && ai.highlights.length ? '<h2>Key Highlights</h2>' + _list(ai.highlights) : '')
+        + (ai.highlights     && ai.highlights.length     ? '<h2>Key Highlights</h2>'    + _list(ai.highlights)     : '')
         + (ai.recommendations && ai.recommendations.length ? '<h2>Recommendations</h2>' + _list(ai.recommendations) : '');
-    }else{
-      page2Html = '<p class="muted">AI narrative analysis is unavailable right now (the insights endpoint may not be connected yet), so here are the underlying stats instead:</p>'
+    } else {
+      /* Build stats dynamically from whatever fields exist */
+      var checkboxEntries = Object.keys(summary.checkbox_rates);
+      var checkboxHtml = checkboxEntries.length
+        ? checkboxEntries.map(function(label){
+            return '<div class="stat-box"><div class="stat-num">' + summary.checkbox_rates[label] + '%</div><div class="stat-lbl">' + esc(label) + '</div></div>';
+          }).join('')
+        : '';
+
+      var tallyEntries = Object.keys(summary.field_tallies);
+      var tallyHtml = tallyEntries.length
+        ? '<div class="cols">' + tallyEntries.map(function(label){
+            return '<div><h2>' + esc(label) + '</h2>' + _tallyRows(summary.field_tallies[label]) + '</div>';
+          }).join('') + '</div>'
+        : '<p class="muted">No choice or text fields to tally.</p>';
+
+      page2Html = '<p class="muted">AI narrative analysis is unavailable — here are the underlying stats instead:</p>'
         + '<div class="stats-grid">'
         + '<div class="stat-box"><div class="stat-num">' + summary.total_registrations + '</div><div class="stat-lbl">Total registrations</div></div>'
-        + '<div class="stat-box"><div class="stat-num">' + summary.redemption_rate_pct + '%</div><div class="stat-lbl">Redemption rate</div></div>'
-        + '<div class="stat-box"><div class="stat-num">' + summary.consent_rate_pct + '%</div><div class="stat-lbl">Consent rate</div></div>'
+        + (hasCode ? '<div class="stat-box"><div class="stat-num">' + summary.redemption_rate_pct + '%</div><div class="stat-lbl">Redemption rate</div></div>' : '')
+        + checkboxHtml
         + '</div>'
-        + '<div class="cols">'
-        + '<div><h2>Top Products Interested</h2>' + _tallyRows(summary.top_products_interested) + '</div>'
-        + '<div><h2>Top Expected Spend</h2>' + _tallyRows(summary.top_expected_spend) + '</div>'
-        + '<div><h2>Top Attend Frequency</h2>' + _tallyRows(summary.top_attend_frequency) + '</div>'
-        + '<div><h2>Top Heard About</h2>' + _tallyRows(summary.top_heard_about) + '</div>'
-        + '</div>';
+        + tallyHtml;
     }
 
     var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>'
@@ -3012,19 +3087,20 @@ var VT = (function(){
       + '.page-break p{font-size:11px;line-height:1.6;margin:0 0 8px;}'
       + '.page-break ul{margin:0 0 8px;padding-left:18px;font-size:11px;line-height:1.6;}'
       + '.muted{color:#777;font-size:10.5px;}'
-      + '.stats-grid{display:flex;gap:12px;margin:14px 0;}'
-      + '.stat-box{flex:1;background:#faf6e6;border:1px solid #f0c000;border-radius:8px;padding:10px;text-align:center;}'
+      + '.stats-grid{display:flex;gap:12px;margin:14px 0;flex-wrap:wrap;}'
+      + '.stat-box{flex:1;min-width:100px;background:#faf6e6;border:1px solid #f0c000;border-radius:8px;padding:10px;text-align:center;}'
       + '.stat-num{font-size:20px;font-weight:900;color:#1a1a2e;}'
       + '.stat-lbl{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}'
-      + '.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}'
-      + 'table.mini{font-size:10px;}table.mini td{border-bottom:1px solid #eee;padding:3px 4px;}'
+      + '.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:12px;}'
+      + 'table.mini{font-size:10px;width:100%;}table.mini td{border-bottom:1px solid #eee;padding:3px 4px;}'
+      + 'h2{font-size:12px;margin:14px 0 5px;color:#1a1a2e;font-weight:700;}'
       + '@media print{body{padding:12px;}@page{margin:12mm;}}'
       + '</style></head><body>'
       + '<div class="header">'
       + '<div><h1>' + esc(campName) + '</h1><div>Registrations Report — Page 1 of 2</div><span class="badge">ImpactGrid Admin</span></div>'
       + '<div class="meta">Generated: ' + dateStr + '<br>Total entries: <strong>' + _activeRegs.length + '</strong></div>'
       + '</div>'
-      + '<table><thead><tr>' + headers.map(function(h){ return '<th>' + h + '</th>'; }).join('') + '</tr></thead>'
+      + '<table><thead><tr>' + headers.map(function(h){ return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead>'
       + '<tbody>' + rowsHtml + '</tbody></table>'
       + '<div class="footer">ImpactGrid Group &mdash; Confidential &mdash; ' + dateStr + '</div>'
       + '<div class="page-break">'
@@ -3049,6 +3125,7 @@ var VT = (function(){
     onCreateTypeChange: onCreateTypeChange,
     createCampaign: createCampaign,
     toggleActive: toggleActive,
+    deleteCampaign: deleteCampaign,
     copyLink: copyLink,
     viewRegistrations: viewRegistrations,
     exportCSV: exportCSV,
