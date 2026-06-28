@@ -50,6 +50,7 @@
     { href: 'index.html',       label: 'Home' },
     { href: 'services.html',    label: 'Services' },
     { href: 'portfolio.html',   label: 'Portfolio' },
+    { href: 'blog.html',        label: 'Blog' },
     { href: 'about.html',       label: 'About' },
     { href: 'book-us.html',     label: 'Book Us' },
   ];
@@ -62,6 +63,7 @@
     'index.html':     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>',
     'services.html':  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/><path d="M2 20h20"/></svg>',
     'portfolio.html': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+    'blog.html':      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4.5C2 3.67 2.67 3 3.5 3H9a3 3 0 0 1 3 3 3 3 0 0 1 3-3h5.5c.83 0 1.5.67 1.5 1.5v14c0 .83-.67 1.5-1.5 1.5H15a3 3 0 0 0-3 3 3 3 0 0 0-3-3H3.5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M12 6v15"/></svg>',
     'about.html':     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
     'book-us.html':   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
   };
@@ -98,6 +100,7 @@
       { href:'index.html',       label:'Home' },
       { href:'services.html',    label:'Services' },
       { href:'portfolio.html',   label:'Portfolio' },
+      { href:'blog.html',        label:'Blog' },
       { href:'about.html',       label:'About' },
       { href:'book-us.html',     label:'Book Us' },
     ].map(function(l) {
@@ -352,7 +355,7 @@
                 }).join('') +
               '</div>' +
             '</div>' +
-            '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="about.html">About</a><a href="book-us.html">Book Us</a></div>' +
+            '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="book-us.html">Book Us</a></div>' +
             '<div class="fc"><h4>Contact</h4><a href="mailto:events@impactgridgroup.com">events@impactgridgroup.com</a><a href="tel:07469016509">07469 016509</a></div>' +
             '<div class="fc"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>' +
           '</div>' +
