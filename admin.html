@@ -1222,20 +1222,7 @@ If you have any questions, just reply to this email.
                   <div style="overflow-x:auto;">
                     <table style="width:100%;border-collapse:collapse;font-size:12.5px;" id="vtRegTable">
                       <thead>
-                        <tr style="color:var(--text3);text-transform:uppercase;font-size:10.5px;">
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Code</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Name</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Phone</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Email</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Household</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Products</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Spend</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Freq</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Heard via</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Consent</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Redeemed</th>
-                          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);">Date</th>
-                        </tr>
+                        <tr id="vtRegHead" style="color:var(--text3);text-transform:uppercase;font-size:10.5px;"></tr>
                       </thead>
                       <tbody id="vtRegBody"></tbody>
                     </table>
@@ -2853,21 +2840,29 @@ var VT = (function(){
     }
 
     empty.style.display = 'none';
+
+    /* Build dynamic headers */
+    var regFields  = _activeFields();
+    var regHasCode = (_activeCampaign && _activeCampaign.page_design && _activeCampaign.page_design.form_type) !== 'research';
+    var thS = 'style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);"';
+    var headEl = document.getElementById('vtRegHead');
+    if(headEl){
+      headEl.innerHTML =
+        (regHasCode ? '<th '+thS+'>Code</th>' : '') +
+        regFields.map(function(f){ return '<th '+thS+'>'+esc(f.label)+'</th>'; }).join('') +
+        '<th '+thS+'>Date</th>';
+    }
+
+    /* Build dynamic rows */
+    var tdS = 'style="padding:6px 8px;border-bottom:1px solid var(--border);"';
     body.innerHTML = _activeRegs.map(function(r){
-      return '<tr>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--fm);">'+esc(r.voucher_code||'—')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.full_name)+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.phone)+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.email)+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+(r.household_size||'')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.products_interested||'')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.expected_spend||'')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.attend_frequency||'')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.heard_about||'')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+(r.consent?'Yes':'No')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+(r.redeemed?'Yes':'No')+'</td>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;">'+new Date(r.created_at).toLocaleDateString('en-GB')+'</td>'
-        + '</tr>';
+      var cells =
+        (regHasCode ? '<td '+tdS+' style="padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--fm);">'+esc(r.voucher_code||'—')+'</td>' : '') +
+        regFields.map(function(f){
+          return '<td '+tdS+'>'+esc(_getVal(r,f))+'</td>';
+        }).join('') +
+        '<td '+tdS+' style="padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;">'+new Date(r.created_at).toLocaleDateString('en-GB')+'</td>';
+      return '<tr>'+cells+'</tr>';
     }).join('');
   }
 
@@ -2896,12 +2891,12 @@ var VT = (function(){
 
     var headers = (hasCode ? ['Voucher Code'] : [])
       .concat(fields.map(function(f){ return f.label; }))
-      .concat(['Redeemed','Date']);
+      .concat(['Date']);
 
     var rows = _activeRegs.map(function(r){
       var cells = (hasCode ? [r.voucher_code||'—'] : [])
         .concat(fields.map(function(f){ return _getVal(r, f); }))
-        .concat([r.redeemed ? 'Yes' : 'No', new Date(r.created_at).toISOString()]);
+        .concat([new Date(r.created_at).toISOString()]);
       return cells.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
     });
 
@@ -3011,7 +3006,7 @@ var VT = (function(){
     /* ── Page 1: data table ── */
     var headers = (hasCode ? ['Voucher Code'] : [])
       .concat(fields.map(function(f){ return f.label; }))
-      .concat(['Redeemed','Date']);
+      .concat(['Date']);
 
     var rowsHtml = _activeRegs.map(function(r, i){
       var bg   = i % 2 === 0 ? '#ffffff' : '#f9f9fb';
@@ -3022,7 +3017,6 @@ var VT = (function(){
           return '<td' + (center?' style="text-align:center;"':'') + '>' + esc(v) + '</td>';
         }))
         .concat([
-          '<td style="text-align:center;">' + (r.redeemed ? '✓' : '✗') + '</td>',
           '<td style="white-space:nowrap;">' + new Date(r.created_at).toLocaleDateString('en-GB') + '</td>'
         ]);
       return '<tr style="background:' + bg + ';">' + cells.join('') + '</tr>';
