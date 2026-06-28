@@ -152,7 +152,7 @@ var REG = (function () {
     var missing  = [];
 
     fields.forEach(function(f) {
-      if (f._isSection) return; // skip section dividers
+      if (f._isSection) return;
       var el = document.getElementById('rg_' + f.key);
       if (!el) return;
       var val = f.type === 'checkbox' ? el.checked : el.value.trim();
@@ -169,63 +169,46 @@ var REG = (function () {
     btn.disabled    = true;
     btn.textContent = 'Submitting…';
 
-    /* Pass the core named params the RPC expects, plus everything else as extra_fields JSON */
-    var coreKeys = ['full_name','phone','email','household_size','products_interested','expected_spend','attend_frequency','heard_about','consent'];
-    var extra    = {};
-    Object.keys(values).forEach(function(k) {
-      if (coreKeys.indexOf(k) === -1) extra[k] = values[k];
-    });
+    try {
+      var API = (window.EVENTS_API || 'https://impactgrid-events-api.onrender.com');
+      var res = await fetch(API + '/api/voucher-register', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ slug: _campaign.slug, fields: values })
+      });
 
-    var { data, error } = await _client().rpc('register_for_campaign', {
-      p_slug:                 _campaign.slug,
-      p_full_name:            values['full_name']           || '',
-      p_phone:                values['phone']               || '',
-      p_email:                values['email']               || '',
-      p_household_size:       values['household_size']      ? parseInt(values['household_size'], 10) : null,
-      p_products_interested:  values['products_interested'] || '',
-      p_expected_spend:       values['expected_spend']      || '',
-      p_attend_frequency:     values['attend_frequency']    || '',
-      p_heard_about:          values['heard_about']         || '',
-      p_consent:              values['consent']             || false,
-      p_extra_fields:         Object.keys(extra).length ? JSON.stringify(extra) : null
-    });
+      var data = await res.json();
 
-    if (error) {
-      /* If the RPC doesn't accept p_extra_fields yet, retry without it */
-      if (error.message && error.message.indexOf('p_extra_fields') !== -1) {
-        var retry = await _client().rpc('register_for_campaign', {
-          p_slug:                _campaign.slug,
-          p_full_name:           values['full_name']           || '',
-          p_phone:               values['phone']               || '',
-          p_email:               values['email']               || '',
-          p_household_size:      values['household_size']      ? parseInt(values['household_size'], 10) : null,
-          p_products_interested: values['products_interested'] || '',
-          p_expected_spend:      values['expected_spend']      || '',
-          p_attend_frequency:    values['attend_frequency']    || '',
-          p_heard_about:         values['heard_about']         || '',
-          p_consent:             values['consent']             || false
-        });
-        if (!retry.error) { _showSuccess(retry.data); return; }
-        error = retry.error;
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Registration failed');
       }
+
+      _showSuccess(data.voucherCode, data.formType);
+
+    } catch (err) {
       btn.disabled    = false;
       btn.textContent = _design.button_text || 'Get My Voucher Code';
-      errBox.innerHTML = '<div class="rg-error">Could not register: ' + _esc(error.message) + '</div>';
-      return;
+      errBox.innerHTML = '<div class="rg-error">Could not register: ' + _esc(err.message) + '</div>';
     }
-
-    _showSuccess(data);
   }
 
-  function _showSuccess(code) {
-    var card = document.getElementById('rgCard');
-    var thankYou = _design.thank_you_message || 'Show this code on arrival to redeem your voucher.';
+  function _showSuccess(code, formType) {
+    var card     = document.getElementById('rgCard');
+    var thankYou = _design.thank_you_message || (formType === 'research'
+      ? 'Thank you for your response!'
+      : 'Show this code on arrival to redeem your voucher.');
+
+    var codeBlock = (formType !== 'research' && code)
+      ? '<div class="rg-code">' + _esc(code) + '</div>'
+        + '<p class="rg-sub" style="font-size:12px;">Keep this code safe — you\'ll need it on arrival.</p>'
+        + '<p class="rg-sub" style="font-size:12px;">A confirmation email with your code has been sent to you.</p>'
+      : '';
+
     card.innerHTML =
       '<div class="rg-success">' +
         '<h1 class="rg-title">You\'re registered! 🎉</h1>' +
         '<p class="rg-sub">' + _esc(thankYou) + '</p>' +
-        '<div class="rg-code">' + _esc(code) + '</div>' +
-        '<p class="rg-sub">Keep this code safe, you won\'t be able to retrieve it again from this page.</p>' +
+        codeBlock +
       '</div>';
   }
 
