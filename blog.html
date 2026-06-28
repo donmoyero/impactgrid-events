@@ -269,8 +269,8 @@
 </head>
 <body>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
   <script src="auth.js"></script>
 
   <div id="ig-nav"></div>
@@ -339,9 +339,9 @@
   <script>
   /* ════════════════════════════════════════
      BLOG BOOK ENGINE
-     Data model (Firestore, impactgrid-events-api project):
-       blog_posts/{postId}            { title, coverImage, category, createdAt, order }
-       blog_posts/{postId}/pages/{id} { type: 'text'|'image'|'youtube', order, heading, body, url, videoId, caption }
+     Data model (Supabase, content project):
+       blog_posts  { id, title, cover_image, category, created_at }
+       blog_pages  { id, post_id, order, type, heading, body, url, cloudinary_id, video_id, caption }
 
      Each spread = left page (idx-1) + right page (idx). idx 0 = closed cover.
   ════════════════════════════════════════ */
@@ -527,31 +527,49 @@
     if (Math.abs(dx) > 44) bookFlip(dx < 0 ? 1 : -1);
   });
 
-  /* ── Load posts from Firestore ── */
+  /* ── Load posts from Supabase ── */
   async function loadPosts() {
     try {
-      var cfg = await fetch('https://impactgrid-events-api.onrender.com/api/firebase-config').then(function(r){ return r.json(); });
-      if (!firebase.apps.length) firebase.initializeApp(cfg);
-      var db = firebase.firestore();
-      var snap = await db.collection('blog_posts').orderBy('createdAt', 'desc').get();
+      var sb = getContentClient();
 
+      /* Load all posts */
+      var { data: postsData, error: postsErr } = await sb
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (postsErr) throw postsErr;
+
+      /* Load pages for each post */
       var loaded = [];
-      for (var i = 0; i < snap.docs.length; i++) {
-        var doc = snap.docs[i];
-        var data = doc.data();
-        var pagesSnap = await db.collection('blog_posts').doc(doc.id).collection('pages').orderBy('order', 'asc').get();
-        var pages = pagesSnap.docs.map(function(d){ return d.data(); });
+      for (var i = 0; i < (postsData || []).length; i++) {
+        var p = postsData[i];
+        var { data: pagesData, error: pagesErr } = await sb
+          .from('blog_pages')
+          .select('*')
+          .eq('post_id', p.id)
+          .order('order', { ascending: true });
+        if (pagesErr) throw pagesErr;
         loaded.push({
-          id: doc.id,
-          title: data.title || 'Untitled',
-          coverImage: data.coverImage || '',
-          category: data.category || '',
-          pages: pages
+          id: p.id,
+          title: p.title || 'Untitled',
+          coverImage: p.cover_image || '',
+          category: p.category || '',
+          pages: (pagesData || []).map(function(pg) {
+            return {
+              type: pg.type,
+              heading: pg.heading || '',
+              body: pg.body || '',
+              url: pg.url || '',
+              cloudinaryId: pg.cloudinary_id || '',
+              videoId: pg.video_id || '',
+              caption: pg.caption || ''
+            };
+          })
         });
       }
       posts = loaded;
     } catch (e) {
-      console.warn('Blog Firestore fetch failed:', e);
+      console.warn('Blog Supabase fetch failed:', e);
       posts = [];
     }
     renderShelf();
