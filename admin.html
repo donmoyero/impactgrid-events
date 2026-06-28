@@ -1638,6 +1638,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   if(data.session.user.email !== IG_ADMIN_EMAIL){ window.location.href='dashboard.html'; return; }
   document.getElementById('topbarUser').textContent = data.session.user.email;
   loadStats();
+  loadBizSettings(); /* load biz settings on boot so invoice generation always has them */
 });
 
 /*  THEME  */
@@ -4724,16 +4725,10 @@ async function confirmBooking(){
   var b=_currentBooking; if(!b) return;
   var invoice=modalCollectInvoice();
   var packageNotes=document.getElementById('modal-package-notes').value.trim();
-  var alertEl=document.getElementById('modalAlert');
-  function showModalAlert(msg,ok){
-    alertEl.textContent=msg;
-    alertEl.style.cssText='display:block;padding:10px 14px;border-radius:var(--r);font-size:12px;margin-bottom:14px;'
-      +(ok?'background:var(--green-dim);border:1px solid rgba(45,212,160,.25);color:var(--green);'
-          :'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
-  }
   var btn=document.getElementById('confirmSendBtn');
   btn.disabled=true; btn.textContent=' Confirming…';
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  var biz = _bizSettings;
 
   try {
     // Step 1 — confirm booking + create event server-side
@@ -4747,7 +4742,29 @@ async function confirmBooking(){
     var num=parseInt(invoice.invoice_number.replace(/\D/g,''),10);
     if(!isNaN(num)) localStorage.setItem('ig_last_inv_num',String(num));
 
-    // Step 2 — send invoice as PDF attachment
+    // Step 2 — save invoice to Supabase
+    var sb = getSupabase();
+    var invRow = {
+      invoice_number: invoice.invoice_number,
+      invoice_date:   invoice.invoice_date || null,
+      due_date:       invoice.due_date     || null,
+      client_name:    invoice.client_name  || b.name,
+      client_email:   b.email,
+      lines:          invoice.line_items,
+      discount:       parseFloat(invoice.discount) || 0,
+      subtotal:       parseFloat(invoice.subtotal) || 0,
+      total:          parseFloat(invoice.total)    || 0,
+      notes:          invoice.notes        || '',
+      sent:           true,
+      bank_name:      biz.account_name   || localStorage.getItem('ig_biz_account_name')   || '',
+      bank_account:   biz.account_number || localStorage.getItem('ig_biz_account_number') || '',
+      bank_sort:      biz.sort_code      || localStorage.getItem('ig_biz_sort_code')      || '',
+      biz_name:       biz.biz_name       || localStorage.getItem('ig_biz_name')           || '',
+      biz_location:   biz.biz_address    || localStorage.getItem('ig_biz_address')        || '',
+    };
+    await sb.from('invoices').upsert(invRow, { onConflict: 'invoice_number' });
+
+    // Step 3 — send invoice as PDF attachment
     btn.textContent=' Sending invoice…';
     var invoiceHtml=generateInvoiceHtml(invoice, b.email);
     await fetch(API+'/api/send-invoice',{
@@ -4758,7 +4775,7 @@ async function confirmBooking(){
         message: 'Dear '+b.name+',\n\nThank you for your booking. Please find your invoice attached for £'+parseFloat(invoice.total||0).toFixed(2)+'.\n\nKind regards,\nImpact Grid Events',
         invoiceHtml: invoiceHtml,
         invoiceNumber: invoice.invoice_number,
-        bizName: 'Impact Grid Events'
+        bizName: biz.biz_name || localStorage.getItem('ig_biz_name') || 'Impact Grid Events'
       })
     });
 
@@ -4981,14 +4998,34 @@ async function saveAndResendInvoice() {
   btn.textContent = ' Saving…';
   var sb = getSupabase();
   try {
-    // Save updated invoice back to Supabase bookings record
-    var { error } = await sb.from('bookings').update({ invoice: invoice }).eq('id', b.id);
+    /* Save / update invoice in Supabase invoices table */
+    var biz = _bizSettings;
+    var invRow = {
+      invoice_number: invoice.invoice_number,
+      invoice_date:   invoice.invoice_date   || null,
+      due_date:       invoice.due_date       || null,
+      client_name:    invoice.client_name    || b.name,
+      client_email:   b.email,
+      lines:          invoice.line_items,
+      discount:       parseFloat(invoice.discount) || 0,
+      subtotal:       parseFloat(invoice.subtotal) || 0,
+      total:          parseFloat(invoice.total)    || 0,
+      notes:          invoice.notes          || '',
+      sent:           true,
+      bank_name:      biz.account_name   || localStorage.getItem('ig_biz_account_name')   || '',
+      bank_account:   biz.account_number || localStorage.getItem('ig_biz_account_number') || '',
+      bank_sort:      biz.sort_code      || localStorage.getItem('ig_biz_sort_code')      || '',
+      biz_name:       biz.biz_name       || localStorage.getItem('ig_biz_name')           || '',
+      biz_location:   biz.biz_address    || localStorage.getItem('ig_biz_address')        || '',
+    };
+    var { error } = await sb.from('invoices')
+      .upsert(invRow, { onConflict: 'invoice_number' });
     if (error) throw error;
 
-    // Update local cache
+    /* Update local booking cache so Edit & Resend re-opens with new data */
     b.invoice = invoice;
 
-    // Send the updated invoice PDF
+    /* Send updated PDF */
     btn.textContent = ' Sending…';
     var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
     var invoiceHtml = generateInvoiceHtml(invoice, b.email);
@@ -5000,13 +5037,13 @@ async function saveAndResendInvoice() {
         message: 'Dear ' + b.name + ',\n\nPlease find your updated invoice attached for £' + parseFloat(invoice.total||0).toFixed(2) + '.\n\nKind regards,\nImpact Grid Events',
         invoiceHtml: invoiceHtml,
         invoiceNumber: invoice.invoice_number,
-        bizName: 'Impact Grid Events'
+        bizName: biz.biz_name || localStorage.getItem('ig_biz_name') || 'Impact Grid Events'
       })
     });
     var data = await res.json();
     if (!data.success) throw new Error(data.error || 'Send failed');
 
-    showModalAlert(' Invoice updated & resent to ' + b.email, true);
+    showModalAlert(' Invoice saved & resent to ' + b.email, true);
     btn.textContent = ' Sent!';
     setTimeout(function(){ closeConfirmModal(); }, 1800);
   } catch(e) {
@@ -5415,6 +5452,17 @@ window.openEditInvoiceModal  = openEditInvoiceModal;
 window.saveAndResendInvoice  = saveAndResendInvoice;
 window.closeConfirmModal = closeConfirmModal;
 /* ── BUSINESS SETTINGS ───────────────────────────────────────── */
+/* Global modal alert — used by confirmBooking AND saveAndResendInvoice */
+function showModalAlert(msg, ok) {
+  var alertEl = document.getElementById('modalAlert');
+  if (!alertEl) return;
+  alertEl.textContent = msg;
+  alertEl.style.cssText = 'display:block;padding:10px 14px;border-radius:var(--r);font-size:12px;margin-bottom:14px;'
+    + (ok ? 'background:var(--green-dim);border:1px solid rgba(45,212,160,.25);color:var(--green);'
+           : 'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
+}
+window.showModalAlert = showModalAlert;
+
 var BIZ_KEYS = {
   'biz-name':           'ig_biz_name',
   'biz-address':        'ig_biz_address',
@@ -5426,33 +5474,93 @@ var BIZ_KEYS = {
   'biz-admin-email':    'ig_biz_admin_email',
 };
 
-function loadBizSettings() {
-  Object.keys(BIZ_KEYS).forEach(function(id) {
+/* In-memory cache of biz settings loaded from Supabase */
+var _bizSettings = {};
+
+function _applyBizSettings(row) {
+  if (!row) return;
+  _bizSettings = row;
+  /* Map Supabase columns → input field IDs */
+  var map = {
+    'biz-name':           row.biz_name,
+    'biz-address':        row.biz_address,
+    'biz-phone':          row.biz_phone,
+    'biz-email':          row.biz_email,
+    'biz-account-name':   row.account_name,
+    'biz-account-number': row.account_number,
+    'biz-sort-code':      row.sort_code,
+    'biz-admin-email':    row.admin_email,
+  };
+  Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id);
-    if (el) el.value = localStorage.getItem(BIZ_KEYS[id]) || '';
+    if (el) el.value = map[id] || '';
   });
-  /* Update payment preview in invoice builder */
+  /* Also mirror to localStorage so existing invoice code still works */
+  if (row.biz_name)       localStorage.setItem('ig_biz_name',           row.biz_name);
+  if (row.biz_address)    localStorage.setItem('ig_biz_address',        row.biz_address);
+  if (row.biz_phone)      localStorage.setItem('ig_biz_phone',          row.biz_phone);
+  if (row.biz_email)      localStorage.setItem('ig_biz_email',          row.biz_email);
+  if (row.account_name)   localStorage.setItem('ig_biz_account_name',   row.account_name);
+  if (row.account_number) localStorage.setItem('ig_biz_account_number', row.account_number);
+  if (row.sort_code)      localStorage.setItem('ig_biz_sort_code',      row.sort_code);
+  if (row.admin_email)    localStorage.setItem('ig_biz_admin_email',    row.admin_email);
+  if (row.admin_email)    window.IG_ADMIN_EMAIL = row.admin_email;
+  /* Update payment preview */
   var preview = document.getElementById('inv-payment-preview');
   if (preview) {
-    var acct = localStorage.getItem('ig_biz_account_name');
-    var num  = localStorage.getItem('ig_biz_account_number');
-    var sort = localStorage.getItem('ig_biz_sort_code');
-    preview.textContent = acct
-      ? (acct + (num ? ' · Acc: ' + num : '') + (sort ? ' · Sort: ' + sort : ''))
+    preview.textContent = row.account_name
+      ? (row.account_name + (row.account_number ? ' · Acc: ' + row.account_number : '') + (row.sort_code ? ' · Sort: ' + row.sort_code : ''))
       : 'Set in Business Settings →';
   }
 }
 
-function saveBizSettings() {
-  Object.keys(BIZ_KEYS).forEach(function(id) {
+async function loadBizSettings() {
+  var sb = getSupabase();
+  try {
+    var { data, error } = await sb.from('business_settings').select('*').eq('id','main').single();
+    if (!error && data) { _applyBizSettings(data); return; }
+  } catch(e) {}
+  /* Fallback to localStorage if Supabase fails */
+  var map = {
+    'biz-name':           'ig_biz_name',
+    'biz-address':        'ig_biz_address',
+    'biz-phone':          'ig_biz_phone',
+    'biz-email':          'ig_biz_email',
+    'biz-account-name':   'ig_biz_account_name',
+    'biz-account-number': 'ig_biz_account_number',
+    'biz-sort-code':      'ig_biz_sort_code',
+    'biz-admin-email':    'ig_biz_admin_email',
+  };
+  Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id);
-    if (el) localStorage.setItem(BIZ_KEYS[id], el.value.trim());
+    if (el) el.value = localStorage.getItem(map[id]) || '';
   });
-  /* Refresh IG_ADMIN_EMAIL in memory */
-  window.IG_ADMIN_EMAIL = localStorage.getItem('ig_biz_admin_email') || 'admin@impactgridgroup.com';
-  loadBizSettings();
+}
+
+async function saveBizSettings() {
+  var btn = document.querySelector('[onclick="saveBizSettings()"]');
   var msg = document.getElementById('biz-save-msg');
-  if (msg) { msg.style.display = 'inline'; setTimeout(function(){ msg.style.display = 'none'; }, 2500); }
+  var row = {
+    id:             'main',
+    biz_name:       (document.getElementById('biz-name')           || {}).value || '',
+    biz_address:    (document.getElementById('biz-address')        || {}).value || '',
+    biz_phone:      (document.getElementById('biz-phone')          || {}).value || '',
+    biz_email:      (document.getElementById('biz-email')          || {}).value || '',
+    account_name:   (document.getElementById('biz-account-name')   || {}).value || '',
+    account_number: (document.getElementById('biz-account-number') || {}).value || '',
+    sort_code:      (document.getElementById('biz-sort-code')      || {}).value || '',
+    admin_email:    (document.getElementById('biz-admin-email')    || {}).value || '',
+    updated_at:     new Date().toISOString(),
+  };
+  var sb = getSupabase();
+  try {
+    var { error } = await sb.from('business_settings').upsert(row, { onConflict: 'id' });
+    if (error) throw error;
+    _applyBizSettings(row);
+    if (msg) { msg.style.display = 'inline'; setTimeout(function(){ msg.style.display = 'none'; }, 2500); }
+  } catch(e) {
+    alert('Failed to save settings: ' + e.message);
+  }
 }
 
 window.saveBizSettings = saveBizSettings;
