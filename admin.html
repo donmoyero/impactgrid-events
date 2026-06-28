@@ -1540,7 +1540,7 @@ If you have any questions, just reply to this email.
   <div id="confirmModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
     <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
       <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-family:var(--fd);font-size:16px;font-weight:900;"> Confirm Booking</div>
+        <div style="font-family:var(--fd);font-size:16px;font-weight:900;" id="confirmModalTitle"> Confirm Booking</div>
         <button onclick="closeConfirmModal()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;"> Close</button>
       </div>
       <div style="padding:20px;">
@@ -1595,7 +1595,7 @@ If you have any questions, just reply to this email.
 
         <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
           <button class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
-          <button class="btn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBookingFromModal()"> Reject Instead</button>
+          <button class="btn" id="rejectInsteadBtn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBookingFromModal()"> Reject Instead</button>
           <button class="btn btn-gold" id="confirmSendBtn" onclick="confirmBooking()"> Confirm & Send Invoice →</button>
         </div>
       </div>
@@ -4586,7 +4586,7 @@ function renderBookingsTable(data) {
           + '<td><div class="td-actions">'
           + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')"> Confirm</button>' : '')
           + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')"> Reject</button>' : '')
-          + (b.status==='confirmed' ? '<button class="btn btn-sm" style="border:1px solid var(--gold);color:var(--gold);" onclick="resendInvoice(\'' + b.id + '\')"> Invoice</button>' : '')
+          + (b.status==='confirmed' ? '<button class="btn btn-sm" style="border:1px solid var(--gold);color:var(--gold);" onclick="openEditInvoiceModal(\'' + b.id + '\')"> Edit & Resend</button>' : '')
           + (b.status==='confirmed' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="cancelConfirmedBooking(\'' + b.id + '\')"> Cancel</button>' : '')
           + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')"> View</button>'
           + '</div></td></tr>';
@@ -4652,6 +4652,15 @@ function _mrow(label,val){
 function closeConfirmModal(){
   document.getElementById('confirmModal').style.display='none';
   _currentBooking=null;
+  // Reset modal to default confirm mode
+  if (_editInvoiceMode) {
+    _editInvoiceMode = false;
+    document.getElementById('confirmModalTitle').textContent = ' Confirm Booking';
+    document.getElementById('rejectInsteadBtn').style.display = '';
+    var btn = document.getElementById('confirmSendBtn');
+    btn.textContent = ' Confirm & Send Invoice →';
+    btn.onclick = confirmBooking;
+  }
 }
 
 function modalAddLine(desc,qty,rate){
@@ -4913,6 +4922,97 @@ async function sendInvoiceOnly() {
   } catch(e) {
     alert('Error sending invoice: ' + e.message);
     btn.disabled = false; btn.textContent = ' Send Invoice Only';
+  }
+}
+
+var _editInvoiceMode = false;
+
+function openEditInvoiceModal(id) {
+  _currentBooking = _allBookings.find(function(b){ return b.id === id; });
+  if (!_currentBooking) return;
+  var b = _currentBooking;
+  var inv = b.invoice;
+
+  // Switch modal to edit mode
+  _editInvoiceMode = true;
+  document.getElementById('confirmModalTitle').textContent = ' Edit Invoice';
+  document.getElementById('rejectInsteadBtn').style.display = 'none';
+  var btn = document.getElementById('confirmSendBtn');
+  btn.textContent = ' Save & Resend Invoice →';
+  btn.onclick = saveAndResendInvoice;
+  btn.disabled = false;
+
+  // Show booking summary
+  document.getElementById('modalBookingSummary').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+    + _mrow('Client', b.name) + _mrow('Email', b.email)
+    + _mrow('Date', b.event_date||'—') + _mrow('Type', b.event_type||'—')
+    + '</div>';
+
+  // Pre-fill invoice fields from saved invoice (or sensible defaults)
+  document.getElementById('modal-inv-number').value  = (inv && inv.invoice_number)  || '';
+  document.getElementById('modal-inv-client').value  = (inv && inv.client_name)     || b.name;
+  document.getElementById('modal-inv-date').value    = (inv && inv.invoice_date)    || new Date().toISOString().split('T')[0];
+  document.getElementById('modal-inv-due').value     = (inv && inv.due_date)        || '';
+  document.getElementById('modal-inv-discount').value= (inv && inv.discount != null) ? inv.discount : '0';
+  document.getElementById('modal-package-notes').value = (inv && inv.notes) || b.package_notes || '';
+
+  // Re-populate line items
+  document.getElementById('modal-line-items').innerHTML = '';
+  _modalLineCount = 0;
+  var lines = (inv && inv.line_items && inv.line_items.length) ? inv.line_items : [{desc: b.event_type||'Service', qty:1, rate:0}];
+  lines.forEach(function(l){ modalAddLine(l.desc, l.qty, l.rate); });
+
+  document.getElementById('modalAlert').style.display = 'none';
+  modalUpdateTotals();
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+async function saveAndResendInvoice() {
+  var b = _currentBooking;
+  if (!b) return;
+  var invoice = modalCollectInvoice();
+  if (!invoice.line_items.length || invoice.total === 0) {
+    showModalAlert('Please add at least one line item with a rate.');
+    return;
+  }
+  var btn = document.getElementById('confirmSendBtn');
+  btn.disabled = true;
+  btn.textContent = ' Saving…';
+  var sb = getSupabase();
+  try {
+    // Save updated invoice back to Supabase bookings record
+    var { error } = await sb.from('bookings').update({ invoice: invoice }).eq('id', b.id);
+    if (error) throw error;
+
+    // Update local cache
+    b.invoice = invoice;
+
+    // Send the updated invoice PDF
+    btn.textContent = ' Sending…';
+    var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+    var invoiceHtml = generateInvoiceHtml(invoice, b.email);
+    var res = await fetch(API + '/api/send-invoice', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        to: b.email,
+        subject: 'Updated Invoice ' + invoice.invoice_number + ' — Impact Grid Events',
+        message: 'Dear ' + b.name + ',\n\nPlease find your updated invoice attached for £' + parseFloat(invoice.total||0).toFixed(2) + '.\n\nKind regards,\nImpact Grid Events',
+        invoiceHtml: invoiceHtml,
+        invoiceNumber: invoice.invoice_number,
+        bizName: 'Impact Grid Events'
+      })
+    });
+    var data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Send failed');
+
+    showModalAlert(' Invoice updated & resent to ' + b.email, true);
+    btn.textContent = ' Sent!';
+    setTimeout(function(){ closeConfirmModal(); }, 1800);
+  } catch(e) {
+    showModalAlert(' Error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = ' Save & Resend Invoice →';
   }
 }
 
@@ -5310,7 +5410,9 @@ window.bkBulkUnbook            = bkBulkUnbook;
 
 window.loadBookings      = loadBookings;
 window.filterBookings    = filterBookings;
-window.openConfirmModal  = openConfirmModal;
+window.openConfirmModal      = openConfirmModal;
+window.openEditInvoiceModal  = openEditInvoiceModal;
+window.saveAndResendInvoice  = saveAndResendInvoice;
 window.closeConfirmModal = closeConfirmModal;
 /* ── BUSINESS SETTINGS ───────────────────────────────────────── */
 var BIZ_KEYS = {
