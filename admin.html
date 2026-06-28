@@ -1071,18 +1071,25 @@ If you have any questions, just reply to this email.
         <div>
             <div class="card">
               <div class="card-head">
-                <h2> Voucher Campaigns</h2>
-                <button class="btn btn-gold btn-sm" onclick="VT.showCreateForm()">+ New Campaign</button>
+                <h2> Campaigns</h2>
+                <button class="btn btn-gold btn-sm" onclick="VT.showCreateForm()">+ New Form</button>
               </div>
               <div class="card-body">
 
                 <div id="vtCreateForm" style="display:none;margin-bottom:16px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);">
                   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
                     <div class="field-group">
+                      <div class="field-label">Form type</div>
+                      <select id="vtFormType" class="form-input" onchange="VT.onCreateTypeChange(this.value)">
+                        <option value="voucher">Voucher Form (issues a code)</option>
+                        <option value="research">Research Form (no code)</option>
+                      </select>
+                    </div>
+                    <div class="field-group">
                       <div class="field-label">Campaign name</div>
                       <input type="text" id="vtName" class="form-input" placeholder="Lagos Market Test Run"/>
                     </div>
-                    <div class="field-group">
+                    <div class="field-group" id="vtPrefixGroup">
                       <div class="field-label">Code prefix</div>
                       <input type="text" id="vtPrefix" class="form-input" placeholder="LAGOS" maxlength="12" style="text-transform:uppercase;"/>
                     </div>
@@ -1127,7 +1134,10 @@ If you have any questions, just reply to this email.
                         <div class="vt-dz-text">Drag &amp; drop or click to upload</div>
                       </div>
                       <input type="hidden" id="vtHeaderImage">
-                      <div class="field-hint">Shown above the headline</div>
+                      <label style="display:flex;gap:6px;align-items:center;margin-top:8px;font-size:11.5px;color:var(--text2);cursor:pointer;">
+                        <input type="checkbox" id="vtHeaderCover" style="margin:0;"> Cover whole form (full-bleed)
+                      </label>
+                      <div class="field-hint">Shown above the headline — or stretched behind the entire form if "cover" is on</div>
                     </div>
                     <div class="field-group">
                       <div class="field-label">Footer image</div>
@@ -1137,7 +1147,10 @@ If you have any questions, just reply to this email.
                         <div class="vt-dz-text">Drag &amp; drop or click to upload</div>
                       </div>
                       <input type="hidden" id="vtFooterImage">
-                      <div class="field-hint">Shown at the bottom of the page</div>
+                      <label style="display:flex;gap:6px;align-items:center;margin-top:8px;font-size:11.5px;color:var(--text2);cursor:pointer;">
+                        <input type="checkbox" id="vtFooterCover" style="margin:0;"> Cover whole form (full-bleed)
+                      </label>
+                      <div class="field-hint">Shown at the bottom — or stretched behind the entire form if "cover" is on</div>
                     </div>
                     <div class="field-group">
                       <div class="field-label">Accent colour</div>
@@ -1171,6 +1184,24 @@ If you have any questions, just reply to this email.
                     </div>
                   </div>
 
+                  <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
+                    <div class="field-group" style="max-width:320px;margin-bottom:14px;">
+                      <div class="field-label">Form type</div>
+                      <select id="vtFormType2" class="form-input" onchange="VT.setFormType(this.value)">
+                        <option value="voucher">Voucher Form (issues a code)</option>
+                        <option value="research">Research Form (no code)</option>
+                      </select>
+                      <div class="field-hint">Research forms collect answers only — guests don't receive a voucher code.</div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                      <h2 style="font-size:14px;margin:0;">Form Fields</h2>
+                      <button class="btn btn-ghost btn-sm" onclick="VT.addField()">+ Add field</button>
+                    </div>
+                    <div id="vtFieldsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <div class="field-hint" style="margin-top:8px;">These appear on the public registration page in this order. Add custom fields or edit/remove the defaults.</div>
+                  </div>
+
                   <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                     <button class="btn btn-gold btn-sm" onclick="VT.savePageDesign()">Save Page Design</button>
                     <button class="btn btn-ghost btn-sm" id="vtPreviewLink" onclick="window.open(this.dataset.url,'_blank')">Preview Page ↗</button>
@@ -1183,7 +1214,7 @@ If you have any questions, just reply to this email.
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
                     <h2 id="vtRegTitle" style="font-size:15px;margin:0;">Registrations</h2>
                     <button class="btn btn-ghost btn-sm" onclick="VT.exportCSV()">Export CSV</button>
-                    <button class="btn btn-ghost btn-sm" onclick="VT.exportPDF()"> Export PDF</button>
+                    <button class="btn btn-ghost btn-sm" id="vtExportPdfBtn" onclick="VT.exportPDF()"> Export PDF (+ AI insights)</button>
                   </div>
                   <div style="overflow-x:auto;">
                     <table style="width:100%;border-collapse:collapse;font-size:12.5px;" id="vtRegTable">
@@ -2395,9 +2426,29 @@ var VT = (function(){
   var _campaigns      = [];
   var _activeCampaign = null;
   var _activeRegs     = [];
+  var _editingFields  = [];   // working copy of form fields while design editor is open
 
   function _slugify(s){
     return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  }
+
+  function _uid(){
+    return 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  }
+
+  /* Default field "slots" for a new campaign. Admin can add/edit/remove freely afterwards. */
+  function _defaultFields(){
+    return [
+      { id:_uid(), key:'full_name',         label:'Full Name',           type:'text',     required:true  },
+      { id:_uid(), key:'phone',             label:'Phone',               type:'tel',      required:true  },
+      { id:_uid(), key:'email',             label:'Email',               type:'email',    required:true  },
+      { id:_uid(), key:'household_size',    label:'Household Size',      type:'number',   required:false },
+      { id:_uid(), key:'products_interested', label:'Products Interested', type:'text',   required:false },
+      { id:_uid(), key:'expected_spend',    label:'Expected Spend',      type:'text',     required:false },
+      { id:_uid(), key:'attend_frequency',  label:'Attend Frequency',    type:'text',     required:false },
+      { id:_uid(), key:'heard_about',       label:'Heard About',         type:'text',     required:false },
+      { id:_uid(), key:'consent',           label:'I consent to be contacted', type:'checkbox', required:true }
+    ];
   }
 
   async function init(){
@@ -2417,25 +2468,34 @@ var VT = (function(){
     }
   }
 
+  function onCreateTypeChange(type){
+    var grp = document.getElementById('vtPrefixGroup');
+    if(grp) grp.style.display = (type === 'research') ? 'none' : '';
+  }
+
   function hideCreateForm(){
     document.getElementById('vtCreateForm').style.display = 'none';
-    document.getElementById('vtName').value   = '';
-    document.getElementById('vtPrefix').value = '';
-    document.getElementById('vtSlug').value   = '';
+    document.getElementById('vtName').value     = '';
+    document.getElementById('vtPrefix').value   = '';
+    document.getElementById('vtSlug').value     = '';
+    document.getElementById('vtFormType').value = 'voucher';
+    onCreateTypeChange('voucher');
   }
 
   async function createCampaign(){
     var name   = document.getElementById('vtName').value.trim();
+    var type   = document.getElementById('vtFormType').value || 'voucher';
     var prefix = document.getElementById('vtPrefix').value.trim().toUpperCase();
     var slug   = document.getElementById('vtSlug').value.trim() || _slugify(name);
 
-    if(!name || !prefix || !slug){
-      toast('','Missing details','Fill in name, prefix, and slug');
+    if(!name || !slug || (type === 'voucher' && !prefix)){
+      toast('','Missing details', type === 'voucher' ? 'Fill in name, prefix, and slug' : 'Fill in name and slug');
       return;
     }
 
     var { error } = await getSupabase().from('campaigns').insert({
-      name: name, prefix: prefix, slug: slug, active: true
+      name: name, prefix: prefix || null, slug: slug, active: true,
+      page_design: { form_type: type, fields: _defaultFields() }
     });
 
     if(error){
@@ -2443,7 +2503,7 @@ var VT = (function(){
       return;
     }
 
-    toast('','Campaign created', name);
+    toast('','Form created', name);
     hideCreateForm();
     await loadCampaigns();
   }
@@ -2471,11 +2531,19 @@ var VT = (function(){
 
     listEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">' + _campaigns.map(function(c){
       var publicUrl = location.origin + '/register.html?c=' + encodeURIComponent(c.slug);
+      var formType  = (c.page_design && c.page_design.form_type) || (c.prefix ? 'voucher' : 'research');
+      var typeBadge = formType === 'research'
+        ? '<span style="font-size:10.5px;padding:2px 8px;border-radius:20px;margin-left:4px;background:var(--bg3);color:var(--text2);">Research</span>'
+        : '<span style="font-size:10.5px;padding:2px 8px;border-radius:20px;margin-left:4px;background:var(--gold-dim,#3a2f0f);color:var(--gold,#f0c000);">Voucher</span>';
+      var subline   = formType === 'research'
+        ? 'Research form · Entries: ' + (c.next_seq ? (c.next_seq-1) : 0)
+        : 'Prefix: '+esc(c.prefix||'—')+' · Issued so far: '+((c.next_seq||1)-1);
       return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border);border-radius:var(--r);flex-wrap:wrap;">'
         + '<div style="min-width:220px;flex:1;">'
         + '<div style="font-weight:600;font-size:13.5px;">'+esc(c.name)
-        + ' <span style="font-size:10.5px;padding:2px 8px;border-radius:20px;margin-left:4px;background:'+(c.active?'var(--green-dim)':'var(--bg3)')+';color:'+(c.active?'var(--green)':'var(--text3)')+';">'+(c.active?'Active':'Paused')+'</span></div>'
-        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Prefix: '+esc(c.prefix)+' · Issued so far: '+(c.next_seq-1)+'</div>'
+        + ' <span style="font-size:10.5px;padding:2px 8px;border-radius:20px;margin-left:4px;background:'+(c.active?'var(--green-dim)':'var(--bg3)')+';color:'+(c.active?'var(--green)':'var(--text3)')+';">'+(c.active?'Active':'Paused')+'</span>'
+        + typeBadge + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">'+subline+'</div>'
         + '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;">'
         + '<input readonly value="'+esc(publicUrl)+'" style="flex:1;min-width:160px;font-family:var(--fm);font-size:11px;padding:6px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text2);">'
         + '<button class="btn btn-ghost btn-sm" onclick="VT.copyLink(this)" data-url="'+esc(publicUrl)+'">Copy</button>'
@@ -2503,12 +2571,18 @@ var VT = (function(){
     document.getElementById('vtBgImage').value      = d.background_image || '';
     document.getElementById('vtHeaderImage').value  = d.header_image     || '';
     document.getElementById('vtFooterImage').value  = d.footer_image     || '';
+    document.getElementById('vtHeaderCover').checked = !!d.header_image_cover;
+    document.getElementById('vtFooterCover').checked = !!d.footer_image_cover;
     document.getElementById('vtAccentColor').value  = d.accent_color     || '#FFD400';
     document.getElementById('vtHeadline').value     = d.headline         || '';
     document.getElementById('vtSubheadline').value  = d.subheadline      || '';
     document.getElementById('vtButtonText').value   = d.button_text      || '';
     document.getElementById('vtThankYou').value      = d.thank_you_message || '';
+    document.getElementById('vtFormType2').value    = d.form_type || (c.prefix ? 'voucher' : 'research');
     document.getElementById('vtDesignStatus').style.display = 'none';
+
+    _editingFields = (d.fields && d.fields.length) ? JSON.parse(JSON.stringify(d.fields)) : _defaultFields();
+    _renderFieldsEditor();
 
     [['vtBgImage','vtBgPreview'],['vtHeaderImage','vtHeaderPreview'],['vtFooterImage','vtFooterPreview']].forEach(function(pair){
       var url = document.getElementById(pair[0]).value;
@@ -2521,6 +2595,56 @@ var VT = (function(){
 
     document.getElementById('vtDesignEditor').style.display = 'block';
     document.getElementById('vtDesignEditor').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  function setFormType(type){
+    /* purely a label on page_design.fields/form_type — saved with the rest of the design on Save */
+  }
+
+  /* ---- Form Fields ("slots") builder ---- */
+  function _renderFieldsEditor(){
+    var list = document.getElementById('vtFieldsList');
+    if(!list) return;
+    list.innerHTML = _editingFields.map(function(f, idx){
+      return '<div style="display:flex;gap:8px;align-items:center;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;flex-wrap:wrap;">'
+        + '<input type="text" value="'+esc(f.label)+'" placeholder="Field label" style="flex:1;min-width:140px;padding:7px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12.5px;" oninput="VT.updateField('+idx+',\'label\',this.value)">'
+        + '<select style="padding:7px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12.5px;" onchange="VT.updateField('+idx+',\'type\',this.value)">'
+        + ['text','email','tel','number','textarea','select','checkbox'].map(function(t){
+            return '<option value="'+t+'"'+(f.type===t?' selected':'')+'>'+(t==='tel'?'Phone':t==='select'?'Dropdown':t==='textarea'?'Long text':t.charAt(0).toUpperCase()+t.slice(1))+'</option>';
+          }).join('')
+        + '</select>'
+        + '<label style="font-size:11px;display:flex;gap:4px;align-items:center;color:var(--text2);white-space:nowrap;"><input type="checkbox" '+(f.required?'checked':'')+' onchange="VT.updateField('+idx+',\'required\',this.checked)" style="margin:0;"> Required</label>'
+        + '<button class="btn btn-ghost btn-sm" onclick="VT.removeField('+idx+')" title="Remove field">✕</button>'
+        + (f.type==='select' ? '<input type="text" value="'+esc((f.options||[]).join(', '))+'" placeholder="Options, comma separated" style="flex:1;min-width:200px;padding:7px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12.5px;" oninput="VT.updateField('+idx+',\'optionsRaw\',this.value)">' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  function addField(){
+    _editingFields.push({ id:_uid(), key:'field_'+_editingFields.length, label:'New Field', type:'text', required:false });
+    _renderFieldsEditor();
+  }
+
+  function removeField(idx){
+    _editingFields.splice(idx, 1);
+    _renderFieldsEditor();
+  }
+
+  function updateField(idx, prop, val){
+    var f = _editingFields[idx];
+    if(!f) return;
+    if(prop === 'optionsRaw'){
+      f.options = val.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      return; // no re-render needed, avoids losing input focus
+    }
+    f[prop] = val;
+    if(prop === 'label'){
+      /* keep a stable key for new custom fields, derived from the label */
+      if(!f.key || f.key.indexOf('field_') === 0) f.key = _slugify(val).replace(/-/g,'_') || f.key;
+      return; // no re-render, avoids losing focus while typing
+    }
+    if(prop === 'required'){ return; } // checkbox state already reflects itself
+    _renderFieldsEditor(); // type change: re-render so the Options input shows/hides correctly
   }
 
   function closeDesignEditor(){
@@ -2589,14 +2713,18 @@ var VT = (function(){
     if(!_activeCampaign) return;
 
     var design = {
-      background_image:  document.getElementById('vtBgImage').value.trim(),
-      header_image:       document.getElementById('vtHeaderImage').value.trim(),
-      footer_image:       document.getElementById('vtFooterImage').value.trim(),
-      accent_color:        document.getElementById('vtAccentColor').value,
-      headline:            document.getElementById('vtHeadline').value.trim(),
-      subheadline:         document.getElementById('vtSubheadline').value.trim(),
-      button_text:         document.getElementById('vtButtonText').value.trim(),
-      thank_you_message:    document.getElementById('vtThankYou').value.trim()
+      background_image:    document.getElementById('vtBgImage').value.trim(),
+      header_image:         document.getElementById('vtHeaderImage').value.trim(),
+      footer_image:         document.getElementById('vtFooterImage').value.trim(),
+      header_image_cover:   document.getElementById('vtHeaderCover').checked,
+      footer_image_cover:   document.getElementById('vtFooterCover').checked,
+      accent_color:          document.getElementById('vtAccentColor').value,
+      headline:              document.getElementById('vtHeadline').value.trim(),
+      subheadline:           document.getElementById('vtSubheadline').value.trim(),
+      button_text:           document.getElementById('vtButtonText').value.trim(),
+      thank_you_message:      document.getElementById('vtThankYou').value.trim(),
+      form_type:              document.getElementById('vtFormType2').value,
+      fields:                 _editingFields
     };
 
     var { error } = await getSupabase()
@@ -2615,6 +2743,7 @@ var VT = (function(){
     toast('','Page design saved', _activeCampaign.name);
     await loadCampaigns();
   }
+
 
   function copyLink(btn){
     var url = btn.getAttribute('data-url');
@@ -2658,7 +2787,7 @@ var VT = (function(){
     empty.style.display = 'none';
     body.innerHTML = _activeRegs.map(function(r){
       return '<tr>'
-        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--fm);">'+esc(r.voucher_code)+'</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--fm);">'+esc(r.voucher_code||'—')+'</td>'
         + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.full_name)+'</td>'
         + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.phone)+'</td>'
         + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+esc(r.email)+'</td>'
@@ -2679,7 +2808,7 @@ var VT = (function(){
 
     var headers = ['Voucher Code','Full Name','Phone','Email','Household Size','Products Interested','Expected Spend','Attend Frequency','Heard About','Consent','Redeemed','Date'];
     var rows = _activeRegs.map(function(r){
-      return [r.voucher_code, r.full_name, r.phone, r.email, r.household_size||'', r.products_interested||'', r.expected_spend||'', r.attend_frequency||'', r.heard_about||'', r.consent?'Yes':'No', r.redeemed?'Yes':'No', new Date(r.created_at).toISOString()]
+      return [r.voucher_code||'—', r.full_name, r.phone, r.email, r.household_size||'', r.products_interested||'', r.expected_spend||'', r.attend_frequency||'', r.heard_about||'', r.consent?'Yes':'No', r.redeemed?'Yes':'No', new Date(r.created_at).toISOString()]
         .map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
     });
     var csv  = headers.join(',') + '\n' + rows.join('\n');
@@ -2690,18 +2819,78 @@ var VT = (function(){
     a.click();
   }
 
-  function exportPDF(){
+  /* ---- AI insights (page 2 of the PDF) ---- */
+
+  function _tally(regs, field, limit){
+    var counts = {};
+    regs.forEach(function(r){
+      var v = (r[field] || '').toString().trim();
+      if(!v) return;
+      counts[v] = (counts[v] || 0) + 1;
+    });
+    return Object.keys(counts)
+      .map(function(k){ return { value:k, count:counts[k] }; })
+      .sort(function(a,b){ return b.count - a.count; })
+      .slice(0, limit || 5);
+  }
+
+  function _computeInsightsSummary(regs){
+    var total     = regs.length;
+    var redeemed  = regs.filter(function(r){ return r.redeemed; }).length;
+    var consented = regs.filter(function(r){ return r.consent; }).length;
+    var times     = regs.map(function(r){ return new Date(r.created_at).getTime(); }).filter(function(t){ return !isNaN(t); });
+    return {
+      total_registrations: total,
+      redeemed_count: redeemed,
+      redemption_rate_pct: total ? Math.round(redeemed / total * 100) : 0,
+      consent_rate_pct: total ? Math.round(consented / total * 100) : 0,
+      top_products_interested: _tally(regs, 'products_interested'),
+      top_expected_spend: _tally(regs, 'expected_spend'),
+      top_attend_frequency: _tally(regs, 'attend_frequency'),
+      top_heard_about: _tally(regs, 'heard_about'),
+      date_range: times.length ? { from: new Date(Math.min.apply(null, times)).toISOString(), to: new Date(Math.max.apply(null, times)).toISOString() } : null
+    };
+  }
+
+  /* Calls your backend (NOT the Anthropic API directly — keep API keys server-side).
+     Expects POST EVENTS_API + '/api/voucher-insights' to return:
+       { insights: { summary_text: "...", highlights: ["...","..."], recommendations: ["...","..."] } }
+     If the endpoint isn't set up yet, this fails quietly and the PDF falls back to a stats-only page 2. */
+  async function _fetchAIInsights(campaignName, summary){
+    try{
+      var res = await fetch(EVENTS_API + '/api/voucher-insights', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ campaign_name: campaignName, summary: summary })
+      });
+      if(!res.ok) return null;
+      var data = await res.json();
+      return (data && data.insights) ? data.insights : null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  async function exportPDF(){
     if(!_activeRegs.length){ toast('','Nothing to export','No registrations loaded'); return; }
 
-    var campName = _activeCampaign ? _activeCampaign.name : 'Voucher Registrations';
+    var btn = document.getElementById('vtExportPdfBtn');
+    var btnOldText = btn ? btn.textContent : '';
+    if(btn){ btn.disabled = true; btn.textContent = 'Generating AI insights…'; }
+
+    var campName = _activeCampaign ? _activeCampaign.name : 'Registrations';
     var dateStr  = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+    var summary  = _computeInsightsSummary(_activeRegs);
+    var ai       = await _fetchAIInsights(campName, summary);
+
+    if(btn){ btn.disabled = false; btn.textContent = btnOldText; }
 
     var headers = ['Voucher Code','Full Name','Phone','Email','H/H Size','Products','Spend','Frequency','Heard About','Consent','Redeemed','Date'];
 
     var rowsHtml = _activeRegs.map(function(r, i){
       var bg = i % 2 === 0 ? '#ffffff' : '#f9f9fb';
       return '<tr style="background:' + bg + ';">'
-        + '<td>' + esc(r.voucher_code||'') + '</td>'
+        + '<td>' + esc(r.voucher_code||'—') + '</td>'
         + '<td>' + esc(r.full_name||'') + '</td>'
         + '<td>' + esc(r.phone||'') + '</td>'
         + '<td>' + esc(r.email||'') + '</td>'
@@ -2716,6 +2905,36 @@ var VT = (function(){
         + '</tr>';
     }).join('');
 
+    function _list(items){
+      return '<ul>' + items.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+    }
+    function _tallyRows(items){
+      if(!items.length) return '<div class="muted">No data yet</div>';
+      return '<table class="mini"><tbody>' + items.map(function(it){
+        return '<tr><td>' + esc(it.value) + '</td><td style="text-align:right;">' + it.count + '</td></tr>';
+      }).join('') + '</tbody></table>';
+    }
+
+    var page2Html;
+    if(ai){
+      page2Html = '<h2>Overview</h2><p>' + esc(ai.summary_text || '') + '</p>'
+        + (ai.highlights && ai.highlights.length ? '<h2>Key Highlights</h2>' + _list(ai.highlights) : '')
+        + (ai.recommendations && ai.recommendations.length ? '<h2>Recommendations</h2>' + _list(ai.recommendations) : '');
+    }else{
+      page2Html = '<p class="muted">AI narrative analysis is unavailable right now (the insights endpoint may not be connected yet), so here are the underlying stats instead:</p>'
+        + '<div class="stats-grid">'
+        + '<div class="stat-box"><div class="stat-num">' + summary.total_registrations + '</div><div class="stat-lbl">Total registrations</div></div>'
+        + '<div class="stat-box"><div class="stat-num">' + summary.redemption_rate_pct + '%</div><div class="stat-lbl">Redemption rate</div></div>'
+        + '<div class="stat-box"><div class="stat-num">' + summary.consent_rate_pct + '%</div><div class="stat-lbl">Consent rate</div></div>'
+        + '</div>'
+        + '<div class="cols">'
+        + '<div><h2>Top Products Interested</h2>' + _tallyRows(summary.top_products_interested) + '</div>'
+        + '<div><h2>Top Expected Spend</h2>' + _tallyRows(summary.top_expected_spend) + '</div>'
+        + '<div><h2>Top Attend Frequency</h2>' + _tallyRows(summary.top_attend_frequency) + '</div>'
+        + '<div><h2>Top Heard About</h2>' + _tallyRows(summary.top_heard_about) + '</div>'
+        + '</div>';
+    }
+
     var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>'
       + '<title>' + esc(campName) + ' — Registrations</title>'
       + '<style>'
@@ -2728,15 +2947,33 @@ var VT = (function(){
       + 'th{background:#1a1a2e;color:#f0c000;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:7px 6px;text-align:left;}'
       + 'td{padding:6px 6px;font-size:10px;border-bottom:1px solid #eee;vertical-align:top;}'
       + '.footer{margin-top:18px;font-size:9px;color:#999;text-align:center;border-top:1px solid #eee;padding-top:10px;}'
+      + '.page-break{page-break-before:always;}'
+      + '.page-break h1{font-size:16px;margin:0 0 4px;}'
+      + '.page-break h2{font-size:12px;margin:16px 0 6px;color:#1a1a2e;}'
+      + '.page-break p{font-size:11px;line-height:1.6;margin:0 0 8px;}'
+      + '.page-break ul{margin:0 0 8px;padding-left:18px;font-size:11px;line-height:1.6;}'
+      + '.muted{color:#777;font-size:10.5px;}'
+      + '.stats-grid{display:flex;gap:12px;margin:14px 0;}'
+      + '.stat-box{flex:1;background:#faf6e6;border:1px solid #f0c000;border-radius:8px;padding:10px;text-align:center;}'
+      + '.stat-num{font-size:20px;font-weight:900;color:#1a1a2e;}'
+      + '.stat-lbl{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}'
+      + '.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}'
+      + 'table.mini{font-size:10px;}table.mini td{border-bottom:1px solid #eee;padding:3px 4px;}'
       + '@media print{body{padding:12px;}@page{margin:12mm;}}'
       + '</style></head><body>'
       + '<div class="header">'
-      + '<div><h1>' + esc(campName) + '</h1><div>Voucher Registrations Report</div><span class="badge">ImpactGrid Admin</span></div>'
+      + '<div><h1>' + esc(campName) + '</h1><div>Registrations Report — Page 1 of 2</div><span class="badge">ImpactGrid Admin</span></div>'
       + '<div class="meta">Generated: ' + dateStr + '<br>Total entries: <strong>' + _activeRegs.length + '</strong></div>'
       + '</div>'
       + '<table><thead><tr>' + headers.map(function(h){ return '<th>' + h + '</th>'; }).join('') + '</tr></thead>'
       + '<tbody>' + rowsHtml + '</tbody></table>'
       + '<div class="footer">ImpactGrid Group &mdash; Confidential &mdash; ' + dateStr + '</div>'
+      + '<div class="page-break">'
+      + '<div class="header"><div><h1>AI Insights &amp; Analysis</h1><div>' + esc(campName) + ' — Page 2 of 2</div><span class="badge">ImpactGrid Admin</span></div>'
+      + '<div class="meta">Generated: ' + dateStr + '</div></div>'
+      + page2Html
+      + '<div class="footer">ImpactGrid Group &mdash; Confidential &mdash; ' + dateStr + '</div>'
+      + '</div>'
       + '</body></html>';
 
     var w = window.open('', '_blank', 'width=1100,height=700');
@@ -2750,6 +2987,7 @@ var VT = (function(){
     init: init,
     showCreateForm: showCreateForm,
     hideCreateForm: hideCreateForm,
+    onCreateTypeChange: onCreateTypeChange,
     createCampaign: createCampaign,
     toggleActive: toggleActive,
     copyLink: copyLink,
@@ -2758,6 +2996,10 @@ var VT = (function(){
     exportPDF: exportPDF,
     openDesignEditor: openDesignEditor,
     closeDesignEditor: closeDesignEditor,
+    setFormType: setFormType,
+    addField: addField,
+    removeField: removeField,
+    updateField: updateField,
     savePageDesign: savePageDesign,
     dzDragOver: dzDragOver,
     dzDragLeave: dzDragLeave,
