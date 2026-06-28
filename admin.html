@@ -2828,7 +2828,7 @@ var VT = (function(){
     document.getElementById('vtRegTitle').textContent = 'Registrations — ' + (_activeCampaign ? _activeCampaign.name : '');
 
     var { data, error } = await getSupabase()
-      .from('voucher_registrations')
+      .from('campaign_registrations')
       .select('*')
       .eq('campaign_id', campaignId)
       .order('created_at', { ascending:false });
