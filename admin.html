@@ -4630,8 +4630,9 @@ function openConfirmModal(id) {
   document.getElementById('modal-inv-date').value = fmt(today);
   document.getElementById('modal-inv-due').value  = fmt(due);
   document.getElementById('modal-inv-client').value = b.name;
-  var last = parseInt(localStorage.getItem('ig_last_inv_num')||'2',10);
-  document.getElementById('modal-inv-number').value = 'INV-'+String(last+1).padStart(6,'0');
+  var year = new Date().getFullYear();
+  var rand = Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('modal-inv-number').value = 'INV-' + year + '-' + rand;
   document.getElementById('modal-line-items').innerHTML = '';
   _modalLineCount = 0;
   modalAddLine(b.event_type||'Photography',1,0);
@@ -4738,9 +4739,6 @@ async function confirmBooking(){
     });
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Backend error');
-
-    var num=parseInt(invoice.invoice_number.replace(/\D/g,''),10);
-    if(!isNaN(num)) localStorage.setItem('ig_last_inv_num',String(num));
 
     // Step 2 — save invoice to Supabase
     var sb = getSupabase();
@@ -4931,8 +4929,6 @@ async function sendInvoiceOnly() {
     });
     var data = await res.json();
     if (!data.success) throw new Error(data.error || 'Failed');
-    var num = parseInt(invoice.invoice_number.replace(/\D/g,''), 10);
-    if (!isNaN(num)) localStorage.setItem('ig_last_inv_num', String(num));
     toast('', 'Invoice sent!', invoice.invoice_number + ' → ' + b.email);
     btn.textContent = ' Sent ✓';
     setTimeout(function(){ btn.disabled = false; btn.textContent = ' Send Invoice Only'; }, 3000);
