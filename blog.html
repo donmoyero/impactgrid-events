@@ -22,7 +22,7 @@
     :root { --pf: 'Fraunces', Georgia, serif; }
 
     /* ═══════════════════════════════════════
-       SHELF — grid of closed books
+       SHELF — grid of closed books (cover page)
     ═══════════════════════════════════════ */
     .blog-page { padding: 80px 24px 100px; }
     .blog-label {
@@ -115,155 +115,104 @@
     }
 
     /* ═══════════════════════════════════════
-       BOOK OVERLAY (open viewer)
+       POST VIEW — full blog article (replaces the page-flip book)
     ═══════════════════════════════════════ */
-    .book-overlay {
+    .post-view {
       position: fixed; inset: 0; z-index: 2000;
-      background: rgba(10,8,5,0.0);
-      display: flex; align-items: center; justify-content: center;
-      padding: 40px 20px;
+      background: #fff; overflow-y: auto;
       opacity: 0; pointer-events: none;
-      transition: background 0.4s, opacity 0.3s;
+      transition: opacity 0.25s;
     }
-    .book-overlay.show {
-      background: rgba(10,8,5,0.78);
-      opacity: 1; pointer-events: auto;
-    }
+    .post-view.show { opacity: 1; pointer-events: auto; }
 
-    .book-close {
-      position: absolute; top: 22px; right: 26px; z-index: 60;
+    .post-close {
+      position: fixed; top: 22px; right: 26px; z-index: 2010;
       width: 38px; height: 38px; border-radius: 50%;
-      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
-      color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      background: rgba(20,16,10,0.06); border: 1px solid rgba(20,16,10,0.14);
+      color: var(--text); font-size: 18px; display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: background 0.2s;
     }
-    .book-close:hover { background: rgba(255,255,255,0.18); }
+    .post-close:hover { background: rgba(20,16,10,0.12); }
 
-    .book-scene { perspective: 2400px; width: min(1300px, 96vw); position: relative; }
-    .book-scene::after {
-      content: ''; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
-      width: 55%; height: 50px;
-      background: radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%);
-      filter: blur(14px); pointer-events: none;
-    }
+    .post-hero { width: 100%; max-height: 48vh; object-fit: cover; display: block; }
 
-    .book-root {
-      position: relative; width: 100%; aspect-ratio: 2 / 1.15;
-      transform-style: preserve-3d;
-      transform: rotateY(0deg) scale(1);
-      transition: transform 0.6s cubic-bezier(0.34,1.2,0.64,1), opacity 0.4s;
-    }
-
-    /* Closed state: a single cover board sits centered, page halves hidden */
-    .book-root.is-closed .book-half,
-    .book-root.is-closed .book-spine,
-    .book-root.is-closed .book-click-left,
-    .book-root.is-closed .book-click-right { opacity: 0; pointer-events: none; }
-    .book-cover-board {
-      position: absolute; inset: 0; left: 25%; width: 50%;
-      border-radius: 6px;
-      background: linear-gradient(135deg, #1d1812 0%, #100d09 100%);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      display: flex; flex-direction: column; justify-content: flex-end;
-      overflow: hidden;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.4s;
-      cursor: pointer;
-    }
-    .book-root.is-closed .book-cover-board { opacity: 1; pointer-events: auto; }
-    .book-cover-board img {
-      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8;
-    }
-    .book-cover-board::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 80%);
-    }
-    .book-cover-info { position: relative; z-index: 1; padding: 30px; text-align: center; }
-    .book-cover-tag {
+    .post-header { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; text-align: center; }
+    .post-tag {
       font-family: var(--fm); font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
-      text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 10px;
+      text-transform: uppercase; color: rgba(40,32,18,0.55); margin-bottom: 10px;
     }
-    .book-cover-title {
-      font-family: var(--pf); font-size: clamp(20px, 3vw, 32px); color: #fff; line-height: 1.2;
-    }
-    .book-cover-hint {
-      margin-top: 14px; font-family: var(--fm); font-size: 9px; letter-spacing: 0.1em;
-      text-transform: uppercase; color: rgba(255,255,255,0.4);
+    .post-title {
+      font-family: var(--fb); font-size: clamp(28px, 4vw, 46px); font-weight: 900;
+      line-height: 1.1; letter-spacing: -0.02em; color: var(--text);
     }
 
-    .book-half { position: absolute; top: 0; width: 50%; height: 100%; overflow: hidden; transition: opacity 0.3s; }
-    .book-half-left  { left: 0;  border-radius: 6px 0 0 6px; box-shadow: -6px 8px 40px rgba(0,0,0,0.45), -2px 0 8px rgba(0,0,0,0.2); background: #f7f2e8; }
-    .book-half-right { right: 0; border-radius: 0 6px 6px 0; box-shadow: 6px 8px 40px rgba(0,0,0,0.45), 2px 0 8px rgba(0,0,0,0.2); background: #f7f2e8; }
+    .post-body { max-width: 720px; margin: 0 auto; padding: 40px 24px 140px; display: flex; flex-direction: column; gap: 40px; }
 
-    /* Page content types */
-    .pg-content { position: absolute; inset: 0; display: flex; flex-direction: column; }
-    .pg-image { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .pg-text { padding: 44px 38px; overflow-y: auto; }
-    .pg-text .pg-heading { font-family: var(--pf); font-size: clamp(18px, 2.4vw, 26px); color: #2a2419; margin-bottom: 16px; line-height: 1.25; }
-    .pg-text .pg-body { font-family: var(--fb); font-size: 14.5px; line-height: 1.85; color: #4a4234; white-space: pre-wrap; }
-    .pg-youtube { width: 100%; height: 100%; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
-    .pg-youtube iframe { width: 100%; height: 100%; border: 0; }
-    .pg-youtube-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-    .pg-youtube-play {
-      position: absolute; width: 60px; height: 60px; border-radius: 50%;
+    .post-block { position: relative; }
+    .post-block-text .pb-heading { font-family: var(--pf); font-size: clamp(19px, 2.4vw, 26px); color: #2a2419; margin-bottom: 14px; line-height: 1.3; }
+    .post-block-text .pb-body { font-family: var(--fb); font-size: 16px; line-height: 1.85; color: #4a4234; white-space: pre-wrap; }
+    .post-block-image img { width: 100%; border-radius: 10px; display: block; }
+    .post-block-youtube { width: 100%; border-radius: 10px; overflow: hidden; background: #000; position: relative; aspect-ratio: 16/9; }
+    .post-block-youtube iframe { width: 100%; height: 100%; border: 0; }
+    .pby-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+    .pby-play {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 64px; height: 64px; border-radius: 50%;
       background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 20px; cursor: pointer; pointer-events: none;
+      color: #fff; font-size: 22px; pointer-events: none;
     }
-    .pg-caption {
-      position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 18px;
-      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
-      font-family: var(--fm); font-size: 10.5px; color: #fff;
-    }
-    .pg-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #b8ab90; font-family: var(--fm); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+    .pb-caption { margin-top: 10px; font-family: var(--fm); font-size: 11px; color: rgba(40,32,18,0.55); text-align: center; }
 
-    .book-pg-num {
-      position: absolute; bottom: 14px; font-family: var(--fm); font-size: 11px;
-      color: rgba(60,50,30,0.5); background: rgba(255,255,255,0.5); padding: 3px 10px;
-      border-radius: 100px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5;
-    }
-    .book-half-left .book-pg-num  { left: 18px; }
-    .book-half-right .book-pg-num { right: 18px; }
+    .post-empty { text-align: center; font-family: var(--fm); font-size: 12px; color: rgba(40,32,18,0.4); padding: 60px 0; }
 
-    .book-spine {
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 18px; height: 100%; z-index: 50; pointer-events: none;
-      background: linear-gradient(to right, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.08) 30%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.08) 70%, rgba(0,0,0,0.25) 100%);
+    /* admin-only controls (shown when logged in) */
+    .pb-admin-bar { display: flex; gap: 6px; justify-content: flex-end; margin-bottom: 8px; }
+    .pb-admin-btn {
+      width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(40,32,18,0.15);
+      background: rgba(40,32,18,0.04); display: flex; align-items: center; justify-content: center;
+      font-size: 12px; cursor: pointer; color: rgba(40,32,18,0.6);
     }
+    .pb-admin-btn:hover { background: rgba(40,32,18,0.1); }
+    .pb-admin-btn.danger:hover { background: #f3d9d9; color: #a33; }
+    .pb-admin-btn[disabled] { opacity: 0.3; cursor: default; }
+    .pb-admin-btn[disabled]:hover { background: rgba(40,32,18,0.04); }
 
-    .flip-leaf {
-      position: absolute; top: 0; width: 50%; height: 100%;
-      transform-style: preserve-3d; transform-origin: left center; z-index: 30; pointer-events: none;
+    .add-block-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+    .add-block-btn {
+      border: 1.5px dashed rgba(40,32,18,0.3); padding: 12px 22px; border-radius: 100px;
+      background: transparent; cursor: pointer; font-family: var(--fm); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase; color: rgba(40,32,18,0.6);
+      transition: all 0.2s;
     }
-    .flip-leaf-face, .flip-leaf-back { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; background: #f7f2e8; }
-    .flip-leaf-face { border-radius: 0 4px 4px 0; box-shadow: 6px 0 20px rgba(0,0,0,0.3); }
-    .flip-leaf-back { transform: rotateY(180deg); border-radius: 6px 0 0 6px; box-shadow: -6px 0 20px rgba(0,0,0,0.3); }
+    .add-block-btn:hover { border-color: var(--gold); color: var(--text); background: rgba(212,175,100,0.08); }
 
-    .book-click-left, .book-click-right {
-      position: absolute; top: 0; width: 50%; height: 100%; z-index: 40; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
+    /* add / edit modal */
+    .block-modal-overlay {
+      position: fixed; inset: 0; z-index: 3000; background: rgba(20,16,10,0.5);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
-    .book-click-left  { left: 0; }
-    .book-click-right { right: 0; }
-    .book-arrow {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.15);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: rgba(40,32,18,0.6); transition: all 0.2s; opacity: 0;
+    .block-modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .block-modal { background: #fff; border-radius: 12px; max-width: 480px; width: 100%; padding: 28px; box-shadow: 0 30px 70px rgba(0,0,0,0.3); }
+    .block-modal-title { font-family: var(--pf); font-size: 20px; margin-bottom: 18px; color: var(--text); }
+    .bm-field { margin-bottom: 14px; }
+    .bm-field label { display: block; font-family: var(--fm); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(40,32,18,0.5); margin-bottom: 6px; }
+    .bm-field input, .bm-field textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid rgba(40,32,18,0.2); border-radius: 6px;
+      font-family: var(--fb); font-size: 14px; color: var(--text); box-sizing: border-box;
     }
-    .book-click-left:hover .book-arrow, .book-click-right:hover .book-arrow { opacity: 1; background: rgba(0,0,0,0.14); }
-    .book-click-left.disabled, .book-click-right.disabled { cursor: default; }
-    .book-click-left.disabled .book-arrow, .book-click-right.disabled .book-arrow { display: none; }
-
-    .book-status { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; }
-    .book-status-label { font-family: var(--pf); font-size: 14px; font-style: italic; color: rgba(255,255,255,0.7); }
-    .book-hint { margin-top: 8px; text-align: center; font-family: var(--fm); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
-
-    .book-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6); font-family: var(--fm); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; z-index: 70; }
+    .bm-field textarea { min-height: 110px; resize: vertical; }
+    .block-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+    .bm-btn { padding: 9px 18px; border-radius: 100px; font-family: var(--fm); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; }
+    .bm-cancel { background: transparent; color: rgba(40,32,18,0.6); border: 1px solid rgba(40,32,18,0.2); }
+    .bm-save { background: var(--text); color: #fff; }
+    .bm-save:hover { opacity: 0.85; }
 
     @media (max-width: 700px) {
       .blog-page { padding: 56px 14px 80px; }
       .shelf { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 22px 16px; }
-      .pg-text { padding: 24px 20px; }
+      .post-header { padding: 36px 18px 0; }
+      .post-body { padding: 30px 18px 100px; gap: 30px; }
     }
   </style>
 </head>
@@ -291,66 +240,44 @@
   <div id="ig-footer"></div>
   <script>renderFooter();</script>
 
-  <!-- ═══ BOOK OVERLAY ═══ -->
-  <div class="book-overlay" id="bookOverlay">
-    <button class="book-close" id="bookCloseBtn" aria-label="Close book">✕</button>
-    <div class="book-scene" id="bookScene">
-      <div class="book-root" id="bookRoot">
+  <!-- ═══ POST VIEW (full article, opens from the book cover) ═══ -->
+  <div class="post-view" id="postView">
+    <button class="post-close" id="postCloseBtn" aria-label="Close">✕</button>
+    <img class="post-hero" id="postHero" src="" alt="" style="display:none;">
+    <div class="post-header">
+      <div class="post-tag" id="postTag"></div>
+      <h1 class="post-title" id="postTitle"></h1>
+    </div>
+    <div class="post-body" id="postBody"></div>
+  </div>
 
-        <div class="book-loading" id="bookLoading" style="display:none;">Loading…</div>
-
-        <!-- Cover board (closed state) -->
-        <div class="book-cover-board" id="bookCoverBoard">
-          <img id="bookCoverImg" src="" alt="" style="display:none;">
-          <div class="book-cover-info">
-            <div class="book-cover-tag" id="bookCoverTag"></div>
-            <div class="book-cover-title" id="bookCoverTitle"></div>
-            <div class="book-cover-hint" id="bookCoverHint">Click to open</div>
-          </div>
-        </div>
-
-        <div class="book-half book-half-left" id="bookLeft">
-          <div class="pg-content" id="bookLeftContent"></div>
-          <div class="book-pg-num" id="bookLeftNum"></div>
-        </div>
-        <div class="book-half book-half-right" id="bookRight">
-          <div class="pg-content" id="bookRightContent"></div>
-          <div class="book-pg-num" id="bookRightNum"></div>
-        </div>
-
-        <div class="book-spine"></div>
-
-        <div class="flip-leaf" id="flipLeaf" style="display:none;">
-          <div class="flip-leaf-face"><div class="pg-content" id="flipFaceContent"></div></div>
-          <div class="flip-leaf-back"><div class="pg-content" id="flipBackContent"></div></div>
-        </div>
-
-        <div class="book-click-left" id="clickLeft"><div class="book-arrow">←</div></div>
-        <div class="book-click-right" id="clickRight"><div class="book-arrow">→</div></div>
+  <!-- ═══ Add / edit block modal (admin only) ═══ -->
+  <div class="block-modal-overlay" id="blockModalOverlay">
+    <div class="block-modal">
+      <div class="block-modal-title" id="blockModalTitle">Add text</div>
+      <div id="blockModalFields"></div>
+      <div class="block-modal-actions">
+        <button class="bm-btn bm-cancel" id="blockModalCancel">Cancel</button>
+        <button class="bm-btn bm-save" id="blockModalSave">Save</button>
       </div>
-
-      <div class="book-status" id="bookStatus" style="display:none;">
-        <div class="book-status-label" id="bookStatusLabel"></div>
-      </div>
-      <div class="book-hint" id="bookHint" style="display:none;">← Flip the pages →</div>
     </div>
   </div>
 
   <script>
   /* ════════════════════════════════════════
-     BLOG BOOK ENGINE
+     BLOG ENGINE
      Data model (Supabase, content project):
        blog_posts  { id, title, cover_image, category, created_at }
        blog_pages  { id, post_id, order, type, heading, body, url, cloudinary_id, video_id, caption }
 
-     Each spread = left page (idx-1) + right page (idx). idx 0 = closed cover.
+     The shelf shows closed-book covers (unchanged).
+     Clicking a cover opens a normal full-page article view (not a page-flip book),
+     listing every page/block in order. Logged-in admins get + Add / move / delete controls.
   ════════════════════════════════════════ */
 
-  var posts = [];          // [{id,title,coverImage,category,pages:[{type,...}]}]
+  var posts = [];          // [{id,title,coverImage,category,pages:[{id,order,type,...}]}]
   var activePost = null;
-  var spreadIdx = 0;       // 0 = closed; 1 = first open spread (left blank, right = page0)
-  var isFlipping = false;
-  var isOpen = false;
+  var isAdmin = false;
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -370,7 +297,7 @@
       return;
     }
     shelf.innerHTML = posts.map(function(p, i) {
-      return '<div class="closed-book" data-idx="' + i + '" onclick="openBook(' + i + ')">' +
+      return '<div class="closed-book" data-idx="' + i + '" onclick="openPost(' + i + ')">' +
         '<div class="closed-book-cover">' +
           (p.coverImage ? '<img src="' + esc(p.coverImage) + '" alt="">' : '') +
           '<div class="closed-book-spine"></div>' +
@@ -384,76 +311,80 @@
     }).join('');
   }
 
-  /* ── Open / close ── */
-  function openBook(i) {
+  /* ── Open / close the article view ── */
+  function openPost(i) {
     activePost = posts[i];
     if (!activePost) return;
-    spreadIdx = 0;
-    isOpen = true;
 
-    document.getElementById('bookCoverTag').textContent = activePost.category || 'Journal';
-    document.getElementById('bookCoverTitle').textContent = activePost.title;
-    var coverImg = document.getElementById('bookCoverImg');
-    if (activePost.coverImage) { coverImg.src = activePost.coverImage; coverImg.style.display = 'block'; }
-    else { coverImg.style.display = 'none'; }
+    document.getElementById('postTag').textContent = activePost.category || 'Journal';
+    document.getElementById('postTitle').textContent = activePost.title;
+    var hero = document.getElementById('postHero');
+    if (activePost.coverImage) { hero.src = activePost.coverImage; hero.style.display = 'block'; }
+    else { hero.style.display = 'none'; }
 
-    document.getElementById('bookOverlay').classList.add('show');
-    document.getElementById('bookRoot').classList.add('is-closed');
-    document.getElementById('bookStatus').style.display = 'none';
-    document.getElementById('bookHint').style.display = 'none';
-
-    // wire the cover board click to open the first spread
-    document.getElementById('bookCoverBoard').onclick = function(){ flipOpenFromCover(); };
+    renderPostBody();
+    document.getElementById('postView').classList.add('show');
+    document.body.style.overflow = 'hidden';
   }
 
-  function flipOpenFromCover() {
-    if (isFlipping) return;
-    isFlipping = true;
-    document.getElementById('bookRoot').classList.remove('is-closed');
-    spreadIdx = 0;
-    renderSpread(0);
-    document.getElementById('bookStatus').style.display = 'flex';
-    document.getElementById('bookHint').style.display = 'block';
-    setTimeout(function(){ isFlipping = false; }, 350);
-  }
-
-  function closeBook() {
-    document.getElementById('bookOverlay').classList.remove('show');
-    document.getElementById('bookRoot').classList.add('is-closed');
-    isOpen = false;
+  function closePost() {
+    document.getElementById('postView').classList.remove('show');
+    document.body.style.overflow = '';
     activePost = null;
   }
-  document.getElementById('bookCloseBtn').addEventListener('click', closeBook);
-  document.getElementById('bookOverlay').addEventListener('click', function(e){
-    if (e.target === this) closeBook();
-  });
+  document.getElementById('postCloseBtn').addEventListener('click', closePost);
   document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape' && isOpen) closeBook();
-    if (!isOpen || !activePost) return;
-    if (e.key === 'ArrowRight') bookFlip(1);
-    if (e.key === 'ArrowLeft')  bookFlip(-1);
+    if (e.key === 'Escape' && activePost) closePost();
   });
 
-  /* ── Build page content HTML for a given page object ── */
-  function pageHTML(pg) {
-    if (!pg) return '<div class="pg-empty">·</div>';
+  /* ── Build HTML for a single content block ── */
+  function blockHTML(pg, idx) {
+    var adminBar = isAdmin ? adminBarHTML(idx) : '';
     if (pg.type === 'image') {
-      return '<img class="pg-image" src="' + esc(pg.url) + '" alt="">' +
-        (pg.caption ? '<div class="pg-caption">' + esc(pg.caption) + '</div>' : '');
+      return '<div class="post-block post-block-image">' + adminBar +
+        '<img src="' + esc(pg.url) + '" alt="">' +
+        (pg.caption ? '<div class="pb-caption">' + esc(pg.caption) + '</div>' : '') +
+        '</div>';
     }
     if (pg.type === 'youtube') {
       var vid = esc(pg.videoId || '');
-      return '<div class="pg-youtube" data-vid="' + vid + '">' +
-        '<img class="pg-youtube-thumb" src="https://img.youtube.com/vi/' + vid + '/hqdefault.jpg" alt="" onclick="playYoutube(this)">' +
-        '<div class="pg-youtube-play" onclick="this.previousElementSibling.click()">▶</div>' +
+      return '<div class="post-block post-block-youtube-wrap">' + adminBar +
+        '<div class="post-block-youtube" data-vid="' + vid + '">' +
+          '<img class="pby-thumb" src="https://img.youtube.com/vi/' + vid + '/hqdefault.jpg" alt="" onclick="playYoutube(this)">' +
+          '<div class="pby-play" onclick="this.previousElementSibling.click()">▶</div>' +
         '</div>' +
-        (pg.caption ? '<div class="pg-caption">' + esc(pg.caption) + '</div>' : '');
+        (pg.caption ? '<div class="pb-caption">' + esc(pg.caption) + '</div>' : '') +
+        '</div>';
     }
     // text
-    return '<div class="pg-text">' +
-      (pg.heading ? '<div class="pg-heading">' + esc(pg.heading) + '</div>' : '') +
-      '<div class="pg-body">' + esc(pg.body || '') + '</div>' +
+    return '<div class="post-block post-block-text">' + adminBar +
+      (pg.heading ? '<div class="pb-heading">' + esc(pg.heading) + '</div>' : '') +
+      '<div class="pb-body">' + esc(pg.body || '') + '</div>' +
       '</div>';
+  }
+
+  function adminBarHTML(idx) {
+    var total = activePost.pages.length;
+    return '<div class="pb-admin-bar">' +
+      '<button class="pb-admin-btn" title="Move up" ' + (idx === 0 ? 'disabled' : '') + ' onclick="moveBlock(' + idx + ',-1)">↑</button>' +
+      '<button class="pb-admin-btn" title="Move down" ' + (idx === total - 1 ? 'disabled' : '') + ' onclick="moveBlock(' + idx + ',1)">↓</button>' +
+      '<button class="pb-admin-btn danger" title="Delete" onclick="deleteBlock(' + idx + ')">✕</button>' +
+      '</div>';
+  }
+
+  function renderPostBody() {
+    var body = document.getElementById('postBody');
+    var pages = activePost.pages;
+    var html = pages.length
+      ? pages.map(function(pg, idx){ return blockHTML(pg, idx); }).join('')
+      : '<div class="post-empty">No content yet.</div>';
+    if (isAdmin) {
+      html += '<div class="add-block-row">' +
+        '<button class="add-block-btn" onclick="openBlockModal(\'text\')">+ Add text</button>' +
+        '<button class="add-block-btn" onclick="openBlockModal(\'image\')">+ Add picture</button>' +
+        '</div>';
+    }
+    body.innerHTML = html;
   }
 
   function playYoutube(imgEl) {
@@ -463,69 +394,118 @@
       'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
   }
 
-  /* ── Render the static left/right halves ── */
-  function renderSpread(idx) {
+  /* ── Admin: reorder blocks (swap order values in Supabase) ── */
+  async function moveBlock(idx, dir) {
+    if (!isAdmin || !activePost) return;
     var pages = activePost.pages;
-    var total = pages.length;
+    var newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= pages.length) return;
 
-    var leftPg  = idx === 0 ? null : pages[idx - 1];
-    var rightPg = pages[idx] || null;
+    var a = pages[idx], b = pages[newIdx];
+    var aOrder = a.order, bOrder = b.order;
+    pages[idx] = b; pages[newIdx] = a;
+    renderPostBody();
 
-    document.getElementById('bookLeftContent').innerHTML  = pageHTML(leftPg);
-    document.getElementById('bookRightContent').innerHTML = pageHTML(rightPg);
-    document.getElementById('bookLeftNum').textContent  = leftPg  ? idx + ' / ' + total : '';
-    document.getElementById('bookRightNum').textContent = rightPg ? (idx + 1) + ' / ' + total : '';
-
-    document.getElementById('bookStatusLabel').textContent = activePost.title + ' — page ' + Math.min(idx + 1, total) + ' of ' + total;
-    document.getElementById('clickLeft').classList.toggle('disabled', idx <= 0);
-    document.getElementById('clickRight').classList.toggle('disabled', idx >= total - 1);
+    try {
+      var sb = getContentClient();
+      await sb.from('blog_pages').update({ order: bOrder }).eq('id', a.id);
+      await sb.from('blog_pages').update({ order: aOrder }).eq('id', b.id);
+      a.order = bOrder; b.order = aOrder;
+    } catch (e) {
+      console.warn('Reorder failed:', e);
+    }
   }
 
-  function bookFlip(dir) {
-    if (isFlipping || !activePost) return;
-    var total = activePost.pages.length;
-    var newIdx = spreadIdx + dir;
-    if (newIdx < 0 || newIdx > total - 1) return;
-    isFlipping = true;
+  /* ── Admin: delete a block ── */
+  async function deleteBlock(idx) {
+    if (!isAdmin || !activePost) return;
+    var pg = activePost.pages[idx];
+    if (!confirm('Delete this section?')) return;
+    try {
+      var sb = getContentClient();
+      var { error } = await sb.from('blog_pages').delete().eq('id', pg.id);
+      if (error) throw error;
+    } catch (e) {
+      console.warn('Delete failed:', e);
+      alert('Could not delete — please try again.');
+      return;
+    }
+    activePost.pages.splice(idx, 1);
+    renderPostBody();
+  }
 
-    var leaf = document.getElementById('flipLeaf');
-    var faceC = document.getElementById('flipFaceContent');
-    var backC = document.getElementById('flipBackContent');
+  /* ── Admin: add a new block ── */
+  var pendingBlockType = null;
 
-    if (dir > 0) {
-      faceC.innerHTML = pageHTML(activePost.pages[spreadIdx]);
-      backC.innerHTML = pageHTML(activePost.pages[newIdx]);
-      leaf.style.left = '50%'; leaf.style.transformOrigin = 'left center';
-      leaf.style.transform = 'rotateY(0deg)'; leaf.style.display = 'block';
-      setTimeout(function(){ leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)'; leaf.style.transform = 'rotateY(-180deg)'; }, 16);
+  function openBlockModal(type) {
+    pendingBlockType = type;
+    var fields = document.getElementById('blockModalFields');
+    document.getElementById('blockModalTitle').textContent = type === 'text' ? 'Add text section' : 'Add picture';
+    if (type === 'text') {
+      fields.innerHTML =
+        '<div class="bm-field"><label>Heading (optional)</label><input id="bmHeading" type="text"></div>' +
+        '<div class="bm-field"><label>Text</label><textarea id="bmBody"></textarea></div>';
     } else {
-      var curLeftPg = spreadIdx === 0 ? null : activePost.pages[spreadIdx - 1];
-      var prevPg    = newIdx === 0 ? null : activePost.pages[newIdx - 1];
-      faceC.innerHTML = pageHTML(prevPg);
-      backC.innerHTML = pageHTML(curLeftPg);
-      leaf.style.left = '0%'; leaf.style.transformOrigin = 'right center';
-      leaf.style.transform = 'rotateY(-180deg)'; leaf.style.display = 'block';
-      setTimeout(function(){ leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)'; leaf.style.transform = 'rotateY(0deg)'; }, 16);
+      fields.innerHTML =
+        '<div class="bm-field"><label>Image URL</label><input id="bmUrl" type="text" placeholder="https://..."></div>' +
+        '<div class="bm-field"><label>Caption (optional)</label><input id="bmCaption" type="text"></div>';
+    }
+    document.getElementById('blockModalOverlay').classList.add('show');
+  }
+
+  function closeBlockModal() {
+    document.getElementById('blockModalOverlay').classList.remove('show');
+    pendingBlockType = null;
+  }
+  document.getElementById('blockModalCancel').addEventListener('click', closeBlockModal);
+  document.getElementById('blockModalOverlay').addEventListener('click', function(e){
+    if (e.target === this) closeBlockModal();
+  });
+
+  document.getElementById('blockModalSave').addEventListener('click', async function() {
+    if (!pendingBlockType || !activePost || !isAdmin) return;
+
+    var maxOrder = activePost.pages.reduce(function(m, p){ return Math.max(m, p.order || 0); }, -1);
+    var row = { post_id: activePost.id, type: pendingBlockType, order: maxOrder + 1 };
+
+    if (pendingBlockType === 'text') {
+      row.heading = document.getElementById('bmHeading').value.trim();
+      row.body = document.getElementById('bmBody').value.trim();
+      if (!row.body) { alert('Please add some text.'); return; }
+    } else {
+      row.url = document.getElementById('bmUrl').value.trim();
+      row.caption = document.getElementById('bmCaption').value.trim();
+      if (!row.url) { alert('Please add an image URL.'); return; }
     }
 
-    setTimeout(function() {
-      spreadIdx = newIdx;
-      renderSpread(spreadIdx);
-      leaf.style.display = 'none'; leaf.style.transition = ''; leaf.style.transform = '';
-      isFlipping = false;
-    }, 780);
-  }
-
-  document.getElementById('clickLeft').addEventListener('click', function(){ bookFlip(-1); });
-  document.getElementById('clickRight').addEventListener('click', function(){ bookFlip(1); });
-
-  var _tx = 0;
-  document.getElementById('bookRoot').addEventListener('touchstart', function(e){ _tx = e.touches[0].clientX; }, {passive:true});
-  document.getElementById('bookRoot').addEventListener('touchend', function(e){
-    if (!isOpen) return;
-    var dx = e.changedTouches[0].clientX - _tx;
-    if (Math.abs(dx) > 44) bookFlip(dx < 0 ? 1 : -1);
+    try {
+      var sb = getContentClient();
+      var { data, error } = await sb.from('blog_pages').insert(row).select().single();
+      if (error) throw error;
+      activePost.pages.push({
+        id: data.id, order: data.order, type: data.type,
+        heading: data.heading || '', body: data.body || '',
+        url: data.url || '', cloudinaryId: data.cloudinary_id || '',
+        videoId: data.video_id || '', caption: data.caption || ''
+      });
+      closeBlockModal();
+      renderPostBody();
+    } catch (e) {
+      console.warn('Add block failed:', e);
+      alert('Could not save — please try again.');
+    }
   });
+
+  /* ── Check whether the current visitor is logged in (admin) ── */
+  async function checkAdmin() {
+    try {
+      var sb = getContentClient();
+      var res = await sb.auth.getSession();
+      isAdmin = !!(res && res.data && res.data.session);
+    } catch (e) {
+      isAdmin = false;
+    }
+  }
 
   /* ── Load posts from Supabase ── */
   async function loadPosts() {
@@ -556,6 +536,8 @@
           category: p.category || '',
           pages: (pagesData || []).map(function(pg) {
             return {
+              id: pg.id,
+              order: pg.order,
               type: pg.type,
               heading: pg.heading || '',
               body: pg.body || '',
@@ -575,10 +557,15 @@
     renderShelf();
   }
 
+  async function init() {
+    await checkAdmin();
+    await loadPosts();
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadPosts);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    loadPosts();
+    init();
   }
   </script>
 
