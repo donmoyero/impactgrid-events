@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Accounts — Impact Grid</title>
+<link rel="icon" href="favicon.ico"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+:root { --sidebar-w:220px; --red-glo:rgba(217,79,59,0.18); }
+[data-theme="dark"] { --red-glo:rgba(247,95,79,0.22); }
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; overflow:hidden; }
+body { background:var(--bg); color:var(--text); font-family:var(--fb); font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased; display:flex; flex-direction:column; }
+a { color:inherit; text-decoration:none; }
+button { cursor:pointer; font-family:var(--fb); border:none; background:none; }
+h1,h2,h3,h4 { font-family:var(--fd); font-weight:900; line-height:1.08; letter-spacing:-.025em; }
+input,textarea,select { font-family:var(--fb); font-size:13px; color:var(--text); background:var(--bg2); border:1px solid var(--border2); border-radius:var(--r); padding:9px 12px; width:100%; outline:none; transition:border-color .2s; }
+input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-dim); }
+
+/* ── TOPBAR ── */
+.topbar { flex-shrink:0; height:52px; background:rgba(242,244,251,.95); backdrop-filter:blur(24px); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:14px; z-index:100; }
+[data-theme="dark"] .topbar { background:rgba(7,9,15,.92); }
+.topbar-logo { display:flex; align-items:center; gap:8px; font-family:var(--fd); font-weight:900; font-size:14px; }
+.topbar-mark { width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,var(--gold),var(--gold2)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#fff; flex-shrink:0; }
+.topbar-div { width:1px; height:22px; background:var(--border2); }
+.topbar-user { font-family:var(--fm); font-size:10px; color:var(--text2); margin-left:auto; }
+.topbar-btn { padding:6px 12px; border-radius:8px; font-size:12px; font-weight:500; color:var(--text2); border:1px solid var(--border2); transition:all .2s; }
+.topbar-btn:hover { color:var(--text); border-color:var(--gold); }
+
+/* ── LAYOUT ── */
+.shell { display:flex; flex:1; overflow:hidden; }
+.sidebar { width:var(--sidebar-w); flex-shrink:0; background:var(--card); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow-y:auto; }
+.sb-head { padding:16px 14px 12px; border-bottom:1px solid var(--border); }
+.sb-title { font-family:var(--fd); font-size:13px; font-weight:900; color:var(--gold); }
+.sb-sub { font-size:10px; color:var(--text3); margin-top:2px; font-family:var(--fm); }
+.sb-nav { padding:10px 8px; flex:1; }
+.sb-label { font-family:var(--fm); font-size:9px; letter-spacing:.13em; text-transform:uppercase; color:var(--text3); padding:0 6px; margin:10px 0 6px; }
+.sb-item { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:10px; font-size:13px; font-weight:500; color:var(--text2); cursor:pointer; transition:all .15s; margin-bottom:2px; }
+.sb-item:hover { background:var(--bg2); color:var(--text); }
+.sb-item.active { background:var(--gold-dim); color:var(--gold); font-weight:700; }
+.sb-ico { font-size:15px; width:20px; text-align:center; }
+.main { flex:1; overflow-y:auto; padding:24px; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* ── DIJO NANOBOT ── */
+.dijo-bar { background:var(--card); border:1px solid var(--border2); border-radius:16px; padding:16px 18px; margin-bottom:24px; display:flex; align-items:flex-start; gap:14px; position:relative; overflow:hidden; }
+.dijo-bar::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg, var(--gold-dim) 0%, transparent 60%); opacity:.4; pointer-events:none; }
+.dijo-bot { position:relative; flex-shrink:0; }
+.dijo-orb { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--gold2)); display:flex; align-items:center; justify-content:center; font-size:20px; animation:dijo-float 3s ease-in-out infinite; box-shadow:0 0 0 0 var(--gold-glo); }
+@keyframes dijo-float {
+  0%,100% { transform:translateY(0) scale(1); box-shadow:0 0 0 4px var(--gold-dim); }
+  50% { transform:translateY(-4px) scale(1.04); box-shadow:0 0 0 8px var(--gold-dim); }
+}
+.dijo-pulse { position:absolute; top:2px; right:2px; width:10px; height:10px; border-radius:50%; background:var(--green); border:2px solid var(--card); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+.dijo-content { flex:1; position:relative; }
+.dijo-name { font-family:var(--fd); font-size:13px; font-weight:900; color:var(--gold); margin-bottom:2px; }
+.dijo-msg { font-size:12px; color:var(--text2); line-height:1.5; min-height:32px; }
+.dijo-typing { display:inline-flex; gap:3px; align-items:center; height:16px; }
+.dijo-typing span { width:5px; height:5px; border-radius:50%; background:var(--text3); animation:dot 1.2s infinite; }
+.dijo-typing span:nth-child(2) { animation-delay:.2s; }
+.dijo-typing span:nth-child(3) { animation-delay:.4s; }
+@keyframes dot { 0%,80%,100%{transform:scale(.6);opacity:.4;} 40%{transform:scale(1);opacity:1;} }
+.dijo-input-row { display:flex; gap:8px; margin-top:10px; }
+.dijo-input { flex:1; background:var(--bg2); border:1px solid var(--border2); border-radius:10px; padding:8px 12px; font-size:12px; color:var(--text); }
+.dijo-input:focus { border-color:var(--gold); box-shadow:0 0 0 2px var(--gold-dim); }
+.dijo-send { background:var(--gold); color:#fff; border:none; border-radius:10px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; transition:opacity .2s; }
+.dijo-send:hover { opacity:.85; }
+.dijo-history { max-height:160px; overflow-y:auto; margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+.dijo-bubble { font-size:12px; padding:7px 11px; border-radius:10px; max-width:90%; line-height:1.5; }
+.dijo-bubble.user { background:var(--gold-dim); color:var(--gold); align-self:flex-end; border:1px solid var(--gold-glo); }
+.dijo-bubble.ai { background:var(--bg2); color:var(--text); align-self:flex-start; border:1px solid var(--border); }
+
+/* ── CARDS & STATS ── */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 18px; }
+.stat-label { font-family:var(--fm); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; }
+.stat-val { font-family:var(--fd); font-size:26px; font-weight:900; color:var(--text); line-height:1; }
+.stat-val.green { color:var(--green); }
+.stat-val.red { color:var(--red); }
+.stat-val.gold { color:var(--gold); }
+.stat-sub { font-size:11px; color:var(--text3); margin-top:4px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:14px; margin-bottom:16px; }
+.card-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.card-head h2 { font-size:14px; font-weight:800; }
+.card-body { padding:16px 18px; }
+
+/* ── TABLE ── */
+.tbl { width:100%; border-collapse:collapse; font-size:13px; }
+.tbl th { font-family:var(--fm); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); padding:8px 12px; text-align:left; border-bottom:1px solid var(--border); }
+.tbl td { padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.tbl tr:last-child td { border-bottom:none; }
+.tbl tr:hover td { background:var(--bg2); }
+.pill { display:inline-flex; align-items:center; padding:3px 8px; border-radius:20px; font-size:10px; font-weight:700; font-family:var(--fm); }
+.pill-green { background:rgba(45,212,160,.12); color:var(--green); border:1px solid rgba(45,212,160,.2); }
+.pill-gold { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-glo); }
+.pill-red { background:var(--red-dim); color:var(--red); border:1px solid var(--red-glo); }
+.pill-blue { background:rgba(59,130,246,.1); color:#3b82f6; border:1px solid rgba(59,130,246,.2); }
+
+/* ── BUTTONS ── */
+.btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:10px; font-size:13px; font-weight:600; border:1px solid transparent; transition:all .18s; }
+.btn-gold { background:var(--gold); color:#fff; }
+.btn-gold:hover { opacity:.88; }
+.btn-ghost { background:transparent; border-color:var(--border2); color:var(--text2); }
+.btn-ghost:hover { border-color:var(--gold); color:var(--gold); }
+.btn-sm { padding:5px 11px; font-size:12px; border-radius:8px; }
+.btn-red { background:var(--red-dim); color:var(--red); border-color:var(--red-glo); }
+
+/* ── MONTH PICKER ── */
+.month-bar { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.month-btn { width:32px; height:32px; border-radius:8px; border:1px solid var(--border2); background:var(--bg2); color:var(--text2); font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .15s; }
+.month-btn:hover { border-color:var(--gold); color:var(--gold); }
+.month-label { font-family:var(--fd); font-size:16px; font-weight:900; }
+
+/* ── MODAL ── */
+.modal-wrap { display:none; position:fixed; inset:0; z-index:999; background:rgba(0,0,0,.65); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px; }
+.modal-wrap.open { display:flex; }
+.modal-box { background:var(--card); border:1px solid var(--border2); border-radius:16px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,.2); }
+.modal-head { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-head h3 { font-size:15px; font-weight:900; }
+.modal-body { padding:20px; display:flex; flex-direction:column; gap:14px; }
+.field-label { font-family:var(--fm); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); display:block; margin-bottom:5px; }
+.field-hint { font-size:11px; color:var(--text3); margin-top:4px; }
+
+/* ── CHECKLIST ── */
+.checklist-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+.checklist-item:last-child { border-bottom:none; }
+.check-box { width:20px; height:20px; border-radius:6px; border:2px solid var(--border2); background:var(--bg2); cursor:pointer; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all .15s; }
+.check-box.done { background:var(--green); border-color:var(--green); color:#fff; }
+.check-tag { font-size:10px; font-weight:700; font-family:var(--fm); padding:2px 7px; border-radius:6px; }
+.tag-urgent { background:var(--red-dim); color:var(--red); border:1px solid var(--red-glo); }
+.tag-upcoming { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-glo); }
+.tag-info { background:var(--bg3); color:var(--text3); border:1px solid var(--border); }
+
+/* ── RECEIPT THUMB ── */
+.receipt-thumb { width:36px; height:36px; border-radius:8px; background:var(--bg2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; transition:all .15s; flex-shrink:0; }
+.receipt-thumb:hover { border-color:var(--gold); }
+
+/* ── CASHBOOK ── */
+.cashbook-row { display:grid; grid-template-columns:100px 1fr 100px 100px 120px; gap:8px; padding:9px 12px; border-bottom:1px solid var(--border); font-size:12px; align-items:center; }
+.cashbook-head { background:var(--bg2); font-family:var(--fm); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); border-radius:8px 8px 0 0; }
+.cashbook-row.income td, .cashbook-row.income { color:var(--green); }
+.cashbook-row.expense { color:var(--red); }
+.cashbook-total { background:var(--bg2); font-weight:700; border-radius:0 0 8px 8px; }
+
+/* ── UPLOAD AREA ── */
+.upload-area { border:2px dashed var(--border2); border-radius:10px; padding:20px; text-align:center; cursor:pointer; transition:all .2s; }
+.upload-area:hover,.upload-area.dragover { border-color:var(--gold); background:var(--gold-dim); }
+.upload-area input { display:none; }
+
+/* ── TOAST ── */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--card); border:1px solid var(--border2); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,.15); transform:translateY(80px); opacity:0; transition:all .3s; z-index:9999; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* ── EXPORT BTN ── */
+.export-bar { display:flex; gap:10px; margin-bottom:16px; align-items:center; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="topbar-mark">IG</div>
+    Impact Grid
+  </div>
+  <div class="topbar-div"></div>
+  <span style="font-size:12px;color:var(--text2);font-weight:600;">Accounts & Finance</span>
+  <span class="topbar-user" id="topUser"></span>
+  <a href="admin.html" class="topbar-btn" style="margin-left:8px;">← Back to Admin</a>
+</div>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-title">Accounts</div>
+      <div class="sb-sub" id="taxYearLabel"></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-label">Overview</div>
+      <div class="sb-item active" onclick="showPage('dashboard',this)"><span class="sb-ico">📊</span>Dashboard</div>
+      <div class="sb-item" onclick="showPage('cashbook',this)"><span class="sb-ico">📒</span>Cashbook</div>
+      <div class="sb-label">Records</div>
+      <div class="sb-item" onclick="showPage('income',this)"><span class="sb-ico">💰</span>Income</div>
+      <div class="sb-item" onclick="showPage('expenses',this)"><span class="sb-ico">🧾</span>Expenses</div>
+      <div class="sb-label">Compliance</div>
+      <div class="sb-item" onclick="showPage('tax',this)"><span class="sb-ico">📋</span>Tax & Legal</div>
+      <div class="sb-item" onclick="showPage('bank',this)"><span class="sb-ico">🏦</span>Bank</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <!-- DIJO NANOBOT -->
+      <div class="dijo-bar">
+        <div class="dijo-bot">
+          <div class="dijo-orb">🤖</div>
+          <div class="dijo-pulse"></div>
+        </div>
+        <div class="dijo-content">
+          <div class="dijo-name">Dijo — Your Accounting AI</div>
+          <div class="dijo-msg" id="dijoMsg">
+            <div class="dijo-typing"><span></span><span></span><span></span></div>
+          </div>
+          <div class="dijo-history" id="dijoHistory"></div>
+          <div class="dijo-input-row">
+            <input class="dijo-input" id="dijoInput" placeholder="Ask Dijo anything about your accounts…" onkeydown="if(event.key==='Enter')sendDijo()"/>
+            <button class="dijo-send" onclick="sendDijo()">Ask →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-label">Total Income</div><div class="stat-val green" id="statIncome">£0</div><div class="stat-sub" id="statIncomeSub">This tax year</div></div>
+        <div class="stat-card"><div class="stat-label">Total Expenses</div><div class="stat-val red" id="statExpenses">£0</div><div class="stat-sub">This tax year</div></div>
+        <div class="stat-card"><div class="stat-label">Net Profit</div><div class="stat-val gold" id="statProfit">£0</div><div class="stat-sub">Before tax</div></div>
+        <div class="stat-card"><div class="stat-label">Est. Tax Due</div><div class="stat-val" id="statTax">£0</div><div class="stat-sub">Corp Tax est.</div></div>
+        <div class="stat-card"><div class="stat-label">Invoices Sent</div><div class="stat-val" id="statInvCount">0</div><div class="stat-sub">This tax year</div></div>
+        <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-val gold" id="statOutstanding">£0</div><div class="stat-sub">Unpaid invoices</div></div>
+      </div>
+
+      <!-- RECENT -->
+      <div class="card">
+        <div class="card-head"><h2>Recent Activity</h2></div>
+        <div class="card-body" style="padding:0;">
+          <table class="tbl" id="recentTbl">
+            <thead><tr><th>Date</th><th>Description</th><th>Type</th><th style="text-align:right;">Amount</th></tr></thead>
+            <tbody id="recentBody"><tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CASHBOOK ══ -->
+    <div class="page" id="page-cashbook">
+      <div class="dijo-bar" style="margin-bottom:20px;">
+        <div class="dijo-bot"><div class="dijo-orb">🤖</div><div class="dijo-pulse"></div></div>
+        <div class="dijo-content">
+          <div class="dijo-name">Dijo</div>
+          <div class="dijo-msg" id="dijoCashMsg">Your cashbook shows every transaction in date order with a running balance — standard format for UK sole traders and limited companies.</div>
+          <div class="dijo-input-row">
+            <input class="dijo-input" id="dijoCashInput" placeholder="Ask about your cashbook…" onkeydown="if(event.key==='Enter')sendDijo('cash')"/>
+            <button class="dijo-send" onclick="sendDijo('cash')">Ask →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="month-bar">
+        <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="month-label" id="cashMonthLabel"></div>
+        <button class="month-btn" onclick="changeMonth(1)">›</button>
+        <div style="margin-left:auto;">
+          <button class="btn btn-ghost btn-sm" onclick="exportCashbookPDF()">⬇ Export PDF</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;overflow:auto;">
+          <div id="cashbookWrap"></div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin-top:16px;" id="cashStats">
+        <div class="stat-card"><div class="stat-label">Month Income</div><div class="stat-val green" id="cbIncome">£0</div></div>
+        <div class="stat-card"><div class="stat-label">Month Expenses</div><div class="stat-val red" id="cbExpenses">£0</div></div>
+        <div class="stat-card"><div class="stat-label">Net</div><div class="stat-val gold" id="cbNet">£0</div></div>
+      </div>
+    </div>
+
+    <!-- ══ INCOME ══ -->
+    <div class="page" id="page-income">
+      <div class="card-head" style="background:var(--card);border:1px solid var(--border);border-radius:14px 14px 0 0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+        <h2>Income — Invoices</h2>
+        <span style="font-size:12px;color:var(--text3);">Pulled from your sent invoices</span>
+      </div>
+      <div class="card" style="border-radius:0 0 14px 14px;margin-bottom:0;">
+        <div class="card-body" style="padding:0;overflow:auto;">
+          <table class="tbl" id="incomeTbl">
+            <thead><tr><th>Invoice #</th><th>Date</th><th>Client</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="incomeBody"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EXPENSES ══ -->
+    <div class="page" id="page-expenses">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 style="font-size:18px;">Expenses</h2>
+        <button class="btn btn-gold" onclick="openExpenseModal()">+ Add Expense</button>
+      </div>
+
+      <div class="dijo-bar" style="margin-bottom:20px;">
+        <div class="dijo-bot"><div class="dijo-orb">🤖</div><div class="dijo-pulse"></div></div>
+        <div class="dijo-content">
+          <div class="dijo-name">Dijo — Allowable Expenses</div>
+          <div class="dijo-msg">As a UK limited company, you can deduct allowable business expenses before calculating Corporation Tax. These include: travel, equipment, software, phone, marketing, and professional fees. Keep all receipts — HMRC can request them up to 6 years back.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;overflow:auto;">
+          <table class="tbl" id="expensesTbl">
+            <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Receipt</th><th style="text-align:right;">Amount</th><th></th></tr></thead>
+            <tbody id="expensesBody"><tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;">No expenses yet. Add your first one.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAX & LEGAL ══ -->
+    <div class="page" id="page-tax">
+      <div class="dijo-bar" style="margin-bottom:20px;">
+        <div class="dijo-bot"><div class="dijo-orb">🤖</div><div class="dijo-pulse"></div></div>
+        <div class="dijo-content">
+          <div class="dijo-name">Dijo — Compliance Monitor</div>
+          <div class="dijo-msg" id="dijoTaxMsg">Monitoring your UK tax and legal obligations. Tick items off as you complete them — I'll track what's pending and alert you to upcoming deadlines.</div>
+          <div class="dijo-input-row">
+            <input class="dijo-input" id="dijoTaxInput" placeholder="Ask about UK tax, Companies House, VAT…" onkeydown="if(event.key==='Enter')sendDijo('tax')"/>
+            <button class="dijo-send" onclick="sendDijo('tax')">Ask →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>📋 Compliance Checklist</h2><span style="font-size:12px;color:var(--text3);" id="checkProgress"></span></div>
+        <div class="card-body" id="checklistWrap"></div>
+      </div>
+    </div>
+
+    <!-- ══ BANK ══ -->
+    <div class="page" id="page-bank">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 style="font-size:18px;">Bank & Charges</h2>
+        <button class="btn btn-gold" onclick="openBankModal()">+ Add Bank Charge</button>
+      </div>
+
+      <div class="dijo-bar" style="margin-bottom:20px;">
+        <div class="dijo-bot"><div class="dijo-orb">🤖</div><div class="dijo-pulse"></div></div>
+        <div class="dijo-content">
+          <div class="dijo-name">Dijo — Bank Reconciliation</div>
+          <div class="dijo-msg" id="dijoBankMsg">Bank charges (monthly fees, transaction fees, overdraft interest) are allowable business expenses for UK limited companies. Log them here and they'll appear in your cashbook automatically.</div>
+        </div>
+      </div>
+
+      <!-- Bank details card -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head"><h2>Registered Bank</h2></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;" id="bankDetailsDisplay">
+            <div><div class="stat-label">Account Name</div><div style="font-weight:700;" id="bdName">—</div></div>
+            <div><div class="stat-label">Account Number</div><div style="font-weight:700;" id="bdNumber">—</div></div>
+            <div><div class="stat-label">Sort Code</div><div style="font-weight:700;" id="bdSort">—</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px;">Bank details are pulled from Business Settings. <a href="admin.html" style="color:var(--gold);">Update in Admin →</a></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Bank Charges</h2></div>
+        <div class="card-body" style="padding:0;overflow:auto;">
+          <table class="tbl">
+            <thead><tr><th>Date</th><th>Description</th><th>Bank</th><th style="text-align:right;">Amount</th><th></th></tr></thead>
+            <tbody id="bankBody"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;">No bank charges logged.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ══ EXPENSE MODAL ══ -->
+<div class="modal-wrap" id="expenseModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="expModalTitle">Add Expense</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('expenseModal')">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="exp-id"/>
+      <div>
+        <label class="field-label">Date</label>
+        <input type="date" id="exp-date"/>
+      </div>
+      <div>
+        <label class="field-label">Description</label>
+        <input type="text" id="exp-desc" placeholder="e.g. Adobe Creative Cloud subscription"/>
+      </div>
+      <div>
+        <label class="field-label">Category</label>
+        <select id="exp-cat">
+          <option value="Software & Subscriptions">Software & Subscriptions</option>
+          <option value="Travel & Transport">Travel & Transport</option>
+          <option value="Equipment & Hardware">Equipment & Hardware</option>
+          <option value="Marketing & Advertising">Marketing & Advertising</option>
+          <option value="Professional Fees">Professional Fees</option>
+          <option value="Phone & Internet">Phone & Internet</option>
+          <option value="Office & Supplies">Office & Supplies</option>
+          <option value="Bank Charges">Bank Charges</option>
+          <option value="Insurance">Insurance</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Amount (£)</label>
+        <input type="number" id="exp-amount" placeholder="0.00" min="0" step="0.01"/>
+      </div>
+      <div>
+        <label class="field-label">Notes (optional)</label>
+        <textarea id="exp-notes" rows="2" placeholder="Any extra details…"></textarea>
+      </div>
+      <div>
+        <label class="field-label">Receipt</label>
+        <div class="upload-area" id="receiptUploadArea" onclick="document.getElementById('receiptFile').click()">
+          <input type="file" id="receiptFile" accept="image/*,application/pdf" onchange="handleReceiptSelect(this)"/>
+          <div id="receiptPreview" style="font-size:13px;color:var(--text3);">📎 Click to attach receipt (image or PDF)</div>
+        </div>
+        <input type="hidden" id="exp-receipt-url"/>
+        <input type="hidden" id="exp-receipt-path"/>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+        <button class="btn btn-ghost" onclick="closeModal('expenseModal')">Cancel</button>
+        <button class="btn btn-gold" id="expSaveBtn" onclick="saveExpense()">Save Expense</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BANK CHARGE MODAL ══ -->
+<div class="modal-wrap" id="bankModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Add Bank Charge</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('bankModal')">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label class="field-label">Date</label>
+        <input type="date" id="bank-date"/>
+      </div>
+      <div>
+        <label class="field-label">Description</label>
+        <input type="text" id="bank-desc" placeholder="e.g. Monthly account fee"/>
+      </div>
+      <div>
+        <label class="field-label">Bank Name</label>
+        <input type="text" id="bank-name" placeholder="e.g. Barclays"/>
+      </div>
+      <div>
+        <label class="field-label">Amount (£)</label>
+        <input type="number" id="bank-amount" placeholder="0.00" min="0" step="0.01"/>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+        <button class="btn btn-ghost" onclick="closeModal('bankModal')">Cancel</button>
+        <button class="btn btn-gold" onclick="saveBankCharge()">Save Charge</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT VIEWER MODAL -->
+<div class="modal-wrap" id="receiptViewModal">
+  <div class="modal-box" style="max-width:700px;">
+    <div class="modal-head">
+      <h3>Receipt</h3>
+      <div style="display:flex;gap:8px;">
+        <a class="btn btn-gold btn-sm" id="receiptDownloadBtn" download>⬇ Download</a>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('receiptViewModal')">✕ Close</button>
+      </div>
+    </div>
+    <div class="modal-body" style="align-items:center;">
+      <div id="receiptViewContent" style="width:100%;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toastIco"></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="nav.js"></script>
+
+<script>
+/* ══════════════════════════════════════════════
+   ACCOUNTS.JS — Impact Grid Accounting System
+   Confidential — admin access only
+   ══════════════════════════════════════════════ */
+
+var _sb, _bizSettings = {}, _invoices = [], _expenses = [], _bankCharges = [];
+var _currentMonth = new Date().getMonth();
+var _currentYear  = new Date().getFullYear();
+var _dijoHistory  = [];
+
+var CHECKLIST = [
+  { id:'ltd_reg',       text:'Register as a Limited Company with Companies House',  tag:'urgent',   detail:'File online at companieshouse.gov.uk. Cost £12. You get a Company Number and Certificate of Incorporation.' },
+  { id:'hmrc_corp',     text:'Register for Corporation Tax within 3 months of trading', tag:'urgent', detail:'Register at gov.uk/register-for-corporation-tax. Deadline is 3 months after you start trading as a Ltd company.' },
+  { id:'bank_biz',      text:'Open a dedicated business bank account',              tag:'urgent',   detail:'Required for a limited company. Keep personal and business finances completely separate.' },
+  { id:'paye',          text:'Register for PAYE if paying yourself a salary',       tag:'upcoming', detail:'Register at gov.uk/register-employer. You can pay yourself a small salary (up to £12,570 tax-free) and take the rest as dividends.' },
+  { id:'vat_check',     text:'Monitor VAT threshold — register if turnover hits £90,000', tag:'upcoming', detail:'UK VAT threshold is £90,000 rolling 12 months. Register at gov.uk/vat-registration before you breach it.' },
+  { id:'conf_stmt',     text:'File Confirmation Statement annually (Companies House)', tag:'upcoming', detail:'Due every year on the anniversary of incorporation. Fee £34 online. Confirms company details are correct.' },
+  { id:'annual_accts',  text:'File Annual Accounts with Companies House',           tag:'upcoming', detail:'Due 9 months after your financial year end for private companies. Can be filed online.' },
+  { id:'corp_tax_ret',  text:'File Corporation Tax Return (CT600) with HMRC',      tag:'upcoming', detail:'Due 12 months after accounting period ends. Tax payment itself is due 9 months and 1 day after year end.' },
+  { id:'directors_reg', text:'Register all directors with Companies House',         tag:'info',     detail:'Each director needs to be listed at Companies House. Done during incorporation or via form AP01.' },
+  { id:'share_allot',   text:'Issue share certificates to shareholders',            tag:'info',     detail:'Keep a register of members. Issue share certificates. File SH01 with Companies House if issuing new shares.' },
+  { id:'insurance',     text:'Get appropriate business insurance',                  tag:'info',     detail:'Professional indemnity, public liability, and equipment insurance are recommended for events businesses.' },
+  { id:'gdpr',          text:'Register with ICO for data protection (GDPR)',        tag:'info',     detail:'Most businesses that process personal data must register with the ICO. Annual fee from £40.' },
+];
+
+/* ── BOOT ── */
+var _accessToken = null;
+var API_BASE = 'https://impactgrid-events-api.onrender.com'; /* TODO: confirm this matches the API_BASE used elsewhere in admin.html/dashboard.html */
+
+document.addEventListener('DOMContentLoaded', async function() {
+  _sb = getSupabase();
+  var { data } = await _sb.auth.getSession();
+  if (!data.session) { window.location.href = 'login.html'; return; }
+  _accessToken = data.session.access_token;
+  document.getElementById('topUser').textContent = data.session.user.email;
+
+  /* Set tax year label */
+  var now = new Date();
+  var taxStart = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  document.getElementById('taxYearLabel').textContent = 'Tax year ' + taxStart + '–' + (taxStart+1);
+
+  await loadBizSettingsAccounts();
+  await Promise.all([ loadInvoices(), loadExpenses(), loadBankCharges() ]);
+  renderStats();
+  renderRecent();
+  renderCashbook();
+  renderIncome();
+  renderExpenses();
+  renderBankCharges();
+  renderChecklist();
+  setTimeout(dijoGreet, 600);
+});
+
+/* ── BIZ SETTINGS ── */
+async function loadBizSettingsAccounts() {
+  try {
+    var { data } = await _sb.from('business_settings').select('*').eq('id','main').single();
+    if (data) {
+      _bizSettings = data;
+      document.getElementById('bdName').textContent   = data.account_name   || '—';
+      document.getElementById('bdNumber').textContent = data.account_number || '—';
+      document.getElementById('bdSort').textContent   = data.sort_code      || '—';
+    }
+  } catch(e) {}
+}
+
+/* ── DATA LOADERS ── */
+async function loadInvoices() {
+  var { data } = await _sb.from('invoices').select('*').order('invoice_date', { ascending:false });
+  _invoices = data || [];
+}
+async function loadExpenses() {
+  var { data } = await _sb.from('expenses').select('*').order('date', { ascending:false });
+  _expenses = data || [];
+}
+async function loadBankCharges() {
+  var { data } = await _sb.from('expenses').select('*').eq('category','Bank Charges').order('date', { ascending:false });
+  _bankCharges = data || [];
+}
+
+/* ── STATS ── */
+function renderStats() {
+  var now = new Date();
+  var taxStart = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  var yearStart = new Date(taxStart, 3, 6); // 6 April
+
+  var income   = _invoices.filter(function(i){ return new Date(i.invoice_date) >= yearStart; }).reduce(function(s,i){ return s + parseFloat(i.total||0); }, 0);
+  var expenses = _expenses.filter(function(e){ return new Date(e.date) >= yearStart; }).reduce(function(s,e){ return s + parseFloat(e.amount||0); }, 0);
+  var profit   = income - expenses;
+  /* UK Corporation Tax: 19% Small Profits Rate ≤£50k, marginal relief £50k-£250k, 25% above */
+  var tax = 0;
+  if (profit > 0) {
+    if (profit <= 50000)       tax = profit * 0.19;
+    else if (profit <= 250000) tax = profit * 0.25 - (250000 - profit) * (3/200);
+    else                       tax = profit * 0.25;
+  }
+  var outstanding = _invoices.filter(function(i){ return !i.sent; }).reduce(function(s,i){ return s + parseFloat(i.total||0); }, 0);
+
+  document.getElementById('statIncome').textContent      = '£' + income.toFixed(2);
+  document.getElementById('statExpenses').textContent    = '£' + expenses.toFixed(2);
+  document.getElementById('statProfit').textContent      = '£' + profit.toFixed(2);
+  document.getElementById('statTax').textContent         = '£' + tax.toFixed(2);
+  document.getElementById('statInvCount').textContent    = _invoices.length;
+  document.getElementById('statOutstanding').textContent = '£' + outstanding.toFixed(2);
+}
+
+/* ── RECENT ACTIVITY ── */
+function renderRecent() {
+  var all = [];
+  _invoices.slice(0,5).forEach(function(i){ all.push({ date:i.invoice_date, desc:'Invoice '+i.invoice_number+' — '+i.client_name, type:'income', amount:parseFloat(i.total||0) }); });
+  _expenses.slice(0,5).forEach(function(e){ all.push({ date:e.date, desc:e.description, type:'expense', amount:parseFloat(e.amount||0) }); });
+  all.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  var body = document.getElementById('recentBody');
+  if (!all.length) { body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px;">No activity yet.</td></tr>'; return; }
+  body.innerHTML = all.slice(0,10).map(function(r){
+    var sign = r.type==='income' ? '+' : '-';
+    var cls  = r.type==='income' ? 'green' : 'red';
+    var pill = r.type==='income' ? '<span class="pill pill-green">Income</span>' : '<span class="pill pill-red">Expense</span>';
+    return '<tr><td style="font-family:var(--fm);font-size:11px;color:var(--text3);">'+fmtDate(r.date)+'</td><td>'+esc(r.desc)+'</td><td>'+pill+'</td><td style="text-align:right;font-weight:700;color:var(--'+cls+');">'+sign+'£'+r.amount.toFixed(2)+'</td></tr>';
+  }).join('');
+}
+
+/* ── CASHBOOK ── */
+function renderCashbook() {
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cashMonthLabel').textContent = months[_currentMonth] + ' ' + _currentYear;
+
+  var mInc = _invoices.filter(function(i){ var d=new Date(i.invoice_date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
+  var mExp = _expenses.filter(function(e){ var d=new Date(e.date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
+
+  var rows = [];
+  mInc.forEach(function(i){ rows.push({ date:i.invoice_date, desc:'Invoice '+i.invoice_number+' — '+i.client_name, type:'income', amount:parseFloat(i.total||0) }); });
+  mExp.forEach(function(e){ rows.push({ date:e.date, desc:e.description+' ('+e.category+')', type:'expense', amount:parseFloat(e.amount||0) }); });
+  rows.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+
+  var balance = 0;
+  var totalInc = 0, totalExp = 0;
+  var html = '<div class="cashbook-row cashbook-head"><div>Date</div><div>Description</div><div style="text-align:right;">In (£)</div><div style="text-align:right;">Out (£)</div><div style="text-align:right;">Balance (£)</div></div>';
+
+  if (!rows.length) {
+    html += '<div style="text-align:center;color:var(--text3);padding:32px;">No transactions this month.</div>';
+  } else {
+    rows.forEach(function(r){
+      if (r.type==='income') { balance += r.amount; totalInc += r.amount; }
+      else { balance -= r.amount; totalExp += r.amount; }
+      var balColor = balance >= 0 ? 'var(--green)' : 'var(--red)';
+      html += '<div class="cashbook-row" style="font-size:12px;">'
+        + '<div style="font-family:var(--fm);color:var(--text3);">'+fmtDate(r.date)+'</div>'
+        + '<div>'+esc(r.desc)+'</div>'
+        + '<div style="text-align:right;color:var(--green);font-weight:600;">'+(r.type==='income'?'£'+r.amount.toFixed(2):'')+'</div>'
+        + '<div style="text-align:right;color:var(--red);font-weight:600;">'+(r.type==='expense'?'£'+r.amount.toFixed(2):'')+'</div>'
+        + '<div style="text-align:right;font-weight:700;color:'+balColor+';">£'+balance.toFixed(2)+'</div>'
+        + '</div>';
+    });
+    html += '<div class="cashbook-row cashbook-total" style="font-size:12px;">'
+      + '<div></div><div style="font-weight:800;">TOTALS</div>'
+      + '<div style="text-align:right;color:var(--green);">£'+totalInc.toFixed(2)+'</div>'
+      + '<div style="text-align:right;color:var(--red);">£'+totalExp.toFixed(2)+'</div>'
+      + '<div style="text-align:right;color:'+(balance>=0?'var(--green)':'var(--red)')+';">£'+balance.toFixed(2)+'</div>'
+      + '</div>';
+  }
+
+  document.getElementById('cashbookWrap').innerHTML = html;
+  document.getElementById('cbIncome').textContent   = '£' + totalInc.toFixed(2);
+  document.getElementById('cbExpenses').textContent = '£' + totalExp.toFixed(2);
+  document.getElementById('cbNet').textContent      = '£' + (totalInc - totalExp).toFixed(2);
+  document.getElementById('cbNet').className        = 'stat-val ' + ((totalInc-totalExp)>=0?'green':'red');
+}
+
+function changeMonth(dir) {
+  _currentMonth += dir;
+  if (_currentMonth > 11) { _currentMonth = 0; _currentYear++; }
+  if (_currentMonth < 0)  { _currentMonth = 11; _currentYear--; }
+  renderCashbook();
+}
+
+/* ── INCOME ── */
+function renderIncome() {
+  var body = document.getElementById('incomeBody');
+  if (!_invoices.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;">No invoices yet.</td></tr>'; return; }
+  body.innerHTML = _invoices.map(function(i){
+    var pill = i.sent ? '<span class="pill pill-green">Sent</span>' : '<span class="pill pill-gold">Draft</span>';
+    return '<tr><td style="font-family:var(--fm);font-size:11px;">'+esc(i.invoice_number)+'</td>'
+      +'<td style="font-size:12px;color:var(--text3);">'+fmtDate(i.invoice_date)+'</td>'
+      +'<td>'+esc(i.client_name||'—')+'</td>'
+      +'<td style="font-weight:700;color:var(--green);">£'+parseFloat(i.total||0).toFixed(2)+'</td>'
+      +'<td>'+pill+'</td></tr>';
+  }).join('');
+}
+
+/* ── EXPENSES ── */
+function renderExpenses() {
+  var body = document.getElementById('expensesBody');
+  if (!_expenses.length) { body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;">No expenses yet. Add your first one.</td></tr>'; return; }
+  body.innerHTML = _expenses.map(function(e){
+    var receipt = e.receipt_path
+      ? '<div class="receipt-thumb" onclick="viewReceipt(\''+esc(e.receipt_path)+'\',\''+esc(e.description)+'\')">📎</div>'
+      : '<span style="color:var(--text3);font-size:11px;">—</span>';
+    return '<tr>'
+      +'<td style="font-size:12px;color:var(--text3);font-family:var(--fm);">'+fmtDate(e.date)+'</td>'
+      +'<td>'+esc(e.description)+'</td>'
+      +'<td><span class="pill pill-blue" style="font-size:9px;">'+esc(e.category||'—')+'</span></td>'
+      +'<td>'+receipt+'</td>'
+      +'<td style="text-align:right;font-weight:700;color:var(--red);">£'+parseFloat(e.amount||0).toFixed(2)+'</td>'
+      +'<td><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">✕</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+/* ── BANK CHARGES ── */
+function renderBankCharges() {
+  var body = document.getElementById('bankBody');
+  var charges = _expenses.filter(function(e){ return e.category === 'Bank Charges'; });
+  if (!charges.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;">No bank charges logged.</td></tr>'; return; }
+  body.innerHTML = charges.map(function(e){
+    return '<tr>'
+      +'<td style="font-size:12px;color:var(--text3);font-family:var(--fm);">'+fmtDate(e.date)+'</td>'
+      +'<td>'+esc(e.description)+'</td>'
+      +'<td>'+esc(e.notes||'—')+'</td>'
+      +'<td style="text-align:right;font-weight:700;color:var(--red);">£'+parseFloat(e.amount||0).toFixed(2)+'</td>'
+      +'<td><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">✕</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+/* ── CHECKLIST ── */
+function renderChecklist() {
+  var saved = JSON.parse(localStorage.getItem('ig_checklist') || '{}');
+  var done  = Object.values(saved).filter(Boolean).length;
+  document.getElementById('checkProgress').textContent = done + ' / ' + CHECKLIST.length + ' complete';
+  document.getElementById('checklistWrap').innerHTML = CHECKLIST.map(function(item){
+    var checked = saved[item.id] ? 'done' : '';
+    var tagCls  = item.tag === 'urgent' ? 'tag-urgent' : item.tag === 'upcoming' ? 'tag-upcoming' : 'tag-info';
+    return '<div class="checklist-item">'
+      +'<div class="check-box '+checked+'" onclick="toggleCheck(\''+item.id+'\')">'+(checked?'✓':'')+'</div>'
+      +'<div style="flex:1;">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
+          +'<span style="font-size:13px;font-weight:600;'+(checked?'text-decoration:line-through;color:var(--text3);':'')+'">'+esc(item.text)+'</span>'
+          +'<span class="check-tag '+tagCls+' ">'+item.tag+'</span>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--text3);line-height:1.5;">'+esc(item.detail)+'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function toggleCheck(id) {
+  var saved = JSON.parse(localStorage.getItem('ig_checklist') || '{}');
+  saved[id] = !saved[id];
+  localStorage.setItem('ig_checklist', JSON.stringify(saved));
+  renderChecklist();
+}
+
+/* ── EXPENSE MODAL ── */
+function openExpenseModal() {
+  document.getElementById('exp-id').value = '';
+  document.getElementById('exp-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('exp-desc').value = '';
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-notes').value = '';
+  document.getElementById('exp-receipt-url').value = '';
+  document.getElementById('exp-receipt-path').value = '';
+  document.getElementById('receiptPreview').innerHTML = '📎 Click to attach receipt (image or PDF)';
+  document.getElementById('expModalTitle').textContent = 'Add Expense';
+  document.getElementById('expenseModal').classList.add('open');
+}
+
+function openBankModal() {
+  document.getElementById('bank-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('bank-desc').value = '';
+  document.getElementById('bank-name').value = _bizSettings.account_name || '';
+  document.getElementById('bank-amount').value = '';
+  document.getElementById('bankModal').classList.add('open');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* ── RECEIPT UPLOAD ── */
+var _receiptFile = null;
+function handleReceiptSelect(input) {
+  var file = input.files[0];
+  if (!file) return;
+  _receiptFile = file;
+  var preview = document.getElementById('receiptPreview');
+  if (file.type.startsWith('image/')) {
+    var url = URL.createObjectURL(file);
+    preview.innerHTML = '<img src="'+url+'" style="max-height:120px;border-radius:8px;margin:0 auto;display:block;"/><div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center;">'+esc(file.name)+'</div>';
+  } else {
+    preview.innerHTML = '📄 <strong>'+esc(file.name)+'</strong><div style="font-size:11px;color:var(--text3);">PDF attached</div>';
+  }
+}
+
+async function uploadReceipt(file) {
+  var ext  = file.name.split('.').pop();
+  var path = 'receipts/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
+  var { error } = await _sb.storage.from('receipts').upload(path, file, { cacheControl:'3600', upsert:false });
+  if (error) throw error;
+  return { path: path };
+}
+
+/* ── SAVE EXPENSE ── */
+async function saveExpense() {
+  var desc   = document.getElementById('exp-desc').value.trim();
+  var amount = parseFloat(document.getElementById('exp-amount').value);
+  var date   = document.getElementById('exp-date').value;
+  if (!desc || !amount || !date) { toast('⚠', 'Fill in all required fields'); return; }
+
+  var btn = document.getElementById('expSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    var receiptPath = document.getElementById('exp-receipt-path').value;
+
+    if (_receiptFile) {
+      btn.textContent = 'Uploading receipt…';
+      var uploaded = await uploadReceipt(_receiptFile);
+      receiptPath = uploaded.path;
+      _receiptFile = null;
+    }
+
+    var row = {
+      date:         date,
+      description:  desc,
+      category:     document.getElementById('exp-cat').value,
+      amount:       amount,
+      notes:        document.getElementById('exp-notes').value.trim(),
+      receipt_path: receiptPath || null,
+    };
+
+    var id = document.getElementById('exp-id').value;
+    if (id) {
+      await _sb.from('expenses').update(row).eq('id', id);
+    } else {
+      await _sb.from('expenses').insert(row);
+    }
+
+    await loadExpenses();
+    renderExpenses();
+    renderBankCharges();
+    renderStats();
+    renderRecent();
+    renderCashbook();
+    closeModal('expenseModal');
+    toast('✅', 'Expense saved');
+  } catch(e) {
+    toast('❌', 'Error: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Save Expense';
+}
+
+/* ── SAVE BANK CHARGE ── */
+async function saveBankCharge() {
+  var desc   = document.getElementById('bank-desc').value.trim();
+  var amount = parseFloat(document.getElementById('bank-amount').value);
+  var date   = document.getElementById('bank-date').value;
+  if (!desc || !amount || !date) { toast('⚠', 'Fill in all required fields'); return; }
+  try {
+    await _sb.from('expenses').insert({
+      date: date, description: desc, category: 'Bank Charges',
+      amount: amount, notes: document.getElementById('bank-name').value.trim()
+    });
+    await loadExpenses(); await loadBankCharges();
+    renderBankCharges(); renderExpenses(); renderStats(); renderCashbook();
+    closeModal('bankModal');
+    toast('✅', 'Bank charge saved');
+  } catch(e) { toast('❌', 'Error: ' + e.message); }
+}
+
+/* ── DELETE EXPENSE ── */
+async function deleteExpense(id) {
+  if (!confirm('Delete this expense?')) return;
+  var exp = _expenses.find(function(e){ return e.id === id; });
+  if (exp && exp.receipt_path) {
+    await _sb.storage.from('receipts').remove([exp.receipt_path]);
+  }
+  await _sb.from('expenses').delete().eq('id', id);
+  await loadExpenses(); await loadBankCharges();
+  renderExpenses(); renderBankCharges(); renderStats(); renderCashbook(); renderRecent();
+  toast('🗑', 'Expense deleted');
+}
+
+/* ── VIEW RECEIPT ── */
+async function viewReceipt(path, name) {
+  var content = document.getElementById('receiptViewContent');
+  content.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px;">Loading receipt…</div>';
+  document.getElementById('receiptViewModal').classList.add('open');
+
+  var { data, error } = await _sb.storage.from('receipts').createSignedUrl(path, 300); /* 5 min */
+  if (error || !data?.signedUrl) {
+    content.innerHTML = '<div style="text-align:center;color:var(--red);padding:24px;">Could not load receipt.</div>';
+    return;
+  }
+  var url   = data.signedUrl;
+  var isPdf = path.toLowerCase().endsWith('.pdf');
+  if (isPdf) {
+    content.innerHTML = '<iframe src="'+url+'" style="width:100%;height:500px;border:none;border-radius:8px;"></iframe>';
+  } else {
+    content.innerHTML = '<img src="'+url+'" style="max-width:100%;border-radius:8px;display:block;margin:0 auto;"/>';
+  }
+  document.getElementById('receiptDownloadBtn').href = url;
+}
+
+/* ── CASHBOOK PDF ── */
+async function exportCashbookPDF() {
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var mLabel = months[_currentMonth] + ' ' + _currentYear;
+  var biz    = _bizSettings;
+
+  var mInc = _invoices.filter(function(i){ var d=new Date(i.invoice_date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
+  var mExp = _expenses.filter(function(e){ var d=new Date(e.date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
+  var rows = [];
+  mInc.forEach(function(i){ rows.push({ date:i.invoice_date, desc:'Invoice '+i.invoice_number+' — '+i.client_name, type:'income', amount:parseFloat(i.total||0) }); });
+  mExp.forEach(function(e){ rows.push({ date:e.date, desc:e.description+' ('+e.category+')', type:'expense', amount:parseFloat(e.amount||0) }); });
+  rows.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+
+  var balance = 0, totalInc = 0, totalExp = 0;
+  var trs = rows.map(function(r){
+    if (r.type==='income'){ balance+=r.amount; totalInc+=r.amount; }
+    else { balance-=r.amount; totalExp+=r.amount; }
+    return '<tr>'
+      +'<td>'+fmtDate(r.date)+'</td>'
+      +'<td>'+r.desc+'</td>'
+      +'<td style="text-align:right;color:#16a34a;">'+(r.type==='income'?'£'+r.amount.toFixed(2):'')+'</td>'
+      +'<td style="text-align:right;color:#dc2626;">'+(r.type==='expense'?'£'+r.amount.toFixed(2):'')+'</td>'
+      +'<td style="text-align:right;font-weight:700;color:'+(balance>=0?'#16a34a':'#dc2626')+';">£'+balance.toFixed(2)+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Cashbook '+mLabel+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;color:#111;padding:40px 20px;max-width:800px;margin:0 auto;}'
+    +'h1{font-size:22px;margin-bottom:4px;}p{font-size:12px;color:#666;margin-bottom:20px;}'
+    +'table{width:100%;border-collapse:collapse;font-size:12px;}'
+    +'th{background:#f3f4f6;padding:8px 10px;text-align:left;border-bottom:2px solid #e5e7eb;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}'
+    +'td{padding:8px 10px;border-bottom:1px solid #f0f0f0;}'
+    +'.total-row{background:#f9fafb;font-weight:700;}'
+    +'</style></head><body>'
+    +'<h1>Cashbook — '+mLabel+'</h1>'
+    +'<p>'+(biz.biz_name||'Impact Grid')+(biz.biz_address?' · '+biz.biz_address:'')+'</p>'
+    +'<table><thead><tr><th>Date</th><th>Description</th><th style="text-align:right;">In (£)</th><th style="text-align:right;">Out (£)</th><th style="text-align:right;">Balance (£)</th></tr></thead>'
+    +'<tbody>'+trs+'<tr class="total-row"><td></td><td>TOTALS</td><td style="text-align:right;color:#16a34a;">£'+totalInc.toFixed(2)+'</td><td style="text-align:right;color:#dc2626;">£'+totalExp.toFixed(2)+'</td><td style="text-align:right;">£'+balance.toFixed(2)+'</td></tr>'
+    +'</tbody></table>'
+    +'<p style="margin-top:20px;">Generated '+new Date().toLocaleDateString('en-GB')+' · Confidential</p>'
+    +'</body></html>';
+
+  var w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 400);
+}
+
+/* ── DIJO AI ── */
+async function dijoGreet() {
+  var income   = parseFloat(document.getElementById('statIncome').textContent.replace('£',''))||0;
+  var expenses = parseFloat(document.getElementById('statExpenses').textContent.replace('£',''))||0;
+  var profit   = income - expenses;
+  var msgs = [
+    'Good '+timeOfDay()+'. Your net profit this tax year is £'+profit.toFixed(2)+'. '+(profit>0?'You\'re on track — keep logging expenses to reduce your tax bill.':'Watch your costs this month — you\'re currently running at a loss.'),
+    'Hello! I\'m Dijo, your accounting AI. I know UK tax law, Companies House obligations, and bookkeeping standards. Ask me anything about your accounts.',
+    'Welcome back. You have '+_invoices.length+' invoices on record this year. Don\'t forget to log all business expenses — they reduce your Corporation Tax bill.',
+  ];
+  setDijoMsg(msgs[Math.floor(Math.random()*msgs.length)]);
+}
+
+function setDijoMsg(msg) {
+  document.getElementById('dijoMsg').textContent = msg;
+}
+
+function timeOfDay() {
+  var h = new Date().getHours();
+  return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+}
+
+async function sendDijo(context) {
+  var inputId = context === 'cash' ? 'dijoCashInput' : context === 'tax' ? 'dijoTaxInput' : 'dijoInput';
+  var msgId   = context === 'cash' ? 'dijoCashMsg'  : context === 'tax' ? 'dijoTaxMsg'   : 'dijoMsg';
+  var input   = document.getElementById(inputId);
+  var q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+
+  /* Add user bubble to history (dashboard only) */
+  if (!context) {
+    _dijoHistory.push({ role:'user', text:q });
+    renderDijoHistory();
+  }
+
+  document.getElementById(msgId).innerHTML = '<div class="dijo-typing"><span></span><span></span><span></span></div>';
+
+  /* Build history payload for the backend (it builds the system prompt + live figures itself) */
+  var historyPayload = _dijoHistory.slice(0, -1).map(function(m){ return { role: m.role==='user'?'user':'assistant', content: m.text }; });
+
+  try {
+    var res = await fetch(API_BASE + '/api/chat-accounts', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + _accessToken
+      },
+      body: JSON.stringify({
+        message: q,
+        history: context ? [] : historyPayload
+      })
+    });
+
+    if (res.status === 401 || res.status === 403) {
+      document.getElementById(msgId).textContent = "Not authorised for this session — please log in again.";
+      return;
+    }
+
+    var data = await res.json();
+    var reply = data.reply || 'Sorry, I couldn\'t get a response. Try again.';
+
+    document.getElementById(msgId).textContent = reply;
+    if (!context) {
+      _dijoHistory.push({ role:'assistant', text:reply });
+      renderDijoHistory();
+      document.getElementById('dijoMsg').innerHTML = '';
+    }
+  } catch (e) {
+    document.getElementById(msgId).textContent = 'Connection error. Check your internet and try again.';
+  }
+}
+
+function renderDijoHistory() {
+  var el = document.getElementById('dijoHistory');
+  if (!el) return;
+  el.innerHTML = _dijoHistory.map(function(m){
+    return '<div class="dijo-bubble '+m.role+'">'+esc(m.text)+'</div>';
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+/* ── NAVIGATION ── */
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
+  document.getElementById('page-'+id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id==='cashbook') renderCashbook();
+}
+
+/* ── UTILS ── */
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-GB'); } catch(e){ return d; } }
+
+function toast(ico, msg) {
+  document.getElementById('toastIco').textContent = ico;
+  document.getElementById('toastMsg').textContent = msg;
+  var t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+/* ── WINDOW EXPORTS ── */
+window.showPage       = showPage;
+window.sendDijo       = sendDijo;
+window.openExpenseModal = openExpenseModal;
+window.openBankModal  = openBankModal;
+window.closeModal     = closeModal;
+window.saveExpense    = saveExpense;
+window.saveBankCharge = saveBankCharge;
+window.deleteExpense  = deleteExpense;
+window.viewReceipt    = viewReceipt;
+window.toggleCheck    = toggleCheck;
+window.changeMonth    = changeMonth;
+window.handleReceiptSelect = handleReceiptSelect;
+window.exportCashbookPDF   = exportCashbookPDF;
+</script>
+</body>
+</html>
