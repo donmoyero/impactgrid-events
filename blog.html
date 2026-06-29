@@ -165,49 +165,6 @@
 
     .post-empty { text-align: center; font-family: var(--fm); font-size: 12px; color: rgba(40,32,18,0.4); padding: 60px 0; }
 
-    /* admin-only controls (shown when logged in) */
-    .pb-admin-bar { display: flex; gap: 6px; justify-content: flex-end; margin-bottom: 8px; }
-    .pb-admin-btn {
-      width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(40,32,18,0.15);
-      background: rgba(40,32,18,0.04); display: flex; align-items: center; justify-content: center;
-      font-size: 12px; cursor: pointer; color: rgba(40,32,18,0.6);
-    }
-    .pb-admin-btn:hover { background: rgba(40,32,18,0.1); }
-    .pb-admin-btn.danger:hover { background: #f3d9d9; color: #a33; }
-    .pb-admin-btn[disabled] { opacity: 0.3; cursor: default; }
-    .pb-admin-btn[disabled]:hover { background: rgba(40,32,18,0.04); }
-
-    .add-block-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
-    .add-block-btn {
-      border: 1.5px dashed rgba(40,32,18,0.3); padding: 12px 22px; border-radius: 100px;
-      background: transparent; cursor: pointer; font-family: var(--fm); font-size: 11px;
-      letter-spacing: 0.08em; text-transform: uppercase; color: rgba(40,32,18,0.6);
-      transition: all 0.2s;
-    }
-    .add-block-btn:hover { border-color: var(--gold); color: var(--text); background: rgba(212,175,100,0.08); }
-
-    /* add / edit modal */
-    .block-modal-overlay {
-      position: fixed; inset: 0; z-index: 3000; background: rgba(20,16,10,0.5);
-      display: flex; align-items: center; justify-content: center; padding: 20px;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
-    }
-    .block-modal-overlay.show { opacity: 1; pointer-events: auto; }
-    .block-modal { background: #fff; border-radius: 12px; max-width: 480px; width: 100%; padding: 28px; box-shadow: 0 30px 70px rgba(0,0,0,0.3); }
-    .block-modal-title { font-family: var(--pf); font-size: 20px; margin-bottom: 18px; color: var(--text); }
-    .bm-field { margin-bottom: 14px; }
-    .bm-field label { display: block; font-family: var(--fm); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(40,32,18,0.5); margin-bottom: 6px; }
-    .bm-field input, .bm-field textarea {
-      width: 100%; padding: 10px 12px; border: 1px solid rgba(40,32,18,0.2); border-radius: 6px;
-      font-family: var(--fb); font-size: 14px; color: var(--text); box-sizing: border-box;
-    }
-    .bm-field textarea { min-height: 110px; resize: vertical; }
-    .block-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
-    .bm-btn { padding: 9px 18px; border-radius: 100px; font-family: var(--fm); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; }
-    .bm-cancel { background: transparent; color: rgba(40,32,18,0.6); border: 1px solid rgba(40,32,18,0.2); }
-    .bm-save { background: var(--text); color: #fff; }
-    .bm-save:hover { opacity: 0.85; }
-
     @media (max-width: 700px) {
       .blog-page { padding: 56px 14px 80px; }
       .shelf { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 22px 16px; }
@@ -251,18 +208,6 @@
     <div class="post-body" id="postBody"></div>
   </div>
 
-  <!-- ═══ Add / edit block modal (admin only) ═══ -->
-  <div class="block-modal-overlay" id="blockModalOverlay">
-    <div class="block-modal">
-      <div class="block-modal-title" id="blockModalTitle">Add text</div>
-      <div id="blockModalFields"></div>
-      <div class="block-modal-actions">
-        <button class="bm-btn bm-cancel" id="blockModalCancel">Cancel</button>
-        <button class="bm-btn bm-save" id="blockModalSave">Save</button>
-      </div>
-    </div>
-  </div>
-
   <script>
   /* ════════════════════════════════════════
      BLOG ENGINE
@@ -272,12 +217,12 @@
 
      The shelf shows closed-book covers (unchanged).
      Clicking a cover opens a normal full-page article view (not a page-flip book),
-     listing every page/block in order. Logged-in admins get + Add / move / delete controls.
+     listing every page/block in order. This page is public/read-only —
+     adding, reordering and deleting content is done from admin.html.
   ════════════════════════════════════════ */
 
   var posts = [];          // [{id,title,coverImage,category,pages:[{id,order,type,...}]}]
   var activePost = null;
-  var isAdmin = false;
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -338,17 +283,16 @@
   });
 
   /* ── Build HTML for a single content block ── */
-  function blockHTML(pg, idx) {
-    var adminBar = isAdmin ? adminBarHTML(idx) : '';
+  function blockHTML(pg) {
     if (pg.type === 'image') {
-      return '<div class="post-block post-block-image">' + adminBar +
+      return '<div class="post-block post-block-image">' +
         '<img src="' + esc(pg.url) + '" alt="">' +
         (pg.caption ? '<div class="pb-caption">' + esc(pg.caption) + '</div>' : '') +
         '</div>';
     }
     if (pg.type === 'youtube') {
       var vid = esc(pg.videoId || '');
-      return '<div class="post-block post-block-youtube-wrap">' + adminBar +
+      return '<div class="post-block post-block-youtube-wrap">' +
         '<div class="post-block-youtube" data-vid="' + vid + '">' +
           '<img class="pby-thumb" src="https://img.youtube.com/vi/' + vid + '/hqdefault.jpg" alt="" onclick="playYoutube(this)">' +
           '<div class="pby-play" onclick="this.previousElementSibling.click()">▶</div>' +
@@ -357,18 +301,9 @@
         '</div>';
     }
     // text
-    return '<div class="post-block post-block-text">' + adminBar +
+    return '<div class="post-block post-block-text">' +
       (pg.heading ? '<div class="pb-heading">' + esc(pg.heading) + '</div>' : '') +
       '<div class="pb-body">' + esc(pg.body || '') + '</div>' +
-      '</div>';
-  }
-
-  function adminBarHTML(idx) {
-    var total = activePost.pages.length;
-    return '<div class="pb-admin-bar">' +
-      '<button class="pb-admin-btn" title="Move up" ' + (idx === 0 ? 'disabled' : '') + ' onclick="moveBlock(' + idx + ',-1)">↑</button>' +
-      '<button class="pb-admin-btn" title="Move down" ' + (idx === total - 1 ? 'disabled' : '') + ' onclick="moveBlock(' + idx + ',1)">↓</button>' +
-      '<button class="pb-admin-btn danger" title="Delete" onclick="deleteBlock(' + idx + ')">✕</button>' +
       '</div>';
   }
 
@@ -376,14 +311,8 @@
     var body = document.getElementById('postBody');
     var pages = activePost.pages;
     var html = pages.length
-      ? pages.map(function(pg, idx){ return blockHTML(pg, idx); }).join('')
+      ? pages.map(function(pg){ return blockHTML(pg); }).join('')
       : '<div class="post-empty">No content yet.</div>';
-    if (isAdmin) {
-      html += '<div class="add-block-row">' +
-        '<button class="add-block-btn" onclick="openBlockModal(\'text\')">+ Add text</button>' +
-        '<button class="add-block-btn" onclick="openBlockModal(\'image\')">+ Add picture</button>' +
-        '</div>';
-    }
     body.innerHTML = html;
   }
 
@@ -392,119 +321,6 @@
     var vid = wrap.getAttribute('data-vid');
     wrap.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + vid + '?autoplay=1" ' +
       'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-  }
-
-  /* ── Admin: reorder blocks (swap order values in Supabase) ── */
-  async function moveBlock(idx, dir) {
-    if (!isAdmin || !activePost) return;
-    var pages = activePost.pages;
-    var newIdx = idx + dir;
-    if (newIdx < 0 || newIdx >= pages.length) return;
-
-    var a = pages[idx], b = pages[newIdx];
-    var aOrder = a.order, bOrder = b.order;
-    pages[idx] = b; pages[newIdx] = a;
-    renderPostBody();
-
-    try {
-      var sb = getContentClient();
-      await sb.from('blog_pages').update({ order: bOrder }).eq('id', a.id);
-      await sb.from('blog_pages').update({ order: aOrder }).eq('id', b.id);
-      a.order = bOrder; b.order = aOrder;
-    } catch (e) {
-      console.warn('Reorder failed:', e);
-    }
-  }
-
-  /* ── Admin: delete a block ── */
-  async function deleteBlock(idx) {
-    if (!isAdmin || !activePost) return;
-    var pg = activePost.pages[idx];
-    if (!confirm('Delete this section?')) return;
-    try {
-      var sb = getContentClient();
-      var { error } = await sb.from('blog_pages').delete().eq('id', pg.id);
-      if (error) throw error;
-    } catch (e) {
-      console.warn('Delete failed:', e);
-      alert('Could not delete — please try again.');
-      return;
-    }
-    activePost.pages.splice(idx, 1);
-    renderPostBody();
-  }
-
-  /* ── Admin: add a new block ── */
-  var pendingBlockType = null;
-
-  function openBlockModal(type) {
-    pendingBlockType = type;
-    var fields = document.getElementById('blockModalFields');
-    document.getElementById('blockModalTitle').textContent = type === 'text' ? 'Add text section' : 'Add picture';
-    if (type === 'text') {
-      fields.innerHTML =
-        '<div class="bm-field"><label>Heading (optional)</label><input id="bmHeading" type="text"></div>' +
-        '<div class="bm-field"><label>Text</label><textarea id="bmBody"></textarea></div>';
-    } else {
-      fields.innerHTML =
-        '<div class="bm-field"><label>Image URL</label><input id="bmUrl" type="text" placeholder="https://..."></div>' +
-        '<div class="bm-field"><label>Caption (optional)</label><input id="bmCaption" type="text"></div>';
-    }
-    document.getElementById('blockModalOverlay').classList.add('show');
-  }
-
-  function closeBlockModal() {
-    document.getElementById('blockModalOverlay').classList.remove('show');
-    pendingBlockType = null;
-  }
-  document.getElementById('blockModalCancel').addEventListener('click', closeBlockModal);
-  document.getElementById('blockModalOverlay').addEventListener('click', function(e){
-    if (e.target === this) closeBlockModal();
-  });
-
-  document.getElementById('blockModalSave').addEventListener('click', async function() {
-    if (!pendingBlockType || !activePost || !isAdmin) return;
-
-    var maxOrder = activePost.pages.reduce(function(m, p){ return Math.max(m, p.order || 0); }, -1);
-    var row = { post_id: activePost.id, type: pendingBlockType, order: maxOrder + 1 };
-
-    if (pendingBlockType === 'text') {
-      row.heading = document.getElementById('bmHeading').value.trim();
-      row.body = document.getElementById('bmBody').value.trim();
-      if (!row.body) { alert('Please add some text.'); return; }
-    } else {
-      row.url = document.getElementById('bmUrl').value.trim();
-      row.caption = document.getElementById('bmCaption').value.trim();
-      if (!row.url) { alert('Please add an image URL.'); return; }
-    }
-
-    try {
-      var sb = getContentClient();
-      var { data, error } = await sb.from('blog_pages').insert(row).select().single();
-      if (error) throw error;
-      activePost.pages.push({
-        id: data.id, order: data.order, type: data.type,
-        heading: data.heading || '', body: data.body || '',
-        url: data.url || '', cloudinaryId: data.cloudinary_id || '',
-        videoId: data.video_id || '', caption: data.caption || ''
-      });
-      closeBlockModal();
-      renderPostBody();
-    } catch (e) {
-      console.warn('Add block failed:', e);
-      alert('Could not save — please try again.');
-    }
-  });
-
-  /* ── Check whether the current visitor is logged in (admin) ── */
-  async function checkAdmin() {
-    try {
-      var sb = getContentClient();
-      var res = await sb.auth.getSession();
-      isAdmin = !!(res && res.data && res.data.session);
-    } catch (e) {
-      isAdmin = false;
-    }
   }
 
   /* ── Load posts from Supabase ── */
@@ -557,15 +373,10 @@
     renderShelf();
   }
 
-  async function init() {
-    await checkAdmin();
-    await loadPosts();
-  }
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', loadPosts);
   } else {
-    init();
+    loadPosts();
   }
   </script>
 
