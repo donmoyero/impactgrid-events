@@ -134,7 +134,7 @@
     }
     .post-close:hover { background: rgba(20,16,10,0.12); }
 
-    .post-hero { width: 100%; max-height: 48vh; object-fit: cover; display: block; }
+    .post-hero { width: 100%; height: auto; display: block; }
 
     .post-header { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; text-align: center; }
     .post-tag {
@@ -160,6 +160,13 @@
       width: 64px; height: 64px; border-radius: 50%;
       background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center;
       color: #fff; font-size: 22px; pointer-events: none;
+    }
+    .pby-fallback {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #cf2030 0%, #8a0f1c 100%);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.5); font-size: 13px;
+      font-family: var(--fm); letter-spacing: 0.08em; text-transform: uppercase;
     }
     .pb-caption { margin-top: 10px; font-family: var(--fm); font-size: 11px; color: rgba(40,32,18,0.55); text-align: center; }
 
@@ -226,6 +233,46 @@
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+  /* Normalizes a stored video ID (or, defensively, a full URL that slipped through) into a bare ID */
+  function extractYoutubeId(raw) {
+    raw = String(raw || '').trim();
+    if (!raw) return '';
+    if (/^[a-zA-Z0-9_-]{10,12}$/.test(raw)) return raw;
+    var patterns = [
+      /[?&]v=([a-zA-Z0-9_-]{10,12})/,
+      /youtu\.be\/([a-zA-Z0-9_-]{10,12})/,
+      /embed\/([a-zA-Z0-9_-]{10,12})/,
+      /shorts\/([a-zA-Z0-9_-]{10,12})/
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      var m = raw.match(patterns[i]);
+      if (m) return m[1];
+    }
+    return raw;
+  }
+
+  /* Tries progressively smaller YouTube thumbnail sizes before giving up,
+     so the block never just sits there blank. */
+  function ytThumbError(imgEl, vid) {
+    var chain = ['hqdefault', 'mqdefault', 'default'];
+    var tier = parseInt(imgEl.getAttribute('data-tier') || '0', 10);
+    var next = tier + 1;
+    if (next < chain.length) {
+      imgEl.setAttribute('data-tier', String(next));
+      imgEl.src = 'https://img.youtube.com/vi/' + vid + '/' + chain[next] + '.jpg';
+    } else {
+      imgEl.onerror = null;
+      imgEl.style.display = 'none';
+      var wrap = imgEl.parentElement;
+      if (wrap && !wrap.querySelector('.pby-fallback')) {
+        var ph = document.createElement('div');
+        ph.className = 'pby-fallback';
+        ph.textContent = 'Video';
+        wrap.insertBefore(ph, imgEl);
+      }
+    }
+  }
+
   /* ── Render the shelf of closed books ── */
   function renderShelf() {
     var shelf = document.getElementById('shelf');
@@ -291,10 +338,10 @@
         '</div>';
     }
     if (pg.type === 'youtube') {
-      var vid = esc(pg.videoId || '');
+      var vid = esc(extractYoutubeId(pg.videoId || ''));
       return '<div class="post-block post-block-youtube-wrap">' +
         '<div class="post-block-youtube" data-vid="' + vid + '">' +
-          '<img class="pby-thumb" src="https://img.youtube.com/vi/' + vid + '/hqdefault.jpg" alt="" onclick="playYoutube(this)">' +
+          '<img class="pby-thumb" data-tier="0" src="https://img.youtube.com/vi/' + vid + '/hqdefault.jpg" alt="" onclick="playYoutube(this)" onerror="ytThumbError(this,\'' + vid + '\')">' +
           '<div class="pby-play" onclick="this.previousElementSibling.click()">▶</div>' +
         '</div>' +
         (pg.caption ? '<div class="pb-caption">' + esc(pg.caption) + '</div>' : '') +
