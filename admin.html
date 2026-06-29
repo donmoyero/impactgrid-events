@@ -122,6 +122,12 @@ tr:hover td{background:var(--bg2);}
 .ws-panel{display:none;}
 .ws-panel.active{display:block;}
 .content-sections{display:flex;flex-direction:column;gap:12px;}
+.blog-page-card{cursor:grab;transition:opacity .15s,box-shadow .15s;}
+.blog-page-card:active{cursor:grabbing;}
+.blog-page-card.blog-page-dragging{opacity:.4;}
+.blog-page-card.blog-page-dragover{box-shadow:0 0 0 2px var(--gold) inset;}
+.blog-page-handle{font-size:13px;color:var(--text3);letter-spacing:-2px;cursor:grab;user-select:none;}
+
 .cs-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
 .cs-head{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .2s;user-select:none;}
 .cs-head:hover{background:rgba(0,0,0,.02);}
@@ -888,8 +894,8 @@ If you have any questions, just reply to this email.
           <div class="ws-sticky">
             <div class="hint-box">
               <strong>How the book works</strong><br><br>
-              Pages flip in the order shown below — use ↑ / ↓ to reorder. Text and image pages can sit side-by-side as a spread on the public blog page.<br><br>
-              YouTube pages just need the video ID (the part after <code>watch?v=</code>) — it shows a thumbnail and only loads the video when clicked.
+              Drag a page by its ⠿⠿ handle to reorder it (or use ↑ / ↓). Text and image pages can sit side-by-side as a spread on the public blog page.<br><br>
+              YouTube pages take the video ID or you can just paste the full YouTube link — it shows a thumbnail and only loads the video when clicked.
             </div>
             <button class="btn btn-gold" onclick="blogSavePost()" style="display:flex;justify-content:center;margin-top:12px;padding:10px;width:100%;"> Save Post</button>
             <a href="blog.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:10px;padding:10px;"> Preview Blog</a>
@@ -4027,6 +4033,67 @@ function blogUpdatePageField(idx, field, value) {
   if (blogCurrentPost && blogCurrentPost.pages[idx]) blogCurrentPost.pages[idx][field] = value;
 }
 
+/* Accepts a bare video ID or a full YouTube URL (watch/youtu.be/embed/shorts) and
+   normalizes it down to the bare 11-char ID, so pasting a link still works. */
+function extractYoutubeId(raw) {
+  raw = String(raw || '').trim();
+  if (!raw) return '';
+  if (/^[a-zA-Z0-9_-]{10,12}$/.test(raw)) return raw; // already a bare ID
+  var patterns = [
+    /[?&]v=([a-zA-Z0-9_-]{10,12})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{10,12})/,
+    /embed\/([a-zA-Z0-9_-]{10,12})/,
+    /shorts\/([a-zA-Z0-9_-]{10,12})/
+  ];
+  for (var i = 0; i < patterns.length; i++) {
+    var m = raw.match(patterns[i]);
+    if (m) return m[1];
+  }
+  return raw;
+}
+
+function blogNormalizeVideoId(idx) {
+  var pg = blogCurrentPost && blogCurrentPost.pages[idx];
+  if (!pg) return;
+  var clean = extractYoutubeId(pg.videoId);
+  pg.videoId = clean;
+  var input = document.getElementById('blogPgVidIn-' + idx);
+  if (input) input.value = clean;
+}
+
+/* ── Drag-and-drop reordering ── */
+var _blogDragIdx = null;
+
+function blogDragStart(e, idx) {
+  _blogDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', String(idx)); } catch(err) {}
+  e.currentTarget.classList.add('blog-page-dragging');
+}
+function blogDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('blog-page-dragover');
+}
+function blogDragLeave(e) {
+  e.currentTarget.classList.remove('blog-page-dragover');
+}
+function blogDrop(e, idx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('blog-page-dragover');
+  if (_blogDragIdx === null || _blogDragIdx === idx) return;
+  var arr = blogCurrentPost.pages;
+  var moved = arr.splice(_blogDragIdx, 1)[0];
+  arr.splice(idx, 0, moved);
+  _blogDragIdx = null;
+  blogRenderPages();
+}
+function blogDragEnd(e) {
+  e.currentTarget.classList.remove('blog-page-dragging');
+  document.querySelectorAll('.blog-page-card.blog-page-dragover').forEach(function(el){ el.classList.remove('blog-page-dragover'); });
+  _blogDragIdx = null;
+}
+
 function blogRenderPages() {
   var el = document.getElementById('blogPagesList');
   var pages = blogCurrentPost ? blogCurrentPost.pages : [];
@@ -4048,12 +4115,21 @@ function blogRenderPages() {
         '<input type="text" placeholder="Caption (optional)" value="' + esc(pg.caption) + '" oninput="blogUpdatePageField(' + idx + ',\'caption\',this.value)">';
     } else {
       body =
-        '<input type="text" placeholder="YouTube video ID (e.g. dQw4w9WgXcQ)" value="' + esc(pg.videoId) + '" oninput="blogUpdatePageField(' + idx + ',\'videoId\',this.value)" style="margin-bottom:8px;">' +
+        '<input type="text" id="blogPgVidIn-' + idx + '" placeholder="YouTube video ID or link (e.g. dQw4w9WgXcQ or a youtube.com/youtu.be link)" value="' + esc(pg.videoId) + '" oninput="blogUpdatePageField(' + idx + ',\'videoId\',this.value)" onblur="blogNormalizeVideoId(' + idx + ')" style="margin-bottom:8px;">' +
         '<input type="text" placeholder="Caption (optional)" value="' + esc(pg.caption) + '" oninput="blogUpdatePageField(' + idx + ',\'caption\',this.value)">';
     }
-    return '<div style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;background:var(--bg2);">' +
+    return '<div class="blog-page-card" draggable="true"' +
+        ' ondragstart="blogDragStart(event,' + idx + ')"' +
+        ' ondragover="blogDragOver(event)"' +
+        ' ondragleave="blogDragLeave(event)"' +
+        ' ondrop="blogDrop(event,' + idx + ')"' +
+        ' ondragend="blogDragEnd(event)"' +
+        ' style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;background:var(--bg2);">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-        '<span class="chip chip-gold">Page ' + (idx + 1) + ' · ' + typeLabel + '</span>' +
+        '<span style="display:flex;align-items:center;gap:8px;">' +
+          '<span class="blog-page-handle" title="Drag to reorder">⠿⠿</span>' +
+          '<span class="chip chip-gold">Page ' + (idx + 1) + ' · ' + typeLabel + '</span>' +
+        '</span>' +
         '<div style="display:flex;gap:4px;">' +
           '<button class="btn btn-ghost btn-sm" onclick="blogMovePage(' + idx + ',-1)" ' + (idx===0?'disabled':'') + '>↑</button>' +
           '<button class="btn btn-ghost btn-sm" onclick="blogMovePage(' + idx + ',1)" ' + (idx===pages.length-1?'disabled':'') + '>↓</button>' +
@@ -4155,6 +4231,12 @@ window.blogAddPage        = blogAddPage;
 window.blogDeletePage     = blogDeletePage;
 window.blogMovePage       = blogMovePage;
 window.blogUpdatePageField= blogUpdatePageField;
+window.blogNormalizeVideoId = blogNormalizeVideoId;
+window.blogDragStart      = blogDragStart;
+window.blogDragOver       = blogDragOver;
+window.blogDragLeave      = blogDragLeave;
+window.blogDrop           = blogDrop;
+window.blogDragEnd        = blogDragEnd;
 window.blogPageImageFile  = blogPageImageFile;
 window.blogSavePost       = blogSavePost;
 /* Close modal on backdrop click */
