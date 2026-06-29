@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog — Impact Grid Group</title>
   <meta name="description" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
+
+  <!-- Default Open Graph (overridden per-post by JS) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Impact Grid Group" />
+  <meta property="og:title" content="Blog — Impact Grid Group" />
+  <meta property="og:description" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
+  <meta property="og:url" content="https://impactgridgroup.com/blog.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
@@ -22,7 +31,7 @@
     :root { --pf: 'Fraunces', Georgia, serif; }
 
     /* ═══════════════════════════════════════
-       SHELF — grid of closed books (cover page)
+       SHELF — grid of closed books
     ═══════════════════════════════════════ */
     .blog-page { padding: 80px 24px 100px; }
     .blog-label {
@@ -33,9 +42,59 @@
     .blog-title {
       font-family: var(--fb); font-size: clamp(36px, 4.5vw, 64px);
       font-weight: 900; line-height: 1.04; letter-spacing: -0.03em;
-      color: var(--text); text-align: center; margin-bottom: 64px;
+      color: var(--text); text-align: center; margin-bottom: 36px;
     }
 
+    /* ── Controls: search + filter chips ── */
+    .blog-controls {
+      max-width: var(--max-w); margin: 0 auto 40px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .search-row {
+      display: flex; justify-content: center;
+    }
+    .search-row input {
+      width: 100%; max-width: 420px;
+      padding: 10px 16px; border-radius: 24px;
+      border: 1.5px solid rgba(40,32,18,0.18);
+      font-family: var(--fm); font-size: 13px; color: var(--text);
+      background: rgba(255,255,255,0.7);
+      outline: none; transition: border-color 0.2s;
+    }
+    .search-row input::placeholder { color: rgba(40,32,18,0.38); }
+    .search-row input:focus { border-color: var(--gold); }
+
+    .filter-row {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .filter-chip {
+      font-family: var(--fm); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 20px;
+      border: 1.5px solid rgba(40,32,18,0.2);
+      color: rgba(40,32,18,0.6); background: transparent;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .filter-chip:hover { border-color: var(--gold); color: var(--text); }
+    .filter-chip.active {
+      background: var(--gold); border-color: var(--gold);
+      color: #fff;
+    }
+
+    /* ── Skeleton loader ── */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton-book {
+      aspect-ratio: 2 / 3;
+      border-radius: 4px 8px 8px 4px;
+      background: linear-gradient(90deg, #e8e4dc 25%, #f0ede6 50%, #e8e4dc 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite;
+    }
+
+    /* ── Shelf grid ── */
     .shelf {
       max-width: var(--max-w); margin: 0 auto;
       display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
@@ -50,11 +109,12 @@
       cursor: pointer;
       transform-style: preserve-3d;
       perspective: 1200px;
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
     }
     .closed-book:hover { transform: translateY(-6px) rotate(-1deg); }
     .closed-book.disabled { cursor: default; }
     .closed-book.disabled:hover { transform: none; }
+    .closed-book.hidden-post { display: none; }
 
     .closed-book-cover {
       position: absolute; inset: 0;
@@ -93,29 +153,28 @@
       font-family: var(--pf); font-size: 16px; font-weight: 400;
       line-height: 1.25; color: #fff;
     }
-    .closed-book-pagecount {
+    .closed-book-meta {
       font-family: var(--fm); font-size: 9px; color: rgba(255,255,255,0.45);
       margin-top: 6px;
     }
 
-    /* Empty-state placeholder book */
+    /* Empty/placeholder book */
     .closed-book.placeholder .closed-book-cover {
       background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
     }
     .closed-book.placeholder .closed-book-cover::after { background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 70%); }
     .closed-book.placeholder .closed-book-title { font-size: 19px; }
 
-    .shelf-board {
+    /* ── No-results message ── */
+    .shelf-empty-msg {
       grid-column: 1 / -1;
-      height: 14px; margin-top: -10px;
-      background: linear-gradient(to bottom, #c9b896, #a8966e);
-      border-radius: 2px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.18);
-      display: none;
+      text-align: center;
+      font-family: var(--fm); font-size: 12px; color: rgba(40,32,18,0.4);
+      padding: 40px 0;
     }
 
     /* ═══════════════════════════════════════
-       POST VIEW — full blog article (replaces the page-flip book)
+       POST VIEW — full article
     ═══════════════════════════════════════ */
     .post-view {
       position: fixed; inset: 0; z-index: 2000;
@@ -125,16 +184,50 @@
     }
     .post-view.show { opacity: 1; pointer-events: auto; }
 
+    /* Top nav bar inside post */
+    .post-topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 2010;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(40,32,18,0.08);
+    }
+    .post-back {
+      font-family: var(--fm); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(40,32,18,0.65); text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      transition: color 0.2s; cursor: pointer; border: none; background: none;
+      padding: 6px 10px; border-radius: 6px;
+    }
+    .post-back:hover { color: var(--text); background: rgba(40,32,18,0.06); }
+    .post-topbar-right { display: flex; align-items: center; gap: 8px; }
+
+    .share-btn {
+      font-family: var(--fm); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 20px;
+      border: 1.5px solid rgba(40,32,18,0.2);
+      color: rgba(40,32,18,0.65); background: transparent;
+      cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 6px;
+    }
+    .share-btn:hover { border-color: var(--gold); color: var(--text); }
+    .share-btn.copied { border-color: #3a8c5c; color: #3a8c5c; }
+
     .post-close {
-      position: fixed; top: 22px; right: 26px; z-index: 2010;
-      width: 38px; height: 38px; border-radius: 50%;
+      width: 34px; height: 34px; border-radius: 50%;
       background: rgba(20,16,10,0.06); border: 1px solid rgba(20,16,10,0.14);
-      color: var(--text); font-size: 18px; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: background 0.2s;
+      color: var(--text); font-size: 16px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s; flex-shrink: 0;
     }
     .post-close:hover { background: rgba(20,16,10,0.12); }
 
-    .post-hero { width: 100%; height: auto; display: block; }
+    .post-hero {
+      width: 100%; height: auto; display: block;
+      margin-top: 64px; /* clear topbar */
+      cursor: zoom-in;
+    }
 
     .post-header { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; text-align: center; }
     .post-tag {
@@ -146,12 +239,29 @@
       line-height: 1.1; letter-spacing: -0.02em; color: var(--text);
     }
 
-    .post-body { max-width: 720px; margin: 0 auto; padding: 40px 24px 140px; display: flex; flex-direction: column; gap: 40px; }
+    /* Reading time + date meta */
+    .post-meta {
+      margin-top: 16px;
+      font-family: var(--fm); font-size: 11px; color: rgba(40,32,18,0.45);
+      letter-spacing: 0.04em;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .post-meta-dot { opacity: 0.4; }
+
+    .post-body { max-width: 720px; margin: 0 auto; padding: 40px 24px 0; display: flex; flex-direction: column; gap: 40px; }
 
     .post-block { position: relative; }
+
+    /* Drop cap on first text block */
+    .post-block-text.first-text .pb-body::first-letter {
+      font-family: var(--pf); font-size: 4.2em; font-weight: 400; font-style: italic;
+      float: left; line-height: 0.78; margin: 0.06em 0.1em 0 0;
+      color: var(--gold, #b8964a);
+    }
+
     .post-block-text .pb-heading { font-family: var(--pf); font-size: clamp(19px, 2.4vw, 26px); color: #2a2419; margin-bottom: 14px; line-height: 1.3; }
     .post-block-text .pb-body { font-family: var(--fb); font-size: 16px; line-height: 1.85; color: #4a4234; white-space: pre-wrap; }
-    .post-block-image img { width: 100%; border-radius: 10px; display: block; }
+    .post-block-image img { width: 100%; border-radius: 10px; display: block; cursor: zoom-in; }
     .post-block-youtube { width: 100%; border-radius: 10px; overflow: hidden; background: #000; position: relative; aspect-ratio: 16/9; }
     .post-block-youtube iframe { width: 100%; height: 100%; border: 0; }
     .pby-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
@@ -172,11 +282,113 @@
 
     .post-empty { text-align: center; font-family: var(--fm); font-size: 12px; color: rgba(40,32,18,0.4); padding: 60px 0; }
 
+    /* ── Scroll-reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.in-view { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    /* ── Related posts ── */
+    .related-section {
+      max-width: 720px; margin: 60px auto 0; padding: 0 24px;
+      border-top: 1px solid rgba(40,32,18,0.1); padding-top: 48px;
+    }
+    .related-heading {
+      font-family: var(--fm); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(40,32,18,0.45); margin-bottom: 24px;
+    }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+    .related-card {
+      cursor: pointer; border-radius: 8px; overflow: hidden;
+      background: #f7f4ef;
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .related-card:hover { transform: translateY(-4px); }
+    .related-card-img {
+      width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block;
+      background: #e8e4dc;
+    }
+    .related-card-info { padding: 12px 14px 14px; }
+    .related-card-tag {
+      font-family: var(--fm); font-size: 8px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(40,32,18,0.45); margin-bottom: 5px;
+    }
+    .related-card-title {
+      font-family: var(--pf); font-size: 14px; line-height: 1.3; color: var(--text);
+    }
+
+    /* ── End-of-post CTA ── */
+    .post-cta {
+      max-width: 720px; margin: 48px auto 80px; padding: 0 24px;
+    }
+    .post-cta-inner {
+      background: linear-gradient(135deg, #1d1812 0%, #2e2518 100%);
+      border-radius: 14px; padding: 44px 36px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .post-cta-inner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(184,150,74,0.18) 0%, transparent 60%);
+    }
+    .post-cta-label {
+      font-family: var(--fm); font-size: 9px; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold, #b8964a); margin-bottom: 12px; position: relative;
+    }
+    .post-cta-heading {
+      font-family: var(--fb); font-size: clamp(20px, 3vw, 28px); font-weight: 900;
+      line-height: 1.1; letter-spacing: -0.02em;
+      color: #fff; margin-bottom: 22px; position: relative;
+    }
+    .post-cta-btn {
+      display: inline-block;
+      font-family: var(--fm); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 13px 28px; border-radius: 28px;
+      background: var(--gold, #b8964a); color: #fff;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: opacity 0.2s; position: relative;
+    }
+    .post-cta-btn:hover { opacity: 0.88; }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 3000;
+      background: rgba(0,0,0,0.92);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.22s;
+    }
+    .lightbox.show { opacity: 1; pointer-events: auto; }
+    .lightbox img {
+      max-width: 90vw; max-height: 90vh;
+      object-fit: contain; border-radius: 6px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+    }
+    .lightbox-close {
+      position: fixed; top: 20px; right: 24px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.22); }
+
     @media (max-width: 700px) {
       .blog-page { padding: 56px 14px 80px; }
       .shelf { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 22px 16px; }
       .post-header { padding: 36px 18px 0; }
-      .post-body { padding: 30px 18px 100px; gap: 30px; }
+      .post-body { padding: 30px 18px 0; gap: 30px; }
+      .post-cta-inner { padding: 32px 22px; }
+      .related-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+      .post-topbar { padding: 10px 14px; }
     }
   </style>
 </head>
@@ -195,8 +407,22 @@
       <div class="blog-label">Stories</div>
       <h1 class="blog-title">ImpactGrid Blog</h1>
 
+      <!-- Search + filter controls -->
+      <div class="blog-controls">
+        <div class="search-row">
+          <input type="search" id="blogSearch" placeholder="Search posts…" autocomplete="off" />
+        </div>
+        <div class="filter-row" id="filterRow">
+          <!-- filter chips injected by JS -->
+        </div>
+      </div>
+
       <div class="shelf" id="shelf">
-        <!-- closed books injected here -->
+        <!-- skeleton loaders shown while fetching -->
+        <div class="skeleton-book"></div>
+        <div class="skeleton-book"></div>
+        <div class="skeleton-book"></div>
+        <div class="skeleton-book"></div>
       </div>
     </div>
   </div>
@@ -204,36 +430,72 @@
   <div id="ig-footer"></div>
   <script>renderFooter();</script>
 
-  <!-- ═══ POST VIEW (full article, opens from the book cover) ═══ -->
+  <!-- POST VIEW -->
   <div class="post-view" id="postView">
-    <button class="post-close" id="postCloseBtn" aria-label="Close">✕</button>
+    <div class="post-topbar">
+      <button class="post-back" id="postBackBtn" aria-label="Back to all posts">
+        ← All stories
+      </button>
+      <div class="post-topbar-right">
+        <button class="share-btn" id="shareBtn" aria-label="Copy link">
+          <span id="shareBtnIcon">⎘</span>
+          <span id="shareBtnLabel">Copy link</span>
+        </button>
+        <button class="post-close" id="postCloseBtn" aria-label="Close">✕</button>
+      </div>
+    </div>
+
     <img class="post-hero" id="postHero" src="" alt="" style="display:none;">
+
     <div class="post-header">
       <div class="post-tag" id="postTag"></div>
       <h1 class="post-title" id="postTitle"></h1>
+      <div class="post-meta" id="postMeta">
+        <span id="postDate"></span>
+        <span class="post-meta-dot" id="postMetaDot" style="display:none">·</span>
+        <span id="postReadTime"></span>
+      </div>
     </div>
+
     <div class="post-body" id="postBody"></div>
+
+    <!-- Related posts -->
+    <div class="related-section" id="relatedSection" style="display:none">
+      <div class="related-heading">More stories</div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </div>
+
+    <!-- End CTA -->
+    <div class="post-cta">
+      <div class="post-cta-inner">
+        <div class="post-cta-label">Work with us</div>
+        <div class="post-cta-heading">Ready to make an impact?</div>
+        <a class="post-cta-btn" href="book-us.html">Book a session →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <img id="lightboxImg" src="" alt="" />
   </div>
 
   <script>
   /* ════════════════════════════════════════
-     BLOG ENGINE
-     Data model (Supabase, content project):
-       blog_posts  { id, title, cover_image, category, created_at }
-       blog_pages  { id, post_id, order, type, heading, body, url, cloudinary_id, video_id, caption }
-
-     The shelf shows closed-book covers (unchanged).
-     Clicking a cover opens a normal full-page article view (not a page-flip book),
-     listing every page/block in order. This page is public/read-only —
-     adding, reordering and deleting content is done from admin.html.
+     BLOG ENGINE (enhanced)
+     blog_posts  { id, title, cover_image, category, created_at }
+     blog_pages  { id, post_id, order, type, heading, body, url, cloudinary_id, video_id, caption }
   ════════════════════════════════════════ */
 
-  var posts = [];          // [{id,title,coverImage,category,pages:[{id,order,type,...}]}]
+  var posts = [];
   var activePost = null;
+  var activePostIdx = -1;
+  var activeFilter = 'All';
+  var searchQuery = '';
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  /* Normalizes a stored video ID (or, defensively, a full URL that slipped through) into a bare ID */
   function extractYoutubeId(raw) {
     raw = String(raw || '').trim();
     if (!raw) return '';
@@ -251,8 +513,6 @@
     return raw;
   }
 
-  /* Tries progressively smaller YouTube thumbnail sizes before giving up,
-     so the block never just sits there blank. */
   function ytThumbError(imgEl, vid) {
     var chain = ['hqdefault', 'mqdefault', 'default'];
     var tier = parseInt(imgEl.getAttribute('data-tier') || '0', 10);
@@ -273,7 +533,127 @@
     }
   }
 
-  /* ── Render the shelf of closed books ── */
+  /* ── Reading time estimator ── */
+  function estimateReadTime(pages) {
+    var words = 0;
+    (pages || []).forEach(function(pg) {
+      if (pg.heading) words += pg.heading.split(/\s+/).length;
+      if (pg.body) words += pg.body.split(/\s+/).length;
+    });
+    var mins = Math.max(1, Math.round(words / 200));
+    return mins + ' min read';
+  }
+
+  /* ── Date formatter ── */
+  function formatDate(iso) {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch(e) { return ''; }
+  }
+
+  /* ── Slug for URL ── */
+  function slugify(title) {
+    return String(title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  /* ── URL routing ── */
+  function pushPostState(post) {
+    var slug = slugify(post.title);
+    history.pushState({ postSlug: slug }, '', '?post=' + encodeURIComponent(slug));
+    // Update OG tags best-effort (helps for re-sharing after navigation)
+    document.title = post.title + ' — Impact Grid Group';
+  }
+
+  function clearPostState() {
+    history.pushState({}, '', 'blog.html');
+    document.title = 'Blog — Impact Grid Group';
+  }
+
+  function checkUrlPost() {
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('post');
+    if (!slug || !posts.length) return;
+    for (var i = 0; i < posts.length; i++) {
+      if (slugify(posts[i].title) === slug) {
+        openPost(i);
+        return;
+      }
+    }
+  }
+
+  window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.postSlug) {
+      // opening from history is fine — checkUrlPost handles it
+    } else {
+      // navigated back past a post
+      if (activePost) {
+        _closePost(false);
+      }
+    }
+  });
+
+  /* ── Filter / search ── */
+  function getCategories() {
+    var cats = {};
+    posts.forEach(function(p) { cats[p.category || 'Journal'] = true; });
+    return Object.keys(cats).sort();
+  }
+
+  function renderFilterChips() {
+    var row = document.getElementById('filterRow');
+    var cats = getCategories();
+    if (cats.length <= 1) { row.style.display = 'none'; return; }
+    var all = ['All'].concat(cats);
+    row.innerHTML = all.map(function(c) {
+      return '<button class="filter-chip' + (c === activeFilter ? ' active' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
+    }).join('');
+    row.querySelectorAll('.filter-chip').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        activeFilter = this.getAttribute('data-cat');
+        renderFilterChips();
+        filterShelf();
+      });
+    });
+  }
+
+  function filterShelf() {
+    var books = document.querySelectorAll('.closed-book:not(.placeholder)');
+    var q = searchQuery.toLowerCase();
+    var anyVisible = false;
+    books.forEach(function(book) {
+      var idx = parseInt(book.getAttribute('data-idx'), 10);
+      var p = posts[idx];
+      if (!p) return;
+      var catMatch = activeFilter === 'All' || (p.category || 'Journal') === activeFilter;
+      var searchMatch = !q || p.title.toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
+      if (catMatch && searchMatch) {
+        book.classList.remove('hidden-post');
+        anyVisible = true;
+      } else {
+        book.classList.add('hidden-post');
+      }
+    });
+    // Show empty message if nothing matches
+    var existing = document.querySelector('.shelf-empty-msg');
+    if (!anyVisible) {
+      if (!existing) {
+        var msg = document.createElement('div');
+        msg.className = 'shelf-empty-msg';
+        msg.textContent = 'No posts match your search.';
+        document.getElementById('shelf').appendChild(msg);
+      }
+    } else {
+      if (existing) existing.remove();
+    }
+  }
+
+  document.getElementById('blogSearch').addEventListener('input', function() {
+    searchQuery = this.value.trim();
+    filterShelf();
+  });
+
+  /* ── Render shelf ── */
   function renderShelf() {
     var shelf = document.getElementById('shelf');
     if (!posts.length) {
@@ -296,50 +676,110 @@
           '<div class="closed-book-info">' +
             '<div class="closed-book-tag">' + esc(p.category || 'Journal') + '</div>' +
             '<div class="closed-book-title">' + esc(p.title) + '</div>' +
-            '<div class="closed-book-pagecount">' + (p.pages.length) + ' page' + (p.pages.length === 1 ? '' : 's') + '</div>' +
+            '<div class="closed-book-meta">' + esc(estimateReadTime(p.pages)) + '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
     }).join('');
+
+    renderFilterChips();
   }
 
-  /* ── Open / close the article view ── */
+  /* ── Open post ── */
   function openPost(i) {
     activePost = posts[i];
+    activePostIdx = i;
     if (!activePost) return;
 
     document.getElementById('postTag').textContent = activePost.category || 'Journal';
     document.getElementById('postTitle').textContent = activePost.title;
+
+    // Meta: date + read time
+    var dateStr = formatDate(activePost.createdAt);
+    var rtStr = estimateReadTime(activePost.pages);
+    document.getElementById('postDate').textContent = dateStr;
+    document.getElementById('postReadTime').textContent = rtStr;
+    document.getElementById('postMetaDot').style.display = dateStr ? 'inline' : 'none';
+
     var hero = document.getElementById('postHero');
-    if (activePost.coverImage) { hero.src = activePost.coverImage; hero.style.display = 'block'; }
-    else { hero.style.display = 'none'; }
+    if (activePost.coverImage) {
+      hero.src = activePost.coverImage;
+      hero.alt = activePost.title;
+      hero.style.display = 'block';
+    } else {
+      hero.style.display = 'none';
+    }
 
     renderPostBody();
+    renderRelated();
+
     document.getElementById('postView').classList.add('show');
+    document.getElementById('postView').scrollTop = 0;
     document.body.style.overflow = 'hidden';
+
+    pushPostState(activePost);
+    initReveal();
   }
 
-  function closePost() {
+  function _closePost(updateHistory) {
     document.getElementById('postView').classList.remove('show');
     document.body.style.overflow = '';
     activePost = null;
+    activePostIdx = -1;
+    if (updateHistory !== false) clearPostState();
   }
+
+  function closePost() { _closePost(true); }
+
   document.getElementById('postCloseBtn').addEventListener('click', closePost);
+  document.getElementById('postBackBtn').addEventListener('click', closePost);
   document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape' && activePost) closePost();
+    if (e.key === 'Escape') {
+      if (document.getElementById('lightbox').classList.contains('show')) {
+        closeLightbox();
+      } else if (activePost) {
+        closePost();
+      }
+    }
   });
 
-  /* ── Build HTML for a single content block ── */
-  function blockHTML(pg) {
+  /* ── Share / copy-link button ── */
+  document.getElementById('shareBtn').addEventListener('click', function() {
+    var url = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function() { showCopied(); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showCopied();
+    }
+  });
+
+  function showCopied() {
+    var btn = document.getElementById('shareBtn');
+    var lbl = document.getElementById('shareBtnLabel');
+    btn.classList.add('copied');
+    lbl.textContent = 'Link copied!';
+    setTimeout(function() {
+      btn.classList.remove('copied');
+      lbl.textContent = 'Copy link';
+    }, 2200);
+  }
+
+  /* ── Block HTML ── */
+  function blockHTML(pg, isFirst) {
     if (pg.type === 'image') {
-      return '<div class="post-block post-block-image">' +
-        '<img src="' + esc(pg.url) + '" alt="">' +
+      return '<div class="post-block post-block-image reveal">' +
+        '<img src="' + esc(pg.url) + '" alt="' + esc(pg.caption || '') + '" onclick="openLightbox(this.src)">' +
         (pg.caption ? '<div class="pb-caption">' + esc(pg.caption) + '</div>' : '') +
         '</div>';
     }
     if (pg.type === 'youtube') {
       var vid = esc(extractYoutubeId(pg.videoId || ''));
-      return '<div class="post-block post-block-youtube-wrap">' +
+      return '<div class="post-block post-block-youtube-wrap reveal">' +
         '<div class="post-block-youtube" data-vid="' + vid + '">' +
           '<img class="pby-thumb" data-tier="0" src="https://img.youtube.com/vi/' + vid + '/hqdefault.jpg" alt="" onclick="playYoutube(this)" onerror="ytThumbError(this,\'' + vid + '\')">' +
           '<div class="pby-play" onclick="this.previousElementSibling.click()">▶</div>' +
@@ -348,7 +788,8 @@
         '</div>';
     }
     // text
-    return '<div class="post-block post-block-text">' +
+    var firstClass = isFirst ? ' first-text' : '';
+    return '<div class="post-block post-block-text' + firstClass + ' reveal">' +
       (pg.heading ? '<div class="pb-heading">' + esc(pg.heading) + '</div>' : '') +
       '<div class="pb-body">' + esc(pg.body || '') + '</div>' +
       '</div>';
@@ -357,12 +798,81 @@
   function renderPostBody() {
     var body = document.getElementById('postBody');
     var pages = activePost.pages;
-    var html = pages.length
-      ? pages.map(function(pg){ return blockHTML(pg); }).join('')
-      : '<div class="post-empty">No content yet.</div>';
-    body.innerHTML = html;
+    if (!pages.length) {
+      body.innerHTML = '<div class="post-empty">No content yet.</div>';
+      return;
+    }
+    var firstTextSeen = false;
+    body.innerHTML = pages.map(function(pg) {
+      var isFirst = false;
+      if (pg.type === 'text' && !firstTextSeen) { isFirst = true; firstTextSeen = true; }
+      return blockHTML(pg, isFirst);
+    }).join('');
   }
 
+  /* ── Related posts ── */
+  function renderRelated() {
+    var section = document.getElementById('relatedSection');
+    var grid = document.getElementById('relatedGrid');
+    var related = posts.filter(function(p, i) {
+      return i !== activePostIdx && (p.category || 'Journal') === (activePost.category || 'Journal');
+    }).slice(0, 3);
+    // fallback: pick any other posts if not enough
+    if (related.length < 2) {
+      related = posts.filter(function(p, i) { return i !== activePostIdx; }).slice(0, 3);
+    }
+    if (!related.length) { section.style.display = 'none'; return; }
+    section.style.display = '';
+    grid.innerHTML = related.map(function(p) {
+      var idx = posts.indexOf(p);
+      return '<div class="related-card" onclick="openPost(' + idx + ')">' +
+        (p.coverImage ? '<img class="related-card-img" src="' + esc(p.coverImage) + '" alt="">' :
+          '<div class="related-card-img"></div>') +
+        '<div class="related-card-info">' +
+          '<div class="related-card-tag">' + esc(p.category || 'Journal') + '</div>' +
+          '<div class="related-card-title">' + esc(p.title) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ── Scroll-reveal ── */
+  var revealObserver;
+  function initReveal() {
+    if (!window.IntersectionObserver) return;
+    if (revealObserver) revealObserver.disconnect();
+    revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+          revealObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.getElementById('postView').querySelectorAll('.reveal').forEach(function(el) {
+      revealObserver.observe(el);
+    });
+  }
+
+  /* ── Lightbox ── */
+  function openLightbox(src) {
+    var lb = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = src;
+    lb.classList.add('show');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('show');
+  }
+  document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+  // Hero image lightbox
+  document.getElementById('postHero').addEventListener('click', function() {
+    if (this.src && this.style.display !== 'none') openLightbox(this.src);
+  });
+
+  /* ── YouTube ── */
   function playYoutube(imgEl) {
     var wrap = imgEl.parentElement;
     var vid = wrap.getAttribute('data-vid');
@@ -370,19 +880,16 @@
       'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
   }
 
-  /* ── Load posts from Supabase ── */
+  /* ── Load from Supabase ── */
   async function loadPosts() {
     try {
       var sb = getContentClient();
-
-      /* Load all posts */
       var { data: postsData, error: postsErr } = await sb
         .from('blog_posts')
         .select('*')
         .order('created_at', { ascending: false });
       if (postsErr) throw postsErr;
 
-      /* Load pages for each post */
       var loaded = [];
       for (var i = 0; i < (postsData || []).length; i++) {
         var p = postsData[i];
@@ -397,27 +904,24 @@
           title: p.title || 'Untitled',
           coverImage: p.cover_image || '',
           category: p.category || '',
+          createdAt: p.created_at || '',
           pages: (pagesData || []).map(function(pg) {
             return {
-              id: pg.id,
-              order: pg.order,
-              type: pg.type,
-              heading: pg.heading || '',
-              body: pg.body || '',
-              url: pg.url || '',
-              cloudinaryId: pg.cloudinary_id || '',
-              videoId: pg.video_id || '',
-              caption: pg.caption || ''
+              id: pg.id, order: pg.order, type: pg.type,
+              heading: pg.heading || '', body: pg.body || '',
+              url: pg.url || '', cloudinaryId: pg.cloudinary_id || '',
+              videoId: pg.video_id || '', caption: pg.caption || ''
             };
           })
         });
       }
       posts = loaded;
     } catch (e) {
-      console.warn('Blog Supabase fetch failed:', e);
+      console.warn('Blog fetch failed:', e);
       posts = [];
     }
     renderShelf();
+    checkUrlPost();
   }
 
   if (document.readyState === 'loading') {
