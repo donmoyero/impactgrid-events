@@ -184,6 +184,20 @@
     }
     .post-view.show { opacity: 1; pointer-events: auto; }
 
+    /* ── Reading progress bar ── */
+    .read-progress {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 2020;
+      height: 3px; background: transparent; pointer-events: none;
+      display: none;
+    }
+    .read-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--gold, #b8964a), var(--gold2, #d4af6a));
+      transition: width 0.08s linear;
+      border-radius: 0 2px 2px 0;
+    }
+    .post-view.show .read-progress { display: block; }
+
     /* Top nav bar inside post */
     .post-topbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 2010;
@@ -489,6 +503,10 @@
 
   <!-- POST VIEW -->
   <div class="post-view" id="postView">
+    <!-- Reading progress bar -->
+    <div class="read-progress" id="readProgress">
+      <div class="read-progress-fill" id="readProgressFill"></div>
+    </div>
     <div class="post-topbar">
       <button class="post-back" id="postBackBtn" aria-label="Back to all posts">
         ← All stories
@@ -780,12 +798,76 @@
     document.body.style.overflow = 'hidden';
 
     pushPostState(activePost);
+    injectJsonLd(activePost);
     initReveal();
+    startProgress();
+  }
+
+  /* ── Reading progress bar ── */
+  var _progressListener = null;
+  function startProgress() {
+    var fill = document.getElementById('readProgressFill');
+    var view = document.getElementById('postView');
+    if (_progressListener) view.removeEventListener('scroll', _progressListener);
+    fill.style.width = '0%';
+    _progressListener = function() {
+      var scrollTop = view.scrollTop;
+      var total = view.scrollHeight - view.clientHeight;
+      var pct = total > 0 ? Math.min(100, (scrollTop / total) * 100) : 0;
+      fill.style.width = pct + '%';
+    };
+    view.addEventListener('scroll', _progressListener, { passive: true });
+  }
+  function stopProgress() {
+    var fill = document.getElementById('readProgressFill');
+    var view = document.getElementById('postView');
+    if (_progressListener) { view.removeEventListener('scroll', _progressListener); _progressListener = null; }
+    fill.style.width = '0%';
+  }
+
+  /* ── JSON-LD structured data ── */
+  function injectJsonLd(post) {
+    removeJsonLd();
+    if (!post) return;
+    var script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'post-jsonld';
+    var datePublished = post.createdAt ? new Date(post.createdAt).toISOString() : '';
+    var imageUrl = post.coverImage || '';
+    var description = '';
+    // Use first text block body as description
+    (post.pages || []).some(function(pg) {
+      if (pg.type === 'text' && pg.body) {
+        description = pg.body.replace(/\s+/g, ' ').trim().slice(0, 160);
+        return true;
+      }
+    });
+    var data = {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      'headline': post.title || '',
+      'description': description,
+      'datePublished': datePublished,
+      'dateModified': datePublished,
+      'author': { '@type': 'Organization', 'name': 'Impact Grid Group', 'url': 'https://impactgridgroup.com' },
+      'publisher': { '@type': 'Organization', 'name': 'Impact Grid Group', 'url': 'https://impactgridgroup.com' },
+      'mainEntityOfPage': { '@type': 'WebPage', '@id': window.location.href },
+      'articleSection': post.category || 'Journal'
+    };
+    if (imageUrl) data['image'] = imageUrl;
+    script.textContent = JSON.stringify(data);
+    document.head.appendChild(script);
+  }
+  function removeJsonLd() {
+    var el = document.getElementById('post-jsonld');
+    if (el) el.remove();
   }
 
   function _closePost(updateHistory) {
     document.getElementById('postView').classList.remove('show');
     document.body.style.overflow = '';
+    stopProgress();
+    removeJsonLd();
     activePost = null;
     activePostIdx = -1;
     if (updateHistory !== false) clearPostState();
