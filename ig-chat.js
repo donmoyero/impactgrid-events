@@ -120,8 +120,8 @@
       width: 52px;
       height: 52px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ffe600 0%, #ffe600 50%, #ffed4a 100%);
-      box-shadow: 0 4px 20px rgba(255,230,0,0.45), 0 0 0 0 rgba(255,230,0,0.4);
+      background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+      box-shadow: 0 4px 20px rgba(17,24,39,0.45), 0 0 0 0 rgba(17,24,39,0.4);
       border: none;
       cursor: pointer;
       display: flex;
@@ -133,7 +133,7 @@
     }
     #ig-chat-bubble:hover {
       transform: scale(1.1);
-      box-shadow: 0 6px 28px rgba(255,230,0,0.6), 0 0 0 6px rgba(255,230,0,0.15);
+      box-shadow: 0 6px 28px rgba(17,24,39,0.6), 0 0 0 6px rgba(17,24,39,0.15);
     }
     #ig-chat-bubble svg { transition: transform 0.25s; }
     #ig-chat-bubble.open svg.icon-chat { display: none; }
@@ -191,9 +191,8 @@
     #ig-chat-avatar {
       width: 34px; height: 34px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ffe600, #ffe600);
+      background: rgba(255,255,255,0.1);
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
       flex-shrink: 0;
       position: relative;
     }
@@ -370,8 +369,8 @@
 
     /* Keyframes */
     @keyframes ig-pulse {
-      0%, 100% { box-shadow: 0 4px 20px rgba(255,230,0,0.45), 0 0 0 0 rgba(255,230,0,0.4); }
-      50%       { box-shadow: 0 4px 20px rgba(255,230,0,0.45), 0 0 0 10px rgba(255,230,0,0); }
+      0%, 100% { box-shadow: 0 4px 20px rgba(17,24,39,0.45), 0 0 0 0 rgba(17,24,39,0.4); }
+      50%       { box-shadow: 0 4px 20px rgba(17,24,39,0.45), 0 0 0 10px rgba(17,24,39,0); }
     }
     @keyframes ig-msg-in {
       from { opacity: 0; transform: translateY(6px) scale(0.97); }
@@ -394,10 +393,10 @@
   wrap.innerHTML = `
     <!-- Bubble button -->
     <button id="ig-chat-bubble" aria-label="Chat with us">
-      <svg class="icon-chat" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#07090f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="icon-chat" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffe600" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
-      <svg class="icon-close" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#07090f" stroke-width="2.5" stroke-linecap="round">
+      <svg class="icon-close" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffe600" stroke-width="2.5" stroke-linecap="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
       <div id="ig-chat-unread">1</div>
@@ -406,10 +405,10 @@
     <!-- Chat window -->
     <div id="ig-chat-window" role="dialog" aria-label="Chat with ImpactGrid">
       <div id="ig-chat-header">
-        <div id="ig-chat-avatar">⚡</div>
+        <div id="ig-chat-avatar"><img src="logo.png" alt="ImpactGrid" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" onerror="this.style.display='none'"/></div>
         <div id="ig-chat-header-info">
-          <div id="ig-chat-header-name">ImpactGrid</div>
-          <div id="ig-chat-header-status">Online · Usually replies instantly</div>
+          <div id="ig-chat-header-name" style="display:none;"></div>
+          <div id="ig-chat-header-status">Online</div>
         </div>
         <div id="ig-chat-codename-badge">${codename}</div>
       </div>
