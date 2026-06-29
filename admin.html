@@ -3899,7 +3899,7 @@ async function loadBlogPosts() {
             '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">' + (p.page_count || 0) + ' page' + ((p.page_count||0) === 1 ? '' : 's') + '</div>' +
             '<div style="display:flex;gap:6px;">' +
               '<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="blogEditPost(\'' + safeId + '\')">Edit</button>' +
-              '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="blogDeletePost(\'' + safeId + '\',' + JSON.stringify(p.cover_public_id||'') + ')">Delete</button>' +
+              '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" data-post-id="' + safeId + '" data-cover-id="' + esc(p.cover_public_id||'') + '" onclick="blogDeletePost(this.dataset.postId, this.dataset.coverId)">Delete</button>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -3973,15 +3973,30 @@ async function blogDeletePost(id, coverPublicId) {
   if (!confirm('Delete this post and all its pages? This cannot be undone.')) return;
   try {
     var sb = getContentClient();
-    /* blog_pages has ON DELETE CASCADE so deleting the post removes pages automatically */
-    if (coverPublicId) {
-      try { await fetch(EVENTS_API + '/api/delete-photo', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ publicId: coverPublicId }) }); } catch(e){}
-    }
+
+    /* 1 — delete pages first (in case CASCADE isn't set up in Supabase yet) */
+    var { error: pagesErr } = await sb.from('blog_pages').delete().eq('post_id', id);
+    if (pagesErr) console.warn('Pages delete warning:', pagesErr.message);
+
+    /* 2 — delete the post */
     var { error } = await sb.from('blog_posts').delete().eq('id', id);
     if (error) throw error;
+
+    /* 3 — clean up Cloudinary cover image in the background (non-blocking) */
+    if (coverPublicId) {
+      fetch(EVENTS_API + '/api/delete-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicId: coverPublicId })
+      }).catch(function(){});
+    }
+
     toast('', 'Post deleted', '');
     loadBlogPosts();
-  } catch(e) { toast('', 'Delete failed', e.message); }
+  } catch(e) {
+    toast('', 'Delete failed', e.message);
+    console.error('blogDeletePost error:', e);
+  }
 }
 
 /* ── Cover image upload ── */
