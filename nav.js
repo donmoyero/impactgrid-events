@@ -50,7 +50,7 @@
     { href: 'index.html',       label: 'Home' },
     { href: 'services.html',    label: 'Services' },
     { href: 'portfolio.html',   label: 'Portfolio' },
-
+    { href: 'blog.html',        label: 'Blog' },
     { href: 'about.html',       label: 'About' },
     { href: 'book-us.html',     label: 'Book Us' },
   ];
@@ -100,7 +100,7 @@
       { href:'index.html',       label:'Home' },
       { href:'services.html',    label:'Services' },
       { href:'portfolio.html',   label:'Portfolio' },
-
+      { href:'blog.html',        label:'Blog' },
       { href:'about.html',       label:'About' },
       { href:'book-us.html',     label:'Book Us' },
     ].map(function(l) {
@@ -355,7 +355,7 @@
                 }).join('') +
               '</div>' +
             '</div>' +
-            '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="about.html">About</a><a href="book-us.html">Book Us</a></div>' +
+            '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="book-us.html">Book Us</a></div>' +
             '<div class="fc"><h4>Contact</h4><a href="mailto:events@impactgridgroup.com">events@impactgridgroup.com</a><a href="tel:07469016509">07469 016509</a></div>' +
             '<div class="fc"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>' +
           '</div>' +
