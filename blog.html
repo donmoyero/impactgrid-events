@@ -223,32 +223,89 @@
     }
     .post-close:hover { background: rgba(20,16,10,0.12); }
 
-    .post-hero {
-      width: 100%; height: auto; display: block;
+    /* ── Hero: image + title overlaid ── */
+    .post-hero-wrap {
+      position: relative;
+      width: 100%;
+      height: 460px;
       margin-top: 64px; /* clear topbar */
+      overflow: hidden;
+      background: #1a1612;
+    }
+    .post-hero {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: top center; /* protect faces — top of frame stays visible */
+      display: block;
+      opacity: 0.82;
       cursor: zoom-in;
+      transition: opacity 0.2s;
+    }
+    .post-hero:hover { opacity: 0.9; }
+
+    /* Dark gradient so text is always readable over any photo */
+    .post-hero-wrap::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(10,8,5,0.88) 0%,
+        rgba(10,8,5,0.45) 45%,
+        rgba(10,8,5,0.08) 75%,
+        transparent 100%
+      );
+      pointer-events: none;
     }
 
-    .post-header { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; text-align: center; }
+    /* Title/meta sitting in the bottom-left of the hero */
+    .post-header {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 2;
+      padding: 0 40px 36px;
+      max-width: none;
+      text-align: left;
+    }
     .post-tag {
-      font-family: var(--fm); font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
-      text-transform: uppercase; color: rgba(40,32,18,0.55); margin-bottom: 10px;
+      font-family: var(--fm); font-size: 9px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;
     }
     .post-title {
-      font-family: var(--fb); font-size: clamp(28px, 4vw, 46px); font-weight: 900;
-      line-height: 1.1; letter-spacing: -0.02em; color: var(--text);
+      font-family: var(--fb); font-size: clamp(24px, 3.5vw, 42px); font-weight: 900;
+      line-height: 1.08; letter-spacing: -0.02em; color: #fff;
+      max-width: 680px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
 
     /* Reading time + date meta */
     .post-meta {
-      margin-top: 16px;
-      font-family: var(--fm); font-size: 11px; color: rgba(40,32,18,0.45);
+      margin-top: 12px;
+      font-family: var(--fm); font-size: 10px; color: rgba(255,255,255,0.5);
       letter-spacing: 0.04em;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex; align-items: center; gap: 8px;
     }
     .post-meta-dot { opacity: 0.4; }
 
-    .post-body { max-width: 720px; margin: 0 auto; padding: 40px 24px 0; display: flex; flex-direction: column; gap: 40px; }
+    /* No-image fallback: plain dark header */
+    .post-hero-wrap.no-image {
+      height: auto;
+      background: #1a1612;
+      padding: 80px 0 0;
+    }
+    .post-hero-wrap.no-image::after { display: none; }
+    .post-hero-wrap.no-image .post-header {
+      position: relative;
+      padding: 36px 40px 40px;
+    }
+    .post-hero-wrap.no-image .post-tag { color: rgba(255,255,255,0.5); }
+
+    @media (max-width: 700px) {
+      .post-hero-wrap { height: 340px; }
+      .post-header { padding: 0 20px 28px; }
+      .post-hero-wrap.no-image .post-header { padding: 28px 20px 32px; }
+    }
+
+    .post-body { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; display: flex; flex-direction: column; gap: 40px; }
 
     .post-block { position: relative; }
 
@@ -445,15 +502,17 @@
       </div>
     </div>
 
-    <img class="post-hero" id="postHero" src="" alt="" style="display:none;">
-
-    <div class="post-header">
-      <div class="post-tag" id="postTag"></div>
-      <h1 class="post-title" id="postTitle"></h1>
-      <div class="post-meta" id="postMeta">
-        <span id="postDate"></span>
-        <span class="post-meta-dot" id="postMetaDot" style="display:none">·</span>
-        <span id="postReadTime"></span>
+    <!-- Hero: image + overlaid title/meta -->
+    <div class="post-hero-wrap no-image" id="postHeroWrap">
+      <img class="post-hero" id="postHero" src="" alt="" style="display:none;">
+      <div class="post-header">
+        <div class="post-tag" id="postTag"></div>
+        <h1 class="post-title" id="postTitle"></h1>
+        <div class="post-meta" id="postMeta">
+          <span id="postDate"></span>
+          <span class="post-meta-dot" id="postMetaDot" style="display:none">·</span>
+          <span id="postReadTime"></span>
+        </div>
       </div>
     </div>
 
@@ -702,12 +761,15 @@
     document.getElementById('postMetaDot').style.display = dateStr ? 'inline' : 'none';
 
     var hero = document.getElementById('postHero');
+    var heroWrap = document.getElementById('postHeroWrap');
     if (activePost.coverImage) {
       hero.src = activePost.coverImage;
       hero.alt = activePost.title;
       hero.style.display = 'block';
+      heroWrap.classList.remove('no-image');
     } else {
       hero.style.display = 'none';
+      heroWrap.classList.add('no-image');
     }
 
     renderPostBody();
@@ -867,9 +929,12 @@
   document.getElementById('lightbox').addEventListener('click', function(e) {
     if (e.target === this) closeLightbox();
   });
-  // Hero image lightbox
-  document.getElementById('postHero').addEventListener('click', function() {
-    if (this.src && this.style.display !== 'none') openLightbox(this.src);
+  // Hero image lightbox — click anywhere on the hero wrap opens lightbox
+  document.getElementById('postHeroWrap').addEventListener('click', function(e) {
+    var hero = document.getElementById('postHero');
+    if (hero.src && hero.style.display !== 'none' && !document.getElementById('postHeroWrap').classList.contains('no-image')) {
+      openLightbox(hero.src);
+    }
   });
 
   /* ── YouTube ── */
