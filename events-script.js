@@ -614,7 +614,9 @@ async function uploadToCloudinaryBlog(blob, folder){
   var fd = new FormData();
   fd.append('file',          blob);
   fd.append('upload_preset', BLOG_CLOUDINARY_UPLOAD_PRESET);
-  fd.append('folder',        'blog/' + folder);
+  /* NOTE: no 'folder' param — the 'impactgrid_upload' preset has a fixed
+     Asset folder (impactgrid_videos) configured in Cloudinary's dashboard.
+     Sending a conflicting folder param here causes a 400 Bad Request. */
   var res = await fetch('https://api.cloudinary.com/v1_1/' + BLOG_CLOUDINARY_CLOUD_NAME + '/image/upload', {
     method: 'POST', body: fd
   });
