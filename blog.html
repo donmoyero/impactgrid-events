@@ -763,6 +763,50 @@
     renderFilterChips();
   }
 
+  /* ── View tracking (for admin dashboard only — not shown publicly) ── */
+  function getVisitorId() {
+    try {
+      var id = localStorage.getItem('ig_visitor_id');
+      if (!id) {
+        id = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem('ig_visitor_id', id);
+      }
+      return id;
+    } catch (e) { return 'v_anon'; }
+  }
+
+  function trackBlogView(postId) {
+    if (!postId) return;
+    (async function() {
+      try {
+        var visitorId = getVisitorId();
+        var country = '', city = '';
+        try {
+          /* Cache geo lookup per browser session — avoids re-hitting the
+             API on every post view in the same visit. */
+          var cached = sessionStorage.getItem('ig_geo');
+          if (cached) {
+            var g = JSON.parse(cached);
+            country = g.country || ''; city = g.city || '';
+          } else {
+            var geoRes = await fetch('https://ipwho.is/');
+            var geo = await geoRes.json();
+            if (geo && geo.success !== false) {
+              country = geo.country || '';
+              city = geo.city || '';
+              sessionStorage.setItem('ig_geo', JSON.stringify({ country: country, city: city }));
+            }
+          }
+        } catch (geoErr) { /* geo lookup failing shouldn't block the view log */ }
+
+        var sb = getContentClient();
+        await sb.from('blog_views').insert({
+          post_id: postId, visitor_id: visitorId, country: country, city: city
+        });
+      } catch (e) { console.warn('View tracking failed:', e); }
+    })();
+  }
+
   /* ── Open post ── */
   function openPost(i) {
     activePost = posts[i];
@@ -793,6 +837,7 @@
 
     renderPostBody();
     renderRelated();
+    trackBlogView(activePost.id);
 
     document.getElementById('postView').classList.add('show');
     document.getElementById('postView').scrollTop = 0;
