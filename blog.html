@@ -775,34 +775,58 @@
     } catch (e) { return 'v_anon'; }
   }
 
+  function fetchWithTimeout(url, ms) {
+    var ctrl = new AbortController();
+    var t = setTimeout(function(){ ctrl.abort(); }, ms || 4000);
+    return fetch(url, { signal: ctrl.signal }).finally(function(){ clearTimeout(t); });
+  }
+
+  async function lookupGeo() {
+    /* Try two free providers in case one is blocked/rate-limited/down. */
+    try {
+      var r = await fetchWithTimeout('https://ipwho.is/', 4000);
+      var g = await r.json();
+      if (g && g.success !== false && (g.country || g.city)) {
+        return { country: g.country || '', city: g.city || '' };
+      }
+      console.warn('ig geo: ipwho.is returned no location', g);
+    } catch (e1) { console.warn('ig geo: ipwho.is failed', e1); }
+
+    try {
+      var r2 = await fetchWithTimeout('https://ipapi.co/json/', 4000);
+      var g2 = await r2.json();
+      if (g2 && !g2.error) {
+        return { country: g2.country_name || '', city: g2.city || '' };
+      }
+      console.warn('ig geo: ipapi.co returned no location', g2);
+    } catch (e2) { console.warn('ig geo: ipapi.co failed', e2); }
+
+    return { country: '', city: '' };
+  }
+
   function trackBlogView(postId) {
     if (!postId) return;
     (async function() {
       try {
         var visitorId = getVisitorId();
         var country = '', city = '';
-        try {
-          /* Cache geo lookup per browser session — avoids re-hitting the
-             API on every post view in the same visit. */
-          var cached = sessionStorage.getItem('ig_geo');
-          if (cached) {
-            var g = JSON.parse(cached);
-            country = g.country || ''; city = g.city || '';
-          } else {
-            var geoRes = await fetch('https://ipwho.is/');
-            var geo = await geoRes.json();
-            if (geo && geo.success !== false) {
-              country = geo.country || '';
-              city = geo.city || '';
-              sessionStorage.setItem('ig_geo', JSON.stringify({ country: country, city: city }));
-            }
+        var cached = null;
+        try { cached = JSON.parse(sessionStorage.getItem('ig_geo') || 'null'); } catch(e) {}
+        if (cached && (cached.country || cached.city)) {
+          country = cached.country; city = cached.city;
+        } else {
+          var geo = await lookupGeo();
+          country = geo.country; city = geo.city;
+          if (country || city) {
+            try { sessionStorage.setItem('ig_geo', JSON.stringify({ country: country, city: city })); } catch(e) {}
           }
-        } catch (geoErr) { /* geo lookup failing shouldn't block the view log */ }
+        }
 
         var sb = getContentClient();
-        await sb.from('blog_views').insert({
+        var { error: insertErr } = await sb.from('blog_views').insert({
           post_id: postId, visitor_id: visitorId, country: country, city: city
         });
+        if (insertErr) console.warn('ig view insert failed:', insertErr);
       } catch (e) { console.warn('View tracking failed:', e); }
     })();
   }
