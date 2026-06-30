@@ -608,7 +608,7 @@ async function uploadToCloudinary(blob, folder){
    BLOG-ONLY CLOUDINARY (separate account from portfolio/events)
 ════════════════════════════════════════════════════ */
 var BLOG_CLOUDINARY_CLOUD_NAME    = 'dsaym55pt';
-var BLOG_CLOUDINARY_UPLOAD_PRESET = 'impactgrid_upload';
+var BLOG_CLOUDINARY_UPLOAD_PRESET = 'impactgrid_blog';
 
 async function uploadToCloudinaryBlog(blob, folder){
   var fd = new FormData();
