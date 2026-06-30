@@ -592,26 +592,23 @@ function resizeImageToThumb(file)      { return resizeImage(file, 800,  0.70); }
 function resizeImageToWebVersion(file) { return resizeImage(file, 1400, 0.82); }
 
 /* "Original" tier: true full-quality original whenever possible.
-   Cloudinary's free plan hard-caps uploads at 10MB, which only rarely
-   matters (Live Photos, burst shots, ProRAW). So:
-   - File already under the cap → return it completely untouched, zero
-     quality loss, exact original bytes.
+   Matches the old Supabase-era logic exactly:
+   - uploadPhotos() already gatekeeps file.type to jpeg/png/webp before
+     this ever runs, so there is no HEIC/non-standard branch here —
+     no unreliable client-side canvas decode of formats browsers can't
+     always read. iOS's web file-picker hands over an already-compatible
+     format in the first place; the old code relied on that, not on
+     converting anything itself.
+   - File already under Cloudinary's 10MB cap → return it completely
+     untouched, zero quality loss, exact original bytes.
    - File too big → re-encode at FULL resolution first, only stepping
      JPEG quality down in small increments until it fits. Dimensions are
      only reduced as an absolute last resort, so "original" stays as
      close to true original quality as possible. */
 async function prepareOriginalForUpload(file){
   var MAX_BYTES = 9.5 * 1024 * 1024; /* safety margin under the 10MB cap */
-  var isStandardFormat = (file.type === 'image/jpeg' || file.type === 'image/png');
 
-  /* Non-standard formats (HEIC etc. from iPhone) must be converted —
-     otherwise iOS's share sheet won't recognise the saved file as a
-     photo and offers "Save to Files" instead of saving to Camera Roll.
-     Converted at 0.95 quality, full resolution — effectively lossless. */
-  if(!isStandardFormat && file.size <= MAX_BYTES){
-    return await resizeImage(file, 99999, 0.95);
-  }
-  if(isStandardFormat && file.size <= MAX_BYTES){
+  if(file.size <= MAX_BYTES){
     return file; /* true original, zero quality loss */
   }
 
@@ -629,7 +626,15 @@ async function prepareOriginalForUpload(file){
    shrinks huge phone-camera files (18MB+) down to a few hundred KB. */
 function resizeImageForBlog(file) { return resizeImage(file, 1920, 0.88); }
 
-/* Upload a blob to Cloudinary unsigned upload preset */
+/* Upload a blob to Cloudinary unsigned upload preset.
+   NOTE: 'format' cannot be forced from here — Cloudinary restricts
+   unsigned upload requests to a small safe parameter list, and
+   'format' isn't one of them (it's silently ignored if you try).
+   To mirror the old Supabase `contentType: 'image/jpeg'` override,
+   set Format: jpg directly in the impactgrid_photos preset itself
+   (Cloudinary dashboard → Optimize and Deliver → Format). That
+   applies server-side regardless of source format, for every upload
+   through this preset. */
 async function uploadToCloudinary(blob, folder){
   var fd = new FormData();
   fd.append('file',         blob);
