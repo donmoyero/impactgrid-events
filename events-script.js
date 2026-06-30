@@ -591,6 +591,11 @@ function resizeImage(file, maxWidth, quality){
 function resizeImageToThumb(file)      { return resizeImage(file, 800,  0.70); }
 function resizeImageToWebVersion(file) { return resizeImage(file, 1400, 0.82); }
 
+/* Blog images: wider cap (covers can be large/hero-sized) + high quality
+   since blog photos are often the visual centerpiece of a post. Still
+   shrinks huge phone-camera files (18MB+) down to a few hundred KB. */
+function resizeImageForBlog(file) { return resizeImage(file, 1920, 0.88); }
+
 /* Upload a blob to Cloudinary unsigned upload preset */
 async function uploadToCloudinary(blob, folder){
   var fd = new FormData();
@@ -611,8 +616,12 @@ var BLOG_CLOUDINARY_CLOUD_NAME    = 'dsaym55pt';
 var BLOG_CLOUDINARY_UPLOAD_PRESET = 'impactgrid_blog';
 
 async function uploadToCloudinaryBlog(blob, folder){
+  /* Resize/convert to a web-optimized JPEG before upload. This shrinks huge
+     phone-camera photos (often 15-20MB+) down to a few hundred KB at high
+     visual quality, avoiding Cloudinary's free-plan 10MB upload limit. */
+  var webBlob = await resizeImageForBlog(blob);
   var fd = new FormData();
-  fd.append('file',          blob);
+  fd.append('file',          webBlob);
   fd.append('upload_preset', BLOG_CLOUDINARY_UPLOAD_PRESET);
   /* NOTE: no 'folder' param — the 'impactgrid_upload' preset has a fixed
      Asset folder (impactgrid_videos) configured in Cloudinary's dashboard.
