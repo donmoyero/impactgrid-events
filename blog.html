@@ -186,8 +186,8 @@
 
     /* ── Reading progress bar ── */
     .read-progress {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 2020;
-      height: 3px; background: transparent; pointer-events: none;
+      position: sticky; top: 0; left: 0; right: 0; z-index: 2020;
+      height: 3px; margin-bottom: -3px; background: transparent; pointer-events: none;
       display: none;
     }
     .read-progress-fill {
@@ -200,7 +200,7 @@
 
     /* Top nav bar inside post */
     .post-topbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 2010;
+      position: sticky; top: 0; left: 0; right: 0; z-index: 2010;
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 20px;
       background: rgba(255,255,255,0.92);
