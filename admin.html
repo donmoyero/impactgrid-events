@@ -3894,14 +3894,10 @@ async function loadBlogPosts() {
     try {
       var { data: viewRows, error: viewErr } = await sb
         .from('blog_views')
-        .select('post_id, visitor_id, country, city');
+        .select('post_id, views');
       if (viewErr) throw viewErr;
       (viewRows || []).forEach(function(v) {
-        var s = statsByPost[v.post_id] || (statsByPost[v.post_id] = { total: 0, visitors: {}, locations: {} });
-        s.total++;
-        s.visitors[v.visitor_id] = (s.visitors[v.visitor_id] || 0) + 1;
-        var loc = (v.city ? v.city + ', ' : '') + (v.country || '');
-        if (loc) s.locations[loc] = (s.locations[loc] || 0) + 1;
+        statsByPost[v.post_id] = (statsByPost[v.post_id] || 0) + (v.views || 0);
       });
     } catch (statsErr) {
       console.warn('Blog view stats failed:', statsErr);
@@ -3910,28 +3906,10 @@ async function loadBlogPosts() {
     el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">' +
       blogPosts.map(function(p) {
         var safeId = esc(p.id);
-        var s = statsByPost[p.id];
-        var total = s ? s.total : 0;
-        var uniqueCount = s ? Object.keys(s.visitors).length : 0;
-        var returning = total - uniqueCount;
-        var topLocations = s
-          ? Object.keys(s.locations).sort(function(a,b){ return s.locations[b]-s.locations[a]; }).slice(0,8)
-          : [];
-        var panelId = 'blogStats_' + safeId;
+        var total = statsByPost[p.id] || 0;
         var statsHtml =
           '<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">' +
-            '👁 ' + total + ' view' + (total===1?'':'s') + ' · ' + uniqueCount + ' unique · ' + returning + ' return' +
-          '</div>' +
-          '<div id="' + panelId + '" style="display:none;margin:0 0 10px;padding:10px;border:1px solid var(--border2);border-radius:8px;background:var(--bg3);font-size:12px;">' +
-            '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Total views</span><strong>' + total + '</strong></div>' +
-            '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Unique visitors</span><strong>' + uniqueCount + '</strong></div>' +
-            '<div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>Return views</span><strong>' + returning + '</strong></div>' +
-            '<div style="font-weight:700;margin-bottom:4px;">Top locations</div>' +
-            (topLocations.length
-              ? '<div style="color:var(--text3);line-height:1.7;">' +
-                  topLocations.map(function(l){ return esc(l) + ' — ' + s.locations[l]; }).join('<br>') +
-                '</div>'
-              : '<div style="color:var(--text3);">No location data yet</div>') +
+            '👁 ' + total + ' view' + (total===1?'':'s') +
           '</div>';
         return '<div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);">' +
           (p.cover_image
@@ -3944,7 +3922,6 @@ async function loadBlogPosts() {
             statsHtml +
             '<div style="display:flex;gap:6px;">' +
               '<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="blogEditPost(\'' + safeId + '\')">Edit</button>' +
-              '<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="var el=document.getElementById(\'' + panelId + '\');el.style.display=el.style.display===\'none\'?\'block\':\'none\';">Stats</button>' +
               '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" data-post-id="' + safeId + '" data-cover-id="' + esc(p.cover_public_id||'') + '" onclick="blogDeletePost(this.dataset.postId, this.dataset.coverId)">Delete</button>' +
             '</div>' +
           '</div>' +
