@@ -753,48 +753,127 @@ async function uploadPhotos(files){
 /* ════════════════════════════════════════════════════
    LOAD EVENT PHOTOS (thumbnail grid in admin)
 ════════════════════════════════════════════════════ */
+var epSelectedPhotoIds = new Set();
+var epPhotoMap = {}; /* id -> cloudinary_id, rebuilt on every load */
+
 async function loadEventPhotos(){
   var el = document.getElementById('eventPhotosList');
   if(!el || !selectedEventId) return;
   el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div></div>';
+  epSelectedPhotoIds = new Set();
+  epPhotoMap = {};
   try{
-    var q    = query(collection(db, 'photos'), where('event_id','==',selectedEventId), orderBy('created_at','desc'));
+    /* No orderBy here on purpose — combining where() + orderBy() on
+       different fields requires a Firestore composite index to be
+       created manually in the console first. Sorting client-side
+       avoids that entirely and needs zero Firebase console setup. */
+    var q    = query(collection(db, 'photos'), where('event_id','==',selectedEventId));
     var snap = await getDocs(q);
     var data = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    data.sort(function(a, b){
+      var ta = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
+      var tb = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
+      return tb - ta; /* newest first */
+    });
 
     if(!data.length){
       el.innerHTML = '<div class="empty"><div class="empty-ico">📸</div><div class="empty-txt">No photos yet.</div></div>';
+      epUpdateBulkUI();
       return;
     }
 
     el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;">'
       + data.map(function(p){
+          epPhotoMap[p.id] = p.cloudinary_id || '';
           var viewUrl = p.web_url || p.preview_url;
           var dlUrl   = p.original_url || viewUrl;
-          return '<div style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid var(--border);">'
+          return '<div class="ep-photo-card" style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid var(--border);">'
+            + '<input type="checkbox" class="ep-photo-cb" data-id="' + esc(p.id) + '" onchange="epTogglePhotoSelect(\'' + esc(p.id) + '\',this)" '
+            + 'style="position:absolute;top:4px;left:4px;width:18px;height:18px;cursor:pointer;z-index:2;"/>'
             + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:90px;object-fit:cover;" onerror="this.style.background=\'var(--bg3)\'"/>'
             + '<a href="' + esc(viewUrl) + '" target="_blank" style="position:absolute;bottom:22px;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;">👁 View</a>'
             + '<a href="' + esc(dlUrl) + '" download target="_blank" style="position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;">⬇ Download</a>'
-            + '<button onclick="deletePhoto(\'' + p.id + '\',\'' + esc(p.cloudinary_id||'') + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;">✕</button>'
+            + '<button onclick="deletePhoto(\'' + esc(p.id) + '\',\'' + esc(p.cloudinary_id||'') + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;z-index:2;">✕</button>'
             + '</div>';
         }).join('')
       + '</div>';
+
+    epUpdateBulkUI();
   }catch(e){
     el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
   }
 }
 
+/* ── Multi-select bulk delete ── */
+function epTogglePhotoSelect(id, checkboxEl){
+  if(checkboxEl.checked) epSelectedPhotoIds.add(id);
+  else epSelectedPhotoIds.delete(id);
+  var card = checkboxEl.closest('.ep-photo-card');
+  if(card) card.style.outline = checkboxEl.checked ? '2px solid var(--accent, #caa45d)' : 'none';
+  epUpdateBulkUI();
+}
+
+function epToggleSelectAll(headerCb){
+  var boxes = document.querySelectorAll('.ep-photo-cb');
+  boxes.forEach(function(cb){
+    cb.checked = headerCb.checked;
+    epTogglePhotoSelect(cb.getAttribute('data-id'), cb);
+  });
+}
+
+function epUpdateBulkUI(){
+  var n        = epSelectedPhotoIds.size;
+  var total    = document.querySelectorAll('.ep-photo-cb').length;
+  var btn      = document.getElementById('epBulkDeleteBtn');
+  var countEl  = document.getElementById('epSelectedCount');
+  var headerCb = document.getElementById('epSelectAllCb');
+  if(countEl) countEl.textContent = n;
+  if(btn)     btn.style.display   = n > 0 ? 'inline-flex' : 'none';
+  if(headerCb){
+    headerCb.checked       = total > 0 && n === total;
+    headerCb.indeterminate = n > 0 && n < total;
+  }
+}
+
+async function epBulkDeleteSelected(){
+  var ids = Array.from(epSelectedPhotoIds);
+  if(!ids.length) return;
+  if(!confirm('Delete ' + ids.length + ' selected photo' + (ids.length > 1 ? 's' : '') + '? This cannot be undone.')) return;
+
+  var btn = document.getElementById('epBulkDeleteBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Deleting…'; }
+
+  var failed = 0;
+  for(var i = 0; i < ids.length; i++){
+    try{ await deletePhotoCore(ids[i], epPhotoMap[ids[i]]); }
+    catch(e){ failed++; console.warn('Failed to delete', ids[i], e); }
+  }
+
+  if(failed){
+    toast('⚠️', (ids.length - failed) + ' deleted, ' + failed + ' failed', 'Check console for details');
+  } else {
+    toast('🗑️', ids.length + ' photo' + (ids.length > 1 ? 's' : '') + ' deleted', '');
+  }
+
+  loadEventPhotos();
+}
+
+/* Shared deletion logic (Cloudinary asset + Firestore doc), used by
+   both the single ✕ button and bulk delete so there's one code path. */
+async function deletePhotoCore(id, cloudinaryId){
+  if(cloudinaryId){
+    await fetch(EVENTS_API + '/api/delete-photo', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ publicId: cloudinaryId })
+    });
+  }
+  await deleteDoc(doc(db, 'photos', id));
+}
+
 async function deletePhoto(id, cloudinaryId){
   if(!confirm('Delete this photo?')) return;
   try{
-    /* Tell backend to remove from Cloudinary */
-    if(cloudinaryId){
-      await fetch(EVENTS_API + '/api/delete-photo', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ publicId: cloudinaryId })
-      });
-    }
-    await deleteDoc(doc(db, 'photos', id));
+    await deletePhotoCore(id, cloudinaryId);
     toast('🗑️', 'Photo deleted', '');
     loadEventPhotos();
   }catch(e){ toast('⚠️', 'Error', e.message); }
