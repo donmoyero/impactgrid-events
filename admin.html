@@ -146,6 +146,7 @@ tr:hover td{background:var(--bg2);}
 .upload-zone-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px;}
 .upload-zone-sub{font-size:11px;color:var(--text3);}
 .upload-zone input[type=file]{display:none;}
+#blogCoverFileIn{display:block;} /* label-linked input: must exist in DOM for label click to work on iOS */
 .upload-prog{background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:12px 14px;margin-top:12px;display:none;}
 .prog-track{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:8px;}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;transition:width .3s;}
@@ -861,17 +862,17 @@ If you have any questions, just reply to this email.
                 </div>
 
                 <div class="field-label">Cover image (shown on the closed book)</div>
-                <div class="upload-zone" id="blogCoverDropZone"
+                <label for="blogCoverFileIn" class="upload-zone" id="blogCoverDropZone"
                   ondragover="onDragOver(event,'blogCoverDropZone')"
                   ondragleave="onDragLeave(event,'blogCoverDropZone')"
                   ondrop="onDrop(event,'blogCoverDropZone',blogUploadCover)"
-                  style="position:relative;">
+                  style="display:block;cursor:pointer;">
                   <div class="upload-zone-ico"></div>
-                  <div class="upload-zone-title">Drop a cover image or tap to browse</div>
+                  <div class="upload-zone-title">Tap or click to choose a cover image</div>
                   <div class="upload-zone-sub">JPG · PNG · WebP</div>
                   <input type="file" id="blogCoverFileIn" accept="image/*" onchange="blogCoverFileChange(event)"
-                    style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;"/>
-                </div>
+                    style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;"/>
+                </label>
                 <div id="blogCoverPreviewWrap" style="margin-top:10px;display:none;">
                   <img id="blogCoverPreview" style="width:140px;height:auto;border-radius:var(--r);display:block;" />
                 </div>
@@ -4005,7 +4006,7 @@ async function blogCoverFileChange(e) {
   var f = e.target.files && e.target.files[0];
   if (!f) return;
   await blogUploadCover(f);
-  e.target.value = ''; // reset AFTER upload — iOS invalidates File object if reset before
+  try { e.target.value = ''; } catch(ex) {} /* reset AFTER upload — iOS drops File ref if reset early */
 }
 async function blogUploadCover(file) {
   if (!blogCurrentPost) return;
@@ -4169,7 +4170,7 @@ async function blogPageImageFile(e, idx) {
     blogRenderPages();
     toast('', 'Image added', '');
   } catch(err) { toast('', 'Upload failed', err.message); }
-  e.target.value = ''; // reset AFTER upload — iOS invalidates File object if reset before
+  try { e.target.value = ''; } catch(ex) {} /* reset AFTER upload — iOS drops File ref if reset early */
 }
 
 /* ── Save post + pages ── */
