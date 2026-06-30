@@ -590,10 +590,39 @@ function resizeImage(file, maxWidth, quality){
 
 function resizeImageToThumb(file)      { return resizeImage(file, 800,  0.70); }
 function resizeImageToWebVersion(file) { return resizeImage(file, 1400, 0.82); }
-/* High quality but capped, so huge iPhone-camera files (15-25MB+) stay
-   under Cloudinary's free-plan 10MB unsigned upload limit. 2400px at
-   0.92 quality still looks "original" quality for prints/downloads. */
-function resizeImageToOriginal(file)   { return resizeImage(file, 2400, 0.92); }
+
+/* "Original" tier: true full-quality original whenever possible.
+   Cloudinary's free plan hard-caps uploads at 10MB, which only rarely
+   matters (Live Photos, burst shots, ProRAW). So:
+   - File already under the cap → return it completely untouched, zero
+     quality loss, exact original bytes.
+   - File too big → re-encode at FULL resolution first, only stepping
+     JPEG quality down in small increments until it fits. Dimensions are
+     only reduced as an absolute last resort, so "original" stays as
+     close to true original quality as possible. */
+async function prepareOriginalForUpload(file){
+  var MAX_BYTES = 9.5 * 1024 * 1024; /* safety margin under the 10MB cap */
+  var isStandardFormat = (file.type === 'image/jpeg' || file.type === 'image/png');
+
+  /* Non-standard formats (HEIC etc. from iPhone) must be converted —
+     otherwise iOS's share sheet won't recognise the saved file as a
+     photo and offers "Save to Files" instead of saving to Camera Roll.
+     Converted at 0.95 quality, full resolution — effectively lossless. */
+  if(!isStandardFormat && file.size <= MAX_BYTES){
+    return await resizeImage(file, 99999, 0.95);
+  }
+  if(isStandardFormat && file.size <= MAX_BYTES){
+    return file; /* true original, zero quality loss */
+  }
+
+  var qualities = [0.92, 0.85, 0.78, 0.70];
+  for (var i = 0; i < qualities.length; i++){
+    var blob = await resizeImage(file, 99999, qualities[i]); /* 99999 = keep native resolution */
+    if (blob.size <= MAX_BYTES) return blob;
+  }
+  /* Still too big even at low quality, full res — now also cap dimensions */
+  return await resizeImage(file, 2400, 0.85);
+}
 
 /* Blog images: wider cap (covers can be large/hero-sized) + high quality
    since blog photos are often the visual centerpiece of a post. Still
@@ -678,12 +707,10 @@ async function uploadPhotos(files){
     try{
       var folder = selectedEventId;
 
-      /* 1 — Upload original to Cloudinary (resized/capped so iPhone's
-         15-25MB camera files don't blow past Cloudinary's 10MB free-plan
-         unsigned upload limit — this is what was causing iPhone uploads
-         to fail with a generic "Cloudinary upload failed" error) */
+      /* 1 — Upload original to Cloudinary. Stays true original quality
+         unless the file is too big for Cloudinary's free-plan cap. */
       setStatus('Uploading original…', 15, '');
-      var origBlob   = await resizeImageToOriginal(file);
+      var origBlob   = await prepareOriginalForUpload(file);
       var origResult = await uploadToCloudinary(origBlob, folder + '/original');
 
       /* 2 — Upload web preview */
