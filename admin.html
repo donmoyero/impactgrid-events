@@ -4012,7 +4012,7 @@ async function blogUploadCover(file) {
   if (!blogCurrentPost) return;
   try {
     toast('', 'Uploading cover…', '');
-    var result = await uploadToCloudinary(file, 'blog');
+    var result = await uploadToCloudinaryBlog(file, 'cover');
     blogCurrentPost.coverImage = result.secure_url;
     blogCurrentPost.coverPublicId = result.public_id;
     document.getElementById('blogCoverPreview').src = result.secure_url;
@@ -4164,7 +4164,7 @@ async function blogPageImageFile(e, idx) {
   if (!f) return;
   try {
     toast('', 'Uploading image…', '');
-    var result = await uploadToCloudinary(f, 'blog');
+    var result = await uploadToCloudinaryBlog(f, 'pages');
     blogCurrentPost.pages[idx].url = result.secure_url;
     blogCurrentPost.pages[idx].cloudinaryId = result.public_id;
     blogRenderPages();
