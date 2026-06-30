@@ -590,6 +590,10 @@ function resizeImage(file, maxWidth, quality){
 
 function resizeImageToThumb(file)      { return resizeImage(file, 800,  0.70); }
 function resizeImageToWebVersion(file) { return resizeImage(file, 1400, 0.82); }
+/* High quality but capped, so huge iPhone-camera files (15-25MB+) stay
+   under Cloudinary's free-plan 10MB unsigned upload limit. 2400px at
+   0.92 quality still looks "original" quality for prints/downloads. */
+function resizeImageToOriginal(file)   { return resizeImage(file, 2400, 0.92); }
 
 /* Blog images: wider cap (covers can be large/hero-sized) + high quality
    since blog photos are often the visual centerpiece of a post. Still
@@ -605,7 +609,10 @@ async function uploadToCloudinary(blob, folder){
   var res  = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/image/upload', {
     method: 'POST', body: fd
   });
-  if(!res.ok) throw new Error('Cloudinary upload failed');
+  if(!res.ok){
+    var errBody = await res.json().catch(function(){ return {}; });
+    throw new Error(errBody.error && errBody.error.message ? errBody.error.message : 'Cloudinary upload failed (' + res.status + ')');
+  }
   return await res.json(); /* { secure_url, public_id, ... } */
 }
 
@@ -671,9 +678,13 @@ async function uploadPhotos(files){
     try{
       var folder = selectedEventId;
 
-      /* 1 — Upload original to Cloudinary */
+      /* 1 — Upload original to Cloudinary (resized/capped so iPhone's
+         15-25MB camera files don't blow past Cloudinary's 10MB free-plan
+         unsigned upload limit — this is what was causing iPhone uploads
+         to fail with a generic "Cloudinary upload failed" error) */
       setStatus('Uploading original…', 15, '');
-      var origResult = await uploadToCloudinary(file, folder + '/original');
+      var origBlob   = await resizeImageToOriginal(file);
+      var origResult = await uploadToCloudinary(origBlob, folder + '/original');
 
       /* 2 — Upload web preview */
       setStatus('Creating web preview…', 40, '');
