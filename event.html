@@ -1925,11 +1925,15 @@ async function iosDlTriggerShare(){
     if(el) el.classList.add('saving');
   });
 
-  /* Fetch blobs */
-  var files = [];
-  for(var i = 0; i < batch.length; i++){
+  /* Fetch blobs — in parallel, not one at a time. iOS requires
+     navigator.share() to fire shortly after the tap that triggered it;
+     fetching 9 full-quality photos sequentially can easily burn past
+     that window on a slow connection, causing share() to silently fail.
+     Fetching all of them at once keeps total wait time as short as
+     possible. */
+  var fetchResults = await Promise.all(batch.map(async function(photo, i){
     try{
-      var url = batch[i].original_url || batch[i].preview_url;
+      var url = photo.original_url || photo.preview_url;
       var cleanUrl = url.split('?')[0]
         .replace('/storage/v1/render/image/public/', '/storage/v1/object/public/')
         .replace('/storage/v1/object/sign/', '/storage/v1/object/public/');
@@ -1938,15 +1942,17 @@ async function iosDlTriggerShare(){
       var blob = await r.blob();
       var mime = (blob.type && blob.type.startsWith('image/')) ? blob.type : 'image/jpeg';
       var ext  = mime === 'image/png' ? 'png' : 'jpg';
-      files.push(new File(
+      return new File(
         [blob],
         'ImpactGrid-Photo-' + String(offset + i + 1).padStart(3, '0') + '.' + ext,
         { type: mime }
-      ));
+      );
     }catch(e){
       console.warn('Batch', batchIdx + 1, 'photo', i, 'failed:', e);
+      return null;
     }
-  }
+  }));
+  var files = fetchResults.filter(Boolean);
 
   iosDl.fetching = false;
 
@@ -2028,21 +2034,28 @@ async function iosDlTriggerShare(){
     }
 
   }catch(e){
+    var totalBatches2 = iosDl.batches.length;
+    batch.forEach(function(_, i){
+      var el = document.getElementById('iosDlThumb-' + (offset + i));
+      if(el) el.classList.remove('saving');
+    });
+    btn.disabled = false;
+    btn.className = 'ios-dl-save-btn';
+
     if(e.name === 'AbortError'){
-      var totalBatches2 = iosDl.batches.length;
-      btn.disabled = false;
-      btn.className = 'ios-dl-save-btn';
       document.getElementById('iosDlSaveBtnIcon').textContent = '📲';
       document.getElementById('iosDlSaveBtnText').textContent =
         'Try Batch ' + (iosDl.batchIdx + 1) + ' Again';
       document.getElementById('iosDlInstructionText').innerHTML =
         'Looks like you cancelled. Tap the button again, then tap <strong>"Save Image"</strong> on the Share Sheet.';
-      batch.forEach(function(_, i){
-        var el = document.getElementById('iosDlThumb-' + (offset + i));
-        if(el) el.classList.remove('saving');
-      });
     } else {
       console.warn('Share error:', e);
+      document.getElementById('iosDlSaveBtnIcon').textContent = '🔄';
+      document.getElementById('iosDlSaveBtnText').textContent =
+        'Retry Batch ' + (iosDl.batchIdx + 1);
+      document.getElementById('iosDlInstructionText').innerHTML =
+        '⚠️ Couldn\'t open the Share Sheet. Tap to try again — if it keeps happening, '
+        + 'make sure you opened this gallery directly in Safari (not inside Instagram/WhatsApp/Messenger).';
     }
   }
 }
