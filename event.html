@@ -1153,7 +1153,14 @@ function isMobile(){
    Chrome on iPhone, Chrome on Android, Samsung Browser — all support it. */
 function isSafariIOS(){
   var ua = navigator.userAgent;
-  var isiOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  /* Since iOS 13, iPadOS Safari removes "iPad" from the user-agent
+     string and reports itself as a desktop Mac instead (Apple's
+     "Request Desktop Website by default" behavior). A real Mac has
+     navigator.maxTouchPoints === 0; an iPad, despite claiming to be
+     "Macintosh", still has touch support — that's the reliable way
+     to tell them apart. */
+  var isiPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  var isiOS = (/iPad|iPhone|iPod/.test(ua) || isiPadOS) && !window.MSStream;
   var isSafari = /AppleWebKit/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua) && !/OPiOS/.test(ua) && !/EdgiOS/.test(ua);
   return isiOS && isSafari;
 }
