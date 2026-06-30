@@ -1641,21 +1641,8 @@ function updateSelectionUI(){
      Repeats per batch until all photos saved.
 ══════════════════════════════════════════════════════════════ */
 
-/* Force Cloudinary to deliver any photo as a real JPEG at fetch time,
-   regardless of how it's actually stored (HEIC, WebP, etc). This fixes
-   the iOS "Save to Files instead of Photos" problem retroactively for
-   every photo already uploaded — no re-upload needed — by inserting
-   the f_jpg transformation right after /upload/ in the URL. Cloudinary
-   then converts on the fly and serves Content-Type: image/jpeg, so the
-   extension/mime/bytes are always consistent. Non-Cloudinary URLs pass
-   through untouched. */
-function cloudinaryForceJpg(url){
-  if(!url || url.indexOf('res.cloudinary.com') === -1) return url;
-  return url.replace('/image/upload/', '/image/upload/f_jpg/');
-}
-
 function blobDownload(url, filename){
-  var directUrl = cloudinaryForceJpg(url)
+  var directUrl = url
     .replace('/storage/v1/render/image/public/', '/storage/v1/object/public/')
     .replace('/storage/v1/object/sign/', '/storage/v1/object/public/');
   var qmark = directUrl.indexOf('?');
@@ -1943,7 +1930,7 @@ async function iosDlTriggerShare(){
   for(var i = 0; i < batch.length; i++){
     try{
       var url = batch[i].original_url || batch[i].preview_url;
-      var cleanUrl = cloudinaryForceJpg(url).split('?')[0]
+      var cleanUrl = url.split('?')[0]
         .replace('/storage/v1/render/image/public/', '/storage/v1/object/public/')
         .replace('/storage/v1/object/sign/', '/storage/v1/object/public/');
       var r = await fetch(cleanUrl, { mode: 'cors', cache: 'no-store', redirect: 'follow' });
@@ -2129,14 +2116,14 @@ function iosFallbackTabs(photos){
 function iosTapThumb(idx){
   var p = iosPendingPhotos[idx];
   if(!p) return;
-  window.open(cloudinaryForceJpg(p.original_url || p.preview_url), '_blank');
+  window.open(p.original_url || p.preview_url, '_blank');
   toast('📱', 'Photo opened!', 'Long-press → "Save to Photos"');
 }
 
 function iosOpenAll(){
   if(!iosPendingPhotos.length) return;
   for(var i = 0; i < iosPendingPhotos.length; i++){
-    window.open(cloudinaryForceJpg(iosPendingPhotos[i].original_url || iosPendingPhotos[i].preview_url), '_blank');
+    window.open(iosPendingPhotos[i].original_url || iosPendingPhotos[i].preview_url, '_blank');
   }
   toast('📱', iosPendingPhotos.length + ' photos opened!', 'Long-press each → "Save to Photos"');
   closeIosModal();
