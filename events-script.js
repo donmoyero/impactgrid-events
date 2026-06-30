@@ -604,6 +604,28 @@ async function uploadToCloudinary(blob, folder){
   return await res.json(); /* { secure_url, public_id, ... } */
 }
 
+/* ════════════════════════════════════════════════════
+   BLOG-ONLY CLOUDINARY (separate account from portfolio/events)
+════════════════════════════════════════════════════ */
+var BLOG_CLOUDINARY_CLOUD_NAME    = 'dsaym55pt';
+var BLOG_CLOUDINARY_UPLOAD_PRESET = 'impactgrid_upload';
+
+async function uploadToCloudinaryBlog(blob, folder){
+  var fd = new FormData();
+  fd.append('file',          blob);
+  fd.append('upload_preset', BLOG_CLOUDINARY_UPLOAD_PRESET);
+  fd.append('folder',        'blog/' + folder);
+  var res = await fetch('https://api.cloudinary.com/v1_1/' + BLOG_CLOUDINARY_CLOUD_NAME + '/image/upload', {
+    method: 'POST', body: fd
+  });
+  if(!res.ok){
+    var errBody = await res.json().catch(function(){ return {}; });
+    throw new Error(errBody.error && errBody.error.message ? errBody.error.message : 'Cloudinary upload failed (' + res.status + ')');
+  }
+  return await res.json(); /* { secure_url, public_id, ... } */
+}
+window.uploadToCloudinaryBlog = uploadToCloudinaryBlog;
+
 async function uploadPhotos(files){
   if(!selectedEventId){ toast('⚠️', 'No event selected', 'Pick an event first'); return; }
   var prog = document.getElementById('photoUploadProgress');
