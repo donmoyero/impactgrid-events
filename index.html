@@ -370,7 +370,7 @@
       font-weight: 600;
       letter-spacing: 0.02em;
       line-height: 1.4;
-      color: #000;
+      color: var(--ix-white);
       text-transform: uppercase;
     }
     @media (max-width: 700px) {
@@ -583,7 +583,7 @@
       font-family: var(--ix-display);
       font-size: 17px;
       font-weight: 400;
-      color: #000;
+      color: var(--ix-white);
       letter-spacing: -0.01em;
       line-height: 1.35;
       margin: 0;
@@ -595,7 +595,7 @@
       display: block;
       margin-bottom: 16px;
       text-align: left;
-      color: #000;
+      color: var(--ix-mid);
     }
 
     /* ── Absolute photo panels ── */
@@ -733,10 +733,10 @@
       gap: 24px;
       transition: border-color 0.3s;
     }
-    .quote-card:hover { border-color: #000; }
+    .quote-card:hover { border-color: var(--ix-accent); }
 
     .quote-stars {
-      color: #000;
+      color: var(--ix-accent);
       font-size: 16px;
       letter-spacing: 3px;
     }
@@ -745,7 +745,7 @@
       font-size: 18px;
       font-weight: 300;
       font-style: italic;
-      color: #000;
+      color: var(--ix-white);
       line-height: 1.5;
       flex: 1;
     }
@@ -765,9 +765,9 @@
     .quote-name {
       font-size: 14px;
       font-weight: 500;
-      color: #000;
+      color: var(--ix-white);
     }
-    .quote-role { font-size: 12px; color: #000; }
+    .quote-role { font-size: 12px; color: var(--ix-mid); }
 
     /* ── CTA ──────────────────────────────────────── */
     .cta-section {
@@ -792,10 +792,10 @@
       font-weight: 300;
       line-height: 1.08;
       letter-spacing: -0.03em;
-      color: #000;
+      color: var(--ix-white);
       margin-bottom: 20px;
     }
-    .cta-title em { font-style: italic; color: #000; }
+    .cta-title em { font-style: italic; color: var(--ix-accent); }
     .cta-sub {
       font-size: 17px;
       color: var(--text2);
@@ -865,7 +865,7 @@
     .nl-note {
       margin-top: 14px;
       font-size: 12px;
-      color: #000;
+      color: var(--ix-mid);
     }
 
     /* ── RESPONSIVE ───────────────────────────────── */
@@ -874,9 +874,33 @@
       .bento { grid-template-columns: 1fr; }
       .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
       .who-grid { grid-template-columns: 1fr 1fr; }
-      .how { height: auto; padding: 56px 20px; overflow: visible; }
-      .how-photos-left, .how-photos-right { display: none; }
-      .how-inner { width: 100%; }
+      .how {
+        flex-direction: column;
+        height: auto;
+        padding: 40px 0;
+        overflow: visible;
+        gap: 24px;
+      }
+      .how-inner { width: 100%; padding: 0 20px; order: 1; }
+      .how-photos {
+        position: static;
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        padding: 0 20px 4px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+      .how-photos-left { order: 2; }
+      .how-photos-right { order: 3; }
+      .how-photo {
+        position: static !important;
+        width: 150px !important;
+        height: 190px !important;
+        flex-shrink: 0;
+        scroll-snap-align: start;
+      }
       .quotes-grid { grid-template-columns: 1fr; }
       .who { padding: 72px 20px; }
       .compare { padding: 72px 20px; }
