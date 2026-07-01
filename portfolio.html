@@ -340,9 +340,27 @@
       .pf-page { padding: 60px 12px 80px; }
       .pf-title { margin-bottom: 44px; }
       .book-ev-name { font-size: 12px; }
-      .book-ev-info { bottom: 26px; left: 14px; }
-      .book-ev-info.right { left: auto; right: 14px; }
       .book-arrow { width: 34px; height: 34px; font-size: 14px; }
+
+      /* ── SINGLE PAGE MODE ──
+         The two-page spread needs real horizontal room to stay
+         readable; on a phone it just shrinks until you have to zoom.
+         Navigation already tracks one "current page" index and slides
+         a left/right window over it (see renderSpread()), so showing
+         only the right half — full width, one photo at a time — needs
+         zero JS changes. Tap zones (left half = prev, right half =
+         next) are separate overlay elements already spanning the full
+         book, so they keep working exactly as before. */
+      .book-root { aspect-ratio: 3 / 4; }
+      .book-half-left, .book-spine { display: none; }
+      .book-half-right {
+        width: 100%;
+        left: 0;
+        border-radius: 6px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+      }
+      .book-ev-info { bottom: 26px; left: 14px; }
+      .book-ev-info.right { left: 14px; right: auto; text-align: left; }
     }
   </style>
 </head>
@@ -598,6 +616,18 @@
     if (isFlipping) return;
     var newIdx = spreadIdx + dir;
     if (newIdx < 0 || newIdx > totalPages - 1) return;
+
+    /* On mobile, the book shows a single full-width page (see the
+       max-width:700px CSS), so the 3D flip-leaf animation — built
+       assuming a 50%-width right page — would only visually cover
+       half the photo mid-flip. Rather than rewriting that transform
+       math blind, just switch the photo directly on narrow screens;
+       same navigation, no broken-looking animation. */
+    if (window.innerWidth <= 700) {
+      spreadIdx = newIdx;
+      renderSpread(spreadIdx);
+      return;
+    }
 
     isFlipping = true;
 
