@@ -882,25 +882,42 @@
         gap: 24px;
       }
       .how-inner { width: 100%; padding: 0 20px; order: 1; }
+
+      /* Same mosaic look as desktop — the fixed left:0/right:0 screen-edge
+         positioning can't fit beside the text on a narrow screen, so the
+         two photo blocks stack above/below the text instead of flanking
+         it. Every photo keeps its desktop-relative size and position
+         within its own block, just shifted down by +30px so nothing
+         clips above the container (desktop relied on the wide viewport
+         for that overflow room). */
       .how-photos {
-        position: static;
-        width: 100%;
-        display: flex;
-        gap: 10px;
-        padding: 0 20px 4px;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
+        position: relative;
+        width: min(340px, 92vw);
+        height: 575px;
+        margin: 0 auto;
+        top: auto; bottom: auto; left: auto; right: auto;
       }
-      .how-photos-left { order: 2; }
+      .how-photos-left  { order: 2; }
       .how-photos-right { order: 3; }
-      .how-photo {
-        position: static !important;
-        width: 150px !important;
-        height: 190px !important;
-        flex-shrink: 0;
-        scroll-snap-align: start;
+
+      .how-photos-left .p1 { width: 120px; height: 200px; top: 0;    left: 170px; }
+      .how-photos-left .p2 { width: 150px; height: 180px; top: 0;    left: 10px;  border-radius: 0 10px 10px 0; }
+      .how-photos-left .p3 { width: 120px; height: 230px; top: 175px; left: 10px; }
+      .how-photos-left .p4 { width: 155px; height: 240px; top: 140px; left: 145px; }
+      .how-photos-left .p5 { width: 120px; height: 195px; top: 370px; left: 10px; }
+
+      .how-photos-right .p1 { width: 130px; height: 180px; top: 5px;   right: 0;    border-radius: 10px 0 0 10px; }
+      .how-photos-right .p2 { width: 155px; height: 250px; top: 150px; right: 170px; }
+      .how-photos-right .p3 { width: 155px; height: 250px; top: 150px; right: 0; }
+      .how-photos-right .p4 { width: 155px; height: 185px; top: 375px; right: 170px; }
+      .how-photos-right .p5 { width: 155px; height: 185px; top: 375px; right: 0; }
+
+      /* On very narrow phones (<400px wide), scale the whole mosaic block
+         down proportionally rather than letting it clip or overflow */
+      @media (max-width: 400px) {
+        .how-photos { transform: scale(0.82); transform-origin: top center; }
       }
+
       .quotes-grid { grid-template-columns: 1fr; }
       .who { padding: 72px 20px; }
       .compare { padding: 72px 20px; }
