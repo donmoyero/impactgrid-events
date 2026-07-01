@@ -617,15 +617,42 @@
     var newIdx = spreadIdx + dir;
     if (newIdx < 0 || newIdx > totalPages - 1) return;
 
-    /* On mobile, the book shows a single full-width page (see the
-       max-width:700px CSS), so the 3D flip-leaf animation — built
-       assuming a 50%-width right page — would only visually cover
-       half the photo mid-flip. Rather than rewriting that transform
-       math blind, just switch the photo directly on narrow screens;
-       same navigation, no broken-looking animation. */
+    /* On mobile the book shows one full-width page (see the
+       max-width:700px CSS) instead of a left/right spread. Reuse the
+       same flip-leaf mechanism, just resized to the full width — same
+       page-turn feel, correctly sized for a single page. */
     if (window.innerWidth <= 700) {
-      spreadIdx = newIdx;
-      renderSpread(spreadIdx);
+      isFlipping = true;
+      var mLeaf = document.getElementById('flipLeaf');
+      var mFace = document.getElementById('flipFaceImg');
+      var mBack = document.getElementById('flipBackImg');
+      var curPg = allPages[spreadIdx];
+      var tgtPg = allPages[newIdx];
+
+      mFace.src = curPg ? curPg.url : '';
+      mBack.src = tgtPg ? tgtPg.url : '';
+
+      mLeaf.style.left  = '0%';
+      mLeaf.style.width = '100%';
+      mLeaf.style.transformOrigin = (dir > 0) ? 'left center' : 'right center';
+      mLeaf.style.transform = 'rotateY(0deg)';
+      mLeaf.style.display = 'block';
+
+      setTimeout(function() {
+        mLeaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
+        mLeaf.style.transform = (dir > 0) ? 'rotateY(-180deg)' : 'rotateY(180deg)';
+      }, 16);
+
+      setTimeout(function() {
+        spreadIdx = newIdx;
+        renderSpread(spreadIdx);
+        mLeaf.style.display = 'none';
+        mLeaf.style.transition = '';
+        mLeaf.style.transform  = '';
+        mLeaf.style.width      = '';
+        isFlipping = false;
+      }, 780);
+
       return;
     }
 
