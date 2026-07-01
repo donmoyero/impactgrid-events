@@ -923,6 +923,19 @@
     @media (max-width: 600px) {
       .who-grid { grid-template-columns: 1fr; }
     }
+    /* ── Image protection: block long-press-save (mobile) and
+       right-click-save / drag-save (desktop) on every photo site-wide.
+       Not foolproof (nothing truly is — screenshots always work), but
+       stops the casual one-tap/one-click save that most visitors would
+       otherwise use. -webkit-touch-callout is the one that actually
+       matters for iPhone Safari's long-press "Save Image" popup. ── */
+    img {
+      -webkit-touch-callout: none;   /* kills iOS long-press "Save Image" menu */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      user-drag: none;
+    }
   </style>
 </head>
 <body>
@@ -1255,5 +1268,11 @@
   <div id="ig-footer"></div>
   <script>renderFooter();</script>
 
+  <script>
+    /* Block right-click "Save Image As" on every photo, site-wide */
+    document.addEventListener('contextmenu', function(e){
+      if (e.target && e.target.tagName === 'IMG') e.preventDefault();
+    });
+  </script>
 </body>
 </html>
