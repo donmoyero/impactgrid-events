@@ -278,15 +278,16 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
 
     <!-- ══ INCOME ══ -->
     <div class="page" id="page-income">
-      <div class="card-head" style="background:var(--card);border:1px solid var(--border);border-radius:14px 14px 0 0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
-        <h2>Income — Invoices</h2>
-        <span style="font-size:12px;color:var(--text3);">Pulled from your sent invoices</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 style="font-size:18px;">Income</h2>
+        <button class="btn btn-gold" onclick="openIncomeModal()">+ Add Income</button>
       </div>
-      <div class="card" style="border-radius:0 0 14px 14px;margin-bottom:0;">
+      <div class="card">
+        <div class="card-head"><h2>All Income</h2><span style="font-size:12px;color:var(--text3);">Invoices + manually logged income</span></div>
         <div class="card-body" style="padding:0;overflow:auto;">
           <table class="tbl" id="incomeTbl">
-            <thead><tr><th>Invoice #</th><th>Date</th><th>Client</th><th>Total</th><th>Status</th></tr></thead>
-            <tbody id="incomeBody"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;">Loading…</td></tr></tbody>
+            <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th style="text-align:right;">Amount</th><th>Status</th><th></th></tr></thead>
+            <tbody id="incomeBody"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px;">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -436,6 +437,84 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
   </div>
 </div>
 
+<!-- ══ INCOME MODAL (manual entries) ══ -->
+<div class="modal-wrap" id="incomeModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="incModalTitle">Add Income</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('incomeModal')">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="inc-id"/>
+      <div>
+        <label class="field-label">Date</label>
+        <input type="date" id="inc-date"/>
+      </div>
+      <div>
+        <label class="field-label">Description</label>
+        <input type="text" id="inc-desc" placeholder="e.g. Deposit — Smith wedding"/>
+      </div>
+      <div>
+        <label class="field-label">Category</label>
+        <select id="inc-cat">
+          <option value="Booking Deposit">Booking Deposit</option>
+          <option value="Full Payment">Full Payment</option>
+          <option value="Print Sales">Print Sales</option>
+          <option value="Licensing / Usage Fee">Licensing / Usage Fee</option>
+          <option value="Refund Received">Refund Received</option>
+          <option value="Other Income">Other Income</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Amount (£)</label>
+        <input type="number" id="inc-amount" placeholder="0.00" min="0" step="0.01"/>
+      </div>
+      <div>
+        <label class="field-label">Notes (optional)</label>
+        <textarea id="inc-notes" rows="2" placeholder="Any extra details…"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+        <button class="btn btn-ghost" onclick="closeModal('incomeModal')">Cancel</button>
+        <button class="btn btn-gold" id="incSaveBtn" onclick="saveIncome()">Save Income</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INVOICE EDIT MODAL ══ -->
+<div class="modal-wrap" id="invoiceEditModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Edit Invoice <span id="invedit-number" style="color:var(--text3);font-weight:500;font-size:12px;"></span></h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('invoiceEditModal')">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="invedit-id"/>
+      <div>
+        <label class="field-label">Date</label>
+        <input type="date" id="invedit-date"/>
+      </div>
+      <div>
+        <label class="field-label">Client</label>
+        <input type="text" id="invedit-client" placeholder="Client name"/>
+      </div>
+      <div>
+        <label class="field-label">Total (£)</label>
+        <input type="number" id="invedit-total" placeholder="0.00" min="0" step="0.01"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="invedit-sent" style="width:auto;"/>
+        <label class="field-label" style="margin:0;" for="invedit-sent">Marked as sent</label>
+      </div>
+      <div class="field-hint">Invoice number isn't editable here — it's your official reference. Everything else can be corrected.</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+        <button class="btn btn-ghost" onclick="closeModal('invoiceEditModal')">Cancel</button>
+        <button class="btn btn-gold" id="invEditSaveBtn" onclick="saveInvoiceEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ BANK CHARGE MODAL ══ -->
 <div class="modal-wrap" id="bankModal">
   <div class="modal-box">
@@ -499,7 +578,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
    Confidential — admin access only
    ══════════════════════════════════════════════ */
 
-var _sb, _bizSettings = {}, _invoices = [], _expenses = [], _bankCharges = [];
+var _sb, _bizSettings = {}, _invoices = [], _expenses = [], _bankCharges = [], _income = [];
 var _currentMonth = new Date().getMonth();
 var _currentYear  = new Date().getFullYear();
 var _dijoHistory  = [];
@@ -536,7 +615,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.getElementById('taxYearLabel').textContent = 'Tax year ' + taxStart + '–' + (taxStart+1);
 
   await loadBizSettingsAccounts();
-  await Promise.all([ loadInvoices(), loadExpenses(), loadBankCharges() ]);
+  await Promise.all([ loadInvoices(), loadExpenses(), loadBankCharges(), loadIncome() ]);
   renderStats();
   renderRecent();
   renderCashbook();
@@ -573,6 +652,10 @@ async function loadBankCharges() {
   var { data } = await _sb.from('expenses').select('*').eq('category','Bank Charges').order('date', { ascending:false });
   _bankCharges = data || [];
 }
+async function loadIncome() {
+  var { data } = await _sb.from('income_entries').select('*').order('date', { ascending:false });
+  _income = data || [];
+}
 
 /* ── STATS ── */
 function renderStats() {
@@ -580,7 +663,8 @@ function renderStats() {
   var taxStart = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
   var yearStart = new Date(taxStart, 3, 6); // 6 April
 
-  var income   = _invoices.filter(function(i){ return new Date(i.invoice_date) >= yearStart; }).reduce(function(s,i){ return s + parseFloat(i.total||0); }, 0);
+  var income   = _invoices.filter(function(i){ return new Date(i.invoice_date) >= yearStart; }).reduce(function(s,i){ return s + parseFloat(i.total||0); }, 0)
+               + _income.filter(function(m){ return new Date(m.date) >= yearStart; }).reduce(function(s,m){ return s + parseFloat(m.amount||0); }, 0);
   var expenses = _expenses.filter(function(e){ return new Date(e.date) >= yearStart; }).reduce(function(s,e){ return s + parseFloat(e.amount||0); }, 0);
   var profit   = income - expenses;
   /* UK Corporation Tax: 19% Small Profits Rate ≤£50k, marginal relief £50k-£250k, 25% above */
@@ -604,6 +688,7 @@ function renderStats() {
 function renderRecent() {
   var all = [];
   _invoices.slice(0,5).forEach(function(i){ all.push({ date:i.invoice_date, desc:'Invoice '+i.invoice_number+' — '+i.client_name, type:'income', amount:parseFloat(i.total||0) }); });
+  _income.slice(0,5).forEach(function(m){ all.push({ date:m.date, desc:m.description, type:'income', amount:parseFloat(m.amount||0) }); });
   _expenses.slice(0,5).forEach(function(e){ all.push({ date:e.date, desc:e.description, type:'expense', amount:parseFloat(e.amount||0) }); });
   all.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
   var body = document.getElementById('recentBody');
@@ -622,10 +707,12 @@ function renderCashbook() {
   document.getElementById('cashMonthLabel').textContent = months[_currentMonth] + ' ' + _currentYear;
 
   var mInc = _invoices.filter(function(i){ var d=new Date(i.invoice_date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
+  var mMan = _income.filter(function(m){ var d=new Date(m.date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
   var mExp = _expenses.filter(function(e){ var d=new Date(e.date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
 
   var rows = [];
   mInc.forEach(function(i){ rows.push({ date:i.invoice_date, desc:'Invoice '+i.invoice_number+' — '+i.client_name, type:'income', amount:parseFloat(i.total||0) }); });
+  mMan.forEach(function(m){ rows.push({ date:m.date, desc:m.description+' ('+m.category+')', type:'income', amount:parseFloat(m.amount||0) }); });
   mExp.forEach(function(e){ rows.push({ date:e.date, desc:e.description+' ('+e.category+')', type:'expense', amount:parseFloat(e.amount||0) }); });
   rows.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
 
@@ -673,14 +760,47 @@ function changeMonth(dir) {
 /* ── INCOME ── */
 function renderIncome() {
   var body = document.getElementById('incomeBody');
-  if (!_invoices.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;">No invoices yet.</td></tr>'; return; }
-  body.innerHTML = _invoices.map(function(i){
-    var pill = i.sent ? '<span class="pill pill-green">Sent</span>' : '<span class="pill pill-gold">Draft</span>';
-    return '<tr><td style="font-family:var(--fm);font-size:11px;">'+esc(i.invoice_number)+'</td>'
-      +'<td style="font-size:12px;color:var(--text3);">'+fmtDate(i.invoice_date)+'</td>'
-      +'<td>'+esc(i.client_name||'—')+'</td>'
-      +'<td style="font-weight:700;color:var(--green);">£'+parseFloat(i.total||0).toFixed(2)+'</td>'
-      +'<td>'+pill+'</td></tr>';
+  var rows = [];
+
+  _invoices.forEach(function(i){
+    rows.push({
+      date: i.invoice_date,
+      desc: 'Invoice '+i.invoice_number+' — '+(i.client_name||'—'),
+      category: '—',
+      typePill: '<span class="pill pill-blue">Invoice</span>',
+      amount: parseFloat(i.total||0),
+      statusPill: i.sent ? '<span class="pill pill-green">Sent</span>' : '<span class="pill pill-gold">Draft</span>',
+      actions: '<button class="btn btn-ghost btn-sm" onclick="openInvoiceEditModal(\''+i.id+'\')">✎</button>'
+    });
+  });
+
+  _income.forEach(function(m){
+    rows.push({
+      date: m.date,
+      desc: m.description,
+      category: m.category || '—',
+      typePill: '<span class="pill pill-gold">Manual</span>',
+      amount: parseFloat(m.amount||0),
+      statusPill: '—',
+      actions: '<button class="btn btn-ghost btn-sm" onclick="openIncomeModal(\''+m.id+'\')">✎</button>'
+              + '<button class="btn btn-red btn-sm" onclick="deleteIncome(\''+m.id+'\')">✕</button>'
+    });
+  });
+
+  rows.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+
+  if (!rows.length) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px;">No income yet. Add your first entry.</td></tr>'; return; }
+
+  body.innerHTML = rows.map(function(r){
+    return '<tr>'
+      +'<td style="font-size:12px;color:var(--text3);font-family:var(--fm);">'+fmtDate(r.date)+'</td>'
+      +'<td>'+esc(r.desc)+'</td>'
+      +'<td><span class="pill pill-blue" style="font-size:9px;">'+esc(r.category)+'</span></td>'
+      +'<td>'+r.typePill+'</td>'
+      +'<td style="text-align:right;font-weight:700;color:var(--green);">£'+r.amount.toFixed(2)+'</td>'
+      +'<td>'+r.statusPill+'</td>'
+      +'<td style="display:flex;gap:6px;">'+r.actions+'</td>'
+      +'</tr>';
   }).join('');
 }
 
@@ -698,7 +818,7 @@ function renderExpenses() {
       +'<td><span class="pill pill-blue" style="font-size:9px;">'+esc(e.category||'—')+'</span></td>'
       +'<td>'+receipt+'</td>'
       +'<td style="text-align:right;font-weight:700;color:var(--red);">£'+parseFloat(e.amount||0).toFixed(2)+'</td>'
-      +'<td><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">✕</button></td>'
+      +'<td style="display:flex;gap:6px;"><button class="btn btn-ghost btn-sm" onclick="openExpenseModal(\''+e.id+'\')">✎</button><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">✕</button></td>'
       +'</tr>';
   }).join('');
 }
@@ -748,17 +868,131 @@ function toggleCheck(id) {
 }
 
 /* ── EXPENSE MODAL ── */
-function openExpenseModal() {
-  document.getElementById('exp-id').value = '';
-  document.getElementById('exp-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('exp-desc').value = '';
-  document.getElementById('exp-amount').value = '';
-  document.getElementById('exp-notes').value = '';
+function openExpenseModal(id) {
+  var exp = id ? _expenses.find(function(e){ return e.id === id; }) : null;
+
+  document.getElementById('exp-id').value = exp ? exp.id : '';
+  document.getElementById('exp-date').value = exp ? exp.date : new Date().toISOString().split('T')[0];
+  document.getElementById('exp-desc').value = exp ? exp.description : '';
+  document.getElementById('exp-cat').value = exp ? (exp.category || 'Other') : 'Software & Subscriptions';
+  document.getElementById('exp-amount').value = exp ? exp.amount : '';
+  document.getElementById('exp-notes').value = exp ? (exp.notes || '') : '';
   document.getElementById('exp-receipt-url').value = '';
-  document.getElementById('exp-receipt-path').value = '';
-  document.getElementById('receiptPreview').innerHTML = '📎 Click to attach receipt (image or PDF)';
-  document.getElementById('expModalTitle').textContent = 'Add Expense';
+  document.getElementById('exp-receipt-path').value = exp ? (exp.receipt_path || '') : '';
+  document.getElementById('receiptPreview').innerHTML = (exp && exp.receipt_path)
+    ? '📎 Receipt already attached — choose a file to replace it'
+    : '📎 Click to attach receipt (image or PDF)';
+  document.getElementById('expModalTitle').textContent = exp ? 'Edit Expense' : 'Add Expense';
+  document.getElementById('expSaveBtn').textContent = exp ? 'Save Changes' : 'Save Expense';
+  _receiptFile = null;
   document.getElementById('expenseModal').classList.add('open');
+}
+
+function openIncomeModal(id) {
+  var inc = id ? _income.find(function(m){ return m.id === id; }) : null;
+
+  document.getElementById('inc-id').value = inc ? inc.id : '';
+  document.getElementById('inc-date').value = inc ? inc.date : new Date().toISOString().split('T')[0];
+  document.getElementById('inc-desc').value = inc ? inc.description : '';
+  document.getElementById('inc-cat').value = inc ? (inc.category || 'Other Income') : 'Booking Deposit';
+  document.getElementById('inc-amount').value = inc ? inc.amount : '';
+  document.getElementById('inc-notes').value = inc ? (inc.notes || '') : '';
+  document.getElementById('incModalTitle').textContent = inc ? 'Edit Income' : 'Add Income';
+  document.getElementById('incSaveBtn').textContent = inc ? 'Save Changes' : 'Save Income';
+  document.getElementById('incomeModal').classList.add('open');
+}
+
+async function saveIncome() {
+  var desc   = document.getElementById('inc-desc').value.trim();
+  var amount = parseFloat(document.getElementById('inc-amount').value);
+  var date   = document.getElementById('inc-date').value;
+  if (!desc || !amount || !date) { toast('⚠', 'Fill in all required fields'); return; }
+
+  var btn = document.getElementById('incSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    var row = {
+      date:        date,
+      description: desc,
+      category:    document.getElementById('inc-cat').value,
+      amount:      amount,
+      notes:       document.getElementById('inc-notes').value.trim(),
+    };
+
+    var id = document.getElementById('inc-id').value;
+    if (id) {
+      await _sb.from('income_entries').update(row).eq('id', id);
+    } else {
+      await _sb.from('income_entries').insert(row);
+    }
+
+    await loadIncome();
+    renderIncome();
+    renderStats();
+    renderRecent();
+    renderCashbook();
+    closeModal('incomeModal');
+    toast('✅', id ? 'Income updated' : 'Income saved');
+  } catch(e) {
+    toast('❌', 'Error: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = document.getElementById('inc-id').value ? 'Save Changes' : 'Save Income';
+}
+
+async function deleteIncome(id) {
+  if (!confirm('Delete this income entry?')) return;
+  await _sb.from('income_entries').delete().eq('id', id);
+  await loadIncome();
+  renderIncome();
+  renderStats();
+  renderRecent();
+  renderCashbook();
+  toast('🗑', 'Income entry deleted');
+}
+
+/* ── EDIT INVOICE ── */
+function openInvoiceEditModal(id) {
+  var inv = _invoices.find(function(i){ return i.id === id; });
+  if (!inv) return;
+  document.getElementById('invedit-id').value = inv.id;
+  document.getElementById('invedit-number').textContent = inv.invoice_number || '—';
+  document.getElementById('invedit-date').value = inv.invoice_date;
+  document.getElementById('invedit-client').value = inv.client_name || '';
+  document.getElementById('invedit-total').value = inv.total;
+  document.getElementById('invedit-sent').checked = !!inv.sent;
+  document.getElementById('invoiceEditModal').classList.add('open');
+}
+
+async function saveInvoiceEdit() {
+  var id = document.getElementById('invedit-id').value;
+  var client = document.getElementById('invedit-client').value.trim();
+  var date   = document.getElementById('invedit-date').value;
+  var total  = parseFloat(document.getElementById('invedit-total').value);
+  if (!client || !date || isNaN(total)) { toast('⚠', 'Fill in all required fields'); return; }
+
+  var btn = document.getElementById('invEditSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await _sb.from('invoices').update({
+      client_name:  client,
+      invoice_date: date,
+      total:        total,
+      sent:         document.getElementById('invedit-sent').checked
+    }).eq('id', id);
+
+    await loadInvoices();
+    renderIncome();
+    renderStats();
+    renderRecent();
+    renderCashbook();
+    closeModal('invoiceEditModal');
+    toast('✅', 'Invoice updated');
+  } catch(e) {
+    toast('❌', 'Error: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Save Changes';
 }
 
 function openBankModal() {
@@ -837,11 +1071,12 @@ async function saveExpense() {
     renderRecent();
     renderCashbook();
     closeModal('expenseModal');
-    toast('✅', 'Expense saved');
+    toast('✅', id ? 'Expense updated' : 'Expense saved');
   } catch(e) {
     toast('❌', 'Error: ' + e.message);
   }
-  btn.disabled = false; btn.textContent = 'Save Expense';
+  btn.disabled = false;
+  btn.textContent = document.getElementById('exp-id').value ? 'Save Changes' : 'Save Expense';
 }
 
 /* ── SAVE BANK CHARGE ── */
@@ -903,9 +1138,11 @@ async function exportCashbookPDF() {
   var biz    = _bizSettings;
 
   var mInc = _invoices.filter(function(i){ var d=new Date(i.invoice_date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
+  var mMan = _income.filter(function(m){ var d=new Date(m.date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
   var mExp = _expenses.filter(function(e){ var d=new Date(e.date); return d.getMonth()===_currentMonth && d.getFullYear()===_currentYear; });
   var rows = [];
   mInc.forEach(function(i){ rows.push({ date:i.invoice_date, desc:'Invoice '+i.invoice_number+' — '+i.client_name, type:'income', amount:parseFloat(i.total||0) }); });
+  mMan.forEach(function(m){ rows.push({ date:m.date, desc:m.description+' ('+m.category+')', type:'income', amount:parseFloat(m.amount||0) }); });
   mExp.forEach(function(e){ rows.push({ date:e.date, desc:e.description+' ('+e.category+')', type:'expense', amount:parseFloat(e.amount||0) }); });
   rows.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
 
@@ -1061,6 +1298,11 @@ window.toggleCheck    = toggleCheck;
 window.changeMonth    = changeMonth;
 window.handleReceiptSelect = handleReceiptSelect;
 window.exportCashbookPDF   = exportCashbookPDF;
+window.openIncomeModal      = openIncomeModal;
+window.saveIncome           = saveIncome;
+window.deleteIncome         = deleteIncome;
+window.openInvoiceEditModal = openInvoiceEditModal;
+window.saveInvoiceEdit      = saveInvoiceEdit;
 </script>
 </body>
 </html>
