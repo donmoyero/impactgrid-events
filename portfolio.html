@@ -366,9 +366,9 @@
 </head>
 <body>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script defer src="auth.js"></script>
 
   <div id="ig-nav"></div>
   <script src="nav.js"></script>
@@ -486,6 +486,15 @@
   ];
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  /* Cloudinary lets you resize/compress on the fly via URL params —
+     no need to touch the upload pipeline. w_1600 is plenty for a
+     full-bleed book page; q_auto/f_auto pick best quality & format
+     (e.g. WebP) automatically for the visitor's browser. */
+  function cldResize(url) {
+    if (!url || url.indexOf('res.cloudinary.com') === -1) return url;
+    return url.replace('/upload/', '/upload/w_1600,q_auto,f_auto/');
+  }
 
   /* ── Build a flat list of page-images from all events ── */
   /* Page 0 = special cover page (first event cover, full spread)
@@ -739,15 +748,25 @@
   /* ── Load photos from Firebase portfolio_photos flat collection ── */
   var _pfDb = null;
 
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDzI3fDAM46_Gp96YMnrA-DG7oAprHs4g4",
+    authDomain: "impactgrid-events.firebaseapp.com",
+    projectId: "impactgrid-events",
+    storageBucket: "impactgrid-events.firebasestorage.app",
+    messagingSenderId: "197404801498",
+    appId: "1:197404801498:web:15675f79edc02e6348a8e3",
+    measurementId: "G-T4BWYBKWFK"
+  };
+
   async function loadEvents() {
     try {
-      var cfg = await fetch('https://impactgrid-events-api.onrender.com/api/firebase-config').then(function(r){ return r.json(); });
+      var cfg = FIREBASE_CONFIG;
       if (!firebase.apps.length) firebase.initializeApp(cfg);
       _pfDb = firebase.firestore();
       var snap = await _pfDb.collection('portfolio_photos')
         .orderBy('created_at', 'desc')
         .get();
-      var photos = snap.docs.map(function(d){ return d.data().url; }).filter(Boolean);
+      var photos = snap.docs.map(function(d){ return cldResize(d.data().url); }).filter(Boolean);
       if (photos.length) {
         usePhotos(photos);
       } else {
