@@ -653,7 +653,8 @@ async function loadBankCharges() {
   _bankCharges = data || [];
 }
 async function loadIncome() {
-  var { data } = await _sb.from('income_entries').select('*').order('date', { ascending:false });
+  var { data, error } = await _sb.from('income_entries').select('*').order('date', { ascending:false });
+  if (error) { console.error('loadIncome error:', error); toast('❌', 'Load income failed: ' + error.message); }
   _income = data || [];
 }
 
@@ -921,11 +922,13 @@ async function saveIncome() {
     };
 
     var id = document.getElementById('inc-id').value;
+    var res;
     if (id) {
-      await _sb.from('income_entries').update(row).eq('id', id);
+      res = await _sb.from('income_entries').update(row).eq('id', id);
     } else {
-      await _sb.from('income_entries').insert(row);
+      res = await _sb.from('income_entries').insert(row);
     }
+    if (res.error) throw res.error;
 
     await loadIncome();
     renderIncome();
@@ -943,7 +946,8 @@ async function saveIncome() {
 
 async function deleteIncome(id) {
   if (!confirm('Delete this income entry?')) return;
-  await _sb.from('income_entries').delete().eq('id', id);
+  var res = await _sb.from('income_entries').delete().eq('id', id);
+  if (res.error) { toast('❌', 'Delete failed: ' + res.error.message); return; }
   await loadIncome();
   renderIncome();
   renderStats();
