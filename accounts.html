@@ -183,14 +183,14 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
     </div>
     <div class="sb-nav">
       <div class="sb-label">Overview</div>
-      <div class="sb-item active" onclick="showPage('dashboard',this)"><span class="sb-ico">📊</span>Dashboard</div>
-      <div class="sb-item" onclick="showPage('cashbook',this)"><span class="sb-ico">📒</span>Cashbook</div>
+      <div class="sb-item active" onclick="showPage('dashboard',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Dashboard</div>
+      <div class="sb-item" onclick="showPage('cashbook',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5.5A1.5 1.5 0 0 1 4 18.5v-14Z"/><path d="M8 3v16"/></svg></span>Cashbook</div>
       <div class="sb-label">Records</div>
-      <div class="sb-item" onclick="showPage('income',this)"><span class="sb-ico">💰</span>Income</div>
-      <div class="sb-item" onclick="showPage('expenses',this)"><span class="sb-ico">🧾</span>Expenses</div>
+      <div class="sb-item" onclick="showPage('income',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"/><path d="M8 7h9v9"/></svg></span>Income</div>
+      <div class="sb-item" onclick="showPage('expenses',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>Expenses</div>
       <div class="sb-label">Compliance</div>
-      <div class="sb-item" onclick="showPage('tax',this)"><span class="sb-ico">📋</span>Tax & Legal</div>
-      <div class="sb-item" onclick="showPage('bank',this)"><span class="sb-ico">🏦</span>Bank</div>
+      <div class="sb-item" onclick="showPage('tax',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M9 3V2h6v1"/><path d="m9 12 2 2 4-4"/></svg></span>Tax & Legal</div>
+      <div class="sb-item" onclick="showPage('bank',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9"/><path d="M3 19h18"/></svg></span>Bank</div>
     </div>
   </div>
 
@@ -259,7 +259,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
         <div class="month-label" id="cashMonthLabel"></div>
         <button class="month-btn" onclick="changeMonth(1)">›</button>
         <div style="margin-left:auto;">
-          <button class="btn btn-ghost btn-sm" onclick="exportCashbookPDF()">⬇ Export PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportCashbookPDF()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>Export PDF</button>
         </div>
       </div>
 
@@ -333,7 +333,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
       </div>
 
       <div class="card">
-        <div class="card-head"><h2>📋 Compliance Checklist</h2><span style="font-size:12px;color:var(--text3);" id="checkProgress"></span></div>
+        <div class="card-head"><h2 style="display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M9 3V2h6v1"/><path d="m9 12 2 2 4-4"/></svg>Compliance Checklist</h2><span style="font-size:12px;color:var(--text3);" id="checkProgress"></span></div>
         <div class="card-body" id="checklistWrap"></div>
       </div>
     </div>
@@ -424,7 +424,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
         <label class="field-label">Receipt</label>
         <div class="upload-area" id="receiptUploadArea" onclick="document.getElementById('receiptFile').click()">
           <input type="file" id="receiptFile" accept="image/*,application/pdf" onchange="handleReceiptSelect(this)"/>
-          <div id="receiptPreview" style="font-size:13px;color:var(--text3);">📎 Click to attach receipt (image or PDF)</div>
+          <div id="receiptPreview" style="font-size:13px;color:var(--text3);display:flex;align-items:center;gap:6px;justify-content:center;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7.5 8.5 16a2.5 2.5 0 0 1-3.5-3.5L14 3.5a4 4 0 1 1 5.5 5.5L10.5 18a5.5 5.5 0 1 1-7.5-7.5L12 1.5"/></svg>Click to attach receipt (image or PDF)</div>
         </div>
         <input type="hidden" id="exp-receipt-url"/>
         <input type="hidden" id="exp-receipt-path"/>
@@ -553,7 +553,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
     <div class="modal-head">
       <h3>Receipt</h3>
       <div style="display:flex;gap:8px;">
-        <a class="btn btn-gold btn-sm" id="receiptDownloadBtn" download>⬇ Download</a>
+        <a class="btn btn-gold btn-sm" id="receiptDownloadBtn" download><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>Download</a>
         <button class="btn btn-ghost btn-sm" onclick="closeModal('receiptViewModal')">✕ Close</button>
       </div>
     </div>
@@ -655,7 +655,7 @@ async function loadBankCharges() {
 }
 async function loadIncome() {
   var { data, error } = await _sb.from('income_entries').select('*').order('date', { ascending:false });
-  if (error) { console.error('loadIncome error:', error); toast('❌', 'Load income failed: ' + error.message); }
+  if (error) { console.error('loadIncome error:', error); toast('error', 'Load income failed: ' + error.message); }
   _income = data || [];
 }
 
@@ -772,7 +772,7 @@ function renderIncome() {
       typePill: '<span class="pill pill-blue">Invoice</span>',
       amount: parseFloat(i.total||0),
       statusPill: i.sent ? '<span class="pill pill-green">Sent</span>' : '<span class="pill pill-gold">Draft</span>',
-      actions: '<button class="btn btn-ghost btn-sm" onclick="openInvoiceEditModal(\''+i.id+'\')">✎</button>'
+      actions: '<button class="btn btn-ghost btn-sm" onclick="openInvoiceEditModal(\''+i.id+'\')">'+ICONS.edit+'</button>'
     });
   });
 
@@ -784,8 +784,8 @@ function renderIncome() {
       typePill: '<span class="pill pill-gold">Manual</span>',
       amount: parseFloat(m.amount||0),
       statusPill: '—',
-      actions: '<button class="btn btn-ghost btn-sm" onclick="openIncomeModal(\''+m.id+'\')">✎</button>'
-              + '<button class="btn btn-red btn-sm" onclick="deleteIncome(\''+m.id+'\')">✕</button>'
+      actions: '<button class="btn btn-ghost btn-sm" onclick="openIncomeModal(\''+m.id+'\')">'+ICONS.edit+'</button>'
+              + '<button class="btn btn-red btn-sm" onclick="deleteIncome(\''+m.id+'\')">'+ICONS.trash+'</button>'
     });
   });
 
@@ -812,7 +812,7 @@ function renderExpenses() {
   if (!_expenses.length) { body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;">No expenses yet. Add your first one.</td></tr>'; return; }
   body.innerHTML = _expenses.map(function(e){
     var receipt = e.receipt_path
-      ? '<div class="receipt-thumb" onclick="viewReceipt(\''+esc(e.receipt_path)+'\',\''+esc(e.description)+'\')">📎</div>'
+      ? '<div class="receipt-thumb" onclick="viewReceipt(\''+esc(e.receipt_path)+'\',\''+esc(e.description)+'\')">'+ICONS.paperclip+'</div>'
       : '<span style="color:var(--text3);font-size:11px;">—</span>';
     return '<tr>'
       +'<td style="font-size:12px;color:var(--text3);font-family:var(--fm);">'+fmtDate(e.date)+'</td>'
@@ -820,7 +820,7 @@ function renderExpenses() {
       +'<td><span class="pill pill-blue" style="font-size:9px;">'+esc(e.category||'—')+'</span></td>'
       +'<td>'+receipt+'</td>'
       +'<td style="text-align:right;font-weight:700;color:var(--red);">£'+parseFloat(e.amount||0).toFixed(2)+'</td>'
-      +'<td style="display:flex;gap:6px;"><button class="btn btn-ghost btn-sm" onclick="openExpenseModal(\''+e.id+'\')">✎</button><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">✕</button></td>'
+      +'<td style="display:flex;gap:6px;"><button class="btn btn-ghost btn-sm" onclick="openExpenseModal(\''+e.id+'\')">'+ICONS.edit+'</button><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">'+ICONS.trash+'</button></td>'
       +'</tr>';
   }).join('');
 }
@@ -836,7 +836,7 @@ function renderBankCharges() {
       +'<td>'+esc(e.description)+'</td>'
       +'<td>'+esc(e.notes||'—')+'</td>'
       +'<td style="text-align:right;font-weight:700;color:var(--red);">£'+parseFloat(e.amount||0).toFixed(2)+'</td>'
-      +'<td><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">✕</button></td>'
+      +'<td><button class="btn btn-red btn-sm" onclick="deleteExpense(\''+e.id+'\')">'+ICONS.trash+'</button></td>'
       +'</tr>';
   }).join('');
 }
@@ -882,8 +882,8 @@ function openExpenseModal(id) {
   document.getElementById('exp-receipt-url').value = '';
   document.getElementById('exp-receipt-path').value = exp ? (exp.receipt_path || '') : '';
   document.getElementById('receiptPreview').innerHTML = (exp && exp.receipt_path)
-    ? '📎 Receipt already attached — choose a file to replace it'
-    : '📎 Click to attach receipt (image or PDF)';
+    ? ICONS.paperclip+' Receipt already attached — choose a file to replace it'
+    : ICONS.paperclip+' Click to attach receipt (image or PDF)';
   document.getElementById('expModalTitle').textContent = exp ? 'Edit Expense' : 'Add Expense';
   document.getElementById('expSaveBtn').textContent = exp ? 'Save Changes' : 'Save Expense';
   _receiptFile = null;
@@ -908,7 +908,7 @@ async function saveIncome() {
   var desc   = document.getElementById('inc-desc').value.trim();
   var amount = parseFloat(document.getElementById('inc-amount').value);
   var date   = document.getElementById('inc-date').value;
-  if (!desc || !amount || !date) { toast('⚠', 'Fill in all required fields'); return; }
+  if (!desc || !amount || !date) { toast('warning', 'Fill in all required fields'); return; }
 
   var btn = document.getElementById('incSaveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
@@ -937,9 +937,9 @@ async function saveIncome() {
     renderRecent();
     renderCashbook();
     closeModal('incomeModal');
-    toast('✅', id ? 'Income updated' : 'Income saved');
+    toast('success', id ? 'Income updated' : 'Income saved');
   } catch(e) {
-    toast('❌', 'Error: ' + e.message);
+    toast('error', 'Error: ' + e.message);
   }
   btn.disabled = false;
   btn.textContent = document.getElementById('inc-id').value ? 'Save Changes' : 'Save Income';
@@ -948,13 +948,13 @@ async function saveIncome() {
 async function deleteIncome(id) {
   if (!confirm('Delete this income entry?')) return;
   var res = await _sb.from('income_entries').delete().eq('id', id);
-  if (res.error) { toast('❌', 'Delete failed: ' + res.error.message); return; }
+  if (res.error) { toast('error', 'Delete failed: ' + res.error.message); return; }
   await loadIncome();
   renderIncome();
   renderStats();
   renderRecent();
   renderCashbook();
-  toast('🗑', 'Income entry deleted');
+  toast('trash', 'Income entry deleted');
 }
 
 /* ── EDIT INVOICE ── */
@@ -975,7 +975,7 @@ async function saveInvoiceEdit() {
   var client = document.getElementById('invedit-client').value.trim();
   var date   = document.getElementById('invedit-date').value;
   var total  = parseFloat(document.getElementById('invedit-total').value);
-  if (!client || !date || isNaN(total)) { toast('⚠', 'Fill in all required fields'); return; }
+  if (!client || !date || isNaN(total)) { toast('warning', 'Fill in all required fields'); return; }
 
   var btn = document.getElementById('invEditSaveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
@@ -993,9 +993,9 @@ async function saveInvoiceEdit() {
     renderRecent();
     renderCashbook();
     closeModal('invoiceEditModal');
-    toast('✅', 'Invoice updated');
+    toast('success', 'Invoice updated');
   } catch(e) {
-    toast('❌', 'Error: ' + e.message);
+    toast('error', 'Error: ' + e.message);
   }
   btn.disabled = false; btn.textContent = 'Save Changes';
 }
@@ -1021,7 +1021,7 @@ function handleReceiptSelect(input) {
     var url = URL.createObjectURL(file);
     preview.innerHTML = '<img src="'+url+'" style="max-height:120px;border-radius:8px;margin:0 auto;display:block;"/><div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center;">'+esc(file.name)+'</div>';
   } else {
-    preview.innerHTML = '📄 <strong>'+esc(file.name)+'</strong><div style="font-size:11px;color:var(--text3);">PDF attached</div>';
+    preview.innerHTML = ICONS.file+' <strong>'+esc(file.name)+'</strong><div style="font-size:11px;color:var(--text3);">PDF attached</div>';
   }
 }
 
@@ -1038,7 +1038,7 @@ async function saveExpense() {
   var desc   = document.getElementById('exp-desc').value.trim();
   var amount = parseFloat(document.getElementById('exp-amount').value);
   var date   = document.getElementById('exp-date').value;
-  if (!desc || !amount || !date) { toast('⚠', 'Fill in all required fields'); return; }
+  if (!desc || !amount || !date) { toast('warning', 'Fill in all required fields'); return; }
 
   var btn = document.getElementById('expSaveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
@@ -1076,9 +1076,9 @@ async function saveExpense() {
     renderRecent();
     renderCashbook();
     closeModal('expenseModal');
-    toast('✅', id ? 'Expense updated' : 'Expense saved');
+    toast('success', id ? 'Expense updated' : 'Expense saved');
   } catch(e) {
-    toast('❌', 'Error: ' + e.message);
+    toast('error', 'Error: ' + e.message);
   }
   btn.disabled = false;
   btn.textContent = document.getElementById('exp-id').value ? 'Save Changes' : 'Save Expense';
@@ -1089,7 +1089,7 @@ async function saveBankCharge() {
   var desc   = document.getElementById('bank-desc').value.trim();
   var amount = parseFloat(document.getElementById('bank-amount').value);
   var date   = document.getElementById('bank-date').value;
-  if (!desc || !amount || !date) { toast('⚠', 'Fill in all required fields'); return; }
+  if (!desc || !amount || !date) { toast('warning', 'Fill in all required fields'); return; }
   try {
     await _sb.from('expenses').insert({
       date: date, description: desc, category: 'Bank Charges',
@@ -1098,8 +1098,8 @@ async function saveBankCharge() {
     await loadExpenses(); await loadBankCharges();
     renderBankCharges(); renderExpenses(); renderStats(); renderCashbook();
     closeModal('bankModal');
-    toast('✅', 'Bank charge saved');
-  } catch(e) { toast('❌', 'Error: ' + e.message); }
+    toast('success', 'Bank charge saved');
+  } catch(e) { toast('error', 'Error: ' + e.message); }
 }
 
 /* ── DELETE EXPENSE ── */
@@ -1112,7 +1112,7 @@ async function deleteExpense(id) {
   await _sb.from('expenses').delete().eq('id', id);
   await loadExpenses(); await loadBankCharges();
   renderExpenses(); renderBankCharges(); renderStats(); renderCashbook(); renderRecent();
-  toast('🗑', 'Expense deleted');
+  toast('trash', 'Expense deleted');
 }
 
 /* ── VIEW RECEIPT ── */
@@ -1211,7 +1211,7 @@ function initAIOrbs() {
         offset: Math.random() * Math.PI * 2
       });
     }
-    return { ctx: ctx, size: size, particles: particles };
+    return { ctx: ctx, size: size, particles: particles, blinkSeed: Math.random(), blinkPhase: Math.random() * 5 };
   });
 
   var start = performance.now();
@@ -1221,7 +1221,7 @@ function initAIOrbs() {
     ctx.clearRect(0, 0, size, size);
 
     var pulse = 1 + Math.sin(t * 1.8) * 0.06;
-    var coreR = 8.5 * pulse;
+    var coreR = 9.5 * pulse;
 
     /* ambient glow */
     var glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, size / 2);
@@ -1248,11 +1248,14 @@ function initAIOrbs() {
     ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
     ctx.fill();
 
-    /* specular highlight */
+    /* soft rim highlight, upper-left, kept away from the face */
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.arc(cx - coreR * 0.32, cy - coreR * 0.32, coreR * 0.22, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.arc(cx - coreR * 0.55, cy - coreR * 0.55, coreR * 0.16, 0, Math.PI * 2);
     ctx.fill();
+
+    /* face — eyes + mouth, gives the orb life */
+    drawFace(ctx, cx, cy, coreR, t, o);
 
     /* orbiting particles in front of core */
     o.particles.forEach(function(p) {
@@ -1261,6 +1264,42 @@ function initAIOrbs() {
       if (depth < 0) return;
       drawParticle(ctx, cx, cy, a, p, t, depth);
     });
+  }
+
+  function blinkAmount(o, t) {
+    var cycle = 3.2 + o.blinkSeed * 1.6;
+    var phase = (t + o.blinkPhase) % cycle;
+    var dur = 0.16;
+    if (phase > dur) return 0;
+    var p = phase / dur;
+    return p < 0.5 ? p * 2 : (1 - p) * 2;
+  }
+
+  function drawFace(ctx, cx, cy, coreR, t, o) {
+    var blink = blinkAmount(o, t);
+    var eyeY = cy - coreR * 0.08;
+    var eyeDX = coreR * 0.36;
+    var eyeW = coreR * 0.15;
+    var eyeH = Math.max(coreR * 0.19 * (1 - blink * 0.92), coreR * 0.02);
+    var faceColor = 'rgba(70,42,10,0.88)';
+
+    ctx.fillStyle = faceColor;
+    [-1, 1].forEach(function(dir) {
+      ctx.beginPath();
+      ctx.ellipse(cx + dir * eyeDX, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    /* gentle smile, gently breathing with the pulse */
+    var smileDepth = coreR * (0.32 + Math.sin(t * 1.8) * 0.02);
+    var mouthY = cy + coreR * 0.28;
+    ctx.beginPath();
+    ctx.strokeStyle = faceColor;
+    ctx.lineWidth = Math.max(coreR * 0.1, 1);
+    ctx.lineCap = 'round';
+    ctx.moveTo(cx - coreR * 0.34, mouthY);
+    ctx.quadraticCurveTo(cx, mouthY + smileDepth * 0.55, cx + coreR * 0.34, mouthY);
+    ctx.stroke();
   }
 
   function drawParticle(ctx, cx, cy, a, p, t, depth) {
@@ -1374,12 +1413,30 @@ function showPage(id, el) {
   if (id==='cashbook') renderCashbook();
 }
 
+/* ── ICON LIBRARY (replaces emoji) ── */
+var ICONS = {
+  dashboard:  '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  cashbook:   '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5.5A1.5 1.5 0 0 1 4 18.5v-14Z"/><path d="M8 3v16"/></svg>',
+  income:     '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"/><path d="M8 7h9v9"/></svg>',
+  expenses:   '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
+  tax:        '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M9 3V2h6v1"/><path d="m9 12 2 2 4-4"/></svg>',
+  bank:       '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9"/><path d="M3 19h18"/></svg>',
+  download:   '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>',
+  paperclip:  '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7.5 8.5 16a2.5 2.5 0 0 1-3.5-3.5L14 3.5a4 4 0 1 1 5.5 5.5L10.5 18a5.5 5.5 0 1 1-7.5-7.5L12 1.5"/></svg>',
+  file:       '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H7a1.5 1.5 0 0 0-1.5 1.5v17A1.5 1.5 0 0 0 7 22h10a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M13 2v6h6"/></svg>',
+  edit:       '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  trash:      '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M19 6l-.8 13.2A2 2 0 0 1 16.2 21H7.8a2 2 0 0 1-2-1.8L5 6"/><path d="M10 11v6M14 11v6"/></svg>',
+  success:    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.3 2.3L16 10"/></svg>',
+  error:      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--red)"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+  warning:    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><path d="M12 3.5 21.5 20h-19z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>',
+};
+
 /* ── UTILS ── */
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-GB'); } catch(e){ return d; } }
 
-function toast(ico, msg) {
-  document.getElementById('toastIco').textContent = ico;
+function toast(type, msg) {
+  document.getElementById('toastIco').innerHTML = ICONS[type] || '';
   document.getElementById('toastMsg').textContent = msg;
   var t = document.getElementById('toast');
   t.classList.add('show');
