@@ -505,9 +505,13 @@
   }
 
   async function loadAbout() {
+    /* Render fallback content immediately — don't make users or crawlers
+       wait on a network round-trip to see the page's real content. */
+    applyFallback();
+
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if (!sb) { applyFallback(); return; }
+      if (!sb) return;
 
       var res = await sb
         .from('about_page')
@@ -517,15 +521,15 @@
 
       if (res.error) throw res.error;
       var d = res.data;
-      if (!d) { applyFallback(); return; }
+      if (!d) return;
 
+      /* Only overwrite fallback if the CMS actually has content set */
       renderStory(d);
-      renderPillars(d.pillars && d.pillars.length ? d.pillars : FALLBACK.pillars);
-      renderTeam(d.team && d.team.length ? d.team : FALLBACK.team);
+      if (d.pillars && d.pillars.length) renderPillars(d.pillars);
+      if (d.team && d.team.length) renderTeam(d.team);
 
     } catch(e) {
       console.warn('About page fetch failed, using fallback:', e);
-      applyFallback();
     }
   }
 

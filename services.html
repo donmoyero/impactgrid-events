@@ -386,9 +386,13 @@
   }
 
   async function loadServices(){
+    /* Show fallback content immediately — don't leave the page blank
+       while waiting on a network round-trip. */
+    renderServices(FALLBACK_SERVICES);
+
     try{
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if(!sb){ renderServices(FALLBACK_SERVICES); return; }
+      if(!sb) return;
 
       var res = await sb
         .from('services')
@@ -397,10 +401,9 @@
         .order('sort_order', {ascending:true});
 
       if(res.error) throw res.error;
-      renderServices(res.data && res.data.length ? res.data : FALLBACK_SERVICES);
+      if(res.data && res.data.length) renderServices(res.data);
     } catch(e){
       console.warn('Services fetch failed, using fallback:', e);
-      renderServices(FALLBACK_SERVICES);
     }
   }
 
