@@ -88,6 +88,14 @@
   --sh2:     0 16px 48px rgba(0,0,0,0.10);
   --sh-gold: 0 8px 28px rgba(170,152,3,0.22);
   --sh-gold-sm: 0 4px 14px rgba(170,152,3,0.16);
+
+  /* Ink — raw RGB triplet for text/border rgba() overlays that need a
+     theme-aware base colour (used on blog.html). Light mode: dark ink. */
+  --ink: 40,32,18;
+
+  /* Surface — raw RGB triplet for translucent card/panel backgrounds
+     (e.g. blurred sticky bars) that need to sit opposite --ink. */
+  --surface: 255,255,255;
 }
 
 [data-theme="dark"] {
@@ -128,6 +136,14 @@
   --sh2:     0 16px 64px rgba(0,0,0,0.65);
   --sh-gold: 0 8px 28px rgba(200,179,4,0.28);
   --sh-gold-sm: 0 4px 14px rgba(200,179,4,0.20);
+
+  /* Dark mode: flip ink to a light tone so blog.html text/borders
+     built from rgba(var(--ink),alpha) stay legible. */
+  --ink: 240,236,228;
+
+  /* Dark mode: flip surface to a dark tone so translucent panels
+     built from rgba(var(--surface),alpha) don't stay white. */
+  --surface: 17,17,17;
 }
 
 /* ════════════════════════════════════════════════════

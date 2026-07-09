@@ -56,12 +56,12 @@
     .search-row input {
       width: 100%; max-width: 420px;
       padding: 10px 16px; border-radius: 24px;
-      border: 1.5px solid rgba(40,32,18,0.18);
+      border: 1.5px solid rgba(var(--ink),0.18);
       font-family: var(--fm); font-size: 13px; color: var(--text);
-      background: rgba(255,255,255,0.7);
+      background: rgba(var(--surface),0.7);
       outline: none; transition: border-color 0.2s;
     }
-    .search-row input::placeholder { color: rgba(40,32,18,0.38); }
+    .search-row input::placeholder { color: rgba(var(--ink),0.38); }
     .search-row input:focus { border-color: var(--gold); }
 
     .filter-row {
@@ -71,8 +71,8 @@
       font-family: var(--fm); font-size: 10px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
       padding: 6px 14px; border-radius: 20px;
-      border: 1.5px solid rgba(40,32,18,0.2);
-      color: rgba(40,32,18,0.6); background: transparent;
+      border: 1.5px solid rgba(var(--ink),0.2);
+      color: rgba(var(--ink),0.6); background: transparent;
       cursor: pointer; transition: all 0.18s;
     }
     .filter-chip:hover { border-color: var(--gold); color: var(--text); }
@@ -169,7 +169,7 @@
     .shelf-empty-msg {
       grid-column: 1 / -1;
       text-align: center;
-      font-family: var(--fm); font-size: 12px; color: rgba(40,32,18,0.4);
+      font-family: var(--fm); font-size: 12px; color: rgba(var(--ink),0.4);
       padding: 40px 0;
     }
 
@@ -203,27 +203,27 @@
       position: sticky; top: 0; left: 0; right: 0; z-index: 2010;
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 20px;
-      background: rgba(255,255,255,0.92);
+      background: rgba(var(--surface),0.92);
       backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(40,32,18,0.08);
+      border-bottom: 1px solid rgba(var(--ink),0.08);
     }
     .post-back {
       font-family: var(--fm); font-size: 11px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
-      color: rgba(40,32,18,0.65); text-decoration: none;
+      color: rgba(var(--ink),0.65); text-decoration: none;
       display: flex; align-items: center; gap: 6px;
       transition: color 0.2s; cursor: pointer; border: none; background: none;
       padding: 6px 10px; border-radius: 6px;
     }
-    .post-back:hover { color: var(--text); background: rgba(40,32,18,0.06); }
+    .post-back:hover { color: var(--text); background: rgba(var(--ink),0.06); }
     .post-topbar-right { display: flex; align-items: center; gap: 8px; }
 
     .share-btn {
       font-family: var(--fm); font-size: 10px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
       padding: 6px 14px; border-radius: 20px;
-      border: 1.5px solid rgba(40,32,18,0.2);
-      color: rgba(40,32,18,0.65); background: transparent;
+      border: 1.5px solid rgba(var(--ink),0.2);
+      color: rgba(var(--ink),0.65); background: transparent;
       cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 6px;
     }
     .share-btn:hover { border-color: var(--gold); color: var(--text); }
@@ -231,11 +231,11 @@
 
     .post-close {
       width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(20,16,10,0.06); border: 1px solid rgba(20,16,10,0.14);
+      background: rgba(var(--ink),0.06); border: 1px solid rgba(var(--ink),0.14);
       color: var(--text); font-size: 16px; display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: background 0.2s; flex-shrink: 0;
     }
-    .post-close:hover { background: rgba(20,16,10,0.12); }
+    .post-close:hover { background: rgba(var(--ink),0.12); }
 
     /* ── Hero: image + title overlaid ── */
     .post-hero-wrap {
@@ -349,9 +349,9 @@
       color: rgba(255,255,255,0.5); font-size: 13px;
       font-family: var(--fm); letter-spacing: 0.08em; text-transform: uppercase;
     }
-    .pb-caption { margin-top: 10px; font-family: var(--fm); font-size: 11px; color: rgba(40,32,18,0.55); text-align: center; }
+    .pb-caption { margin-top: 10px; font-family: var(--fm); font-size: 11px; color: rgba(var(--ink),0.55); text-align: center; }
 
-    .post-empty { text-align: center; font-family: var(--fm); font-size: 12px; color: rgba(40,32,18,0.4); padding: 60px 0; }
+    .post-empty { text-align: center; font-family: var(--fm); font-size: 12px; color: rgba(var(--ink),0.4); padding: 60px 0; }
 
     /* ── Scroll-reveal ── */
     .reveal {
@@ -367,12 +367,12 @@
     /* ── Related posts ── */
     .related-section {
       max-width: 720px; margin: 60px auto 0; padding: 0 24px;
-      border-top: 1px solid var(--border, rgba(40,32,18,0.1)); padding-top: 48px;
+      border-top: 1px solid var(--border, rgba(var(--ink),0.1)); padding-top: 48px;
     }
     .related-heading {
       font-family: var(--fm); font-size: 10px; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--text3, rgba(40,32,18,0.45)); margin-bottom: 24px;
+      color: var(--text3, rgba(var(--ink),0.45)); margin-bottom: 24px;
     }
     .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
     .related-card {
@@ -389,7 +389,7 @@
     .related-card-tag {
       font-family: var(--fm); font-size: 8px; font-weight: 700;
       letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--text3, rgba(40,32,18,0.45)); margin-bottom: 5px;
+      color: var(--text3, rgba(var(--ink),0.45)); margin-bottom: 5px;
     }
     .related-card-title {
       font-family: var(--pf); font-size: 14px; line-height: 1.3; color: var(--text);
@@ -433,24 +433,24 @@
     /* ── Comments ── */
     .comment-section {
       max-width: 720px; margin: 56px auto 0; padding: 48px 24px 0;
-      border-top: 1px solid var(--border, rgba(40,32,18,0.1));
+      border-top: 1px solid var(--border, rgba(var(--ink),0.1));
     }
     .comment-heading {
       font-family: var(--fm); font-size: 10px; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--text3, rgba(40,32,18,0.45)); margin-bottom: 22px;
+      color: var(--text3, rgba(var(--ink),0.45)); margin-bottom: 22px;
     }
     .comment-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
     .comment-item { background: var(--bg2, #f7f4ef); border-radius: 10px; padding: 16px 18px; }
     .comment-item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
     .comment-author { font-family: var(--fm); font-size: 11px; font-weight: 700; color: var(--text); }
-    .comment-date { font-family: var(--fm); font-size: 9px; color: var(--text3, rgba(40,32,18,0.4)); }
+    .comment-date { font-family: var(--fm); font-size: 9px; color: var(--text3, rgba(var(--ink),0.4)); }
     .comment-body { font-family: var(--pf); font-size: 14px; line-height: 1.55; color: var(--text2, var(--text)); white-space: pre-wrap; }
-    .comment-empty { font-family: var(--pf); font-size: 14px; color: var(--text3, rgba(40,32,18,0.5)); font-style: italic; }
+    .comment-empty { font-family: var(--pf); font-size: 14px; color: var(--text3, rgba(var(--ink),0.5)); font-style: italic; }
     .comment-form { display: flex; flex-direction: column; gap: 10px; }
     .comment-form input, .comment-form textarea {
       font-family: var(--pf); font-size: 14px; padding: 12px 14px;
-      border: 1px solid var(--border2, rgba(40,32,18,0.15)); border-radius: 8px;
+      border: 1px solid var(--border2, rgba(var(--ink),0.15)); border-radius: 8px;
       background: var(--card, #fff); color: var(--text); resize: vertical;
     }
     .comment-form input:focus, .comment-form textarea:focus { outline: none; border-color: var(--gold); }
@@ -464,7 +464,7 @@
     }
     .comment-submit-btn:hover { opacity: 0.88; }
     .comment-submit-btn:disabled { opacity: 0.5; cursor: default; }
-    .comment-status { font-family: var(--fm); font-size: 10px; color: rgba(40,32,18,0.5); }
+    .comment-status { font-family: var(--fm); font-size: 10px; color: rgba(var(--ink),0.5); }
 
     /* ── Lightbox ── */
     .lightbox {
