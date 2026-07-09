@@ -430,6 +430,42 @@
     }
     .post-cta-btn:hover { opacity: 0.88; }
 
+    /* ── Comments ── */
+    .comment-section {
+      max-width: 720px; margin: 56px auto 0; padding: 48px 24px 0;
+      border-top: 1px solid rgba(40,32,18,0.1);
+    }
+    .comment-heading {
+      font-family: var(--fm); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(40,32,18,0.45); margin-bottom: 22px;
+    }
+    .comment-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+    .comment-item { background: #f7f4ef; border-radius: 10px; padding: 16px 18px; }
+    .comment-item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .comment-author { font-family: var(--fm); font-size: 11px; font-weight: 700; color: var(--text); }
+    .comment-date { font-family: var(--fm); font-size: 9px; color: rgba(40,32,18,0.4); }
+    .comment-body { font-family: var(--pf); font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-wrap; }
+    .comment-empty { font-family: var(--pf); font-size: 14px; color: rgba(40,32,18,0.5); font-style: italic; }
+    .comment-form { display: flex; flex-direction: column; gap: 10px; }
+    .comment-form input, .comment-form textarea {
+      font-family: var(--pf); font-size: 14px; padding: 12px 14px;
+      border: 1px solid rgba(40,32,18,0.15); border-radius: 8px;
+      background: #fff; color: var(--text); resize: vertical;
+    }
+    .comment-form input:focus, .comment-form textarea:focus { outline: none; border-color: var(--gold); }
+    .comment-submit-btn {
+      align-self: flex-start;
+      font-family: var(--fm); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 11px 24px; border-radius: 24px;
+      background: var(--gold, #b8964a); color: #fff;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .comment-submit-btn:hover { opacity: 0.88; }
+    .comment-submit-btn:disabled { opacity: 0.5; cursor: default; }
+    .comment-status { font-family: var(--fm); font-size: 10px; color: rgba(40,32,18,0.5); }
+
     /* ── Lightbox ── */
     .lightbox {
       position: fixed; inset: 0; z-index: 3000;
@@ -533,6 +569,8 @@
           <span id="postDate"></span>
           <span class="post-meta-dot" id="postMetaDot" style="display:none">·</span>
           <span id="postReadTime"></span>
+          <span class="post-meta-dot" id="postMetaDot2" style="display:none">·</span>
+          <span id="postViewCount"></span>
         </div>
       </div>
     </div>
@@ -543,6 +581,18 @@
     <div class="related-section" id="relatedSection" style="display:none">
       <div class="related-heading">More stories</div>
       <div class="related-grid" id="relatedGrid"></div>
+    </div>
+
+    <!-- Comments -->
+    <div class="comment-section" id="commentSection">
+      <div class="comment-heading">Comments (<span id="commentCount">0</span>)</div>
+      <div class="comment-list" id="commentList"></div>
+      <form class="comment-form" id="commentForm">
+        <input type="text" id="commentName" placeholder="Your name" maxlength="60" required>
+        <textarea id="commentBody" placeholder="Share your thoughts…" rows="3" maxlength="1000" required></textarea>
+        <button type="submit" class="comment-submit-btn" id="commentSubmitBtn">Post comment</button>
+        <span class="comment-status" id="commentStatus"></span>
+      </form>
     </div>
 
     <!-- End CTA -->
@@ -833,6 +883,59 @@
     })();
   }
 
+  function loadViewCount(postId) {
+    if (!postId) return;
+    (async function() {
+      try {
+        var sb = getContentClient();
+        var { count, error } = await sb
+          .from('blog_views')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', postId);
+        var el = document.getElementById('postViewCount');
+        var dot = document.getElementById('postMetaDot2');
+        if (error || count == null) { el.textContent = ''; dot.style.display = 'none'; return; }
+        el.textContent = count + (count === 1 ? ' view' : ' views');
+        dot.style.display = 'inline';
+      } catch (e) { console.warn('View count failed:', e); }
+    })();
+  }
+
+  function loadComments(postId) {
+    if (!postId) return;
+    var listEl = document.getElementById('commentList');
+    var countEl = document.getElementById('commentCount');
+    listEl.innerHTML = '<div class="comment-empty">Loading comments…</div>';
+    (async function() {
+      try {
+        var sb = getContentClient();
+        var { data, error } = await sb
+          .from('blog_comments')
+          .select('*')
+          .eq('post_id', postId)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        countEl.textContent = (data || []).length;
+        if (!data || !data.length) {
+          listEl.innerHTML = '<div class="comment-empty">No comments yet — be the first to share your thoughts.</div>';
+          return;
+        }
+        listEl.innerHTML = data.map(function(c) {
+          return '<div class="comment-item">' +
+            '<div class="comment-item-head">' +
+              '<span class="comment-author">' + esc(c.name) + '</span>' +
+              '<span class="comment-date">' + formatDate(c.created_at) + '</span>' +
+            '</div>' +
+            '<div class="comment-body">' + esc(c.comment) + '</div>' +
+          '</div>';
+        }).join('');
+      } catch (e) {
+        console.warn('Load comments failed:', e);
+        listEl.innerHTML = '<div class="comment-empty">Couldn\u2019t load comments right now.</div>';
+      }
+    })();
+  }
+
   /* ── Open post ── */
   function openPost(i) {
     activePost = posts[i];
@@ -864,6 +967,8 @@
     renderPostBody();
     renderRelated();
     trackBlogView(activePost.id);
+    loadViewCount(activePost.id);
+    loadComments(activePost.id);
 
     document.getElementById('postView').classList.add('show');
     document.getElementById('postView').scrollTop = 0;
@@ -949,6 +1054,38 @@
 
   document.getElementById('postCloseBtn').addEventListener('click', closePost);
   document.getElementById('postBackBtn').addEventListener('click', closePost);
+
+  document.getElementById('commentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!activePost) return;
+    var nameEl = document.getElementById('commentName');
+    var bodyEl = document.getElementById('commentBody');
+    var btn = document.getElementById('commentSubmitBtn');
+    var status = document.getElementById('commentStatus');
+    var name = nameEl.value.trim();
+    var body = bodyEl.value.trim();
+    if (!name || !body) return;
+    btn.disabled = true;
+    status.textContent = 'Posting…';
+    (async function() {
+      try {
+        var sb = getContentClient();
+        var { error } = await sb.from('blog_comments').insert({
+          post_id: activePost.id, name: name, comment: body
+        });
+        if (error) throw error;
+        nameEl.value = '';
+        bodyEl.value = '';
+        status.textContent = '';
+        loadComments(activePost.id);
+      } catch (err) {
+        console.warn('Comment submit failed:', err);
+        status.textContent = 'Something went wrong — please try again.';
+      } finally {
+        btn.disabled = false;
+      }
+    })();
+  });
   document.addEventListener('keydown', function(e){
     if (e.key === 'Escape') {
       if (document.getElementById('lightbox').classList.contains('show')) {
