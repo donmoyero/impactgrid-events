@@ -2658,8 +2658,23 @@ var VT = (function(){
 
   async function deleteCampaign(id, name){
     if(!confirm('Delete "'+name+'"?\n\nThis will permanently remove the form and all its registrations. This cannot be undone.')) return;
-    var { error } = await getSupabase().from('campaigns').delete().eq('id', id);
+    var sb = getSupabase();
+
+    // Grab page_design first so we can clean up its images from storage
+    var { data: row } = await sb.from('campaigns').select('page_design').eq('id', id).single();
+
+    var { error } = await sb.from('campaigns').delete().eq('id', id);
     if(error){ toast('','Could not delete', error.message); return; }
+
+    if(row && row.page_design){
+      var text = JSON.stringify(row.page_design);
+      var marker = '/campaign-assets/';
+      var re = new RegExp(marker.replace(/\//g,'\\/') + '([^"\\\\]+)', 'g');
+      var m, paths = [];
+      while((m = re.exec(text)) !== null){ paths.push(decodeURIComponent(m[1])); }
+      if(paths.length) await sb.storage.from('campaign-assets').remove(paths);
+    }
+
     toast('','Form deleted', name);
     await loadCampaigns();
   }
@@ -3609,8 +3624,23 @@ async function deleteService(id, title){
   if(!confirm('Delete "'+title+'"? This cannot be undone.')) return;
   try {
     var sb = getSupabase();
+
+    // Look up the image path before deleting the row, so we can clean up storage too
+    var { data: row } = await sb.from('services').select('image_url').eq('id', id).single();
+
     var res = await sb.from('services').delete().eq('id', id);
     if(res.error) throw res.error;
+
+    // Remove the associated file from storage, if any
+    if(row && row.image_url){
+      var marker = '/site-media/';
+      var idx = row.image_url.indexOf(marker);
+      if(idx !== -1){
+        var storagePath = row.image_url.substring(idx + marker.length);
+        await sb.storage.from('site-media').remove([storagePath]);
+      }
+    }
+
     toast('', 'Service deleted', title);
     loadServices();
   } catch(e){
