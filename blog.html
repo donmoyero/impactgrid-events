@@ -19,9 +19,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
 
-  <!-- Google AdSense — only loaded on this page, so ads only ever appear here -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082" crossorigin="anonymous"></script>
-
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -323,31 +320,8 @@
     }
 
     .post-body { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; display: flex; flex-direction: column; gap: 40px; }
-
-    /* Post layout: main column + sticky sidebar ad (post view only) */
-    .post-layout {
-      max-width: 1060px; margin: 0 auto; padding: 0 24px;
-      display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 8px;
-      align-items: start;
-    }
-    .post-layout .post-body,
-    .post-layout .related-section,
-    .post-layout .comment-section,
-    .post-layout .post-cta { padding-left: 0; padding-right: 0; }
-    .post-sidebar { position: sticky; top: 88px; }
-    .ad-slot {
-      background: var(--bg2); border: 1px solid var(--border2, rgba(var(--ink),0.1));
-      border-radius: 10px; padding: 12px; min-height: 250px;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-    }
-    .ad-label {
-      font-family: var(--fm); font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text3, rgba(var(--ink),0.45)); align-self: flex-start;
-    }
-    @media (max-width: 980px) {
-      .post-layout { grid-template-columns: 1fr; padding: 0; }
-      .post-sidebar { display: none; }
-    }
+    .post-ad-slot { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .post-ad-slot:empty { display: none; }
 
     .post-block { position: relative; }
 
@@ -601,50 +575,36 @@
       </div>
     </div>
 
-    <div class="post-layout">
-      <div class="post-main">
-        <div class="post-body" id="postBody"></div>
+    <div class="post-body" id="postBody"></div>
 
-        <!-- Related posts -->
-        <div class="related-section" id="relatedSection" style="display:none">
-          <div class="related-heading">More stories</div>
-          <div class="related-grid" id="relatedGrid"></div>
-        </div>
+    <!-- Infolinks ad — script is injected dynamically only when a post is opened -->
+    <div class="post-ad-slot" id="postAdSlot"></div>
 
-        <!-- Comments -->
-        <div class="comment-section" id="commentSection">
-          <div class="comment-heading">Comments (<span id="commentCount">0</span>)</div>
-          <div class="comment-list" id="commentList"></div>
-          <form class="comment-form" id="commentForm">
-            <input type="text" id="commentName" placeholder="Your name" maxlength="60" required>
-            <textarea id="commentBody" placeholder="Share your thoughts…" rows="3" maxlength="1000" required></textarea>
-            <button type="submit" class="comment-submit-btn" id="commentSubmitBtn">Post comment</button>
-            <span class="comment-status" id="commentStatus"></span>
-          </form>
-        </div>
+    <!-- Related posts -->
+    <div class="related-section" id="relatedSection" style="display:none">
+      <div class="related-heading">More stories</div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </div>
 
-        <!-- End CTA -->
-        <div class="post-cta">
-          <div class="post-cta-inner">
-            <div class="post-cta-label">Work with us</div>
-            <div class="post-cta-heading">Ready to make an impact?</div>
-            <a class="post-cta-btn" href="book-us.html">Book a session →</a>
-          </div>
-        </div>
+    <!-- Comments -->
+    <div class="comment-section" id="commentSection">
+      <div class="comment-heading">Comments (<span id="commentCount">0</span>)</div>
+      <div class="comment-list" id="commentList"></div>
+      <form class="comment-form" id="commentForm">
+        <input type="text" id="commentName" placeholder="Your name" maxlength="60" required>
+        <textarea id="commentBody" placeholder="Share your thoughts…" rows="3" maxlength="1000" required></textarea>
+        <button type="submit" class="comment-submit-btn" id="commentSubmitBtn">Post comment</button>
+        <span class="comment-status" id="commentStatus"></span>
+      </form>
+    </div>
+
+    <!-- End CTA -->
+    <div class="post-cta">
+      <div class="post-cta-inner">
+        <div class="post-cta-label">Work with us</div>
+        <div class="post-cta-heading">Ready to make an impact?</div>
+        <a class="post-cta-btn" href="book-us.html">Book a session →</a>
       </div>
-
-      <!-- Sidebar ad — only rendered inside the post reading view -->
-      <aside class="post-sidebar" id="postSidebar">
-        <div class="ad-slot">
-          <span class="ad-label">Advertisement</span>
-          <ins class="adsbygoogle"
-               style="display:block"
-               data-ad-client="ca-pub-4028190825342082"
-               data-ad-slot="5654088833"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
-        </div>
-      </aside>
     </div>
   </div>
 
@@ -1017,11 +977,27 @@
     document.getElementById('postView').scrollTop = 0;
     document.body.style.overflow = 'hidden';
 
+    loadInfolinksAd();
+
     pushPostState(activePost);
     injectJsonLd(activePost);
     initReveal();
     startProgress();
   }
+
+  /* ── Infolinks ad (post view only, loaded once) ── */
+  var infolinksLoaded = false;
+  function loadInfolinksAd() {
+    if (infolinksLoaded) return;
+    infolinksLoaded = true;
+    window.infolinks_pid = 3446473;
+    window.infolinks_wsid = 0;
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.src = 'https://resources.infolinks.com/js/infolinks_main.js';
+    document.getElementById('postAdSlot').appendChild(s);
+  }
+
 
   /* ── Reading progress bar ── */
   var _progressListener = null;
@@ -1328,9 +1304,6 @@
   } else {
     loadPosts();
   }
-
-  // Render the sidebar ad (post view only — this slot doesn't exist elsewhere on the site)
-  try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { console.warn('AdSense failed to load:', e); }
   </script>
 
 </body>
