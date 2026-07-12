@@ -1280,6 +1280,13 @@ async function enterGallery(){
   /* Show review FAB once gallery is visible */
   if (typeof initReviewFab === 'function' && eventData) {
     initReviewFab(eventData.id, eventData.name);
+
+    /* Deep-link support: emailed review requests link here with ?review=1
+       so guests land straight in the review modal instead of hunting for the FAB. */
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('review') === '1') {
+      setTimeout(function(){ openReviewModal(); }, 400);
+    }
   }
 }
 

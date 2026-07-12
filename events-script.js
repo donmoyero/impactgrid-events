@@ -947,6 +947,7 @@ function renderRequestsTable(data){
           + '<td><div class="td-actions">'
           + (r.status !== 'approved' ? '<button class="btn btn-green btn-sm" onclick="approveRequest(\'' + r.id + '\',\'' + esc(r.user_email) + '\',\'' + r.event_id + '\')">✓ Approve</button>' : '')
           + (r.status !== 'rejected' ? '<button class="btn btn-red btn-sm" onclick="rejectRequest(\'' + r.id + '\')">✕ Reject</button>' : '')
+          + (r.status === 'approved' ? '<button class="btn btn-sm" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);" onclick="sendReviewRequest(\'' + r.id + '\',\'' + esc(r.user_email) + '\')">⭐ Send Review Request</button>' : '')
           + '</div></td></tr>';
       }).join('')
     + '</tbody></table>';
@@ -976,6 +977,23 @@ async function rejectRequest(id){
   await updateDoc(doc(db, 'download_requests', id), { status: 'rejected' });
   toast('🗑️', 'Request rejected', '');
   loadDownloadRequests();
+}
+
+async function sendReviewRequest(id, email){
+  if(!confirm('Send a review request email to ' + email + ' now?')) return;
+  toast('📤', 'Sending…', '', true);
+  try{
+    var res  = await fetch(EVENTS_API + '/api/send-review-request', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ requestId: id })
+    });
+    var data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Server error');
+    toast('✅', 'Review request sent!', email + ' will get an email asking for a review');
+  }catch(e){
+    toast('⚠️', 'Failed to send', e.message);
+  }
 }
 
 /* ════════════════════════════════════════════════════

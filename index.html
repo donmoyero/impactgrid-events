@@ -1031,7 +1031,9 @@
   <!-- WHY US -->
   <section class="testimonials" id="why">
     <div class="testimonials-inner">
-      <div class="quotes-grid">
+      <div class="quotes-grid" id="quotesGrid">
+        <!-- Populated from Supabase event_reviews (approved=true) by loadHomepageReviews() below.
+             Falls back to these default cards if there are no approved reviews yet. -->
         <div class="quote-card">
           <div class="quote-stars">★★★★★</div>
           <p class="quote-text">"Great photography needs great delivery. We bring the creative eye and the systems to make sure nothing is lost after the last song plays."</p>
@@ -1093,6 +1095,52 @@
 
   <script>
   /* ── Newsletter signup ── */
+  /* ── Live homepage reviews ── */
+  async function loadHomepageReviews(){
+    var grid = document.getElementById('quotesGrid');
+    if(!grid) return;
+
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if(!sb) return; // keep default cards already in the markup
+
+      var { data, error } = await sb
+        .from('event_reviews')
+        .select('reviewer_name, event_name, rating, message')
+        .eq('approved', true)
+        .not('message', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(9);
+
+      if(error || !data || !data.length) return; // keep default cards
+
+      function esc(s){
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+      function stars(n){
+        n = Math.max(0, Math.min(5, n || 5));
+        return '★★★★★☆☆☆☆☆'.slice(5 - n, 10 - n);
+      }
+
+      grid.innerHTML = data.map(function(r){
+        return '<div class="quote-card">' +
+          '<div class="quote-stars">' + stars(r.rating) + '</div>' +
+          '<p class="quote-text">"' + esc(r.message) + '"</p>' +
+          '<div class="quote-author">' +
+            '<div>' +
+              '<div class="quote-name">' + esc(r.reviewer_name || 'Verified Guest') + '</div>' +
+              (r.event_name ? '<div class="quote-role">' + esc(r.event_name) + '</div>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch(e) {
+      console.warn('[reviews] Falling back to default testimonials:', e.message);
+      // leave default cards in place
+    }
+  }
+  loadHomepageReviews();
+
   async function submitNewsletter(){
     var input = document.getElementById('nlEmail');
     var btn   = document.getElementById('nlBtn');
