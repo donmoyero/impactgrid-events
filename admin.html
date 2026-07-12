@@ -302,6 +302,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico"></span>Create Event</a>
         <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico"></span>Upload Photos</a>
         <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico"></span>Reviews<span class="sb-badge" id="reviewsBadge" style="display:none;">0</span></a>
+        <a href="#" onclick="return nav('reviewemails',this)"><span class="sb-ico"></span>Send Review Request</a>
         <a href="#" onclick="return nav('bookings',this)"><span class="sb-ico"></span>Bookings<span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></a>
       </nav>
     </div>
@@ -1372,6 +1373,108 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
+    <!--  REVIEW EDIT MODAL  -->
+    <div id="reviewEditModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <h2 style="font-size:16px;font-weight:900;">Edit Review</h2>
+          <button onclick="closeReviewEditModal()" style="font-size:18px;color:var(--text3);background:none;border:none;cursor:pointer;line-height:1;">✕</button>
+        </div>
+        <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
+          <input type="hidden" id="revEdit-id"/>
+          <input type="hidden" id="revEdit-rating" value="5"/>
+
+          <div class="field-group">
+            <div class="field-label">Rating</div>
+            <div id="revEdit-starPicker" style="font-size:26px;color:var(--gold);letter-spacing:4px;cursor:pointer;">
+              <span class="star-pick" data-v="1" onclick="_setEditStars(1)">☆</span><span class="star-pick" data-v="2" onclick="_setEditStars(2)">☆</span><span class="star-pick" data-v="3" onclick="_setEditStars(3)">☆</span><span class="star-pick" data-v="4" onclick="_setEditStars(4)">☆</span><span class="star-pick" data-v="5" onclick="_setEditStars(5)">☆</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Reviewer Name</div>
+            <input type="text" id="revEdit-reviewer" placeholder="e.g. Sarah O."/>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Event Name</div>
+            <input type="text" id="revEdit-event" placeholder="e.g. Ade & Bola's Wedding"/>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Review Message</div>
+            <textarea id="revEdit-message" rows="4" placeholder="What the guest said…"></textarea>
+          </div>
+
+          <button id="revEdit-saveBtn" class="btn btn-gold" onclick="saveReviewEdit()" style="width:100%;">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!--  SEND REVIEW REQUEST  -->
+    <div class="page" id="page-reviewemails">
+      <div class="page-header">
+        <div class="page-title">Send Review Request</div>
+        <div class="page-sub">Every review-request email your system has sent — automatic, cron, or manual — plus a form to send one to any email address on demand.</div>
+      </div>
+
+      <div class="ws-layout">
+        <div>
+          <div id="review-emails-table-wrap">
+            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+          </div>
+        </div>
+
+        <div class="ws-sticky">
+          <div class="card" style="padding:18px;">
+            <h2 style="font-size:15px;font-weight:900;margin-bottom:12px;">✍️ Send to Any Email</h2>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="field-group">
+                <div class="field-label">Guest Email *</div>
+                <input type="email" id="adhoc-email" placeholder="guest@email.com"/>
+              </div>
+              <div class="field-group">
+                <div class="field-label">Event Name</div>
+                <input type="text" id="adhoc-event-name" placeholder="e.g. Ade & Bola's Wedding"/>
+              </div>
+              <div class="field-group">
+                <div class="field-label">Event Gallery Link *</div>
+                <input type="text" id="adhoc-event-url" placeholder="https://.../event.html?event=...&code=..."/>
+              </div>
+              <button id="adhoc-sendBtn" class="btn btn-gold" onclick="sendAdhocReviewRequest()">⭐ Send Review Request</button>
+            </div>
+          </div>
+          <div class="hint-box" style="margin-top:10px;">
+            <strong>Where to find the gallery link</strong><br><br>
+            Copy it from the <strong>All Events</strong> page — each event's "👁 View Event" link is the gallery URL guests use.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  REVIEW EMAIL VIEW/RESEND MODAL  -->
+    <div id="reviewEmailModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <h2 style="font-size:16px;font-weight:900;">Review Request Email</h2>
+          <button onclick="closeReviewEmailModal()" style="font-size:18px;color:var(--text3);background:none;border:none;cursor:pointer;line-height:1;">✕</button>
+        </div>
+        <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
+          <input type="hidden" id="remail-id"/>
+          <div style="font-size:12px;color:var(--text3);">
+            To: <strong id="remail-to" style="color:var(--text);"></strong><br>
+            Event: <strong id="remail-event" style="color:var(--text);"></strong><br>
+            Status: <span id="remail-status"></span>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Message (edit before resending if you like)</div>
+            <textarea id="remail-message" rows="5"></textarea>
+          </div>
+          <button id="remail-resendBtn" class="btn btn-gold" onclick="resendReviewEmailFromModal()" style="width:100%;">📤 Resend</button>
+        </div>
+      </div>
+    </div>
+
 
   <!-- BUSINESS SETTINGS PAGE -->
   <div class="page" id="page-bizsettings">
@@ -1639,6 +1742,7 @@ If you have any questions, just reply to this email.
 <!-- Events management (Firebase Firestore + Cloudinary) -->
 <script src="events-script.js"></script>
 <script src="reviews-script.js"></script>
+<script src="review-emails-script.js"></script>
 
 <script>
 /*  CONFIG  */
@@ -1704,6 +1808,7 @@ function nav(id,el){
     uploadphotos:'loadUploadPhotos',
     downloadrequests:'loadDownloadRequests',
     reviews:'loadEventReviews',
+    reviewemails:'loadReviewEmailLog',
     hero:'loadAllHomepageSections',
     bookings:'loadBookings',
     vouchers:'initVouchersPage',

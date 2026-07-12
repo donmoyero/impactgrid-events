@@ -172,11 +172,77 @@
             (isPending
               ? '<button id="rev-approve-' + r.id + '" class="btn btn-green btn-sm" onclick="approveReview(\'' + r.id + '\')">✓ Approve</button>'
               : '') +
+            '<button class="btn btn-ghost btn-sm" onclick="editReview(\'' + r.id + '\')">✏ Edit</button>' +
             '<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteReview(\'' + r.id + '\')">🗑 Delete</button>' +
           '</div>' +
         '</div>' +
       '</div>';
     }).join('');
   }
+
+  /* ── Edit ───────────────────────────────────────────────── */
+  window.editReview = function (id) {
+    var r = _reviews.find(function (x) { return x.id === id; });
+    if (!r) return;
+
+    document.getElementById('revEdit-id').value          = r.id;
+    document.getElementById('revEdit-reviewer').value     = r.reviewer_name || '';
+    document.getElementById('revEdit-event').value        = r.event_name || '';
+    document.getElementById('revEdit-message').value      = r.message || '';
+    _setEditStars(r.rating || 5);
+
+    var modal = document.getElementById('reviewEditModal');
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.closeReviewEditModal = function () {
+    var modal = document.getElementById('reviewEditModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  var _editRating = 5;
+  window._setEditStars = _setEditStars;
+  function _setEditStars(n) {
+    _editRating = n;
+    document.getElementById('revEdit-rating').value = n;
+    var stars = document.querySelectorAll('#revEdit-starPicker .star-pick');
+    stars.forEach(function (s) {
+      var v = parseInt(s.getAttribute('data-v'), 10);
+      s.textContent = v <= n ? '★' : '☆';
+    });
+  }
+
+  window.saveReviewEdit = async function () {
+    var id       = document.getElementById('revEdit-id').value;
+    var btn      = document.getElementById('revEdit-saveBtn');
+    var reviewer = document.getElementById('revEdit-reviewer').value.trim();
+    var eventNm  = document.getElementById('revEdit-event').value.trim();
+    var message  = document.getElementById('revEdit-message').value.trim();
+    var rating   = parseInt(document.getElementById('revEdit-rating').value, 10) || 5;
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    try {
+      var { error } = await getSupabase()
+        .from('event_reviews')
+        .update({
+          reviewer_name: reviewer || null,
+          event_name   : eventNm || null,
+          message      : message || null,
+          rating       : rating
+        })
+        .eq('id', id);
+      if (error) throw error;
+
+      var r = _reviews.find(function (x) { return x.id === id; });
+      if (r) { r.reviewer_name = reviewer; r.event_name = eventNm; r.message = message; r.rating = rating; }
+      _renderTable();
+      closeReviewEditModal();
+      toast('✅', 'Review updated', '');
+    } catch (e) {
+      toast('❌', 'Failed to save', e.message);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+    }
+  };
 
 })();
