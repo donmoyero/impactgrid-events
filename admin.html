@@ -302,6 +302,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico"></span>Create Event</a>
         <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico"></span>Upload Photos</a>
         <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico"></span>Reviews</a>
+        <a href="#" onclick="return nav('brandpartners',this)"><span class="sb-ico"></span>Brand Partners</a>
         <a href="#" onclick="return nav('bookings',this)"><span class="sb-ico"></span>Bookings<span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></a>
       </nav>
     </div>
@@ -1392,6 +1393,34 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
+    <!--  BRAND PARTNERS  -->
+    <div class="page" id="page-brandpartners">
+      <div class="page-header">
+        <div class="page-title">Brand Partners</div>
+        <div class="page-sub">Upload logos of brands that work with you. They appear on the homepage, under the trust badges — logos only, no heading.</div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;padding:18px;">
+        <h2 style="font-size:15px;font-weight:900;margin-bottom:12px;">Upload a Logo</h2>
+        <input type="file" id="brandLogoFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="handleBrandLogoFile(event)" style="display:none;"/>
+        <button class="btn btn-gold" onclick="document.getElementById('brandLogoFile').click()">📤 Upload Logo</button>
+        <div id="brandUploadProg" style="display:none;margin-top:10px;">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px;" id="brandUploadName"></div>
+          <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;"><div id="brandUploadBar" style="height:100%;width:0%;background:var(--gold);transition:width .2s;"></div></div>
+        </div>
+        <div class="field-hint" style="margin-top:8px;">PNG, JPG, WebP or SVG. Transparent-background PNGs look best against the dark homepage strip.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Uploaded Logos</h2></div>
+        <div class="card-body">
+          <div id="brandPartnersList">
+            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!--  REVIEW EDIT MODAL  -->
     <div id="reviewEditModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
       <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
@@ -1721,6 +1750,7 @@ If you have any questions, just reply to this email.
 <script src="events-script.js"></script>
 <script src="reviews-script.js"></script>
 <script src="review-emails-script.js"></script>
+<script src="brand-partners-script.js"></script>
 
 <script>
 /*  CONFIG  */
@@ -1786,6 +1816,7 @@ function nav(id,el){
     uploadphotos:'loadUploadPhotos',
     downloadrequests:'loadDownloadRequests',
     reviews:'loadReviewsPage',
+    brandpartners:'loadBrandPartnersAdmin',
     hero:'loadAllHomepageSections',
     bookings:'loadBookings',
     vouchers:'initVouchersPage',

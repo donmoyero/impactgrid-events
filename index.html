@@ -349,22 +349,22 @@
       gap: 14px;
     }
     .trust-icon {
-      width: 46px;
-      height: 46px;
+      width: 64px;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
     }
     .trust-icon svg { width: 100%; height: 100%; }
-    .icon-green-fill { color: #1a9c4a; }
-    .icon-gold-fill  { color: var(--gold); }
-    .icon-gold-circle {
-      border-radius: 50%;
-      background: var(--gold);
-      padding: 11px;
+    .seal-green polygon { fill: #1a9c4a; }
+    .seal-gold  polygon { fill: var(--gold); }
+    .badge-ring {
+      fill: none;
+      stroke: rgba(255,255,255,0.35);
+      stroke-width: 1;
     }
-    .icon-gold-circle svg { width: 24px; height: 24px; }
     .trust-label {
       font-size: 13px;
       font-weight: 600;
@@ -375,6 +375,31 @@
     }
     @media (max-width: 700px) {
       .trust-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── BRAND PARTNERS STRIP ──────────────────────── */
+    .partners-strip {
+      padding: 0 40px 70px;
+    }
+    .partners-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+    }
+    .partner-logo {
+      max-height: 42px;
+      max-width: 140px;
+      width: auto;
+      object-fit: contain;
+      opacity: 0.85;
+      transition: opacity .2s;
+    }
+    .partner-logo:hover {
+      opacity: 1;
     }
 
     /* ── GALLERY STRIP ─────────────────────────────── */
@@ -1054,30 +1079,35 @@
   <section class="trust-strip">
     <div class="trust-inner">
       <div class="trust-item">
-        <span class="trust-icon icon-green-fill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="trust-icon">
+          <svg viewBox="0 0 64 64" class="seal-green"><polygon points="32.0,2.0 36.1,6.3 41.3,3.5 43.8,8.8 49.6,7.7 50.4,13.6 56.3,14.4 55.2,20.2 60.5,22.7 57.7,27.9 62.0,32.0 57.7,36.1 60.5,41.3 55.2,43.8 56.3,49.6 50.4,50.4 49.6,56.3 43.8,55.2 41.3,60.5 36.1,57.7 32.0,62.0 27.9,57.7 22.7,60.5 20.2,55.2 14.4,56.3 13.6,50.4 7.7,49.6 8.8,43.8 3.5,41.3 6.3,36.1 2.0,32.0 6.3,27.9 3.5,22.7 8.8,20.2 7.7,14.4 13.6,13.6 14.4,7.7 20.2,8.8 22.7,3.5 27.9,6.3"/><circle cx="32" cy="32" r="22" class="badge-ring"/><path d="M22 33l7 7 13-15" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
         <span class="trust-label">100% Satisfaction<br>Guarantee</span>
       </div>
       <div class="trust-item">
-        <span class="trust-icon icon-gold-fill">
-          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M1 7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3h3.5a1 1 0 0 1 .8.4l2.2 3a1 1 0 0 1 .5.85V17a1 1 0 0 1-1 1h-1.2a2.5 2.5 0 0 1-4.6 0H8.8a2.5 2.5 0 0 1-4.6 0H3a1 1 0 0 1-1-1z"/><circle cx="6.5" cy="18.5" r="1.6" fill="#fff"/><circle cx="17.5" cy="18.5" r="1.6" fill="#fff"/></svg>
+        <span class="trust-icon">
+          <svg viewBox="0 0 64 64" class="seal-gold"><polygon points="32.0,2.0 36.1,6.3 41.3,3.5 43.8,8.8 49.6,7.7 50.4,13.6 56.3,14.4 55.2,20.2 60.5,22.7 57.7,27.9 62.0,32.0 57.7,36.1 60.5,41.3 55.2,43.8 56.3,49.6 50.4,50.4 49.6,56.3 43.8,55.2 41.3,60.5 36.1,57.7 32.0,62.0 27.9,57.7 22.7,60.5 20.2,55.2 14.4,56.3 13.6,50.4 7.7,49.6 8.8,43.8 3.5,41.3 6.3,36.1 2.0,32.0 6.3,27.9 3.5,22.7 8.8,20.2 7.7,14.4 13.6,13.6 14.4,7.7 20.2,8.8 22.7,3.5 27.9,6.3"/><circle cx="32" cy="32" r="22" class="badge-ring"/><g fill="#fff" transform="translate(15,20)"><path d="M1 5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3h3.5a1 1 0 0 1 .8.4l2.2 3a1 1 0 0 1 .5.85V15a1 1 0 0 1-1 1h-1.2a2.5 2.5 0 0 1-4.6 0H8.8a2.5 2.5 0 0 1-4.6 0H3a1 1 0 0 1-1-1z"/><circle cx="6.5" cy="16.5" r="1.6" fill-opacity=".9"/><circle cx="17.5" cy="16.5" r="1.6" fill-opacity=".9"/></g></svg>
         </span>
         <span class="trust-label">Fast, Reliable<br>Delivery</span>
       </div>
       <div class="trust-item">
-        <span class="trust-icon icon-green-fill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l8 3.5v6c0 5-3.5 8.5-8 10.5C7.5 19.5 4 16 4 11V5.5L12 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="trust-icon">
+          <svg viewBox="0 0 64 64" class="seal-green"><polygon points="32.0,2.0 36.1,6.3 41.3,3.5 43.8,8.8 49.6,7.7 50.4,13.6 56.3,14.4 55.2,20.2 60.5,22.7 57.7,27.9 62.0,32.0 57.7,36.1 60.5,41.3 55.2,43.8 56.3,49.6 50.4,50.4 49.6,56.3 43.8,55.2 41.3,60.5 36.1,57.7 32.0,62.0 27.9,57.7 22.7,60.5 20.2,55.2 14.4,56.3 13.6,50.4 7.7,49.6 8.8,43.8 3.5,41.3 6.3,36.1 2.0,32.0 6.3,27.9 3.5,22.7 8.8,20.2 7.7,14.4 13.6,13.6 14.4,7.7 20.2,8.8 22.7,3.5 27.9,6.3"/><circle cx="32" cy="32" r="22" class="badge-ring"/><path d="M32 18l8 3.5v6c0 5-3.5 8.5-8 10.5-4.5-2-8-5.5-8-10.5v-6l8-3.5z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
         <span class="trust-label">Secure Online<br>Booking</span>
       </div>
       <div class="trust-item">
-        <span class="trust-icon icon-gold-circle">
-          <svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M12 4.5l2.3 4.9 5.3.7-3.9 3.7.95 5.3L12 16.6l-4.65 2.5.95-5.3-3.9-3.7 5.3-.7z"/></svg>
+        <span class="trust-icon">
+          <svg viewBox="0 0 64 64" class="seal-gold"><polygon points="32.0,2.0 36.1,6.3 41.3,3.5 43.8,8.8 49.6,7.7 50.4,13.6 56.3,14.4 55.2,20.2 60.5,22.7 57.7,27.9 62.0,32.0 57.7,36.1 60.5,41.3 55.2,43.8 56.3,49.6 50.4,50.4 49.6,56.3 43.8,55.2 41.3,60.5 36.1,57.7 32.0,62.0 27.9,57.7 22.7,60.5 20.2,55.2 14.4,56.3 13.6,50.4 7.7,49.6 8.8,43.8 3.5,41.3 6.3,36.1 2.0,32.0 6.3,27.9 3.5,22.7 8.8,20.2 7.7,14.4 13.6,13.6 14.4,7.7 20.2,8.8 22.7,3.5 27.9,6.3"/><circle cx="32" cy="32" r="22" class="badge-ring"/><path d="M32 20.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L32 35.6l-5.9 3.1 1.2-6.6-4.8-4.6 6.6-.9z" fill="#fff"/></svg>
         </span>
         <span class="trust-label">Verified Client<br>Reviews</span>
       </div>
     </div>
+  </section>
+
+  <!-- BRAND PARTNERS (logos only, no heading — populated from admin) -->
+  <section class="partners-strip" id="partnersStrip" style="display:none;">
+    <div class="partners-inner" id="partnersInner"></div>
   </section>
 
   <!-- CTA -->
@@ -1140,6 +1170,37 @@
     }
   }
   loadHomepageReviews();
+
+  /* ── Brand partner logos (admin-uploaded, no heading) ──── */
+  async function loadBrandPartners(){
+    var strip = document.getElementById('partnersStrip');
+    var inner = document.getElementById('partnersInner');
+    if(!strip || !inner) return;
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if(!sb) return;
+
+      var { data, error } = await sb
+        .from('brand_partners')
+        .select('name, logo_url')
+        .order('position', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: true });
+
+      if(error || !data || !data.length) return; // keep hidden
+
+      function esc(s){
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      inner.innerHTML = data.map(function(p){
+        return '<img class="partner-logo" src="' + esc(p.logo_url) + '" alt="' + esc(p.name || '') + '" loading="lazy"/>';
+      }).join('');
+      strip.style.display = '';
+    } catch(e) {
+      console.warn('[brand-partners] Failed to load:', e.message);
+    }
+  }
+  loadBrandPartners();
 
   async function submitNewsletter(){
     var input = document.getElementById('nlEmail');
