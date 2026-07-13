@@ -1044,23 +1044,11 @@
 
 
   <!-- WHY US -->
-  <section class="testimonials" id="why">
+  <section class="testimonials" id="why" style="display:none;">
     <div class="testimonials-inner">
       <div class="quotes-grid" id="quotesGrid">
         <!-- Populated from Supabase event_reviews by loadHomepageReviews() below, ordered by
-             admin-set position. Falls back to these default cards if there are no reviews yet. -->
-        <div class="quote-card">
-          <div class="quote-stars">★★★★★</div>
-          <p class="quote-text">"Great photography needs great delivery. We bring the creative eye and the systems to make sure nothing is lost after the last song plays."</p>
-        </div>
-        <div class="quote-card">
-          <div class="quote-stars">★★★★★</div>
-          <p class="quote-text">"Poor delivery ruins good photography. Our gallery systems let guests find their photos fast — no chasing, no waiting."</p>
-        </div>
-        <div class="quote-card">
-          <div class="quote-stars">★★★★★</div>
-          <p class="quote-text">"Since December we've covered live events, built delivery systems that work, and earned strong feedback. We're just getting started."</p>
-        </div>
+             admin-set position. Section stays hidden until at least one real review loads. -->
       </div>
     </div>
   </section>
@@ -1118,7 +1106,7 @@
 
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if(!sb) return; // keep default cards already in the markup
+      if(!sb) return; // no client available — section stays hidden
 
       var { data, error } = await sb
         .from('event_reviews')
@@ -1127,7 +1115,7 @@
         .order('created_at', { ascending: false })
         .limit(9);
 
-      if(error || !data || !data.length) return; // keep default cards
+      if(error || !data || !data.length) return; // no reviews yet — section stays hidden
 
       function esc(s){
         return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1149,9 +1137,12 @@
           '</div>' +
         '</div>';
       }).join('');
+
+      var section = document.getElementById('why');
+      if (section) section.style.display = '';
     } catch(e) {
-      console.warn('[reviews] Falling back to default testimonials:', e.message);
-      // leave default cards in place
+      console.warn('[reviews] Could not load reviews:', e.message);
+      // section stays hidden — no fake content to fall back to
     }
   }
   loadHomepageReviews();
