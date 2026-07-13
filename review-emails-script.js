@@ -15,7 +15,6 @@
 (function () {
 
   var _log      = [];
-  var _events    = [];
   var _loading   = false;
 
   /* ── Auth header helper — every send/resend call must prove
@@ -31,7 +30,6 @@
     if (_loading) return;
     _loading = true;
     _renderSkeleton();
-    _loadEventOptions();
 
     try {
       var c = getSupabase();
@@ -50,28 +48,6 @@
       _loading = false;
     }
   };
-
-  /* ── Populate the event picker for the adhoc-send form ──── */
-  async function _loadEventOptions() {
-    var sel = document.getElementById('adhoc-event-select');
-    if (!sel) return;
-    try {
-      var c = getSupabase();
-      var { data, error } = await c
-        .from('events')
-        .select('id, name, event_slug, event_code')
-        .eq('is_active', true)
-        .order('name', { ascending: true });
-      if (error) throw error;
-      _events = data || [];
-      sel.innerHTML = '<option value="">Select an event…</option>' +
-        _events.map(function (ev) {
-          return '<option value="' + ev.id + '">' + _esc(ev.name) + '</option>';
-        }).join('');
-    } catch (e) {
-      sel.innerHTML = '<option value="">Couldn\'t load events</option>';
-    }
-  }
 
   function _esc(s) {
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -180,23 +156,17 @@
     }
   };
 
-  /* ── Manual ad-hoc send (any email, not tied to a request) ──
-     Admin just picks the event from a dropdown and types the
-     guest's email — the gallery link is built automatically. ── */
+  /* ── Manual ad-hoc send (any email, not tied to an event) ──
+     Admin just types the guest's email — links to the generic
+     leave-review page, not a specific gallery. ── */
   window.sendAdhocReviewRequest = async function () {
     var email  = document.getElementById('adhoc-email').value.trim();
-    var evId   = document.getElementById('adhoc-event-select').value;
     var btn    = document.getElementById('adhoc-sendBtn');
 
-    if (!email || !evId) {
-      toast('⚠️', 'Missing info', 'Guest email and event are required');
+    if (!email) {
+      toast('⚠️', 'Missing info', 'Guest email is required');
       return;
     }
-
-    var ev = _events.find(function (e) { return String(e.id) === String(evId); });
-    if (!ev) { toast('⚠️', 'Event not found', 'Try reloading the page'); return; }
-
-    var eventUrl = location.origin + '/event.html?event=' + ev.event_slug + '&code=' + ev.event_code;
 
     if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
     try {
@@ -204,14 +174,13 @@
       var res  = await fetch(EVENTS_API + '/api/send-review-request-adhoc', {
         method : 'POST',
         headers: Object.assign({ 'Content-Type': 'application/json' }, authHdr),
-        body   : JSON.stringify({ guestEmail: email, eventName: ev.name, eventUrl: eventUrl })
+        body   : JSON.stringify({ guestEmail: email })
       });
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
 
       toast('✅', 'Review request sent!', email + ' will get an email asking for a review');
       document.getElementById('adhoc-email').value = '';
-      document.getElementById('adhoc-event-select').value = '';
       loadReviewEmailLog();
     } catch (e) {
       toast('❌', 'Failed to send', e.message);

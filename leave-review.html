@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Leave a Review — ImpactGrid Events</title>
+<link rel="icon" href="favicon.ico"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet"/>
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{
+    --bg:#0d0d10; --card:#17171c; --border:rgba(255,255,255,0.08);
+    --text:#f4f4f7; --text2:#a8a8b8; --text3:#6f6f80;
+    --accent:#c97e08; --accent2:#a86505;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif;
+    padding:24px;
+  }
+  .wrap{width:100%;max-width:440px;}
+  .logo{display:block;margin:0 auto 28px;text-align:center;}
+  .logo img{height:34px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:20px;
+    padding:32px 28px; box-shadow:0 24px 64px rgba(0,0,0,0.35);
+  }
+  h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px;}
+  .sub{font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 24px;}
+  label{display:block;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+  .field{margin-bottom:16px;}
+  input[type=text], textarea{
+    width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);
+    background:#0d0d10;color:var(--text);font-size:14px;outline:none;
+    transition:border-color .2s;box-sizing:border-box;font-family:inherit;
+  }
+  input[type=text]:focus, textarea:focus{border-color:var(--accent);}
+  textarea{resize:none;}
+  #char-count{text-align:right;font-size:11px;color:var(--text3);margin-top:3px;font-family:monospace;}
+  #stars{display:flex;gap:8px;margin-bottom:4px;}
+  #stars span{font-size:30px;cursor:pointer;transition:transform .15s;opacity:.3;}
+  #error{display:none;font-size:13px;color:#ff6b5a;background:rgba(255,107,90,0.1);border:1px solid rgba(255,107,90,0.25);border-radius:8px;padding:10px 13px;margin-bottom:14px;}
+  .btn{
+    width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:opacity .2s;
+  }
+  .btn:disabled{opacity:.6;cursor:default;}
+  #success{display:none;text-align:center;}
+  #success .emoji{font-size:44px;margin-bottom:12px;}
+  #success h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin:0 0 8px;}
+  #success p{font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 22px;}
+  #success a{
+    display:inline-block;padding:11px 26px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;font-size:14px;font-weight:700;text-decoration:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="logo"><img src="logo.png" alt="ImpactGrid Events"/></div>
+
+  <div class="card">
+    <div id="form-inner">
+      <h1>Leave a Review</h1>
+      <p class="sub">Enjoyed working with us? We'd love to hear about it — takes less than a minute.</p>
+
+      <div class="field">
+        <label>Your Name</label>
+        <input id="rev-name" type="text" placeholder="e.g. Sarah Johnson" maxlength="80"/>
+      </div>
+
+      <div class="field">
+        <label>Rating</label>
+        <div id="stars">
+          <span data-val="1" onclick="setStar(1)">★</span>
+          <span data-val="2" onclick="setStar(2)">★</span>
+          <span data-val="3" onclick="setStar(3)">★</span>
+          <span data-val="4" onclick="setStar(4)">★</span>
+          <span data-val="5" onclick="setStar(5)">★</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Your Review <span style="font-weight:400;opacity:.6;">(optional)</span></label>
+        <textarea id="rev-message" rows="3" placeholder="How was the experience?" maxlength="400"></textarea>
+        <div id="char-count">0 / 400</div>
+      </div>
+
+      <div id="error"></div>
+
+      <button class="btn" id="submit-btn" onclick="submitReview()">Submit Review ⭐</button>
+    </div>
+
+    <div id="success">
+      <div class="emoji">🎉</div>
+      <h2>Thanks for your review!</h2>
+      <p>We really appreciate the feedback.</p>
+      <a href="index.html">Back to Homepage</a>
+    </div>
+  </div>
+</div>
+
+<script>
+var _rating = 0;
+
+function setStar(n) {
+  _rating = n;
+  document.querySelectorAll('#stars span').forEach(function (s) {
+    var v = parseInt(s.dataset.val, 10);
+    s.style.opacity = v <= n ? '1' : '0.3';
+    s.style.color   = v <= n ? '#c97e08' : '';
+  });
+}
+
+document.getElementById('rev-message').addEventListener('input', function () {
+  document.getElementById('char-count').textContent = this.value.length + ' / 400';
+});
+
+async function submitReview() {
+  var name    = document.getElementById('rev-name').value.trim();
+  var message = document.getElementById('rev-message').value.trim();
+  var errEl   = document.getElementById('error');
+  var btn     = document.getElementById('submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!name)     { errEl.textContent = 'Please enter your name.';      errEl.style.display = 'block'; return; }
+  if (!_rating)  { errEl.textContent = 'Please select a star rating.'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    var { error } = await getContentClient().from('event_reviews').insert({
+      event_id:      null,
+      event_name:    null,
+      reviewer_name: name,
+      rating:        _rating,
+      message:       message || null
+    });
+    if (error) throw error;
+
+    document.getElementById('form-inner').style.display = 'none';
+    document.getElementById('success').style.display    = 'block';
+  } catch (e) {
+    errEl.textContent = 'Something went wrong — please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Submit Review ⭐';
+  }
+}
+</script>
+
+</body>
+</html>
