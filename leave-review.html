@@ -67,7 +67,7 @@
   <div class="card">
     <div id="form-inner">
       <h1>Leave a Review</h1>
-      <p class="sub">Enjoyed working with us? We'd love to hear about it — takes less than a minute.</p>
+      <p class="sub" id="rev-sub">Enjoyed working with us? We'd love to hear about it — takes less than a minute.</p>
 
       <div class="field">
         <label>Your Name</label>
@@ -107,6 +107,12 @@
 
 <script>
 var _rating = 0;
+var _urlParams = new URLSearchParams(window.location.search);
+var _serviceId = _urlParams.get('service') || null;
+var _serviceTitle = _urlParams.get('sname') || null;
+if (_serviceTitle) {
+  document.getElementById('rev-sub').textContent = 'How was your ' + _serviceTitle + ' experience with us? Takes less than a minute.';
+}
 
 function setStar(n) {
   _rating = n;
@@ -139,6 +145,8 @@ async function submitReview() {
     var { error } = await getContentClient().from('event_reviews').insert({
       event_id:      null,
       event_name:    null,
+      service_id:    _serviceId,
+      service_title: _serviceTitle,
       reviewer_name: name,
       rating:        _rating,
       message:       message || null

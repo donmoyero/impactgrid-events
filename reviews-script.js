@@ -21,7 +21,7 @@
     try {
       var c = getSupabase();
       var q = c.from('event_reviews')
-        .select('id, reviewer_name, event_name, rating, message, position, created_at')
+        .select('id, reviewer_name, event_name, service_title, rating, message, position, created_at')
         .order('position', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
 
@@ -136,6 +136,7 @@
             '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
               '<span style="font-size:14px;font-weight:700;">' + _esc(r.reviewer_name || 'Anonymous') + '</span>' +
               (r.event_name ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">📸 ' + _esc(r.event_name) + '</span>' : '') +
+              (r.service_title ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">🛠 ' + _esc(r.service_title) + '</span>' : '') +
               '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">' + date + '</span>' +
             '</div>' +
             '<div style="color:var(--gold);font-size:14px;margin-bottom:6px;">' + _stars(r.rating) + '</div>' +

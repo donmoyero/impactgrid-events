@@ -1376,6 +1376,12 @@ If you have any questions, just reply to this email.
                 <div class="field-label">Guest Email *</div>
                 <input type="email" id="adhoc-email" placeholder="guest@email.com"/>
               </div>
+              <div class="field-group">
+                <div class="field-label">Service <span style="font-weight:400;opacity:.6;">(optional)</span></div>
+                <select id="adhoc-service">
+                  <option value="">No specific service</option>
+                </select>
+              </div>
               <button id="adhoc-sendBtn" class="btn btn-gold" onclick="sendAdhocReviewRequest()">⭐ Send Review Request</button>
             </div>
           </div>
@@ -1411,6 +1417,28 @@ If you have any questions, just reply to this email.
           <div id="brandPartnersList">
             <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  SEND REVIEW REQUEST — PICK SERVICE MODAL  -->
+    <div id="sendReviewServiceModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:420px;box-shadow:var(--sh2);">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <h2 style="font-size:16px;font-weight:900;">Send Review Request</h2>
+          <button onclick="closeSendReviewServiceModal()" style="font-size:18px;color:var(--text3);background:none;border:none;cursor:pointer;line-height:1;">✕</button>
+        </div>
+        <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
+          <input type="hidden" id="srm-requestId"/>
+          <input type="hidden" id="srm-email"/>
+          <div style="font-size:13px;color:var(--text3);">Sending to <strong id="srm-emailLabel" style="color:var(--text);"></strong></div>
+          <div class="field-group">
+            <div class="field-label">Service <span style="font-weight:400;opacity:.6;">(optional)</span></div>
+            <select id="srm-service">
+              <option value="">No specific service</option>
+            </select>
+          </div>
+          <button id="srm-sendBtn" class="btn btn-gold" onclick="confirmSendReviewRequest()" style="width:100%;">📤 Send</button>
         </div>
       </div>
     </div>

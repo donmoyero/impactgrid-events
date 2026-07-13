@@ -16,6 +16,30 @@
 
   var _log      = [];
   var _loading   = false;
+  var _services  = null; // cached list of {id, title}
+
+  /* ── Shared: fetch services once, populate any <select> with them.
+     Used by the ad-hoc send form here, and by the per-request send
+     modal in events-script.js. ── */
+  window.loadServiceOptions = async function (selectEl) {
+    if (!selectEl) return;
+    try {
+      if (!_services) {
+        var c = getSupabase();
+        var { data, error } = await c.from('services').select('id, title').order('sort_order', { ascending: true });
+        if (error) throw error;
+        _services = data || [];
+      }
+      _services.forEach(function (s) {
+        var opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.title;
+        selectEl.appendChild(opt);
+      });
+    } catch (e) {
+      console.warn('[reviews] Could not load services for dropdown:', e.message);
+    }
+  };
 
   /* ── Auth header helper — every send/resend call must prove
      it's really the logged-in admin, not just localStorage. ── */
@@ -31,11 +55,14 @@
     _loading = true;
     _renderSkeleton();
 
+    var svcSelect = document.getElementById('adhoc-service');
+    if (svcSelect && svcSelect.options.length <= 1) loadServiceOptions(svcSelect);
+
     try {
       var c = getSupabase();
       var { data, error } = await c
         .from('review_email_log')
-        .select('id, guest_email, event_name, ai_message, review_url, source, status, error, sent_at, resent_at, resend_count')
+        .select('id, guest_email, event_name, service_title, ai_message, review_url, source, status, error, sent_at, resent_at, resend_count')
         .order('sent_at', { ascending: false })
         .limit(200);
 
@@ -98,7 +125,7 @@
           if ((r.ai_message || '').length > 60) preview += '…';
           return '<tr>'
             + '<td style="font-weight:600;">' + _esc(r.guest_email) + '</td>'
-            + '<td>' + _esc(r.event_name || '—') + '</td>'
+            + '<td>' + _esc(r.event_name || (r.service_title ? '🛠 ' + r.service_title : '—')) + '</td>'
             + '<td style="font-size:11px;color:var(--text3);max-width:220px;">' + _esc(preview) + '</td>'
             + '<td style="font-size:11px;color:var(--text3);">' + _sourceLabel(r.source) + '</td>'
             + '<td>' + statusPill + '</td>'
@@ -161,6 +188,8 @@
      leave-review page, not a specific gallery. ── */
   window.sendAdhocReviewRequest = async function () {
     var email  = document.getElementById('adhoc-email').value.trim();
+    var svcEl  = document.getElementById('adhoc-service');
+    var serviceId = svcEl ? svcEl.value : '';
     var btn    = document.getElementById('adhoc-sendBtn');
 
     if (!email) {
@@ -174,13 +203,14 @@
       var res  = await fetch(EVENTS_API + '/api/send-review-request-adhoc', {
         method : 'POST',
         headers: Object.assign({ 'Content-Type': 'application/json' }, authHdr),
-        body   : JSON.stringify({ guestEmail: email })
+        body   : JSON.stringify({ guestEmail: email, serviceId: serviceId || null })
       });
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
 
       toast('✅', 'Review request sent!', email + ' will get an email asking for a review');
       document.getElementById('adhoc-email').value = '';
+      if (svcEl) svcEl.value = '';
       loadReviewEmailLog();
     } catch (e) {
       toast('❌', 'Failed to send', e.message);

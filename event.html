@@ -2497,6 +2497,8 @@ async function submitContact(e){
 var _revRating  = 0;
 var _revEventId = null;
 var _revEventName = null;
+var _revServiceId = new URLSearchParams(window.location.search).get('service') || null;
+var _revServiceTitle = new URLSearchParams(window.location.search).get('sname') || null;
 
 /* Called by enterGallery() once the event is loaded */
 function initReviewFab(eventId, eventName) {
@@ -2564,6 +2566,8 @@ async function submitReview() {
     var { error } = await getContentClient().from('event_reviews').insert({
       event_id:      _revEventId,
       event_name:    _revEventName,
+      service_id:    _revServiceId,
+      service_title: _revServiceTitle,
       reviewer_name: name,
       rating:        _revRating,
       message:       message || null

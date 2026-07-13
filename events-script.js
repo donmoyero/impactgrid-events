@@ -980,7 +980,33 @@ async function rejectRequest(id){
 }
 
 async function sendReviewRequest(id, email){
-  if(!confirm('Send a review request email to ' + email + ' now?')) return;
+  document.getElementById('srm-requestId').value = id;
+  document.getElementById('srm-email').value = email;
+  document.getElementById('srm-emailLabel').textContent = email;
+
+  var svcEl = document.getElementById('srm-service');
+  if (svcEl && svcEl.options.length <= 1 && typeof loadServiceOptions === 'function') {
+    await loadServiceOptions(svcEl);
+  }
+  if (svcEl) svcEl.value = '';
+
+  var modal = document.getElementById('sendReviewServiceModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeSendReviewServiceModal(){
+  var modal = document.getElementById('sendReviewServiceModal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function confirmSendReviewRequest(){
+  var id      = document.getElementById('srm-requestId').value;
+  var email   = document.getElementById('srm-email').value;
+  var svcEl   = document.getElementById('srm-service');
+  var serviceId = svcEl ? svcEl.value : '';
+  var btn     = document.getElementById('srm-sendBtn');
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
   toast('📤', 'Sending…', '', true);
   try{
     var c = getSupabase();
@@ -989,13 +1015,16 @@ async function sendReviewRequest(id, email){
     var res  = await fetch(EVENTS_API + '/api/send-review-request', {
       method : 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { 'Authorization': 'Bearer ' + token } : {}),
-      body   : JSON.stringify({ requestId: id })
+      body   : JSON.stringify({ requestId: id, serviceId: serviceId || null })
     });
     var data = await res.json();
     if(!res.ok) throw new Error(data.error || 'Server error');
     toast('✅', 'Review request sent!', email + ' will get an email asking for a review');
+    closeSendReviewServiceModal();
   }catch(e){
     toast('⚠️', 'Failed to send', e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Send'; }
   }
 }
 
