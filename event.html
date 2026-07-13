@@ -2479,7 +2479,7 @@ async function submitContact(e){
     <div id="review-success" style="display:none;text-align:center;padding:10px 0;">
       <div style="font-size:42px;margin-bottom:12px;">🎉</div>
       <h4 style="font-size:17px;font-weight:900;margin-bottom:8px;">Thanks for your review!</h4>
-      <p style="font-size:13px;color:var(--text2,#4a5068);line-height:1.6;margin-bottom:20px;">It'll appear on our homepage once approved. We really appreciate the feedback.</p>
+      <p style="font-size:13px;color:var(--text2,#4a5068);line-height:1.6;margin-bottom:20px;">It may appear on our homepage. We really appreciate the feedback.</p>
       <button onclick="closeReviewModal()" style="padding:10px 28px;border-radius:10px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;">Done ✓</button>
     </div>
   </div>
@@ -2563,8 +2563,7 @@ async function submitReview() {
       event_name:    _revEventName,
       reviewer_name: name,
       rating:        _revRating,
-      message:       message || null,
-      approved:      false
+      message:       message || null
     });
     if (error) throw error;
 

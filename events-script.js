@@ -983,9 +983,12 @@ async function sendReviewRequest(id, email){
   if(!confirm('Send a review request email to ' + email + ' now?')) return;
   toast('📤', 'Sending…', '', true);
   try{
+    var c = getSupabase();
+    var { data: sessionData } = await c.auth.getSession();
+    var token = sessionData && sessionData.session ? sessionData.session.access_token : null;
     var res  = await fetch(EVENTS_API + '/api/send-review-request', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { 'Authorization': 'Bearer ' + token } : {}),
       body   : JSON.stringify({ requestId: id })
     });
     var data = await res.json();

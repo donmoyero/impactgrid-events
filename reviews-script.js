@@ -1,15 +1,16 @@
 /* ═══════════════════════════════════════════════════════════
    ImpactGrid — reviews-script.js
-   Admin panel: view, approve, and delete event reviews.
+   Admin panel: view, edit, reorder, and delete every review.
+   No approval gate — every submitted review is live on the
+   homepage immediately; admin can only edit, reorder, delete.
    Reads from / writes to the `event_reviews` Supabase table.
    Exposes: loadEventReviews()
 ═══════════════════════════════════════════════════════════ */
 
 (function () {
 
-  var _reviews     = [];
-  var _filter      = 'pending'; // 'pending' | 'approved' | 'all'
-  var _loading     = false;
+  var _reviews = [];
+  var _loading = false;
 
   /* ── Load & render ──────────────────────────────────────── */
   window.loadEventReviews = async function () {
@@ -20,14 +21,14 @@
     try {
       var c = getSupabase();
       var q = c.from('event_reviews')
-        .select('id, reviewer_name, event_name, rating, message, approved, created_at')
+        .select('id, reviewer_name, event_name, rating, message, position, created_at')
+        .order('position', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
 
       var { data, error } = await q;
       if (error) throw error;
 
       _reviews = data || [];
-      _updateBadge(_reviews.filter(function(r){ return !r.approved; }).length);
       _renderTable();
     } catch (e) {
       _renderError(e.message);
@@ -36,30 +37,9 @@
     }
   };
 
-  /* ── Approve ────────────────────────────────────────────── */
-  window.approveReview = async function (id) {
-    var btn = document.getElementById('rev-approve-' + id);
-    if (btn) { btn.disabled = true; btn.textContent = '…'; }
-    try {
-      var { error } = await getSupabase()
-        .from('event_reviews')
-        .update({ approved: true, approved_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) throw error;
-      var r = _reviews.find(function(x){ return x.id === id; });
-      if (r) r.approved = true;
-      _updateBadge(_reviews.filter(function(r){ return !r.approved; }).length);
-      _renderTable();
-      toast('✅', 'Review approved', 'Now visible on the homepage');
-    } catch (e) {
-      toast('❌', 'Failed to approve', e.message);
-      if (btn) { btn.disabled = false; btn.textContent = '✓ Approve'; }
-    }
-  };
-
   /* ── Delete ─────────────────────────────────────────────── */
   window.deleteReview = async function (id) {
-    if (!confirm('Delete this review permanently?')) return;
+    if (!confirm('Delete this review permanently? This also removes it from the homepage.')) return;
     try {
       var { error } = await getSupabase()
         .from('event_reviews')
@@ -67,7 +47,6 @@
         .eq('id', id);
       if (error) throw error;
       _reviews = _reviews.filter(function(r){ return r.id !== id; });
-      _updateBadge(_reviews.filter(function(r){ return !r.approved; }).length);
       _renderTable();
       toast('🗑️', 'Review deleted', '');
     } catch (e) {
@@ -75,33 +54,37 @@
     }
   };
 
-  /* ── Filter tabs ────────────────────────────────────────── */
-  window.setReviewFilter = function (f) {
-    _filter = f;
-    ['pending','approved','all'].forEach(function(tab) {
-      var btn = document.getElementById('rev-tab-' + tab);
-      if (!btn) return;
-      btn.style.background = (tab === f) ? 'var(--card)' : 'transparent';
-      btn.style.color      = (tab === f) ? 'var(--text)'  : 'var(--text2)';
-      btn.style.boxShadow  = (tab === f) ? 'var(--sh)'    : 'none';
-    });
+  /* ── Reorder (move up / down on the homepage) ───────────── */
+  window.moveReview = async function (id, dir) {
+    var idx = _reviews.findIndex(function (r) { return r.id === id; });
+    if (idx === -1) return;
+    var swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= _reviews.length) return;
+
+    var a = _reviews[idx], b = _reviews[swapIdx];
+
+    /* Assign clean sequential positions to the whole list on first
+       reorder, in case some rows still have a null position. */
+    _reviews.forEach(function (r, i) { r.position = i; });
+    var tmp = _reviews[idx].position;
+    _reviews[idx].position = _reviews[swapIdx].position;
+    _reviews[swapIdx].position = tmp;
+
+    _reviews.sort(function (x, y) { return x.position - y.position; });
     _renderTable();
+
+    try {
+      var c = getSupabase();
+      await Promise.all(_reviews.map(function (r) {
+        return c.from('event_reviews').update({ position: r.position }).eq('id', r.id);
+      }));
+    } catch (e) {
+      toast('❌', 'Failed to save order', e.message);
+      loadEventReviews();
+    }
   };
 
   /* ── Internal helpers ───────────────────────────────────── */
-  function _filtered() {
-    if (_filter === 'pending')  return _reviews.filter(function(r){ return !r.approved; });
-    if (_filter === 'approved') return _reviews.filter(function(r){ return  r.approved; });
-    return _reviews;
-  }
-
-  function _updateBadge(n) {
-    var el = document.getElementById('reviewsBadge');
-    if (!el) return;
-    el.textContent = n;
-    el.style.display = n > 0 ? 'inline-flex' : 'none';
-  }
-
   function _stars(n) {
     var s = '';
     for (var i = 1; i <= 5; i++) s += (i <= n ? '★' : '☆');
@@ -133,45 +116,32 @@
     var el = document.getElementById('reviews-table-wrap');
     if (!el) return;
 
-    var rows = _filtered();
+    var countEl = document.getElementById('rev-count-all');
+    if (countEl) countEl.textContent = _reviews.length;
 
-    /* Update filter counts */
-    var pending  = _reviews.filter(function(r){ return !r.approved; }).length;
-    var approved = _reviews.filter(function(r){ return  r.approved; }).length;
-    var countEl;
-    countEl = document.getElementById('rev-count-pending');  if (countEl) countEl.textContent = pending;
-    countEl = document.getElementById('rev-count-approved'); if (countEl) countEl.textContent = approved;
-    countEl = document.getElementById('rev-count-all');      if (countEl) countEl.textContent = _reviews.length;
-
-    if (!rows.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico">⭐</div><div class="empty-txt">' +
-        (_filter === 'pending' ? 'No pending reviews — all caught up!' :
-         _filter === 'approved' ? 'No approved reviews yet.' : 'No reviews yet.') +
-        '</div></div>';
+    if (!_reviews.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-ico">⭐</div><div class="empty-txt">No reviews yet.</div></div>';
       return;
     }
 
-    el.innerHTML = rows.map(function(r) {
+    el.innerHTML = _reviews.map(function (r, i) {
       var date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
-      var isPending = !r.approved;
       return '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;">' +
         '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
-          '<div style="min-width:0;">' +
+          '<div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0;">' +
+            '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;" ' + (i === 0 ? 'disabled' : '') + ' onclick="moveReview(\'' + r.id + '\',\'up\')">▲</button>' +
+            '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;" ' + (i === _reviews.length - 1 ? 'disabled' : '') + ' onclick="moveReview(\'' + r.id + '\',\'down\')">▼</button>' +
+          '</div>' +
+          '<div style="min-width:0;flex:1;">' +
             '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
               '<span style="font-size:14px;font-weight:700;">' + _esc(r.reviewer_name || 'Anonymous') + '</span>' +
               (r.event_name ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">📸 ' + _esc(r.event_name) + '</span>' : '') +
               '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">' + date + '</span>' +
-              (isPending
-                ? '<span style="font-size:10px;background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);padding:2px 7px;border-radius:5px;font-family:var(--fm);letter-spacing:.04em;">PENDING</span>'
-                : '<span style="font-size:10px;background:var(--green-dim);color:var(--green);border:1px solid rgba(15,168,118,.2);padding:2px 7px;border-radius:5px;font-family:var(--fm);letter-spacing:.04em;">APPROVED</span>') +
             '</div>' +
             '<div style="color:var(--gold);font-size:14px;margin-bottom:6px;">' + _stars(r.rating) + '</div>' +
             (r.message ? '<div style="font-size:13px;color:var(--text2);line-height:1.6;">' + _esc(r.message) + '</div>' : '') +
           '</div>' +
           '<div style="display:flex;gap:6px;flex-shrink:0;">' +
-            (isPending
-              ? '<button id="rev-approve-' + r.id + '" class="btn btn-green btn-sm" onclick="approveReview(\'' + r.id + '\')">✓ Approve</button>'
-              : '') +
             '<button class="btn btn-ghost btn-sm" onclick="editReview(\'' + r.id + '\')">✏ Edit</button>' +
             '<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteReview(\'' + r.id + '\')">🗑 Delete</button>' +
           '</div>' +

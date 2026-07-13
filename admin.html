@@ -301,8 +301,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('events',this)"><span class="sb-ico"></span>All Events</a>
         <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico"></span>Create Event</a>
         <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico"></span>Upload Photos</a>
-        <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico"></span>Reviews<span class="sb-badge" id="reviewsBadge" style="display:none;">0</span></a>
-        <a href="#" onclick="return nav('reviewemails',this)"><span class="sb-ico"></span>Send Review Request</a>
+        <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico"></span>Reviews</a>
         <a href="#" onclick="return nav('bookings',this)"><span class="sb-ico"></span>Bookings<span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></a>
       </nav>
     </div>
@@ -1340,34 +1339,54 @@ If you have any questions, just reply to this email.
     <div class="page" id="page-reviews">
       <div class="page-header">
         <div class="page-title">Reviews</div>
-        <div class="page-sub">Approve guest reviews before they appear on the homepage. Pending reviews are never public.</div>
+        <div class="page-sub">Every guest review is live on the homepage automatically. Edit, reorder, or delete any review below — plus send review-request emails and see everything the AI has sent.</div>
       </div>
 
-      <div class="ws-layout">
-        <div>
-          <!-- Filter tabs -->
-          <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
-            <button id="rev-tab-pending"  onclick="setReviewFilter('pending')"  style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);transition:all .2s;"> Pending <span id="rev-count-pending" style="font-size:11px;opacity:.6;">0</span></button>
-            <button id="rev-tab-approved" onclick="setReviewFilter('approved')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;"> Approved <span id="rev-count-approved" style="font-size:11px;opacity:.6;">0</span></button>
-            <button id="rev-tab-all"      onclick="setReviewFilter('all')"      style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;"> All <span id="rev-count-all" style="font-size:11px;opacity:.6;">0</span></button>
-          </div>
-
-          <!-- Reviews list -->
+      <!--  BOX 1 — All Reviews  -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-head">
+          <h2>⭐ All Reviews <span id="rev-count-all" style="font-size:12px;color:var(--text3);font-weight:400;">0</span></h2>
+        </div>
+        <div class="card-body">
           <div id="reviews-table-wrap">
             <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading reviews…</div></div>
           </div>
         </div>
+      </div>
+
+      <!--  BOX 2 — Send Review Request + Sent Reviews log  -->
+      <div class="ws-layout">
+        <div>
+          <div class="card">
+            <div class="card-head"><h2>📤 Sent Reviews — what the AI has sent</h2></div>
+            <div class="card-body">
+              <div id="review-emails-table-wrap">
+                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="ws-sticky">
-          <div class="hint-box">
-            <strong>How reviews work</strong><br><br>
-            Guests submit a review from the event page after viewing their photos. Reviews sit as <strong>pending</strong> until you approve them here — they are never shown publicly until approved.<br><br>
-            Approved reviews appear in the <strong>Reviews</strong> section on the homepage automatically.
+          <div class="card" style="padding:18px;">
+            <h2 style="font-size:15px;font-weight:900;margin-bottom:12px;">✍️ Send Review Request</h2>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="field-group">
+                <div class="field-label">Guest Email *</div>
+                <input type="email" id="adhoc-email" placeholder="guest@email.com"/>
+              </div>
+              <div class="field-group">
+                <div class="field-label">Event *</div>
+                <select id="adhoc-event-select" class="form-input">
+                  <option value="">Select an event…</option>
+                </select>
+              </div>
+              <button id="adhoc-sendBtn" class="btn btn-gold" onclick="sendAdhocReviewRequest()">⭐ Send Review Request</button>
+            </div>
           </div>
           <div class="hint-box" style="margin-top:10px;">
-            <strong>Supabase table</strong><br><br>
-            Reads from <code style="font-size:10px;background:var(--bg3);padding:2px 5px;border-radius:4px;">event_reviews</code> — needs columns:<br>
-            <code style="font-size:10px;background:var(--bg3);padding:2px 5px;border-radius:4px;display:block;margin-top:6px;line-height:1.9;">id, reviewer_name, event_name, rating, message, approved, approved_at, created_at</code>
+            <strong>How this works</strong><br><br>
+            The AI writes a short, warm review request and emails it to the guest with a link straight to that event's gallery, so they can leave a review as a site visitor. Every send is logged on the left — click any row to preview the exact message and resend it.
           </div>
         </div>
       </div>
@@ -1407,47 +1426,6 @@ If you have any questions, just reply to this email.
           </div>
 
           <button id="revEdit-saveBtn" class="btn btn-gold" onclick="saveReviewEdit()" style="width:100%;">Save Changes</button>
-        </div>
-      </div>
-    </div>
-
-    <!--  SEND REVIEW REQUEST  -->
-    <div class="page" id="page-reviewemails">
-      <div class="page-header">
-        <div class="page-title">Send Review Request</div>
-        <div class="page-sub">Every review-request email your system has sent — automatic, cron, or manual — plus a form to send one to any email address on demand.</div>
-      </div>
-
-      <div class="ws-layout">
-        <div>
-          <div id="review-emails-table-wrap">
-            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
-          </div>
-        </div>
-
-        <div class="ws-sticky">
-          <div class="card" style="padding:18px;">
-            <h2 style="font-size:15px;font-weight:900;margin-bottom:12px;">✍️ Send to Any Email</h2>
-            <div style="display:flex;flex-direction:column;gap:12px;">
-              <div class="field-group">
-                <div class="field-label">Guest Email *</div>
-                <input type="email" id="adhoc-email" placeholder="guest@email.com"/>
-              </div>
-              <div class="field-group">
-                <div class="field-label">Event Name</div>
-                <input type="text" id="adhoc-event-name" placeholder="e.g. Ade & Bola's Wedding"/>
-              </div>
-              <div class="field-group">
-                <div class="field-label">Event Gallery Link *</div>
-                <input type="text" id="adhoc-event-url" placeholder="https://.../event.html?event=...&code=..."/>
-              </div>
-              <button id="adhoc-sendBtn" class="btn btn-gold" onclick="sendAdhocReviewRequest()">⭐ Send Review Request</button>
-            </div>
-          </div>
-          <div class="hint-box" style="margin-top:10px;">
-            <strong>Where to find the gallery link</strong><br><br>
-            Copy it from the <strong>All Events</strong> page — each event's "👁 View Event" link is the gallery URL guests use.
-          </div>
         </div>
       </div>
     </div>
@@ -1807,8 +1785,7 @@ function nav(id,el){
     events:'loadEvents',createevent:'initCreateEventPage',
     uploadphotos:'loadUploadPhotos',
     downloadrequests:'loadDownloadRequests',
-    reviews:'loadEventReviews',
-    reviewemails:'loadReviewEmailLog',
+    reviews:'loadReviewsPage',
     hero:'loadAllHomepageSections',
     bookings:'loadBookings',
     vouchers:'initVouchersPage',
@@ -1816,6 +1793,12 @@ function nav(id,el){
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
   return false;
+}
+
+/*  Reviews page loads both boxes: the review list and the sent-email log  */
+function loadReviewsPage(){
+  if(window.loadEventReviews)   loadEventReviews();
+  if(window.loadReviewEmailLog) loadReviewEmailLog();
 }
 
 /*  TOAST  */

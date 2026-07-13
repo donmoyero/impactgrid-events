@@ -1032,8 +1032,8 @@
   <section class="testimonials" id="why">
     <div class="testimonials-inner">
       <div class="quotes-grid" id="quotesGrid">
-        <!-- Populated from Supabase event_reviews (approved=true) by loadHomepageReviews() below.
-             Falls back to these default cards if there are no approved reviews yet. -->
+        <!-- Populated from Supabase event_reviews by loadHomepageReviews() below, ordered by
+             admin-set position. Falls back to these default cards if there are no reviews yet. -->
         <div class="quote-card">
           <div class="quote-stars">★★★★★</div>
           <p class="quote-text">"Great photography needs great delivery. We bring the creative eye and the systems to make sure nothing is lost after the last song plays."</p>
@@ -1107,8 +1107,8 @@
       var { data, error } = await sb
         .from('event_reviews')
         .select('reviewer_name, event_name, rating, message')
-        .eq('approved', true)
         .not('message', 'is', null)
+        .order('position', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false })
         .limit(9);
 
