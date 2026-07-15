@@ -855,6 +855,18 @@ input,textarea,select{font-family:inherit;}
 .tpl-nightlife .share-btn:hover{background:linear-gradient(135deg,var(--accent),var(--pink));color:#fff;border-color:transparent;}
 
 /* ══════════════════════════════════════
+   VIDEO — badge on thumbs, player in lightbox
+   (theme-independent, sits on top of every template)
+══════════════════════════════════════ */
+.photo-card{position:relative;}
+.video-play-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;pointer-events:none;backdrop-filter:blur(2px);}
+#lightboxVideo{max-width:100%;max-height:88vh;border-radius:4px;display:none;background:#000;}
+#lightboxVideo.active{display:block;}
+#lightboxImg.lb-hidden{display:none;}
+.lb-fullscreen-btn{position:absolute;top:14px;right:64px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;z-index:10;transition:all .2s;}
+.lb-fullscreen-btn:hover{background:rgba(255,255,255,.25);}
+
+/* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
 @media(max-width:900px){
@@ -987,9 +999,11 @@ input,textarea,select{font-family:inherit;}
 <!-- ══════════════════════════════════════ LIGHTBOX ══════════════════════════════════════ -->
 <div class="lightbox hidden" id="lightbox" onclick="closeLightboxBg(event)">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-fullscreen-btn" id="lbFullscreenBtn" onclick="event.stopPropagation();lbToggleFullscreen()">⛶ Fullscreen</button>
   <div class="lightbox-img-wrap">
     <button class="lightbox-nav lightbox-prev" onclick="lbPrev(event)">‹</button>
     <img id="lightboxImg" src="" alt=""/>
+    <video id="lightboxVideo" controls playsinline></video>
     <button class="lightbox-nav lightbox-next" onclick="lbNext(event)">›</button>
   </div>
   <div class="lb-counter" id="lbCounter">1 / 10</div>
@@ -1311,6 +1325,15 @@ async function loadPhotos(){
       .get();
     var data = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
 
+    /* Photos first, videos last — stable sort keeps upload order within each group. */
+    data = data.map(function(p, i){ return { p: p, i: i }; })
+      .sort(function(a, b){
+        var av = a.p.media_type === 'video' ? 1 : 0;
+        var bv = b.p.media_type === 'video' ? 1 : 0;
+        return av - bv || (a.i - b.i);
+      })
+      .map(function(x){ return x.p; });
+
     allPhotos = data || [];
 
     var sg = document.getElementById('skeletonGrid');
@@ -1562,10 +1585,12 @@ function renderPhotos(photos){
 
   grid.innerHTML = photos.map(function(p, i){
     var isSel = selectedIds.has(p.id);
+    var isVid = p.media_type === 'video';
     return '<div class="photo-card' + (isSel?' selected':'') + '" id="card-' + p.id + '" data-id="' + p.id + '" data-idx="' + i + '" onclick="handleCardClick(\'' + p.id + '\',' + i + ',event)">'
       + '<div class="select-checkbox" onclick="toggleSelect(\'' + p.id + '\',event)"></div>'
       + '<div class="select-overlay"></div>'
       + '<img src="' + esc(p.preview_url) + '" alt="" loading="lazy"/>'
+      + (isVid ? '<div class="video-play-badge">▶</div>' : '')
       + '<div class="photo-card-overlay">'
       + '<button class="lb-btn lb-btn-dl" style="font-size:11px;padding:7px 14px;" onclick="event.stopPropagation();quickDownload(\'' + esc(p.original_url||p.preview_url) + '\',' + i + ')">⬇ Save</button>'
       + '</div>'
@@ -1673,7 +1698,8 @@ function blobDownload(url, filename){
       return r.blob();
     })
     .then(function(blob){
-      var mime = (blob.type && blob.type.startsWith('image/')) ? blob.type : 'image/jpeg';
+      var isMedia = blob.type && (blob.type.startsWith('image/') || blob.type.startsWith('video/'));
+      var mime = isMedia ? blob.type : 'image/jpeg';
       var safeBlob = (mime !== blob.type) ? new Blob([blob], { type: mime }) : blob;
       return new Promise(function(resolve, reject){
         try{
@@ -1732,15 +1758,16 @@ function cancelDl(){
 }
 
 function quickDownload(url, idx){
+  var _qdPhoto = allPhotos[parseInt(idx)] || { id: null };
+  var isVid = _qdPhoto.media_type === 'video';
   if(isSafariIOS()){
-    showIosModal([{ original_url: url, preview_url: url }]);
+    showIosModal([_qdPhoto.id ? _qdPhoto : { original_url: url, preview_url: url }]);
     return;
   }
-  var filename = 'ImpactGrid-Photo-' + (parseInt(idx) + 1) + '.jpg';
-  var _qdPhoto = allPhotos[parseInt(idx)] || { id: null };
-  toast('⬇', 'Saving photo…', 'Check your Downloads / Gallery');
+  var filename = 'ImpactGrid-' + (isVid ? 'Video-' : 'Photo-') + (parseInt(idx) + 1) + (isVid ? '.mp4' : '.jpg');
+  toast('⬇', isVid ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
   blobDownload(url, filename)
-    .then(function(){ toast('✅', 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([_qdPhoto]); })
+    .then(function(){ toast('✅', isVid ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([_qdPhoto]); })
     .catch(function(){ toast('⚠️', 'Download failed', 'Try again or check your connection'); });
 }
 
@@ -1751,10 +1778,11 @@ async function downloadBatch(photos){
   }
 
   if(photos.length === 1){
+    var isVid0 = photos[0].media_type === 'video';
     var url = photos[0].original_url || photos[0].preview_url;
-    toast('⬇', 'Saving photo…', 'Check your Downloads / Gallery');
-    blobDownload(url, 'ImpactGrid-Photo-001.jpg')
-      .then(function(){ toast('✅', 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload(photos); })
+    toast('⬇', isVid0 ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
+    blobDownload(url, 'ImpactGrid-' + (isVid0 ? 'Video-001.mp4' : 'Photo-001.jpg'))
+      .then(function(){ toast('✅', isVid0 ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload(photos); })
       .catch(function(){ toast('⚠️', 'Download failed', 'Try again'); });
     return;
   }
@@ -1765,13 +1793,14 @@ async function downloadBatch(photos){
 
   for(var i = 0; i < photos.length; i++){
     if(dlCancelled) break;
+    var isVidI = photos[i].media_type === 'video';
     var url = photos[i].original_url || photos[i].preview_url;
     var num = String(i + 1).padStart(3, '0');
     try{
-      await blobDownload(url, 'ImpactGrid-Photo-' + num + '.jpg');
+      await blobDownload(url, 'ImpactGrid-' + (isVidI ? 'Video-' : 'Photo-') + num + (isVidI ? '.mp4' : '.jpg'));
       done++;
     }catch(e){
-      console.warn('Photo', i, 'failed:', e);
+      console.warn('Item', i, 'failed:', e);
       failed++;
       done++;
     }
@@ -1786,7 +1815,7 @@ async function downloadBatch(photos){
     var saved = photos.length - failed;
     trackDownload(photos.slice(0, saved));
     if(failed === 0){
-      toast('✅', 'All ' + photos.length + ' photos saved!', 'Check your Downloads / Gallery');
+      toast('✅', 'All ' + photos.length + ' saved!', 'Check your Downloads / Gallery');
     } else {
       toast('⚠️', saved + ' of ' + photos.length + ' saved', failed + ' failed — try again');
     }
@@ -1824,6 +1853,21 @@ var iosDl = {
   cancelled : false,
 };
 
+/* Picks accurate wording for a batch that may contain photos, videos, or both. */
+function mediaLabel(items, plural){
+  var hasPhoto = items.some(function(p){ return p.media_type !== 'video'; });
+  var hasVideo = items.some(function(p){ return p.media_type === 'video'; });
+  var singular = (hasPhoto && hasVideo) ? 'Item' : (hasVideo ? 'Video' : 'Photo');
+  if(!plural) return singular;
+  return singular + (items.length > 1 ? 's' : '');
+}
+function shareSheetActionLabel(items){
+  var hasPhoto = items.some(function(p){ return p.media_type !== 'video'; });
+  var hasVideo = items.some(function(p){ return p.media_type === 'video'; });
+  if(hasPhoto && hasVideo) return '"Save Image" / "Save Video"';
+  return hasVideo ? '"Save Video"' : '"Save Image"';
+}
+
 function showIosModal(photos){
   /* If navigator.share + files supported → new modal */
   if(!(navigator.share && navigator.canShare)){
@@ -1850,12 +1894,13 @@ function showIosModal(photos){
   document.getElementById('iosDlInstruction').style.display = '';
 
   var totalBatches = iosDl.batches.length;
+  var label = mediaLabel(photos, true).toLowerCase();
   document.getElementById('iosDlTitle').textContent =
-    'Save ' + photos.length + ' Photo' + (photos.length > 1 ? 's' : '');
+    'Save ' + photos.length + ' ' + mediaLabel(photos, true);
   document.getElementById('iosDlSubtitle').textContent =
     totalBatches === 1
-      ? 'All ' + photos.length + ' photo' + (photos.length > 1 ? 's' : '') + ' in one tap'
-      : photos.length + ' photos · ' + totalBatches + ' batches of up to ' + iosDl.BATCH_SIZE;
+      ? 'All ' + photos.length + ' ' + label + ' in one tap'
+      : photos.length + ' ' + label + ' · ' + totalBatches + ' batches of up to ' + iosDl.BATCH_SIZE;
 
   iosDlUpdateProgress();
   iosDlRenderThumbs(0);
@@ -1869,7 +1914,7 @@ function showIosModal(photos){
       : 'Save Batch 1 of ' + totalBatches;
 
   document.getElementById('iosDlInstructionText').innerHTML =
-    'Tap <strong>"Save to Device"</strong> — your Share Sheet opens. Tap <strong>"Save Image"</strong> to save all photos in this batch to your Camera Roll.';
+    'Tap <strong>"Save to Device"</strong> — your Share Sheet opens. Tap <strong>' + shareSheetActionLabel(photos) + '</strong> to save all ' + label + ' in this batch to your Camera Roll.';
 
   document.getElementById('iosDlModal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -1952,6 +1997,7 @@ async function iosDlTriggerShare(){
      possible. */
   var fetchResults = await Promise.all(batch.map(async function(photo, i){
     try{
+      var isVid = photo.media_type === 'video';
       var url = photo.original_url || photo.preview_url;
       var cleanUrl = url.split('?')[0]
         .replace('/storage/v1/render/image/public/', '/storage/v1/object/public/')
@@ -1959,15 +2005,21 @@ async function iosDlTriggerShare(){
       var r = await fetch(cleanUrl, { mode: 'cors', cache: 'no-store', redirect: 'follow' });
       if(!r.ok) throw new Error('HTTP ' + r.status);
       var blob = await r.blob();
-      var mime = (blob.type && blob.type.startsWith('image/')) ? blob.type : 'image/jpeg';
-      var ext  = mime === 'image/png' ? 'png' : 'jpg';
+      var mime, ext;
+      if(isVid){
+        mime = (blob.type && blob.type.startsWith('video/')) ? blob.type : 'video/mp4';
+        ext  = mime === 'video/quicktime' ? 'mov' : (mime === 'video/webm' ? 'webm' : 'mp4');
+      } else {
+        mime = (blob.type && blob.type.startsWith('image/')) ? blob.type : 'image/jpeg';
+        ext  = mime === 'image/png' ? 'png' : 'jpg';
+      }
       return new File(
         [blob],
-        'ImpactGrid-Photo-' + String(offset + i + 1).padStart(3, '0') + '.' + ext,
+        'ImpactGrid-' + (isVid ? 'Video-' : 'Photo-') + String(offset + i + 1).padStart(3, '0') + '.' + ext,
         { type: mime }
       );
     }catch(e){
-      console.warn('Batch', batchIdx + 1, 'photo', i, 'failed:', e);
+      console.warn('Batch', batchIdx + 1, 'item', i, 'failed:', e);
       return null;
     }
   }));
@@ -2005,14 +2057,14 @@ async function iosDlTriggerShare(){
   document.getElementById('iosDlSaveBtnIcon').textContent = '📤';
   document.getElementById('iosDlSaveBtnText').textContent = 'Opening Share Sheet…';
   document.getElementById('iosDlInstructionText').innerHTML =
-    'Share Sheet opening — tap <strong>"Save Image"</strong> to save all ' + files.length + ' photos to Camera Roll.';
+    'Share Sheet opening — tap <strong>' + shareSheetActionLabel(batch) + '</strong> to save all ' + files.length + ' ' + mediaLabel(batch, true).toLowerCase() + ' to Camera Roll.';
 
   /* Trigger share */
   try{
     await navigator.share({
       files : files,
-      title : 'ImpactGrid Photos',
-      text  : 'Tap "Save Image" to save to Camera Roll'
+      title : 'ImpactGrid ' + mediaLabel(batch, true),
+      text  : 'Tap ' + shareSheetActionLabel(batch) + ' to save to Camera Roll'
     });
 
     /* User completed share */
@@ -2066,7 +2118,7 @@ async function iosDlTriggerShare(){
       document.getElementById('iosDlSaveBtnText').textContent =
         'Try Batch ' + (iosDl.batchIdx + 1) + ' Again';
       document.getElementById('iosDlInstructionText').innerHTML =
-        'Looks like you cancelled. Tap the button again, then tap <strong>"Save Image"</strong> on the Share Sheet.';
+        'Looks like you cancelled. Tap the button again, then tap <strong>' + shareSheetActionLabel(batch) + '</strong> on the Share Sheet.';
     } else {
       console.warn('Share error:', e);
       document.getElementById('iosDlSaveBtnIcon').textContent = '🔄';
@@ -2088,16 +2140,17 @@ function iosDlNextBatch(){
   document.getElementById('iosDlSaveBtnText').textContent =
     'Save Batch ' + (iosDl.batchIdx + 1) + ' of ' + totalBatches;
   document.getElementById('iosDlNextBtn').classList.add('hidden');
+  var nextBatch = iosDl.batches[iosDl.batchIdx] || [];
   document.getElementById('iosDlInstructionText').innerHTML =
-    'Tap <strong>"Save to Device"</strong> — your Share Sheet opens. Tap <strong>"Save Image"</strong> to save this batch to Camera Roll.';
+    'Tap <strong>"Save to Device"</strong> — your Share Sheet opens. Tap <strong>' + shareSheetActionLabel(nextBatch) + '</strong> to save this batch to Camera Roll.';
 }
 
 function iosDlShowDone(){
   document.getElementById('iosDlBtnArea').classList.add('hidden');
   document.getElementById('iosDlInstruction').style.display = 'none';
   document.getElementById('iosDlDone').classList.remove('hidden');
-  document.getElementById('iosDlDoneTitle').textContent = '🎉 All ' + iosDl.saved + ' Photos Saved!';
-  document.getElementById('iosDlDoneSub').textContent   = 'Check your Camera Roll — all your photos are there.';
+  document.getElementById('iosDlDoneTitle').textContent = '🎉 All ' + iosDl.saved + ' ' + mediaLabel(iosDl.photos, true) + ' Saved!';
+  document.getElementById('iosDlDoneSub').textContent   = 'Check your Camera Roll — everything is there.';
   iosDlUpdateProgress();
 }
 
@@ -2181,28 +2234,63 @@ function openLightbox(idx, event){
 function showLightboxAt(idx){
   if(!allPhotos.length) return;
   lbIndex = (idx + allPhotos.length) % allPhotos.length;
-  var p = allPhotos[lbIndex];
-  document.getElementById('lightboxImg').src       = p.preview_url;
+  var p       = allPhotos[lbIndex];
+  var isVid   = p.media_type === 'video';
+  var imgEl   = document.getElementById('lightboxImg');
+  var vidEl   = document.getElementById('lightboxVideo');
+  var dlBtn   = document.getElementById('lbDownloadBtn');
+
+  /* Always stop any playing video before switching slides */
+  vidEl.pause();
+  vidEl.removeAttribute('src');
+  vidEl.load();
+
+  if(isVid){
+    imgEl.classList.add('lb-hidden');
+    vidEl.classList.add('active');
+    vidEl.src = p.web_url || p.original_url;
+  } else {
+    vidEl.classList.remove('active');
+    imgEl.classList.remove('lb-hidden');
+    imgEl.src = p.preview_url;
+  }
+
+  if(dlBtn) dlBtn.textContent = isVid ? '⬇ Save Video' : '⬇ Save Photo';
   document.getElementById('lbCounter').textContent = (lbIndex+1) + ' / ' + allPhotos.length;
+}
+
+function lbToggleFullscreen(){
+  var p     = allPhotos[lbIndex];
+  var isVid = p && p.media_type === 'video';
+  /* For video, native fullscreen on the <video> element gives proper
+     device video-fullscreen controls (scrubber, rotate, etc). */
+  var target = isVid ? document.getElementById('lightboxVideo') : document.getElementById('lightbox');
+  if(target.requestFullscreen) target.requestFullscreen().catch(function(){});
+  else if(target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+  else if(target.webkitEnterFullscreen) target.webkitEnterFullscreen(); /* iOS Safari <video> */
 }
 
 function lbDownload(){
   var p = allPhotos[lbIndex];
   if(!p) return;
+  var isVid = p.media_type === 'video';
   var url = p.original_url || p.preview_url;
   if(isSafariIOS()){
     showIosModal([p]);
     return;
   }
-  toast('⬇', 'Saving photo…', 'Check your Downloads / Gallery');
-  blobDownload(url, 'ImpactGrid-Photo-' + (lbIndex + 1) + '.jpg')
-    .then(function(){ toast('✅', 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([p]); })
+  toast('⬇', isVid ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
+  var filename = 'ImpactGrid-' + (isVid ? 'Video-' : 'Photo-') + (lbIndex + 1) + (isVid ? '.mp4' : '.jpg');
+  blobDownload(url, filename)
+    .then(function(){ toast('✅', isVid ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([p]); })
     .catch(function(){ toast('⚠️', 'Download failed', 'Try again or check your connection'); });
 }
 
 function closeLightbox(){
   document.getElementById('lightbox').classList.add('hidden');
   document.body.style.overflow = '';
+  var vidEl = document.getElementById('lightboxVideo');
+  if(vidEl){ vidEl.pause(); }
 }
 
 function closeLightboxBg(event){

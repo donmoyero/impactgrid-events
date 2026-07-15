@@ -650,6 +650,35 @@ async function uploadToCloudinary(blob, folder){
   return await res.json(); /* { secure_url, public_id, ... } */
 }
 
+/* Upload a video file to Cloudinary (resource_type: video).
+   No client-side re-encoding — videos are uploaded as-is.
+   Same unsigned preset/cloud as photos; Cloudinary presets are
+   resource-type agnostic unless explicitly restricted. */
+async function uploadVideoToCloudinary(file, folder){
+  var fd = new FormData();
+  fd.append('file',         file);
+  fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  fd.append('folder',        'impactgrid/' + folder);
+  var res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/video/upload', {
+    method: 'POST', body: fd
+  });
+  if(!res.ok){
+    var errBody = await res.json().catch(function(){ return {}; });
+    throw new Error(errBody.error && errBody.error.message ? errBody.error.message : 'Cloudinary video upload failed (' + res.status + ')');
+  }
+  return await res.json(); /* { secure_url, public_id, ... } */
+}
+
+/* Derives a JPG poster-frame URL from a Cloudinary video delivery URL,
+   purely via URL manipulation — no extra upload/transformation call
+   needed. Cloudinary generates the frame on first request and caches it.
+   e.g. .../video/upload/v123/impactgrid/evt/original/abc.mp4
+     →   .../video/upload/so_0/v123/impactgrid/evt/original/abc.jpg */
+function cloudinaryVideoPosterUrl(secureUrl){
+  var withOffset = secureUrl.replace('/video/upload/', '/video/upload/so_0/');
+  return withOffset.replace(/\.[a-zA-Z0-9]+($|\?)/, '.jpg$1');
+}
+
 /* ════════════════════════════════════════════════════
    BLOG-ONLY CLOUDINARY (separate account from portfolio/events)
 ════════════════════════════════════════════════════ */
@@ -683,11 +712,19 @@ async function uploadPhotos(files){
   var prog = document.getElementById('photoUploadProgress');
   prog.innerHTML = '';
 
+  var MAX_VIDEO_BYTES = 100 * 1024 * 1024; /* 100MB — typical Cloudinary plan cap */
+
   for(var i = 0; i < files.length; i++){
     var file    = files[i];
-    var allowed = ['image/jpeg','image/png','image/webp'];
-    if(!allowed.includes(file.type)){
-      toast('⚠️', 'Skipped ' + file.name, 'Not a supported image type');
+    var allowedImage = ['image/jpeg','image/png','image/webp'];
+    var allowedVideo = ['video/mp4','video/quicktime','video/webm'];
+    var isVideo = allowedVideo.includes(file.type);
+    if(!allowedImage.includes(file.type) && !isVideo){
+      toast('⚠️', 'Skipped ' + file.name, 'Not a supported photo or video type');
+      continue;
+    }
+    if(isVideo && file.size > MAX_VIDEO_BYTES){
+      toast('⚠️', 'Skipped ' + file.name, 'Video over 100MB — trim it and try again');
       continue;
     }
 
@@ -712,6 +749,29 @@ async function uploadPhotos(files){
     try{
       var folder = selectedEventId;
 
+      if(isVideo){
+        /* Videos: single upload, no client-side re-encoding.
+           Poster thumbnail is derived from the video URL itself
+           (no extra upload/API call needed). */
+        setStatus('Uploading video…', 30, '');
+        var vidResult  = await uploadVideoToCloudinary(file, folder + '/original');
+        var posterUrl  = cloudinaryVideoPosterUrl(vidResult.secure_url);
+
+        setStatus('Saving record…', 85, '');
+        await addDoc(collection(db, 'photos'), {
+          event_id      : selectedEventId,
+          media_type    : 'video',
+          preview_url   : posterUrl,
+          web_url       : vidResult.secure_url,
+          original_url  : vidResult.secure_url,
+          cloudinary_id : vidResult.public_id,
+          created_at    : serverTimestamp()
+        });
+
+        setStatus('✅ Done', 100, 'var(--green)');
+        continue;
+      }
+
       /* 1 — Upload original to Cloudinary. Stays true original quality
          unless the file is too big for Cloudinary's free-plan cap. */
       setStatus('Uploading original…', 15, '');
@@ -732,6 +792,7 @@ async function uploadPhotos(files){
       setStatus('Saving record…', 85, '');
       await addDoc(collection(db, 'photos'), {
         event_id      : selectedEventId,
+        media_type    : 'photo',
         preview_url   : thumbResult.secure_url,
         web_url       : webResult.secure_url,
         original_url  : origResult.secure_url,
@@ -746,7 +807,7 @@ async function uploadPhotos(files){
     }
   }
 
-  toast('✅', 'Upload complete!', files.length + ' photo' + (files.length > 1 ? 's' : '') + ' added');
+  toast('✅', 'Upload complete!', files.length + ' file' + (files.length > 1 ? 's' : '') + ' added');
   loadEventPhotos();
 }
 
@@ -787,10 +848,12 @@ async function loadEventPhotos(){
           epPhotoMap[p.id] = p.cloudinary_id || '';
           var viewUrl = p.web_url || p.preview_url;
           var dlUrl   = p.original_url || viewUrl;
+          var isVid   = p.media_type === 'video';
           return '<div class="ep-photo-card" style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid var(--border);">'
             + '<input type="checkbox" class="ep-photo-cb" data-id="' + esc(p.id) + '" onchange="epTogglePhotoSelect(\'' + esc(p.id) + '\',this)" '
             + 'style="position:absolute;top:4px;left:4px;width:18px;height:18px;cursor:pointer;z-index:2;"/>'
             + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:90px;object-fit:cover;" onerror="this.style.background=\'var(--bg3)\'"/>'
+            + (isVid ? '<div style="position:absolute;top:4px;right:28px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;">▶ Video</div>' : '')
             + '<a href="' + esc(viewUrl) + '" target="_blank" style="position:absolute;bottom:22px;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;">👁 View</a>'
             + '<a href="' + esc(dlUrl) + '" download target="_blank" style="position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;">⬇ Download</a>'
             + '<button onclick="deletePhoto(\'' + esc(p.id) + '\',\'' + esc(p.cloudinary_id||'') + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;z-index:2;">✕</button>'
