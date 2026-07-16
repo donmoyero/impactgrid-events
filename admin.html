@@ -59,7 +59,8 @@ img{display:block;max-width:100%;}
 .main::-webkit-scrollbar{width:5px;}
 .main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 .page{display:none;padding:28px 32px;}
-.page.active{display:block;}
+.page.active{display:block;animation:pageFadeIn .35s cubic-bezier(0.4,0,0.2,1);}
+@keyframes pageFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 .page-header{margin-bottom:24px;}
 .page-title{font-size:22px;font-weight:900;letter-spacing:-.025em;margin-bottom:4px;}
 .page-sub{font-size:13px;color:var(--text2);}
@@ -78,7 +79,7 @@ img{display:block;max-width:100%;}
 .quick-ico{font-size:22px;margin-bottom:10px;}
 .quick-title{font-size:13px;font-weight:700;margin-bottom:3px;}
 .quick-desc{font-size:11px;color:var(--text2);line-height:1.55;}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:var(--fb);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .2s cubic-bezier(0.4,0,0.2,1);font-family:var(--fb);}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;}
 [data-theme="dark"] .btn-gold{color:#07090f;}
 .btn-gold:hover{transform:translateY(-1px);box-shadow:var(--sh-gold);}
@@ -277,7 +278,7 @@ tr:hover td{background:var(--bg2);}
     <span class="topbar-user" id="topbarUser"></span>
     <button class="topbar-btn" id="themeToggleBtn" onclick="toggleAdminTheme()" title="Toggle light/dark"></button>
     <a href="index.html" target="_blank" class="topbar-btn"> View Site</a>
-    <button class="topbar-btn topbar-btn-red" onclick="igLogout()"> Sign Out</button>
+    <button class="topbar-btn topbar-btn-red" onclick="igLogout()">🚪 Sign Out</button>
   </div>
 </div>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -361,7 +362,7 @@ tr:hover td{background:var(--bg2);}
       <div class="page-header"><div class="page-title">Homepage Text</div><div class="page-sub">Edit the hero headline, "How We Work" steps, review quotes, trust badge labels, and newsletter heading.</div></div>
       <div class="ws-layout">
         <div>
-          <div class="card"><div class="card-head"><h2> Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()"> Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div></div></div>
+          <div class="card"><div class="card-head"><h2>📝 Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()">💾 Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div></div></div></div>
         </div>
         <div class="ws-sticky">
           <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds. For the trust badge labels, use a line break where you want the text to wrap onto a second line.</div>
@@ -402,7 +403,7 @@ tr:hover td{background:var(--bg2);}
             <div id="heroGridList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
               <button class="btn btn-ghost btn-sm" onclick="addSectionRow('heroGridList','hero_grid',5)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('heroGridList','hero_grid','Hero grid')"> Save Hero Grid</button>
+              <button class="btn btn-gold" onclick="saveSectionList('heroGridList','hero_grid','Hero grid')">💾 Save Hero Grid</button>
             </div>
           </div>
         </div>
@@ -433,7 +434,7 @@ tr:hover td{background:var(--bg2);}
             <div id="galleryStripList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
               <button class="btn btn-ghost btn-sm" onclick="addSectionRow('galleryStripList','gallery_strip',99)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('galleryStripList','gallery_strip','Gallery strip')"> Save Gallery Strip</button>
+              <button class="btn btn-gold" onclick="saveSectionList('galleryStripList','gallery_strip','Gallery strip')">💾 Save Gallery Strip</button>
             </div>
           </div>
         </div>
@@ -465,7 +466,7 @@ tr:hover td{background:var(--bg2);}
             <div id="howImageList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
               <button class="btn btn-ghost btn-sm" onclick="addSectionRow('howImageList','how_image',10)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('howImageList','how_image','How it works images')"> Save Images</button>
+              <button class="btn btn-gold" onclick="saveSectionList('howImageList','how_image','How it works images')">💾 Save Images</button>
             </div>
           </div>
         </div>
@@ -496,7 +497,7 @@ tr:hover td{background:var(--bg2);}
             <div id="whoCardsList" style="display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
               <button class="btn btn-ghost btn-sm" onclick="addSectionRow('whoCardsList','who_cards',6)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('whoCardsList','who_cards','Who It\'s For cards')"> Save Cards</button>
+              <button class="btn btn-gold" onclick="saveSectionList('whoCardsList','who_cards','Who It\'s For cards')">💾 Save Cards</button>
             </div>
           </div>
         </div>
@@ -512,28 +513,28 @@ tr:hover td{background:var(--bg2);}
     <!-- UPDATES -->
     <div class="page" id="page-updates">
       <div class="page-header"><div class="page-title">Updates Section</div><div class="page-sub">Edit the "ImpactGrid — Latest Updates" section on the homepage.</div></div>
-      <div class="card"><div class="card-head"><h2> Update Cards</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addUpdateCard()">+ Add Card</button><button class="btn btn-gold" onclick="saveUpdateCards()"> Save All</button></div></div><div class="card-body" id="updateCardsEditor"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div></div>
+      <div class="card"><div class="card-head"><h2>🗂️ Update Cards</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addUpdateCard()">+ Add Card</button><button class="btn btn-gold" onclick="saveUpdateCards()">💾 Save All</button></div></div><div class="card-body" id="updateCardsEditor"><div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div></div></div>
     </div>
     <!-- TESTIMONIALS -->
     <div class="page" id="page-testimonials">
       <div class="page-header"><div class="page-title">Testimonials</div><div class="page-sub">Edit the "What People Say" section.</div></div>
-      <div class="card"><div class="card-head"><h2> Testimonials</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTestimonial()">+ Add</button><button class="btn btn-gold" onclick="saveTestimonials()"> Save All</button></div></div>
+      <div class="card"><div class="card-head"><h2>💬 Testimonials</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTestimonial()">+ Add</button><button class="btn btn-gold" onclick="saveTestimonials()">💾 Save All</button></div></div>
         <div class="card-body">
           <div style="background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px;">
             <div class="field-group" style="margin-bottom:10px;"><div class="field-label">Section Heading</div><input type="text" id="trust-title-input" placeholder="e.g. The platform speaks for itself"/></div>
             <div class="field-group" style="margin-bottom:0;"><div class="field-label">Label Tag</div><input type="text" id="trust-label-input" placeholder="e.g. What People Say"/></div>
           </div>
-          <div class="testimonial-list" id="testimonialList"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div>
+          <div class="testimonial-list" id="testimonialList"><div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div></div>
         </div>
       </div>
     </div>
     <!-- TICKER -->
     <div class="page" id="page-ticker">
       <div class="page-header"><div class="page-title">Ticker</div><div class="page-sub">Edit the scrolling announcement bar.</div></div>
-      <div class="card"><div class="card-head"><h2> Ticker Items</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTickerRow()">+ Add</button><button class="btn btn-gold" onclick="saveTicker()"> Save All</button></div></div>
+      <div class="card"><div class="card-head"><h2>📢 Ticker Items</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="addTickerRow()">+ Add</button><button class="btn btn-gold" onclick="saveTicker()">💾 Save All</button></div></div>
         <div class="card-body">
           <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Click the coloured tag to cycle between New / Live / Soon.</p>
-          <div id="tickerList"><div class="empty"><div class="empty-ico"></div></div></div>
+          <div id="tickerList"><div class="empty"><div class="empty-ico">🗒️</div></div></div>
           <div style="margin-top:16px;"><div class="field-label" style="margin-bottom:8px;">Preview</div>
             <div class="ticker-preview-strip"><div class="tp-badge"><div class="tp-dot"></div>ImpactGrid</div><div class="tp-text" id="tickerPreview">—</div></div>
           </div>
@@ -573,16 +574,16 @@ tr:hover td{background:var(--bg2);}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <!-- Device breakdown -->
         <div class="card">
-          <div class="card-head"><h2> Device Types</h2></div>
+          <div class="card-head"><h2>📱 Device Types</h2></div>
           <div class="card-body" id="act-devices">
-            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+            <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
           </div>
         </div>
         <!-- Location breakdown -->
         <div class="card">
-          <div class="card-head"><h2> Visitor Locations</h2></div>
+          <div class="card-head"><h2>🌍 Visitor Locations</h2></div>
           <div class="card-body" id="act-locations">
-            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+            <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
           </div>
         </div>
       </div>
@@ -590,22 +591,22 @@ tr:hover td{background:var(--bg2);}
       <!-- Visit log table -->
       <div class="card" style="margin-bottom:16px;">
         <div class="card-head">
-          <h2> Page Visit Log</h2>
+          <h2>📊 Page Visit Log</h2>
           <span style="font-size:11px;color:var(--text3);">Most recent first</span>
         </div>
         <div class="card-body table-wrap" id="act-visit-log">
-          <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+          <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
         </div>
       </div>
 
       <!-- Downloads log table -->
       <div class="card" style="margin-bottom:16px;">
         <div class="card-head">
-          <h2> Downloads Log</h2>
+          <h2>⬇️ Downloads Log</h2>
           <span style="font-size:11px;color:var(--text3);">Every photo download recorded from event galleries</span>
         </div>
         <div class="card-body table-wrap" id="act-downloads-log">
-          <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+          <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
         </div>
       </div>
 
@@ -613,7 +614,7 @@ tr:hover td{background:var(--bg2);}
     <!-- ALL EVENTS -->
     <div class="page" id="page-events">
       <div class="page-header"><div class="page-title">Events</div><div class="page-sub">All ImpactGrid photo events.</div></div>
-      <div class="card"><div class="card-head"><h2> All Events</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button><button class="btn btn-gold" onclick="nav('createevent',null)"> Create Event</button></div></div><div class="card-body table-wrap" id="eventsList"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div></div></div>
+      <div class="card"><div class="card-head"><h2>📅 All Events</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button><button class="btn btn-gold" onclick="nav('createevent',null)">➕ Create Event</button></div></div><div class="card-body table-wrap" id="eventsList"><div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div></div></div>
     </div>
     <!-- CREATE EVENT -->
     <div class="page" id="page-createevent">
@@ -621,7 +622,7 @@ tr:hover td{background:var(--bg2);}
       <div class="ws-layout">
         <div>
           <div class="card">
-            <div class="card-head"><h2> Event Details</h2></div>
+            <div class="card-head"><h2>🎫 Event Details</h2></div>
             <div class="card-body">
               <div id="createEventAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
               <div class="field-group" style="margin-bottom:12px;"><div class="field-label">Event Name *</div><input type="text" id="ev-name" placeholder="e.g. Johnson Wedding 2026" oninput="updateTemplatePreview()"/></div>
@@ -644,14 +645,14 @@ tr:hover td{background:var(--bg2);}
                 <div class="toggle on" id="ev-code-toggle" onclick="toggleRequireCode()"></div>
                 <div><div style="font-size:13px;font-weight:600;">Require Access Code</div><div style="font-size:11px;color:var(--text3);">Guests must enter the code to view the gallery</div></div>
               </div>
-              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()"> Create Event →</button>
+              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()">➕ Create Event →</button>
             </div>
           </div>
 
           <!--  EMAIL NOTIFICATION  -->
           <div class="card" style="margin-top:16px;">
             <div class="card-head">
-              <h2> Owner Notification Email</h2>
+              <h2>📧 Owner Notification Email</h2>
               <span style="font-size:11px;color:var(--text3);">Sent automatically when event is created</span>
             </div>
             <div class="card-body">
@@ -683,7 +684,7 @@ If you have any questions, just reply to this email.
           <!--  INVOICE  -->
           <div class="card" style="margin-top:16px;">
             <div class="card-head">
-              <h2> Invoice</h2>
+              <h2>🧾 Invoice</h2>
               <span style="font-size:11px;color:var(--text3);">Saved with event · attach to confirmation emails later</span>
             </div>
             <div class="card-body">
@@ -762,9 +763,9 @@ If you have any questions, just reply to this email.
       <div class="page-header"><div class="page-title">Upload Photos</div><div class="page-sub">Upload photos to an event. Preview versions are available immediately.</div></div>
       <div class="ws-layout">
         <div>
-          <div class="card"><div class="card-head"><h2> Select Event</h2></div><div class="card-body"><div class="field-group"><div class="field-label">Event</div><select id="upload-event-select" onchange="onUploadEventChange()"><option value="">— Select an event —</option></select></div><div id="upload-event-info" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:4px;"><div style="font-size:12px;color:var(--text2);" id="upload-event-meta"></div></div></div></div>
-          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2> Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico"></div><div class="upload-zone-title">Drop photos or videos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · MP4 · MOV · WebM (video max 100MB) · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
-          <div class="card" id="upload-photos-list-card" style="display:none;"><div class="card-head"><h2> Event Photos</h2><div style="display:flex;gap:10px;align-items:center;"><label style="font-size:12px;display:flex;gap:5px;align-items:center;cursor:pointer;color:var(--text2);"><input type="checkbox" id="epSelectAllCb" onchange="epToggleSelectAll(this)" style="margin:0;cursor:pointer;"/> Select all</label><button class="btn btn-ghost btn-sm" id="epBulkDeleteBtn" onclick="epBulkDeleteSelected()" style="display:none;color:var(--red);">🗑 Delete Selected (<span id="epSelectedCount">0</span>)</button><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button></div></div><div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico"></div><div class="empty-txt">No photos yet.</div></div></div></div>
+          <div class="card"><div class="card-head"><h2>🎯 Select Event</h2></div><div class="card-body"><div class="field-group"><div class="field-label">Event</div><select id="upload-event-select" onchange="onUploadEventChange()"><option value="">— Select an event —</option></select></div><div id="upload-event-info" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:4px;"><div style="font-size:12px;color:var(--text2);" id="upload-event-meta"></div></div></div></div>
+          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2>📸 Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico"></div><div class="upload-zone-title">Drop photos or videos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · MP4 · MOV · WebM (video max 100MB) · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
+          <div class="card" id="upload-photos-list-card" style="display:none;"><div class="card-head"><h2>🖼️ Event Photos</h2><div style="display:flex;gap:10px;align-items:center;"><label style="font-size:12px;display:flex;gap:5px;align-items:center;cursor:pointer;color:var(--text2);"><input type="checkbox" id="epSelectAllCb" onchange="epToggleSelectAll(this)" style="margin:0;cursor:pointer;"/> Select all</label><button class="btn btn-ghost btn-sm" id="epBulkDeleteBtn" onclick="epBulkDeleteSelected()" style="display:none;color:var(--red);">🗑 Delete Selected (<span id="epSelectedCount">0</span>)</button><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button></div></div><div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No photos yet.</div></div></div></div>
         </div>
         <div class="ws-sticky"><div class="hint-box"><strong>Upload tips</strong><br><br>You can upload multiple photos at once.<br><br>Photos are stored in the event bucket and are available immediately in the gallery after upload.</div></div>
       </div>
@@ -780,7 +781,7 @@ If you have any questions, just reply to this email.
       <div class="ws-layout">
         <div>
           <div class="card">
-            <div class="card-head"><h2> Upload Photos</h2></div>
+            <div class="card-head"><h2>📸 Upload Photos</h2></div>
             <div class="card-body">
               <div class="upload-zone" id="pfDropZone"
                 onclick="document.getElementById('pfFileIn').click()"
@@ -808,7 +809,7 @@ If you have any questions, just reply to this email.
               </div>
             </div>
             <div class="card-body" id="pfPhotosList">
-              <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+              <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
             </div>
           </div>
         </div>
@@ -833,14 +834,14 @@ If you have any questions, just reply to this email.
       <div id="blogListView">
         <div class="card">
           <div class="card-head">
-            <h2> All Posts</h2>
+            <h2>📰 All Posts</h2>
             <div style="display:flex;gap:8px;">
               <button class="btn btn-ghost btn-sm" onclick="loadBlogPosts()">↻ Refresh</button>
               <button class="btn btn-gold" onclick="blogNewPost()">+ New Post</button>
             </div>
           </div>
           <div class="card-body" id="blogPostsList">
-            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+            <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
           </div>
         </div>
       </div>
@@ -851,7 +852,7 @@ If you have any questions, just reply to this email.
           <div>
             <div class="card">
               <div class="card-head">
-                <h2 id="blogEditorTitle"> Post Details</h2>
+                <h2 id="blogEditorTitle">📄 Post Details</h2>
                 <button class="btn btn-ghost btn-sm" onclick="blogBackToList()">← Back to list</button>
               </div>
               <div class="card-body">
@@ -885,7 +886,7 @@ If you have any questions, just reply to this email.
 
             <div class="card">
               <div class="card-head">
-                <h2> Pages</h2>
+                <h2>📑 Pages</h2>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   <button class="btn btn-ghost btn-sm" onclick="blogAddPage('text')">+ Text Page</button>
                   <button class="btn btn-ghost btn-sm" onclick="blogAddPage('image')">+ Image Page</button>
@@ -893,7 +894,7 @@ If you have any questions, just reply to this email.
                 </div>
               </div>
               <div class="card-body" id="blogPagesList">
-                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">No pages yet — add one above.</div></div>
+                <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No pages yet — add one above.</div></div>
               </div>
             </div>
           </div>
@@ -903,7 +904,7 @@ If you have any questions, just reply to this email.
               Drag a page by its ⠿⠿ handle to reorder it (or use ↑ / ↓). Text and image pages can sit side-by-side as a spread on the public blog page.<br><br>
               YouTube pages take the video ID or you can just paste the full YouTube link — it shows a thumbnail and only loads the video when clicked.
             </div>
-            <button class="btn btn-gold" onclick="blogSavePost()" style="display:flex;justify-content:center;margin-top:12px;padding:10px;width:100%;"> Save Post</button>
+            <button class="btn btn-gold" onclick="blogSavePost()" style="display:flex;justify-content:center;margin-top:12px;padding:10px;width:100%;">💾 Save Post</button>
             <a href="blog.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:10px;padding:10px;"> Preview Blog</a>
           </div>
         </div>
@@ -919,14 +920,14 @@ If you have any questions, just reply to this email.
           <!-- Service list -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2> Your Services</h2>
+              <h2>🛠️ Your Services</h2>
               <div style="display:flex;gap:8px;">
                 <button class="btn btn-ghost btn-sm" onclick="loadServices()">↻ Refresh</button>
                 <button class="btn btn-gold" onclick="openServiceModal()">+ Add Service</button>
               </div>
             </div>
             <div class="card-body table-wrap" id="servicesList">
-              <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+              <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
             </div>
           </div>
         </div>
@@ -954,8 +955,8 @@ If you have any questions, just reply to this email.
           <!-- STORY SECTION -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2> Our Story</h2>
-              <button class="btn btn-gold" onclick="saveAboutStory()"> Save Story</button>
+              <h2>📖 Our Story</h2>
+              <button class="btn btn-gold" onclick="saveAboutStory()">💾 Save Story</button>
             </div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
               <div id="aboutStoryAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;"></div>
@@ -996,15 +997,15 @@ If you have any questions, just reply to this email.
           <!-- TEAM MEMBERS -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2> Team Members</h2>
+              <h2>👥 Team Members</h2>
               <div style="display:flex;gap:8px;">
                 <button class="btn btn-ghost btn-sm" onclick="addTeamMember()">+ Add Member</button>
-                <button class="btn btn-gold" onclick="saveTeamMembers()"> Save Team</button>
+                <button class="btn btn-gold" onclick="saveTeamMembers()">💾 Save Team</button>
               </div>
             </div>
             <div class="card-body">
               <div id="teamMembersList" style="display:flex;flex-direction:column;gap:14px;">
-                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
           </div>
@@ -1012,15 +1013,15 @@ If you have any questions, just reply to this email.
           <!-- MISSION & VISION PILLARS -->
           <div class="card" style="margin-bottom:18px;">
             <div class="card-head">
-              <h2> Mission & Vision — Pillars</h2>
+              <h2>🧭 Mission & Vision — Pillars</h2>
               <div style="display:flex;gap:8px;">
                 <button class="btn btn-ghost btn-sm" onclick="addPillar()">+ Add Pillar</button>
-                <button class="btn btn-gold" onclick="savePillars()"> Save Pillars</button>
+                <button class="btn btn-gold" onclick="savePillars()">💾 Save Pillars</button>
               </div>
             </div>
             <div class="card-body">
               <div id="pillarsList" style="display:flex;flex-direction:column;gap:10px;">
-                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
           </div>
@@ -1100,7 +1101,7 @@ If you have any questions, just reply to this email.
 
           <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:4px;">
             <button class="btn btn-ghost" onclick="closeSvcModal()">Cancel</button>
-            <button class="btn btn-gold" id="svcSaveBtn" onclick="saveService()"> Save Service</button>
+            <button class="btn btn-gold" id="svcSaveBtn" onclick="saveService()">💾 Save Service</button>
           </div>
         </div>
       </div>
@@ -1113,14 +1114,14 @@ If you have any questions, just reply to this email.
         <div>
           <!-- Tabs -->
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
-            <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);"> Compose</button>
-            <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);"> Sent</button>
+            <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:var(--card);color:var(--text);box-shadow:var(--sh);">✏️ Compose</button>
+            <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    style="flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--text2);">📤 Sent</button>
           </div>
 
           <!-- COMPOSE -->
           <div id="mail-tab-compose">
             <div class="card">
-              <div class="card-head"><h2> New Email</h2></div>
+              <div class="card-head"><h2>✉️ New Email</h2></div>
               <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
                 <div class="field-group">
                   <div class="field-label">To</div>
@@ -1135,7 +1136,7 @@ If you have any questions, just reply to this email.
                   <textarea id="mail-body" rows="10" placeholder="Type your message here…" style="resize:vertical;"></textarea>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                  <button class="btn btn-gold" onclick="sendMail()"> Send Email</button>
+                  <button class="btn btn-gold" onclick="sendMail()">📧 Send Email</button>
                   <button class="btn btn-ghost" onclick="clearCompose()">Clear</button>
                   <span style="font-size:11px;color:var(--text3);">Sent from events@impactgridgroup.com via Resend</span>
                 </div>
@@ -1147,9 +1148,9 @@ If you have any questions, just reply to this email.
           <!-- SENT -->
           <div id="mail-tab-sent" style="display:none;">
             <div class="card">
-              <div class="card-head"><h2> Sent</h2><button class="btn btn-ghost btn-sm" onclick="loadSent()">↻ Refresh</button></div>
+              <div class="card-head"><h2>📤 Sent</h2><button class="btn btn-ghost btn-sm" onclick="loadSent()">↻ Refresh</button></div>
               <div class="card-body" id="mail-sent-list">
-                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
           </div>
@@ -1169,7 +1170,7 @@ If you have any questions, just reply to this email.
         <div>
             <div class="card">
               <div class="card-head">
-                <h2> Campaigns</h2>
+                <h2>📣 Campaigns</h2>
                 <button class="btn btn-gold btn-sm" onclick="VT.showCreateForm()">+ New Form</button>
               </div>
               <div class="card-body">
@@ -1203,7 +1204,7 @@ If you have any questions, just reply to this email.
                 </div>
 
                 <div id="vtCampaignList">
-                  <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading campaigns…</div></div>
+                  <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading campaigns…</div></div>
                 </div>
 
                 <!-- PAGE DESIGN EDITOR (hidden until "Customize Page" clicked) -->
@@ -1315,7 +1316,7 @@ If you have any questions, just reply to this email.
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
                     <h2 id="vtRegTitle" style="font-size:15px;margin:0;">Registrations</h2>
                     <button class="btn btn-ghost btn-sm" onclick="VT.exportCSV()">Export CSV</button>
-                    <button class="btn btn-ghost btn-sm" id="vtExportPdfBtn" onclick="VT.exportPDF()"> Export PDF (+ AI insights)</button>
+                    <button class="btn btn-ghost btn-sm" id="vtExportPdfBtn" onclick="VT.exportPDF()">📄 Export PDF (+ AI insights)</button>
                   </div>
                   <div style="overflow-x:auto;">
                     <table style="width:100%;border-collapse:collapse;font-size:12.5px;" id="vtRegTable">
@@ -1351,7 +1352,7 @@ If you have any questions, just reply to this email.
         </div>
         <div class="card-body">
           <div id="reviews-table-wrap">
-            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading reviews…</div></div>
+            <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading reviews…</div></div>
           </div>
         </div>
       </div>
@@ -1363,7 +1364,7 @@ If you have any questions, just reply to this email.
             <div class="card-head"><h2>📤 Sent Reviews — what the AI has sent</h2></div>
             <div class="card-body">
               <div id="review-emails-table-wrap">
-                <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+                <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
               </div>
             </div>
           </div>
@@ -1416,7 +1417,7 @@ If you have any questions, just reply to this email.
         <div class="card-head"><h2>Uploaded Logos</h2></div>
         <div class="card-body">
           <div id="brandPartnersList">
-            <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+            <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
           </div>
         </div>
       </div>
@@ -1579,7 +1580,7 @@ If you have any questions, just reply to this email.
       </div>
 
       <div style="margin-top:20px;display:flex;gap:12px;align-items:center;">
-        <button class="btn btn-gold" onclick="saveBizSettings()"> Save Settings</button>
+        <button class="btn btn-gold" onclick="saveBizSettings()">💾 Save Settings</button>
         <span id="biz-save-msg" style="font-size:12px;color:var(--green);display:none;"> Saved!</span>
       </div>
     </div>
@@ -1644,28 +1645,28 @@ If you have any questions, just reply to this email.
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <div style="display:flex;gap:8px;flex-wrap:wrap;" id="bkFilterBar">
             <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:#07090f;">All</button>
-            <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)"> Pending</button>
-            <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)"> Confirmed</button>
-            <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)"> Rejected</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)">⏳ Pending</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)">✅ Confirmed</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)">❌ Rejected</button>
             <button class="btn btn-ghost btn-sm" onclick="bkToggleSelectMode()">Select</button>
             <button class="btn btn-ghost btn-sm" onclick="loadBookings()">↻ Refresh</button>
           </div>
           <div style="display:none;gap:8px;flex-wrap:wrap;align-items:center;" id="bkSelectBar">
             <span style="font-size:12px;color:var(--text3);"><span id="bkSelectedCount">0</span> selected</span>
             <button class="btn btn-ghost btn-sm" onclick="bkSelectAllConfirmed()">Select All Confirmed</button>
-            <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="bkBulkUnbook()"> Unbook Selected</button>
+            <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="bkBulkUnbook()">🗑️ Unbook Selected</button>
             <button class="btn btn-ghost btn-sm" onclick="bkExitSelectMode()">Done</button>
           </div>
         </div>
       </div>
       <div class="card-body table-wrap" id="bookingsList">
-        <div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>
+        <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-head">
-        <h2> Block Dates</h2>
+        <h2>🚫 Block Dates</h2>
         <span style="font-size:11px;color:var(--text3);">Quick-add a date without browsing the calendar above</span>
       </div>
       <div class="card-body">
@@ -1681,7 +1682,7 @@ If you have any questions, just reply to this email.
           <button class="btn btn-gold" onclick="blockDate()" style="flex-shrink:0;white-space:nowrap;">Block Date</button>
         </div>
         <div id="blockedDatesList">
-          <div class="empty"><div class="empty-ico"></div><div class="empty-txt">No dates blocked.</div></div>
+          <div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No dates blocked.</div></div>
         </div>
       </div>
     </div>
@@ -1694,7 +1695,7 @@ If you have any questions, just reply to this email.
     <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
       <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
         <div style="font-family:var(--fd);font-size:16px;font-weight:900;" id="confirmModalTitle"> Confirm Booking</div>
-        <button onclick="closeConfirmModal()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;"> Close</button>
+        <button onclick="closeConfirmModal()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;">✕ Close</button>
       </div>
       <div style="padding:20px;">
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px;font-size:13px;" id="modalBookingSummary"></div>
@@ -1748,8 +1749,8 @@ If you have any questions, just reply to this email.
 
         <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
           <button class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
-          <button class="btn" id="rejectInsteadBtn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBookingFromModal()"> Reject Instead</button>
-          <button class="btn btn-gold" id="confirmSendBtn" onclick="confirmBooking()"> Confirm & Send Invoice →</button>
+          <button class="btn" id="rejectInsteadBtn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBookingFromModal()">❌ Reject Instead</button>
+          <button class="btn btn-gold" id="confirmSendBtn" onclick="confirmBooking()">🧾 Confirm & Send Invoice →</button>
         </div>
       </div>
     </div>
@@ -1940,7 +1941,7 @@ async function loadHomepageEditor(){
       return'<div class="cs-item'+(si===0?' open':'')+'" id="cs-'+si+'"><div class="cs-head" onclick="toggleCs('+si+')"><div class="cs-head-left"><span class="cs-head-icon">'+section.section.split(' ')[0]+'</span><div><div class="cs-head-name">'+esc(section.section.replace(/^\S+\s/,''))+'</div><div class="cs-head-meta">'+section.fields.length+' fields</div></div></div><span class="cs-chevron"></span></div><div class="cs-body">'+fieldsHtml+'</div></div>';
     }).join('');
     loadEcoEditor(data||[]);
-  }catch(e){el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">'+esc(e.message)+'</div></div>';}
+  }catch(e){el.innerHTML='<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">'+esc(e.message)+'</div></div>';}
 }
 function toggleCs(idx){var el=document.getElementById('cs-'+idx);if(el)el.classList.toggle('open');}
 async function saveHomepageContent(){
@@ -2014,11 +2015,11 @@ async function uploadHeroFile(file){
 async function loadHeroSlides(){
   var el=document.getElementById('heroSlideList');
   if(!el) return; /* element only exists on the old slideshow tab — safe no-op */
-  el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML='<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>';
   try{
     var {data}=await getSupabase().from('site_slides').select('*').order('sort_order',{ascending:true});
     heroSlides=data||[];
-    if(!heroSlides.length){el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No slides yet. Upload one above.</div></div>';return;}
+    if(!heroSlides.length){el.innerHTML='<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No slides yet. Upload one above.</div></div>';return;}
     el.innerHTML=heroSlides.map(function(s){
       var isVideo=s.type==='video';
       var thumb=isVideo?'<div class="slide-thumb-video"></div>':'<img class="slide-thumb" src="'+esc(s.url)+'" alt=""/>';
@@ -2068,7 +2069,7 @@ function openHeroCaption(slide){
     '<div class="field-group"><div class="field-label">Accent Colour</div><div class="color-row">'+swatches+'</div><input type="hidden" id="cap-color" value="'+(slide.overlay_color||'#c97e08')+'"/></div>'+
     '<div class="caption-preview-box" id="capPreviewBox">'+buildCapPreview(slide)+'</div>'+
     '<div style="display:flex;gap:8px;margin-top:4px;">'+
-      '<button class="btn btn-gold" style="flex:1;" onclick="saveCaption(\''+slide.id+'\')"> Save Caption</button>'+
+      '<button class="btn btn-gold" style="flex:1;" onclick="saveCaption(\''+slide.id+'\')">💾 Save Caption</button>'+
       '<button class="btn btn-red btn-icon" onclick="deleteSlide(\''+slide.id+'\',\''+esc(slide.storage_path||'')+'\')"></button>'+
     '</div>';
 }
@@ -2382,7 +2383,7 @@ function renderDeviceBreakdown(visits){
   var el = document.getElementById('act-devices');
   if(!el) return;
   if(!visits.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No visit data yet.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No visit data yet.</div></div>';
     return;
   }
   var counts = {};
@@ -2405,7 +2406,7 @@ function renderLocationBreakdown(visits){
   var el = document.getElementById('act-locations');
   if(!el) return;
   if(!visits.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No location data yet.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No location data yet.</div></div>';
     return;
   }
   var counts = {};
@@ -2429,7 +2430,7 @@ function renderVisitLog(visits){
   var el = document.getElementById('act-visit-log');
   if(!el) return;
   if(!visits.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No page visits recorded yet. See setup instructions below.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No page visits recorded yet. See setup instructions below.</div></div>';
     return;
   }
   el.innerHTML = '<table><thead><tr><th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>IP</th></tr></thead><tbody>'
@@ -2460,7 +2461,7 @@ function renderVisitLog(visits){
 async function loadDownloadsLog(eventId){
   var el = document.getElementById('act-downloads-log');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>';
   try{
     var dlSnap;
     try{
@@ -2490,7 +2491,7 @@ function renderDownloadsLog(data){
   var el = document.getElementById('act-downloads-log');
   if(!el) return;
   if(!data.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No downloads recorded yet.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No downloads recorded yet.</div></div>';
     return;
   }
 
@@ -2624,7 +2625,7 @@ async function sendMail(){
 async function loadSent(){
   var el = document.getElementById('mail-sent-list');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico"></div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div></div>';
   try{
     var { data, error } = await getSupabase()
       .from('admin_mail_sent')
@@ -2633,7 +2634,7 @@ async function loadSent(){
       .limit(50);
     if(error) throw error;
     if(!data || !data.length){
-      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No sent emails yet.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No sent emails yet.</div></div>';
       return;
     }
     el.innerHTML = '<div style="display:flex;flex-direction:column;gap:1px;">'
@@ -2766,7 +2767,7 @@ var VT = (function(){
     _campaigns = data || [];
 
     if(!_campaigns.length){
-      listEl.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No campaigns yet — create one above.</div></div>';
+      listEl.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No campaigns yet — create one above.</div></div>';
       return;
     }
 
@@ -3854,14 +3855,14 @@ async function pfLoadPhotos() {
   _pfSelectMode = false;
   _pfSelected.clear();
   pfUpdateSelectUI();
-  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>';
   try {
     if (!db) throw new Error('Firebase not ready — refresh.');
     var q    = query(collection(db, 'portfolio_photos'));
     var snap = await getDocs(q);
     var rows = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
     if (!rows.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No photos yet. Drop some in above!</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No photos yet. Drop some in above!</div></div>';
       document.getElementById('pfSelectToggleBtn').style.display = 'none';
       return;
     }
@@ -3893,7 +3894,7 @@ async function pfLoadPhotos() {
       }).join('') +
     '</div>';
   } catch(e) {
-    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
   }
 }
 
@@ -4111,14 +4112,14 @@ async function loadBlogPosts() {
   var el = document.getElementById('blogPostsList');
   if (!el) return;
   blogShowList();
-  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>';
   try {
     var sb = getContentClient();
     var { data, error } = await sb.from('blog_posts').select('*').order('created_at', { ascending: false });
     if (error) throw error;
     blogPosts = data || [];
     if (!blogPosts.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No posts yet — click "New Post" to write your first.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No posts yet — click "New Post" to write your first.</div></div>';
       return;
     }
 
@@ -4185,7 +4186,7 @@ async function loadBlogPosts() {
       }).join('') +
     '</div>';
   } catch(e) {
-    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
   }
 }
 
@@ -4393,7 +4394,7 @@ function blogRenderPages() {
   var el = document.getElementById('blogPagesList');
   var pages = blogCurrentPost ? blogCurrentPost.pages : [];
   if (!pages.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No pages yet — add one above.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No pages yet — add one above.</div></div>';
     return;
   }
   el.innerHTML = pages.map(function(pg, idx) {
@@ -4616,13 +4617,13 @@ async function saveAboutStory() {
 function renderTeamEditor(members) {
   var list = document.getElementById('teamMembersList');
   if (!list) return;
-  if (!members.length) { list.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No team members yet. Click + Add Member.</div></div>'; return; }
+  if (!members.length) { list.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No team members yet. Click + Add Member.</div></div>'; return; }
   list.innerHTML = members.map(function(m, i) {
     return (
       '<div class="card" style="margin-bottom:0;" id="teamRow'+i+'">' +
         '<div class="card-head">' +
           '<h2 style="font-size:13px;">' + (m.name||'Member '+(i+1)) + '</h2>' +
-          '<button class="btn btn-red btn-sm" onclick="removeTeamMember('+i+')"> Remove</button>' +
+          '<button class="btn btn-red btn-sm" onclick="removeTeamMember('+i+')">🗑️ Remove</button>' +
         '</div>' +
         '<div class="card-body" style="display:flex;flex-direction:column;gap:10px;">' +
           '<div class="form-grid">' +
@@ -4715,13 +4716,13 @@ function handleTeamPhotoFile(e, idx) {
 function renderPillarsEditor(pillars) {
   var list = document.getElementById('pillarsList');
   if (!list) return;
-  if (!pillars.length) { list.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No pillars yet. Click + Add Pillar.</div></div>'; return; }
+  if (!pillars.length) { list.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No pillars yet. Click + Add Pillar.</div></div>'; return; }
   list.innerHTML = pillars.map(function(p, i) {
     return (
       '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;" id="pillarRow'+i+'">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
           '<div style="font-size:13px;font-weight:700;">' + (p.icon||'') + ' Pillar ' + (i+1) + '</div>' +
-          '<button class="btn btn-red btn-sm" onclick="removePillar('+i+')"> Remove</button>' +
+          '<button class="btn btn-red btn-sm" onclick="removePillar('+i+')">🗑️ Remove</button>' +
         '</div>' +
         '<div class="form-grid" style="margin-bottom:8px;">' +
           '<div class="field-group" style="margin-bottom:0;"><div class="field-label">Icon / Emoji</div><input type="text" id="pl-icon-'+i+'" value="'+_esc(p.icon)+'" placeholder="" style="max-width:80px;"/></div>' +
@@ -4859,7 +4860,7 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 async function loadBookings() {
   var el = document.getElementById('bookingsList');
   if (!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">Loading…</div></div>';
   try {
     var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
     var res  = await fetch(API + '/api/bookings');
@@ -4941,7 +4942,7 @@ async function bkBulkUnbook(){
 function renderBookingsTable(data) {
   _bkCurrentView = data;
   var el = document.getElementById('bookingsList');
-  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No bookings found.</div></div>'; return; }
+  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No bookings found.</div></div>'; return; }
   var STATUS_PILL = {
     pending  : '<span class="pill" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);"> Pending</span>',
     confirmed: '<span class="pill pill-active"> Confirmed</span>',
@@ -4972,11 +4973,11 @@ function renderBookingsTable(data) {
           + '<td>' + pill + '</td>'
           + '<td style="font-size:12px;color:var(--text3);">' + submitted + '</td>'
           + '<td><div class="td-actions">'
-          + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')"> Confirm</button>' : '')
-          + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')"> Reject</button>' : '')
-          + (b.status==='confirmed' ? '<button class="btn btn-sm" style="border:1px solid var(--gold);color:var(--gold);" onclick="openEditInvoiceModal(\'' + b.id + '\')"> Edit & Resend</button>' : '')
-          + (b.status==='confirmed' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="cancelConfirmedBooking(\'' + b.id + '\')"> Cancel</button>' : '')
-          + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')"> View</button>'
+          + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')">✅ Confirm</button>' : '')
+          + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')">❌ Reject</button>' : '')
+          + (b.status==='confirmed' ? '<button class="btn btn-sm" style="border:1px solid var(--gold);color:var(--gold);" onclick="openEditInvoiceModal(\'' + b.id + '\')">✏️ Edit & Resend</button>' : '')
+          + (b.status==='confirmed' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="cancelConfirmedBooking(\'' + b.id + '\')">✕ Cancel</button>' : '')
+          + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')">👁️ View</button>'
           + '</div></td></tr>';
       }).join('')
     + '</tbody></table>';
@@ -5482,7 +5483,7 @@ async function loadBlockedDatesList(){
     var dates=data.dates_full||data.dates||[];
     _blockedDatesFull = dates;
     if(el){
-      if(!dates.length){ el.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No dates blocked.</div></div>'; }
+      if(!dates.length){ el.innerHTML='<div class="empty"><div class="empty-ico">🗒️</div><div class="empty-txt">No dates blocked.</div></div>'; }
       else {
         el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px;">'
           +dates.map(function(d){
@@ -5666,10 +5667,10 @@ function renderBkCalMultiPanel(){
         +'<div class="field-label">Reason for '+toBlock.length+' new unavailable date'+(toBlock.length!==1?'s':'')+' <span style="font-weight:400;color:var(--text3);font-size:10px;">(optional)</span></div>'
         +'<input type="text" id="calMultiBlockReason" placeholder="e.g. Annual leave"/>'
         +'</div>'
-        +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;margin-bottom:8px;" onclick="bkCalMultiBlock()"> Mark '+toBlock.length+' Date'+(toBlock.length!==1?'s':'')+' Unavailable</button>';
+        +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;margin-bottom:8px;" onclick="bkCalMultiBlock()">🚫 Mark '+toBlock.length+' Date'+(toBlock.length!==1?'s':'')+' Unavailable</button>';
     }
     if(toUnblock.length){
-      html+='<button class="btn btn-sm" style="width:100%;justify-content:center;background:var(--green-dim);color:var(--green);border:1px solid rgba(15,168,118,.2);margin-bottom:8px;" onclick="bkCalMultiUnblock()"> Unblock '+toUnblock.length+' Date'+(toUnblock.length!==1?'s':'')+'</button>';
+      html+='<button class="btn btn-sm" style="width:100%;justify-content:center;background:var(--green-dim);color:var(--green);border:1px solid rgba(15,168,118,.2);margin-bottom:8px;" onclick="bkCalMultiUnblock()">✅ Unblock '+toUnblock.length+' Date'+(toUnblock.length!==1?'s':'')+'</button>';
     }
   }
   html+='<button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" onclick="toggleBkCalMultiSelect()">Done — Exit Multi-Select</button>'
@@ -5742,13 +5743,13 @@ function renderCalDayPanel(dateStr){
       +'<div style="margin-top:6px;">'+esc(booking.event_type||'—')+(booking.location?' · '+esc(booking.location):'')+'</div>'
       +(booking.guest_count?'<div style="color:var(--text3);margin-top:2px;">Guests: '+esc(booking.guest_count)+'</div>':'')
       +'</div>'
-      +'<button class="btn btn-sm" style="width:100%;justify-content:center;background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);margin-bottom:6px;" onclick="cancelConfirmedBooking(\''+booking.id+'\')"> Cancel &amp; Unbook This Date</button>'
+      +'<button class="btn btn-sm" style="width:100%;justify-content:center;background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);margin-bottom:6px;" onclick="cancelConfirmedBooking(\''+booking.id+'\')">🗑️ Cancel &amp; Unbook This Date</button>'
       +'<button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" onclick="viewBookingDetail(\''+booking.id+'\')">View Full Details</button>';
   } else if(blockedEntry){
     var reason=blockedEntry.reason||'';
     html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px;">This date is <strong style="color:var(--red);">unavailable</strong> — hidden from guests on the Book Us page.</div>'
       +(reason?'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px;font-size:12px;color:var(--text2);">'+esc(reason)+'</div>':'')
-      +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;" onclick="unblockDateFromCalendar(\''+dateStr+'\')"> Unblock This Date</button>';
+      +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;" onclick="unblockDateFromCalendar(\''+dateStr+'\')">✅ Unblock This Date</button>';
   } else if(isPast){
     html+='<div style="font-size:12px;color:var(--text3);">This date has passed — no action available.</div>';
   } else {
@@ -5757,7 +5758,7 @@ function renderCalDayPanel(dateStr){
       +'<div class="field-label">Reason <span style="font-weight:400;color:var(--text3);font-size:10px;">(optional, internal only)</span></div>'
       +'<input type="text" id="calBlockReason" placeholder="e.g. Already booked elsewhere"/>'
       +'</div>'
-      +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;" onclick="blockDateFromCalendar(\''+dateStr+'\')"> Mark as Unavailable</button>';
+      +'<button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;" onclick="blockDateFromCalendar(\''+dateStr+'\')">🚫 Mark as Unavailable</button>';
   }
 
   html+='</div>';
