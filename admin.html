@@ -803,6 +803,7 @@ If you have any questions, just reply to this email.
                 <button class="btn btn-ghost btn-sm" id="pfSelectAllBtn" onclick="pfSelectAll()" style="display:none;">Select All</button>
                 <button class="btn btn-sm" id="pfDeleteSelectedBtn" onclick="pfDeleteSelected()" style="display:none;background:var(--red);color:#fff;border:none;">Delete Selected (<span id="pfSelectedCount">0</span>)</button>
                 <button class="btn btn-ghost btn-sm" id="pfCancelSelectBtn" onclick="pfCancelSelect()" style="display:none;">Cancel</button>
+                <button class="btn btn-ghost btn-sm" onclick="pfReshuffle()" title="Randomize the display order so photos aren't grouped">🔀 Reshuffle</button>
                 <button class="btn btn-ghost btn-sm" onclick="pfLoadPhotos()">↻ Refresh</button>
               </div>
             </div>
@@ -815,7 +816,7 @@ If you have any questions, just reply to this email.
           <div class="hint-box">
             <strong>How it works</strong><br><br>
             Drop in as many photos as you like. Each one uploads to Cloudinary and saves to Firebase instantly.<br><br>
-            They appear in the flip-book on the portfolio page in the order uploaded — newest first.<br><br>
+            They appear in the flip-book on the portfolio page in the order uploaded — newest first — until you hit <strong>🔀 Reshuffle</strong>, which randomizes the order so similar photos don't cluster together. New uploads always show up even before a reshuffle.<br><br>
             Click <strong></strong> on any photo to remove it.
           </div>
         </div>
@@ -3839,6 +3840,14 @@ window.nav = function(page, el){
 var _pfSelectMode = false;
 var _pfSelected   = new Set();
 
+/* Same on-the-fly Cloudinary transform used on the public portfolio page —
+   keeps the admin grid snappy too, and keeps both pages' URLs consistent. */
+function pfCldOptimize(url, width){
+  if (!url || url.indexOf('res.cloudinary.com') === -1) return url;
+  if (url.indexOf('/upload/') === -1) return url;
+  return url.replace('/upload/', '/upload/f_auto,q_auto,w_' + (width || 260) + '/');
+}
+
 async function pfLoadPhotos() {
   var el = document.getElementById('pfPhotosList');
   if (!el) return;
@@ -3848,7 +3857,7 @@ async function pfLoadPhotos() {
   el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try {
     if (!db) throw new Error('Firebase not ready — refresh.');
-    var q    = query(collection(db, 'portfolio_photos'), orderBy('created_at', 'desc'));
+    var q    = query(collection(db, 'portfolio_photos'));
     var snap = await getDocs(q);
     var rows = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
     if (!rows.length) {
@@ -3856,13 +3865,28 @@ async function pfLoadPhotos() {
       document.getElementById('pfSelectToggleBtn').style.display = 'none';
       return;
     }
+
+    /* Mirror the sort used on the public portfolio page: respect a
+       persisted shuffle order when present, falling back to newest-first
+       for anything uploaded since the last reshuffle. Keeping this in
+       sync with portfolio.html is what makes "Reshuffle" here actually
+       match what visitors see. */
+    rows.sort(function(a, b){
+      var ao = (typeof a.order === 'number') ? a.order : Infinity;
+      var bo = (typeof b.order === 'number') ? b.order : Infinity;
+      if (ao !== bo) return ao - bo;
+      var at = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
+      var bt = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
+      return bt - at;
+    });
+
     document.getElementById('pfSelectToggleBtn').style.display = '';
     el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;" id="pfPhotosGrid">' +
       rows.map(function(p) {
         var safeId  = esc(p.id);
         var safeCid = esc(p.cloudinary_id || '');
         return '<div id="pfcard-' + safeId + '" data-id="' + safeId + '" data-cid="' + safeCid + '" onclick="pfCardClick(this)" style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:2px solid var(--border);cursor:pointer;transition:border-color .15s;">' +
-          '<img src="' + esc(p.url) + '" style="width:100%;height:100px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--bg3)\'" />' +
+          '<img src="' + esc(pfCldOptimize(p.url, 260)) + '" loading="lazy" style="width:100%;height:100px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--bg3)\'" />' +
           '<div class="pf-check" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;font-size:22px;color:#fff;">&#10003;</div>' +
           '<button data-id="' + safeId + '" data-cid="' + safeCid + '" onclick="event.stopPropagation();pfDeletePhoto(this.dataset.id,this.dataset.cid)" class="pf-del-btn" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;line-height:1;">x</button>' +
         '</div>';
@@ -3870,6 +3894,41 @@ async function pfLoadPhotos() {
     '</div>';
   } catch(e) {
     el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+/* Randomize display order so similar/sequential photos don't cluster
+   together, and persist it so the public portfolio page picks up the
+   same order (see the `order` sort in loadEvents() in portfolio.html). */
+async function pfReshuffle() {
+  try {
+    if (!db) throw new Error('Firebase not ready — refresh.');
+    var q    = query(collection(db, 'portfolio_photos'));
+    var snap = await getDocs(q);
+    var ids  = snap.docs.map(function(d){ return d.id; });
+    if (!ids.length) { toast('', 'Nothing to reshuffle', 'Upload some photos first.'); return; }
+
+    /* Fisher–Yates shuffle */
+    for (var i = ids.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = ids[i]; ids[i] = ids[j]; ids[j] = tmp;
+    }
+
+    /* Firestore batches cap at 500 writes — chunk just in case a
+       portfolio ever grows past that. */
+    for (var start = 0; start < ids.length; start += 450) {
+      var batch = db.batch();
+      var chunk = ids.slice(start, start + 450);
+      chunk.forEach(function(id, idx){
+        batch.update(db.collection('portfolio_photos').doc(id), { order: start + idx });
+      });
+      await batch.commit();
+    }
+
+    toast('', 'Reshuffled', ids.length + ' photos reordered.');
+    pfLoadPhotos();
+  } catch(e) {
+    toast('', 'Reshuffle failed', e.message || '');
   }
 }
 
@@ -4027,6 +4086,7 @@ async function pfDeletePhoto(id, cloudinaryId) {
 }
 
 window.pfLoadPhotos        = pfLoadPhotos;
+window.pfReshuffle         = pfReshuffle;
 window.pfHandleDrop        = pfHandleDrop;
 window.pfHandleInput       = pfHandleInput;
 window.pfDeletePhoto       = pfDeletePhoto;
