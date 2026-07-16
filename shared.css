@@ -108,7 +108,7 @@
   --border:  rgba(255,255,255,0.06);
   --border2: rgba(255,255,255,0.11);
 
-  --text:  #f0ece4;
+  --text:  #ffffff;
   --text2: #857f74;
   --text3: #4a4640;
 
@@ -139,7 +139,7 @@
 
   /* Dark mode: flip ink to a light tone so blog.html text/borders
      built from rgba(var(--ink),alpha) stay legible. */
-  --ink: 240,236,228;
+  --ink: 255,255,255;
 
   /* Dark mode: flip surface to a dark tone so translucent panels
      built from rgba(var(--surface),alpha) don't stay white. */
@@ -288,7 +288,7 @@ body::after {
   font-weight: 600;
 }
 [data-theme="dark"] .nav-links a:hover { background: rgba(255,255,255,0.05); }
-[data-theme="dark"] .nav-links a { color: var(--text); opacity: 0.75; }
+[data-theme="dark"] .nav-links a { color: var(--text); opacity: 1; }
 [data-theme="dark"] .nav-links a:hover,
 [data-theme="dark"] .nav-links a.active { opacity: 1; }
 
@@ -341,7 +341,7 @@ body::after {
   font-size: 13px; transition: all 0.2s; gap: 6px; color: var(--text2);
 }
 .theme-btn:hover { border-color: var(--text3); color: var(--text); }
-[data-theme="dark"] .theme-btn { color: var(--text); opacity: 0.75; }
+[data-theme="dark"] .theme-btn { color: var(--text); opacity: 1; }
 [data-theme="dark"] .theme-btn:hover { opacity: 1; }
 
 .btn-ghost-sm {
@@ -401,7 +401,7 @@ body::after {
   cursor: pointer; font-family: var(--fb);
 }
 .u-drop a:hover, .u-drop button:hover { background: var(--bg2); color: var(--text); }
-[data-theme="dark"] .u-drop a, [data-theme="dark"] .u-drop button { color: var(--text); opacity: 0.75; }
+[data-theme="dark"] .u-drop a, [data-theme="dark"] .u-drop button { color: var(--text); opacity: 1; }
 [data-theme="dark"] .u-drop a:hover, [data-theme="dark"] .u-drop button:hover { opacity: 1; }
 .u-drop .dd-div { height: 1px; background: var(--border); margin: 4px 0; }
 .u-drop .dd-email { padding: 8px 12px; font-size: 11px; color: var(--text3); font-family: var(--fm); }

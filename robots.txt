@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /services.html
+Allow: /portfolio.html
+Allow: /about.html
+Allow: /book-us.html
+Allow: /blog.html
+Allow: /leave-review.html
+Allow: /privacy.html
+Allow: /terms.html
+
+# Client/creator accounts and private galleries — not meant for search results
+Disallow: /admin.html
+Disallow: /dashboard.html
+Disallow: /client-dashboard.html
+Disallow: /owner.html
+Disallow: /accounts.html
+Disallow: /settings.html
+Disallow: /storage-tools.html
+Disallow: /login.html
+Disallow: /register.html
+Disallow: /join.html
+Disallow: /event.html
+Disallow: /events-pages.html
+
+Sitemap: https://impactgridgroup.com/sitemap.xml

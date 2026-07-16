@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Settings — ImpactGrid</title>
-  <meta name="description" content="Manage your ImpactGrid account, profile, security and integrations." />
+  <title>Settings — Impact Grid</title>
+  <meta name="description" content="Manage your Impact Grid account, profile, security and integrations." />
   <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="shared.css" />
   <style>
@@ -631,7 +631,7 @@
             <div class="s-card-head">
               <div>
                 <h3>Your Creator Profile</h3>
-                <p>Control how your content identity appears across ImpactGrid.</p>
+                <p>Control how your content identity appears across Impact Grid.</p>
               </div>
               <span class="chip chip-gold">Public</span>
             </div>
@@ -698,7 +698,7 @@
 
             <div class="form-group">
               <label class="form-label">Bio</label>
-              <textarea id="s-bio" class="form-textarea" placeholder="Tell the ImpactGrid community who you are and what you do…" style="min-height:88px"></textarea>
+              <textarea id="s-bio" class="form-textarea" placeholder="Tell the Impact Grid community who you are and what you do…" style="min-height:88px"></textarea>
             </div>
 
             <div class="form-row-2">
@@ -734,7 +734,7 @@
         <section class="s-panel" id="panel-account">
           <div class="s-card">
             <div class="s-card-head">
-              <div><h3>Account Overview</h3><p>Your ImpactGrid account status and details.</p></div>
+              <div><h3>Account Overview</h3><p>Your Impact Grid account status and details.</p></div>
             </div>
             <div class="acc-stats">
               <div class="acc-stat"><strong id="stat-days">—</strong><span>Days active</span></div>
@@ -764,7 +764,7 @@
             <div class="sec-item" style="padding-top:0">
               <div class="sec-info">
                 <h4>Delete Account</h4>
-                <p>Permanently remove your ImpactGrid account, profile, applications and all associated data. This action cannot be undone.</p>
+                <p>Permanently remove your Impact Grid account, profile, applications and all associated data. This action cannot be undone.</p>
               </div>
               <button class="btn-sm btn-sm-danger" onclick="confirmDelete()">Delete Account</button>
             </div>
@@ -845,7 +845,7 @@
         <section class="s-panel" id="panel-sessions">
           <div class="s-card">
             <div class="s-card-head">
-              <div><h3>Active Sessions</h3><p>Devices currently signed into your ImpactGrid account.</p></div>
+              <div><h3>Active Sessions</h3><p>Devices currently signed into your Impact Grid account.</p></div>
             </div>
 
             <div class="sec-item" style="padding-top:0">
@@ -883,7 +883,7 @@
         <section class="s-panel" id="panel-preferences">
           <div class="s-card">
             <div class="s-card-head">
-              <div><h3>Appearance</h3><p>Customise how ImpactGrid looks and feels for you.</p></div>
+              <div><h3>Appearance</h3><p>Customise how Impact Grid looks and feels for you.</p></div>
             </div>
 
             <div class="pref-item" style="padding-top:0">
@@ -921,13 +921,13 @@
         <section class="s-panel" id="panel-privacy">
           <div class="s-card">
             <div class="s-card-head">
-              <div><h3>Profile Visibility</h3><p>Control who can see your ImpactGrid profile.</p></div>
+              <div><h3>Profile Visibility</h3><p>Control who can see your Impact Grid profile.</p></div>
             </div>
 
             <div class="pref-item" style="padding-top:0">
               <div class="pref-info">
                 <h4>Public Profile</h4>
-                <p>Allow anyone on ImpactGrid to view your profile and work history.</p>
+                <p>Allow anyone on Impact Grid to view your profile and work history.</p>
               </div>
               <div class="toggle on" id="tog-pub" onclick="togglePref('pub')"></div>
             </div>
@@ -942,7 +942,7 @@
 
           <div class="s-card">
             <div class="s-card-head">
-              <div><h3>Data & Tracking</h3><p>Control how ImpactGrid uses your data.</p></div>
+              <div><h3>Data & Tracking</h3><p>Control how Impact Grid uses your data.</p></div>
             </div>
             <div class="pref-item" style="padding-top:0">
               <div class="pref-info">
@@ -954,7 +954,7 @@
             <div class="pref-item">
               <div class="pref-info">
                 <h4>Personalisation</h4>
-                <p>Allow ImpactGrid to personalise job recommendations and content.</p>
+                <p>Allow Impact Grid to personalise job recommendations and content.</p>
               </div>
               <div class="toggle on" id="tog-personal" onclick="togglePref('personal')"></div>
             </div>
@@ -985,7 +985,7 @@
               <div>
                 <div class="plan-badge-large" id="plan-badge-large">⭐ Free</div>
                 <div class="plan-name-large" id="plan-name-large">Free Plan</div>
-                <div class="plan-tagline" id="plan-tagline">Try ImpactGrid with no card needed.</div>
+                <div class="plan-tagline" id="plan-tagline">Try Impact Grid with no card needed.</div>
               </div>
               <div id="plan-upgrade-cta">
                 <a href="join.html" class="btn btn-gold">Upgrade Plan →</a>
@@ -1004,7 +1004,7 @@
             <div class="trial-blur-content" id="toolsBlurContent">
               <div class="s-card">
                 <div class="s-card-head">
-                  <div><h3>Your Tools</h3><p>All ImpactGrid tools — click to open. Locked tools require a plan upgrade.</p></div>
+                  <div><h3>Your Tools</h3><p>All Impact Grid tools — click to open. Locked tools require a plan upgrade.</p></div>
                 </div>
                 <div class="tools-grid" id="toolsGrid">
                   <!-- JS renders tool links here -->
@@ -1407,7 +1407,7 @@
 
     /* ─── Delete account ─── */
     async function confirmDelete() {
-      if (!confirm('⚠️ Delete your ImpactGrid account?\n\nThis permanently removes your profile, applications, and all data. It cannot be undone.')) return;
+      if (!confirm('⚠️ Delete your Impact Grid account?\n\nThis permanently removes your profile, applications, and all data. It cannot be undone.')) return;
       if (!confirm('Final confirmation — are you absolutely sure?')) return;
       var client     = getSupabase();
       var sessionRes = await client.auth.getSession();
@@ -1691,7 +1691,7 @@
     };
 
     var PLAN_META = {
-      free:         { label: 'Free',         tagline: 'Try ImpactGrid — no card needed.',              badge: '✦ Free'         },
+      free:         { label: 'Free',         tagline: 'Try Impact Grid — no card needed.',              badge: '✦ Free'         },
       professional: { label: 'Professional', tagline: 'For solo creators and freelancers.',             badge: '⭐ Professional' },
       enterprise:   { label: 'Enterprise',   tagline: 'For businesses, agencies & serious operators.', badge: '🏆 Enterprise'  },
       admin:        { label: 'Admin',        tagline: 'Internal admin account — unlimited access.',    badge: '🛡️ Admin'       }
