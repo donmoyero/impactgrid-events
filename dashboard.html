@@ -7,6 +7,8 @@
 <link rel="icon" href="favicon.ico"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- Shared design system (utility classes only — page keeps its own local tokens below, same as admin.html) -->
+<link rel="stylesheet" href="shared.css"/>
 <style>
 :root{--bg:#f2f4fb;--bg2:#e6eaf5;--bg3:#d9dff0;--card:#ffffff;--card2:#f4f6fc;--border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);--text:#0d1017;--text2:#4a5068;--text3:#9099b8;--gold:#c97e08;--gold2:#a86505;--gold-dim:rgba(201,126,8,0.09);--gold-glo:rgba(201,126,8,0.22);--blue:#2d6edb;--blue2:#1a52b0;--blue-dim:rgba(45,110,219,0.08);--green:#0fa876;--green-dim:rgba(15,168,118,0.10);--red:#d94f3b;--red-dim:rgba(217,79,59,0.08);--red-glo:rgba(217,79,59,0.18);--purple:#7c3aed;--purple-dim:rgba(124,58,237,0.08);--fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;--r:12px;--r2:20px;--nav-h:60px;--sidebar-w:240px;--sh:0 4px 24px rgba(0,0,0,0.06);--sh2:0 16px 48px rgba(0,0,0,0.10);--sh-gold:0 8px 28px rgba(201,126,8,0.22);}
 [data-theme="dark"]{--bg:#07090f;--bg2:#0d1017;--bg3:#111520;--card:#151a28;--card2:#1c2235;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#eef0f6;--text2:#8a91a8;--text3:#4a5068;--gold:#f0b429;--gold2:#ffd166;--gold-dim:rgba(240,180,41,0.10);--gold-glo:rgba(240,180,41,0.25);--blue:#4f8ef7;--blue2:#7eb3ff;--blue-dim:rgba(79,142,247,0.10);--green:#2dd4a0;--green-dim:rgba(45,212,160,0.10);--red:#f75f4f;--red-dim:rgba(247,95,79,0.10);--red-glo:rgba(247,95,79,0.22);--purple:#a855f7;--purple-dim:rgba(168,85,247,0.10);--sh:0 4px 24px rgba(0,0,0,0.30);--sh2:0 16px 64px rgba(0,0,0,0.45);--sh-gold:0 8px 28px rgba(240,180,41,0.25);}
@@ -737,6 +739,8 @@ tr:hover td{background:var(--bg2);}
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
+<!-- Shared nav (auth utilities, theme, sidebar helpers — renderNav not called here, dashboard keeps its own sidebar, same as admin.html) -->
+<script src="nav.js"></script>
 
 <!-- Firebase (Events DB) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>

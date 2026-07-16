@@ -746,10 +746,23 @@
       var cfg = await fetch('https://impactgrid-events-api.onrender.com/api/firebase-config').then(function(r){ return r.json(); });
       if (!firebase.apps.length) firebase.initializeApp(cfg);
       _pfDb = firebase.firestore();
-      var snap = await _pfDb.collection('portfolio_photos')
-        .orderBy('created_at', 'desc')
-        .get();
-      var photos = snap.docs.map(function(d){ return d.data().url; }).filter(Boolean);
+      var snap = await _pfDb.collection('portfolio_photos').get();
+      var rows = snap.docs.map(function(d){ return d.data(); });
+
+      /* Match admin.html's pfLoadPhotos() sort exactly: respect a persisted
+         shuffle order when present, falling back to newest-first for any
+         photo uploaded since the last reshuffle. This is what makes the
+         admin "Reshuffle" button actually change what visitors see here. */
+      rows.sort(function(a, b){
+        var ao = (typeof a.order === 'number') ? a.order : Infinity;
+        var bo = (typeof b.order === 'number') ? b.order : Infinity;
+        if (ao !== bo) return ao - bo;
+        var at = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
+        var bt = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
+        return bt - at;
+      });
+
+      var photos = rows.map(function(d){ return d.url; }).filter(Boolean);
       if (photos.length) {
         usePhotos(photos);
       } else {
