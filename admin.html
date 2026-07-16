@@ -314,6 +314,7 @@ tr:hover td{background:var(--bg2);}
     <div class="sb-section">
       <div class="sb-section-label">Communication</div>
       <nav class="sb-nav">
+        <a href="#" onclick="return nav('receptionist',this)"><span class="sb-ico"></span>Receptionist<span class="sb-badge" id="receptionistBadge" style="display:none;">0</span></a>
         <a href="#" onclick="return nav('mail',this)"><span class="sb-ico"></span>Mail</a>
         <a href="#" onclick="return nav('vouchers',this)"><span class="sb-ico"></span>Impactgrid Form</a>
       </nav>
@@ -355,6 +356,7 @@ tr:hover td{background:var(--bg2);}
 <div class="stat-card"><div class="stat-label">Events</div><div class="stat-val" id="stat-events" style="color:var(--blue);">—</div><div class="stat-sub">Active</div></div>
       </div>
       <div class="quick-grid">
+        <div class="quick-card" id="rcp-overview-card" onclick="nav('receptionist',null)" style="border-color:var(--red-glo);background:var(--red-dim);"><div class="quick-ico"></div><div class="quick-title" style="color:var(--red);">Receptionist<span id="rcp-overview-badge" style="display:none;margin-left:6px;font-family:var(--fm);font-size:10px;background:var(--red);color:#fff;padding:1px 7px;border-radius:100px;">0</span></div><div class="quick-desc" id="rcp-overview-desc">See who Dijo talked to and who needs a follow-up</div></div>
         <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico"></div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
 <div class="quick-card" onclick="nav('createevent',null)"><div class="quick-ico"></div><div class="quick-title">Create Event</div><div class="quick-desc">Set up a new photo event with access code and expiry</div></div>
         <div class="quick-card" onclick="nav('uploadphotos',null)"><div class="quick-ico"></div><div class="quick-title">Upload Photos</div><div class="quick-desc">Add photos to an existing event gallery</div></div>
@@ -1111,6 +1113,48 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
+    <!-- RECEPTIONIST HANDOVER -->
+    <div class="page" id="page-receptionist">
+      <div class="page-header"><div class="page-title">Receptionist</div><div class="page-sub">Who Dijo talked to on the site, what they wanted, and who still needs a human reply.</div></div>
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><div class="stat-label">Conversations</div><div class="stat-val" id="rcp-stat-total" style="color:var(--blue);">—</div><div class="stat-sub">Tracked visitors</div></div>
+        <div class="stat-card"><div class="stat-label">Needs Follow-up</div><div class="stat-val" id="rcp-stat-followup" style="color:var(--red);">—</div><div class="stat-sub">Waiting on a reply</div></div>
+        <div class="stat-card"><div class="stat-label">Booked via Chat</div><div class="stat-val" id="rcp-stat-booked" style="color:var(--green);">—</div><div class="stat-sub">Converted</div></div>
+      </div>
+
+      <div class="ws-layout">
+        <div>
+          <div class="card">
+            <div class="card-head">
+              <h2> Conversations</h2>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-ghost btn-sm" id="rcp-filter-btn" onclick="rcpToggleFilter()">Show all</button>
+                <button class="btn btn-ghost btn-sm" onclick="loadReceptionist()">↻ Refresh</button>
+              </div>
+            </div>
+            <div class="card-body" id="rcp-list">
+              <div class="skel-wrap"><div class="skel-row" style="width:80%;"></div><div class="skel-row" style="width:60%;"></div><div class="skel-row" style="width:70%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ws-sticky">
+          <div class="card">
+            <div class="card-head"><h2> Talk to Dijo</h2></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:11px;color:var(--text3);">Test what visitors experience — this preview chat doesn't show up as a lead.</div>
+              <div id="rcp-preview-log" style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;padding:4px 2px;"></div>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="rcp-preview-input" placeholder="Ask Dijo something…" onkeydown="if(event.key==='Enter')rcpSendPreview()"/>
+                <button class="btn btn-gold btn-sm" onclick="rcpSendPreview()">Send</button>
+              </div>
+            </div>
+          </div>
+          <div class="hint-box" style="margin-top:12px;"><strong>How this works</strong><br><br>When Dijo can't answer something, it asks for the visitor's email, flags the chat, and this page shows it here in red until you mark it resolved.</div>
+        </div>
+      </div>
+    </div>
+
     <!-- MAIL -->
     <div class="page" id="page-mail">
       <div class="page-header"><div class="page-title">Mail</div><div class="page-sub">Send emails to guests and read replies from events@impactgridgroup.com</div></div>
@@ -1799,6 +1843,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   document.getElementById('topbarUser').textContent = data.session.user.email;
   loadStats();
   loadBizSettings(); /* load biz settings on boot so invoice generation always has them */
+  loadReceptionist(); /* so the follow-up badge is right there on login */
 });
 
 /*  THEME  */
@@ -1848,7 +1893,8 @@ function nav(id,el){
     hero:'loadAllHomepageSections',
     bookings:'loadBookings',
     vouchers:'initVouchersPage',
-    blog:'loadBlogPosts'
+    blog:'loadBlogPosts',
+    receptionist:'loadReceptionist'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
   return false;
@@ -1887,6 +1933,160 @@ async function loadStats(){
     var snap = await db.collection('events').where('is_active','==',true).get();
     set('stat-events', snap.size);
   }catch(e){ set('stat-events','—'); }
+}
+
+/*  RECEPTIONIST HANDOVER  */
+var rcpSessions=[], rcpShowAll=false, rcpPreviewHistory=[], rcpPreviewCollected={};
+
+async function _rcpAuthHeader(){
+  var c=getSupabase();
+  var { data }=await c.auth.getSession();
+  var token=data && data.session ? data.session.access_token : null;
+  return token ? {'Authorization':'Bearer '+token} : {};
+}
+
+async function loadReceptionist(){
+  var list=document.getElementById('rcp-list');
+  try{
+    var headers=await _rcpAuthHeader();
+    var res=await fetch(EVENTS_API+'/api/receptionist-handover',{headers:headers});
+    var data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Failed to load');
+    rcpSessions=data.sessions||[];
+
+    var followupCount=data.total_needing_followup||0;
+    var bookedCount=rcpSessions.filter(function(s){return s.has_booked;}).length;
+    var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+    set('rcp-stat-total', data.total_conversations||0);
+    set('rcp-stat-followup', followupCount);
+    set('rcp-stat-booked', bookedCount);
+
+    ['receptionistBadge','rcp-overview-badge'].forEach(function(id){
+      var b=document.getElementById(id);
+      if(!b) return;
+      if(followupCount>0){ b.style.display=''; b.textContent=followupCount; }
+      else { b.style.display='none'; }
+    });
+    var descEl=document.getElementById('rcp-overview-desc');
+    if(descEl) descEl.textContent = followupCount>0
+      ? followupCount+' conversation'+(followupCount===1?'':'s')+' waiting on a reply'
+      : 'See who Dijo talked to and who needs a follow-up';
+
+    renderRcpList();
+  }catch(e){
+    if(list) list.innerHTML='<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Couldn\'t load receptionist data</div></div>';
+    console.warn('[receptionist]', e.message);
+  }
+}
+
+function rcpToggleFilter(){
+  rcpShowAll=!rcpShowAll;
+  var btn=document.getElementById('rcp-filter-btn');
+  if(btn) btn.textContent = rcpShowAll ? 'Show follow-ups only' : 'Show all';
+  renderRcpList();
+}
+
+function renderRcpList(){
+  var list=document.getElementById('rcp-list');
+  if(!list) return;
+  var rows = rcpShowAll ? rcpSessions : rcpSessions.filter(function(s){return s.needs_followup;});
+  if(!rows.length){
+    list.innerHTML='<div class="empty"><div class="empty-ico">✅</div><div class="empty-txt">'+
+      (rcpShowAll ? 'No conversations yet' : 'Nothing needs a follow-up right now') +'</div></div>';
+    return;
+  }
+  list.innerHTML = rows.map(function(s){
+    var who = esc(s.name || s.codename);
+    var contact = s.email ? esc(s.email) : (s.event_type ? esc(s.event_type) : 'No contact info yet');
+    var when = new Date(s.last_seen).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    var pill = s.needs_followup
+      ? '<span class="pill pill-rejected">Needs follow-up</span>'
+      : (s.has_booked ? '<span class="pill pill-booked">Booked</span>' : '<span class="pill pill-active">Answered</span>');
+    var inquiryLine = (s.inquiries&&s.inquiries.length)
+      ? '<div style="font-size:12px;color:var(--red);margin-top:4px;"> Asked: '+esc(s.inquiries[s.inquiries.length-1])+'</div>' : '';
+    var transcript = s.transcript.slice(-6).map(function(m){
+      return '<div style="padding:6px 0;border-bottom:1px solid var(--border);">'+
+        '<div style="font-size:12px;"><strong>Them:</strong> '+esc(m.message)+'</div>'+
+        '<div style="font-size:12px;color:var(--text2);"><strong>Dijo:</strong> '+esc(m.reply)+'</div>'+
+      '</div>';
+    }).join('');
+    var resolveBtn = s.needs_followup
+      ? '<button class="btn btn-green btn-sm" onclick="rcpResolve(\''+s.codename+'\')"> Mark Resolved</button>' : '';
+    var replyBtn = s.email
+      ? '<button class="btn btn-blue btn-sm" onclick=\'rcpReply('+JSON.stringify(s.codename)+','+JSON.stringify(s.email)+','+JSON.stringify(s.name||s.codename)+','+JSON.stringify((s.inquiries&&s.inquiries[s.inquiries.length-1])||'')+')\'>✉️ Reply</button>' : '';
+    return '<div class="card" style="margin-bottom:10px;border-color:'+(s.needs_followup?'var(--red-glo)':'var(--border)')+';">'+
+      '<div class="card-body" style="padding:14px 16px;">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">'+
+          '<div><div style="font-weight:700;font-size:13px;">'+who+'</div>'+
+          '<div style="font-size:11px;color:var(--text3);">'+contact+' · '+when+' · '+s.message_count+' messages</div>'+
+          inquiryLine+'</div>'+
+          '<div style="display:flex;gap:6px;align-items:center;">'+pill+replyBtn+resolveBtn+
+          '<button class="btn btn-ghost btn-sm" onclick="rcpToggleT(this)">Transcript</button></div>'+
+        '</div>'+
+        '<div style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+transcript+'</div>'+
+      '</div></div>';
+  }).join('');
+}
+
+function rcpReply(codename, email, name, inquiry){
+  nav('mail', document.querySelector('.sb-nav a[onclick*="\'mail\'"]'));
+  switchMailTab('compose');
+  setTimeout(function(){
+    var to=document.getElementById('mail-to'), subj=document.getElementById('mail-subject'), body=document.getElementById('mail-body');
+    if(to)   to.value   = email;
+    if(subj) subj.value = 'Re: your question — ImpactGrid Events';
+    if(body) body.value = 'Hi '+name+',\n\nThanks for reaching out'+(inquiry?' about '+inquiry.toLowerCase().replace(/\.$/,''):'')+'.\n\n';
+    if(body){ body.focus(); body.setSelectionRange(body.value.length, body.value.length); }
+  }, 60);
+  toast('✉️','Opened in Mail','Once you\'ve sent it, come back and mark resolved');
+}
+
+function rcpToggleT(btn){
+  var panel=btn.closest('.card-body').lastElementChild;
+  panel.style.display = panel.style.display==='none' ? '' : 'none';
+}
+
+async function rcpResolve(codename){
+  try{
+    var headers=await _rcpAuthHeader();
+    headers['Content-Type']='application/json';
+    var res=await fetch(EVENTS_API+'/api/receptionist-handover/resolve',{
+      method:'POST', headers:headers, body:JSON.stringify({codename:codename})
+    });
+    if(!res.ok) throw new Error('Failed');
+    toast('✅','Marked resolved');
+    loadReceptionist();
+  }catch(e){
+    toast('⚠️','Could not resolve','Try again in a moment');
+  }
+}
+
+/*  Talk to Dijo — admin preview chat, doesn't count as a lead  */
+async function rcpSendPreview(){
+  var input=document.getElementById('rcp-preview-input');
+  var msg=(input.value||'').trim();
+  if(!msg) return;
+  var log=document.getElementById('rcp-preview-log');
+  log.innerHTML+='<div style="align-self:flex-end;background:var(--gold-dim);color:var(--gold);padding:7px 11px;border-radius:10px;font-size:12px;max-width:85%;">'+esc(msg)+'</div>';
+  input.value='';
+  log.scrollTop=log.scrollHeight;
+  rcpPreviewHistory.push({role:'user',content:msg});
+  try{
+    var res=await fetch(EVENTS_API+'/api/chat',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message:msg, codename:'AdminPreview', history:rcpPreviewHistory.slice(-14),
+        collected:rcpPreviewCollected, behaviour:{page:'admin-preview'}
+      })
+    });
+    var data=await res.json();
+    rcpPreviewHistory.push({role:'assistant',content:data.reply||''});
+    rcpPreviewCollected = data.collected || rcpPreviewCollected;
+    log.innerHTML+='<div style="align-self:flex-start;background:var(--bg2);padding:7px 11px;border-radius:10px;font-size:12px;max-width:85%;">'+esc(data.reply||'…')+'</div>';
+    log.scrollTop=log.scrollHeight;
+  }catch(e){
+    log.innerHTML+='<div style="font-size:11px;color:var(--red);">Couldn\'t reach Dijo — try again.</div>';
+  }
 }
 
 /*  HELPERS  */
