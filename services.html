@@ -89,16 +89,15 @@
 
     .sv-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 3px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 22px;
     }
 
-    /*  SERVICE CARD  */
-    /* Extends shared .card but overrides padding/radius for image-first layout */
+    /*  SERVICE CARD — compact product tile  */
     .sv-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -108,7 +107,7 @@
     }
     .sv-card:hover {
       border-color: var(--gold-glo);
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       box-shadow: var(--sh2);
     }
 
@@ -116,32 +115,32 @@
 
     .sv-card-img {
       width: 100%;
-      height: 260px;
+      height: 160px;
       object-fit: cover;
       display: block;
-      filter: brightness(0.88);
+      filter: brightness(0.9);
       transition: filter 0.4s, transform 0.5s;
     }
     .sv-card:hover .sv-card-img {
       filter: brightness(1);
-      transform: scale(1.03);
+      transform: scale(1.04);
     }
 
     /* Placeholder when no image set */
     .sv-card-placeholder {
       width: 100%;
-      height: 200px;
+      height: 130px;
       background: var(--bg2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 52px;
+      font-size: 36px;
       flex-shrink: 0;
       border-bottom: 1px solid var(--border);
     }
 
     .sv-card-body {
-      padding: 32px 36px 36px;
+      padding: 16px 18px 18px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -149,67 +148,75 @@
 
     .sv-card-title {
       font-family: var(--sv-display);
-      font-size: clamp(22px, 2.2vw, 30px);
-      font-weight: 400;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
       color: var(--text);
-      margin-bottom: 14px;
+      margin-bottom: 6px;
     }
 
     .sv-card-desc {
-      font-size: 15px;
+      font-size: 12.5px;
       font-weight: 300;
       color: var(--text2);
-      line-height: 1.72;
+      line-height: 1.5;
       flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    /* Expanding gold accent line — mirrors index.html section style */
-    .sv-card-line {
-      width: 32px;
-      height: 2px;
-      background: var(--gold);
-      border-radius: 2px;
-      margin-top: 28px;
-      opacity: 0.5;
-      transition: width 0.35s ease, opacity 0.35s ease;
-    }
-    .sv-card:hover .sv-card-line {
-      width: 56px;
-      opacity: 1;
-    }
     /* Price badge */
     .sv-card-price {
       display: inline-block;
-      margin-top: 16px;
+      margin-top: 10px;
       font-family: var(--fm);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--gold);
       background: var(--gold-dim);
       border: 1px solid var(--gold-glo);
       border-radius: 100px;
-      padding: 4px 12px;
+      padding: 3px 10px;
       letter-spacing: 0.04em;
+      align-self: flex-start;
+    }
+
+    .sv-card-view {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text3);
+      transition: color 0.2s, gap 0.2s;
+    }
+    .sv-card:hover .sv-card-view {
+      color: var(--gold);
+      gap: 8px;
     }
 
     /*  SKELETON LOADER  */
     .sv-skeleton {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
       animation: pulse 1.5s ease-in-out infinite;
     }
     /* pulse keyframe comes from shared.css */
-    .sv-sk-img  { width: 100%; height: 240px; background: var(--bg2); }
-    .sv-sk-body { padding: 32px 36px; }
+    .sv-sk-img  { width: 100%; height: 150px; background: var(--bg2); }
+    .sv-sk-body { padding: 16px 18px; }
     .sv-sk-line {
-      height: 13px;
-      border-radius: 8px;
+      height: 11px;
+      border-radius: 6px;
       background: var(--bg2);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .sv-sk-line.w55 { width: 55%; }
     .sv-sk-line.w80 { width: 80%; }
@@ -226,32 +233,115 @@
 
     /*  RESPONSIVE  */
     @media (max-width: 900px) {
-      .sv-grid        { grid-template-columns: 1fr; }
+      .sv-grid        { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
       .sv-section     { padding: 8px 20px 72px; }
       .sv-header      { padding: 72px 20px 56px; }
-      .sv-card-body   { padding: 24px 24px 28px; }
-  }
-    .sv-book-btn {
-      display: inline-block;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #fff;
-      background: #000;
-      border: 1px solid #000;
-      border-radius: 100px;
-      padding: 7px 16px;
-      transition: background 0.2s, transform 0.2s, opacity 0.2s;
-    }
-    .sv-card:hover .sv-book-btn {
-      background: #222;
-      color: #fff;
-      transform: translateX(3px);
+      .sv-card-body   { padding: 13px 14px 16px; }
+      .sv-card-img    { height: 120px; }
+      .sv-sk-img      { height: 110px; }
     }
 
+    /*  SERVICE DETAIL MODAL  */
+    .sv-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .sv-modal-overlay.open { display: flex; }
+
+    .sv-modal {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      max-width: 620px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: var(--sh2);
+      position: relative;
+    }
+
+    .sv-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .sv-modal-img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      display: block;
+    }
+    .sv-modal-placeholder {
+      width: 100%;
+      height: 140px;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 46px;
+    }
+
+    .sv-modal-body { padding: 30px 34px 34px; }
+
+    .sv-modal-title {
+      font-family: var(--sv-display);
+      font-size: clamp(24px, 2.6vw, 32px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .sv-modal-desc {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text2);
+      line-height: 1.75;
+    }
+
+    .sv-modal-book {
+      display: block;
+      text-align: center;
+      margin-top: 28px;
+      padding: 15px;
+      border-radius: 100px;
+      background: #000;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .sv-modal-book:hover { background: #222; }
+
     @media (max-width: 600px) {
-      .sv-card-img    { height: 200px; }
+      .sv-modal-img  { height: 190px; }
+      .sv-modal-body { padding: 22px 22px 26px; }
+    }
       .sv-sk-img      { height: 180px; }
     }
   </style>
@@ -291,6 +381,22 @@
         <div class="sv-skeleton"><div class="sv-sk-img"></div><div class="sv-sk-body"><div class="sv-sk-line w55"></div><div class="sv-sk-line w80"></div><div class="sv-sk-line w42"></div></div></div>
       </div>
     </section>
+
+    <!-- SERVICE DETAIL MODAL -->
+    <div class="sv-modal-overlay" id="svcDetailOverlay" onclick="if(event.target===this) closeServiceDetail();">
+      <div class="sv-modal">
+        <button class="sv-modal-close" onclick="closeServiceDetail()" aria-label="Close">✕</button>
+        <img class="sv-modal-img" id="svcDetailImg" src="" alt="" style="display:none;"/>
+        <div class="sv-modal-placeholder" id="svcDetailPlaceholder" style="display:none;"></div>
+        <div class="sv-modal-body">
+          <h2 class="sv-modal-title" id="svcDetailTitle"></h2>
+          <span class="sv-card-price" id="svcDetailPrice" style="display:none;"></span>
+          <p class="sv-modal-desc" id="svcDetailDesc"></p>
+          <div id="svcDetailReviews"></div>
+          <a class="sv-modal-book" id="svcDetailBookBtn" href="book-us.html">Book This Service →</a>
+        </div>
+      </div>
+    </div>
 
 
 
@@ -401,6 +507,11 @@
   /* stagger delays matching shared.css .delay-1..5 */
   var DELAYS = ['','delay-1','delay-2','delay-3','delay-4','delay-5'];
 
+  /* Keeps full service + review data available for the detail modal,
+     keyed by id, so the compact card only needs to render a summary. */
+  var _svcById   = {};
+  var _statsById = {};
+
   function renderServices(services, statsMap){
     statsMap = statsMap || {};
     var grid = document.getElementById('servicesGrid');
@@ -414,10 +525,14 @@
       return;
     }
 
+    _svcById   = {};
+    _statsById = statsMap;
+    services.forEach(function(s){ _svcById[s.id] = s; });
+
     grid.innerHTML = services.map(function(s, i){
       var imgBlock = s.image_url
         ? '<div class="sv-card-img-wrap">' +
-            '<img class="sv-card-img" src="'+esc(s.image_url)+'" alt="'+esc(s.title)+'" loading="'+(i<2?'eager':'lazy')+'"/>' +
+            '<img class="sv-card-img" src="'+esc(s.image_url)+'" alt="'+esc(s.title)+'" loading="'+(i<4?'eager':'lazy')+'"/>' +
           '</div>'
         : '<div class="sv-card-placeholder"></div>';
 
@@ -426,26 +541,14 @@
         : '';
 
       var delay = DELAYS[Math.min(i, DELAYS.length-1)];
-      var reviewBlock = _reviewBlock(statsMap[s.id]);
 
-      /* Strip newlines from desc so it never breaks JS on the receiving page */
-      var cleanDesc = (s.description || '').replace(/[\r\n]+/g, ' ').trim();
-      var params = 'service=' + encodeURIComponent(s.title || '')
-        + (s.icon     ? '&price='+ encodeURIComponent(s.icon)  : '')
-        + (cleanDesc  ? '&desc=' + encodeURIComponent(cleanDesc) : '');
-      var bookUrl = 'book-us.html?' + params;
-
-      return '<div class="sv-card anim-fade-up '+delay+'" style="cursor:pointer;" data-href="'+bookUrl.replace(/"/g, '&quot;')+'">' +
+      return '<div class="sv-card anim-fade-up '+delay+'" style="cursor:pointer;" data-id="'+esc(s.id)+'">' +
         imgBlock +
         '<div class="sv-card-body">' +
           '<h2 class="sv-card-title">'+esc(s.title)+'</h2>' +
           '<p class="sv-card-desc">'+esc(s.description)+'</p>' +
-          '<div class="sv-card-line"></div>' +
           priceBlock +
-          reviewBlock +
-          '<div style="margin-top:20px;">' +
-            '<span class="sv-book-btn">Book Now →</span>' +
-          '</div>' +
+          '<div class="sv-card-view">View Details →</div>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -454,12 +557,56 @@
     initAnim();
 
     /* Attach click handlers via JS — avoids special-char issues in inline onclick */
-    document.querySelectorAll('.sv-card[data-href]').forEach(function(card) {
+    document.querySelectorAll('.sv-card[data-id]').forEach(function(card) {
       card.addEventListener('click', function() {
-        window.location.href = card.getAttribute('data-href');
+        openServiceDetail(card.getAttribute('data-id'));
       });
     });
   }
+
+  function openServiceDetail(id){
+    var s = _svcById[id];
+    if(!s) return;
+
+    var imgEl = document.getElementById('svcDetailImg');
+    var phEl  = document.getElementById('svcDetailPlaceholder');
+    if(s.image_url){
+      imgEl.src = s.image_url;
+      imgEl.alt = s.title || '';
+      imgEl.style.display = 'block';
+      phEl.style.display = 'none';
+    } else {
+      imgEl.style.display = 'none';
+      phEl.style.display = 'flex';
+    }
+
+    document.getElementById('svcDetailTitle').textContent = s.title || '';
+    document.getElementById('svcDetailDesc').textContent  = s.description || '';
+
+    var priceEl = document.getElementById('svcDetailPrice');
+    if(s.icon){ priceEl.style.display = 'inline-block'; priceEl.textContent = s.icon; }
+    else      { priceEl.style.display = 'none'; }
+
+    document.getElementById('svcDetailReviews').innerHTML = _reviewBlock(_statsById[id]);
+
+    var cleanDesc = (s.description || '').replace(/[\r\n]+/g, ' ').trim();
+    var params = 'service=' + encodeURIComponent(s.title || '')
+      + (s.icon    ? '&price='+ encodeURIComponent(s.icon)   : '')
+      + (cleanDesc ? '&desc=' + encodeURIComponent(cleanDesc) : '');
+    document.getElementById('svcDetailBookBtn').href = 'book-us.html?' + params;
+
+    document.getElementById('svcDetailOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeServiceDetail(){
+    document.getElementById('svcDetailOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeServiceDetail();
+  });
 
   async function loadServices(){
     /* Show fallback content immediately — don't leave the page blank

@@ -131,6 +131,10 @@ tr:hover td{background:var(--bg2);}
 .blog-page-card:active{cursor:grabbing;}
 .blog-page-card.blog-page-dragging{opacity:.4;}
 .blog-page-card.blog-page-dragover{box-shadow:0 0 0 2px var(--gold) inset;}
+.svc-row{cursor:grab;transition:opacity .15s,box-shadow .15s;}
+.svc-row:active{cursor:grabbing;}
+.svc-row.svc-dragging{opacity:.4;}
+.svc-row.svc-dragover{box-shadow:0 0 0 2px var(--gold) inset;}
 .blog-page-handle{font-size:13px;color:var(--text3);letter-spacing:-2px;cursor:grab;user-select:none;}
 
 .cs-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
@@ -940,8 +944,8 @@ If you have any questions, just reply to this email.
         <div class="ws-sticky">
           <div class="hint-box">
             <strong>How services work</strong><br><br>
-            Each service has a <strong>title</strong>, <strong>description</strong>, an optional <strong>price</strong>, an optional <strong>image</strong>, and a <strong>sort order</strong>.<br><br>
-            Drag images straight from your computer or paste a URL. Services are shown on <code>services.html</code> in the order you set.<br><br>
+            Each service has a <strong>title</strong>, <strong>description</strong>, an optional <strong>price</strong>, an optional <strong>image</strong>.<br><br>
+            Drag any row by its ⠿⠿ handle to reorder — it saves automatically. Services are shown on <code>services.html</code> in that order, and on the live page clicking a service opens its details with a Book button.<br><br>
             Toggle <strong>Active</strong> to hide/show a service without deleting it.
           </div>
           <a href="services.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Services Page</a>
@@ -3859,6 +3863,9 @@ var BUCKET = (typeof BUCKET !== 'undefined') ? BUCKET : 'event-photos';
 var SVC_BUCKET = 'site-media'; /* public bucket for service images */
 
 /* Called when nav('services') fires */
+var _svcRows    = [];
+var _svcDragIdx = null;
+
 function loadServices(){
   var el = document.getElementById('servicesList');
   if(!el) return;
@@ -3866,29 +3873,89 @@ function loadServices(){
   var sb = getSupabase();
   sb.from('services').select('*').order('sort_order',{ascending:true}).then(function(res){
     if(res.error){ el.innerHTML = '<div class="empty"><div class="empty-txt">Error: '+res.error.message+'</div></div>'; return; }
-    var rows = res.data || [];
-    if(!rows.length){ el.innerHTML = '<div class="empty"><div class="empty-txt">No services yet. Click “+ Add Service” to create your first.</div></div>'; return; }
-    var html = '<table><thead><tr><th></th><th>Service</th><th>Price</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead><tbody>';
-    rows.forEach(function(s){
-      var img = s.image_url
-        ? '<img src="'+s.image_url+'" style="width:48px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--border);"/>'
-        : '<div style="width:48px;height:34px;border-radius:6px;background:var(--bg3);"></div>';
-      var priceCell = s.icon
-        ? '<span style="font-family:var(--fm);font-size:12px;color:var(--gold);font-weight:700;">'+s.icon+'</span>'
-        : '<span style="color:var(--text3);font-size:12px;">—</span>';
-      var status = s.is_active ? '<span class="pill pill-active">Active</span>' : '<span class="pill pill-paused">Hidden</span>';
-      html += '<tr>'
-        + '<td>'+img+'</td>'
-        + '<td><div style="font-weight:700;font-size:13px;">'+s.title+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.description+'</div></td>'
-        + '<td>'+priceCell+'</td>'
-        + '<td>'+status+'</td>'
-        + '<td style="font-family:var(--fm);font-size:12px;">'+s.sort_order+'</td>'
-        + '<td><div class="td-actions"><button class="btn btn-blue btn-sm" onclick="editService('+JSON.stringify(s).replace(/"/g,'&quot;')+')">Edit</button><button class="btn btn-red btn-sm" onclick="deleteService(\''+s.id+'\',\''+s.title.replace(/'/g,'')+'\')">Delete</button></div></td>'
-        + '</tr>';
-    });
-    html += '</tbody></table>';
-    el.innerHTML = html;
+    _svcRows = res.data || [];
+    renderServicesAdmin();
   });
+}
+
+function renderServicesAdmin(){
+  var el = document.getElementById('servicesList');
+  if(!el) return;
+  if(!_svcRows.length){ el.innerHTML = '<div class="empty"><div class="empty-txt">No services yet. Click “+ Add Service” to create your first.</div></div>'; return; }
+
+  el.innerHTML = _svcRows.map(function(s, idx){
+    var img = s.image_url
+      ? '<img src="'+s.image_url+'" style="width:56px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0;"/>'
+      : '<div style="width:56px;height:40px;border-radius:6px;background:var(--bg3);flex-shrink:0;"></div>';
+    var priceCell = s.icon
+      ? '<span style="font-family:var(--fm);font-size:12px;color:var(--gold);font-weight:700;white-space:nowrap;">'+s.icon+'</span>'
+      : '';
+    var status = s.is_active ? '<span class="pill pill-active">Active</span>' : '<span class="pill pill-paused">Hidden</span>';
+
+    return '<div class="svc-row" draggable="true"'
+      + ' ondragstart="svcDragStart(event,'+idx+')"'
+      + ' ondragover="svcDragOver(event)"'
+      + ' ondragleave="svcDragLeave(event)"'
+      + ' ondrop="svcDrop(event,'+idx+')"'
+      + ' ondragend="svcDragEnd(event)"'
+      + ' style="display:flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:8px;background:var(--bg2);">'
+      + '<span class="blog-page-handle" title="Drag to reorder" style="cursor:grab;flex-shrink:0;">⠿⠿</span>'
+      + img
+      + '<div style="flex:1;min-width:0;">'
+        + '<div style="font-weight:700;font-size:13px;">'+s.title+'</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.description+'</div>'
+      + '</div>'
+      + priceCell
+      + status
+      + '<div class="td-actions"><button class="btn btn-blue btn-sm" onclick="editService('+JSON.stringify(s).replace(/"/g,'&quot;')+')">Edit</button><button class="btn btn-red btn-sm" onclick="deleteService(\''+s.id+'\',\''+s.title.replace(/'/g,'')+'\')">Delete</button></div>'
+    + '</div>';
+  }).join('');
+}
+
+/* ── Drag-and-drop reordering (mirrors blog page pattern) ── */
+function svcDragStart(e, idx){
+  _svcDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', String(idx)); } catch(err) {}
+  e.currentTarget.classList.add('svc-dragging');
+}
+function svcDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('svc-dragover');
+}
+function svcDragLeave(e){
+  e.currentTarget.classList.remove('svc-dragover');
+}
+function svcDrop(e, idx){
+  e.preventDefault();
+  e.currentTarget.classList.remove('svc-dragover');
+  if(_svcDragIdx === null || _svcDragIdx === idx) return;
+  var moved = _svcRows.splice(_svcDragIdx, 1)[0];
+  _svcRows.splice(idx, 0, moved);
+  _svcDragIdx = null;
+  renderServicesAdmin();
+  saveServiceOrder();
+}
+function svcDragEnd(e){
+  e.currentTarget.classList.remove('svc-dragging');
+  document.querySelectorAll('.svc-row.svc-dragover').forEach(function(el){ el.classList.remove('svc-dragover'); });
+  _svcDragIdx = null;
+}
+
+async function saveServiceOrder(){
+  try {
+    var sb = getSupabase();
+    var updates = _svcRows.map(function(s, i){ return { id: s.id, sort_order: i * 10 }; });
+    await Promise.all(updates.map(function(u){
+      return sb.from('services').update({ sort_order: u.sort_order }).eq('id', u.id);
+    }));
+    _svcRows.forEach(function(s, i){ s.sort_order = i * 10; });
+    toast('', 'Order saved', '');
+  } catch(e) {
+    toast('', 'Failed to save order', e.message);
+    loadServices();
+  }
 }
 
 function openServiceModal(prefill){
