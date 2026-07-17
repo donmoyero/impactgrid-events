@@ -82,7 +82,7 @@
       var c = getSupabase();
       var { data, error } = await c
         .from('brand_partners')
-        .select('id, name, logo_url, storage_path, position')
+        .select('id, name, logo_url, storage_path, position, logo_width, logo_height')
         .order('position', { ascending: true, nullsFirst: false });
       if (error) throw error;
       _partners = data || [];
@@ -104,11 +104,19 @@
     }
 
     el.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">' + _partners.map(function (p, i) {
-      return '<div style="display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;">' +
+      var w = p.logo_width  || '';
+      var h = p.logo_height || '';
+      return '<div style="display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;flex-wrap:wrap;">' +
         '<div style="width:64px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border-radius:8px;flex-shrink:0;">' +
           '<img src="' + _esc(p.logo_url) + '" alt="" style="max-width:56px;max-height:36px;object-fit:contain;"/>' +
         '</div>' +
-        '<div style="flex:1;font-size:13px;font-weight:600;min-width:0;">' + _esc(p.name || 'Untitled') + '</div>' +
+        '<div style="flex:1;font-size:13px;font-weight:600;min-width:120px;">' + _esc(p.name || 'Untitled') + '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);">' +
+          '<label style="display:flex;align-items:center;gap:4px;">W <input type="number" min="1" placeholder="140" value="' + w + '" id="bp-w-' + p.id + '" style="width:60px;padding:4px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/></label>' +
+          '<label style="display:flex;align-items:center;gap:4px;">H <input type="number" min="1" placeholder="42" value="' + h + '" id="bp-h-' + p.id + '" style="width:60px;padding:4px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/></label>' +
+          '<span style="opacity:.7;">px</span>' +
+        '</div>' +
+        '<button class="btn btn-ghost btn-sm" onclick="saveBrandPartnerSize(\'' + p.id + '\')">💾 Save Size</button>' +
         '<div style="display:flex;flex-direction:column;gap:2px;">' +
           '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;" ' + (i === 0 ? 'disabled' : '') + ' onclick="moveBrandPartner(\'' + p.id + '\',\'up\')">▲</button>' +
           '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;" ' + (i === _partners.length - 1 ? 'disabled' : '') + ' onclick="moveBrandPartner(\'' + p.id + '\',\'down\')">▼</button>' +
@@ -116,6 +124,28 @@
         '<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteBrandPartner(\'' + p.id + '\',\'' + _esc(p.storage_path || '') + '\')">🗑 Delete</button>' +
       '</div>';
     }).join('') + '</div>';
+  }
+
+  /* ── Resize (custom width/height in px) ────────────────── */
+  window.saveBrandPartnerSize = async function (id) {
+    var wEl = document.getElementById('bp-w-' + id);
+    var hEl = document.getElementById('bp-h-' + id);
+    var w = wEl && wEl.value ? parseInt(wEl.value, 10) : null;
+    var h = hEl && hEl.value ? parseInt(hEl.value, 10) : null;
+    if ((wEl && wEl.value && (!w || w <= 0)) || (hEl && hEl.value && (!h || h <= 0))) {
+      toast('⚠️', 'Invalid size', 'Width and height must be positive numbers');
+      return;
+    }
+    try {
+      var c = getSupabase();
+      var { error } = await c.from('brand_partners').update({ logo_width: w, logo_height: h }).eq('id', id);
+      if (error) throw error;
+      var p = _partners.find(function (p) { return p.id === id; });
+      if (p) { p.logo_width = w; p.logo_height = h; }
+      toast('✅', 'Size saved', w || h ? (w || 'auto') + ' × ' + (h || 'auto') + 'px' : 'Reset to default size');
+    } catch (e) {
+      toast('❌', 'Failed to save size', e.message);
+    }
   }
 
   /* ── Reorder ────────────────────────────────────────────── */

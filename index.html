@@ -1200,7 +1200,7 @@
 
       var { data, error } = await sb
         .from('brand_partners')
-        .select('name, logo_url')
+        .select('name, logo_url, logo_width, logo_height')
         .order('position', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: true });
 
@@ -1211,7 +1211,17 @@
       }
 
       inner.innerHTML = data.map(function(p){
-        return '<img class="partner-logo" src="' + esc(p.logo_url) + '" alt="' + esc(p.name || '') + '" loading="lazy"/>';
+        /* Falls back to the default CSS sizing (max-height:42px; max-width:140px)
+           when no custom size was set in admin. object-fit:contain keeps the
+           logo's own aspect ratio regardless of the box size. */
+        var sizeStyle = '';
+        if (p.logo_width || p.logo_height) {
+          sizeStyle = ' style="' +
+            (p.logo_width  ? 'max-width:'  + p.logo_width  + 'px;' : '') +
+            (p.logo_height ? 'max-height:' + p.logo_height + 'px;' : '') +
+            '"';
+        }
+        return '<img class="partner-logo" src="' + esc(p.logo_url) + '" alt="' + esc(p.name || '') + '" loading="lazy"' + sizeStyle + '/>';
       }).join('');
       strip.style.display = '';
     } catch(e) {
