@@ -680,6 +680,111 @@ function cloudinaryVideoPosterUrl(secureUrl){
 }
 
 /* ════════════════════════════════════════════════════
+   IN-BROWSER VIDEO COMPRESSION (ffmpeg.wasm)
+   Kicks in only when a video exceeds MAX_VIDEO_BYTES.
+   Downscales/re-encodes so the final file fits under the
+   Cloudinary plan's upload cap, entirely client-side.
+════════════════════════════════════════════════════ */
+var _ffmpegInstance = null;
+var _ffmpegLoading  = null;
+
+/* Reads a video file's duration (seconds) via a throwaway <video> element. */
+function getVideoDuration(file){
+  return new Promise(function(resolve, reject){
+    var url = URL.createObjectURL(file);
+    var v = document.createElement('video');
+    v.preload = 'metadata';
+    v.onloadedmetadata = function(){
+      URL.revokeObjectURL(url);
+      resolve(v.duration || 0);
+    };
+    v.onerror = function(){
+      URL.revokeObjectURL(url);
+      reject(new Error('Could not read video metadata'));
+    };
+    v.src = url;
+  });
+}
+
+/* Lazily loads and caches a single shared ffmpeg.wasm instance
+   (loading the ~25MB core more than once per session is wasteful). */
+async function getFFmpeg(){
+  if(_ffmpegInstance) return _ffmpegInstance;
+  if(_ffmpegLoading)  return _ffmpegLoading;
+
+  _ffmpegLoading = (async function(){
+    var FFmpeg   = window.FFmpegWASM.FFmpeg;
+    var ffmpeg   = new FFmpeg();
+    var baseURL  = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    var coreURL  = await FFmpegUtil.toBlobURL(baseURL + '/ffmpeg-core.js', 'text/javascript');
+    var wasmURL  = await FFmpegUtil.toBlobURL(baseURL + '/ffmpeg-core.wasm', 'application/wasm');
+    await ffmpeg.load({ coreURL: coreURL, wasmURL: wasmURL });
+    _ffmpegInstance = ffmpeg;
+    return ffmpeg;
+  })();
+
+  return _ffmpegLoading;
+}
+
+/* Re-encodes `file` so the output comfortably fits under `maxBytes`.
+   Picks a target bitrate from the video's duration, keeps 1080p when the
+   bitrate budget allows it, and drops to 720p for longer/heavier files.
+   `onProgress(pct)` receives 0-100 while ffmpeg works.
+   Returns a File (same name, .mp4 extension) or throws on failure. */
+async function compressVideoToFit(file, maxBytes, onProgress){
+  var duration = await getVideoDuration(file);
+  if(!duration || !isFinite(duration)) duration = 60; /* safe fallback */
+
+  /* Leave ~8% headroom below the cap for container/audio overhead. */
+  var budgetBytes  = maxBytes * 0.92;
+  var budgetBits   = budgetBytes * 8;
+  var audioKbps    = 96;
+  var videoKbps    = Math.floor((budgetBits / duration / 1000) - audioKbps);
+
+  /* Never go below a watchable floor, never exceed a sensible ceiling. */
+  videoKbps = Math.max(300, Math.min(videoKbps, 4000));
+
+  /* If the bitrate budget is thin, drop resolution so quality-per-pixel
+     stays reasonable rather than smearing 1080p at a starved bitrate. */
+  var scaleFilter = videoKbps < 1200 ? 'scale=-2:720' : 'scale=-2:1080';
+
+  var ffmpeg = await getFFmpeg();
+
+  if(onProgress){
+    ffmpeg.on('progress', function(evt){
+      var pct = Math.min(99, Math.round((evt.progress || 0) * 100));
+      onProgress(pct);
+    });
+  }
+
+  var inputName  = 'in' + (file.name.match(/\.[a-zA-Z0-9]+$/) || ['.mp4'])[0];
+  var outputName = 'out.mp4';
+
+  await ffmpeg.writeFile(inputName, await FFmpegUtil.fetchFile(file));
+
+  await ffmpeg.exec([
+    '-i', inputName,
+    '-vf', scaleFilter,
+    '-c:v', 'libx264',
+    '-b:v', videoKbps + 'k',
+    '-maxrate', videoKbps + 'k',
+    '-bufsize', (videoKbps * 2) + 'k',
+    '-preset', 'veryfast',
+    '-c:a', 'aac',
+    '-b:a', audioKbps + 'k',
+    '-movflags', '+faststart',
+    outputName
+  ]);
+
+  var data = await ffmpeg.readFile(outputName);
+  await ffmpeg.deleteFile(inputName).catch(function(){});
+  await ffmpeg.deleteFile(outputName).catch(function(){});
+
+  var newName = file.name.replace(/\.[a-zA-Z0-9]+$/, '') + '-compressed.mp4';
+  return new File([data.buffer], newName, { type: 'video/mp4' });
+}
+
+/* ════════════════════════════════════════════════════
    BLOG-ONLY CLOUDINARY (separate account from portfolio/events)
 ════════════════════════════════════════════════════ */
 var BLOG_CLOUDINARY_CLOUD_NAME    = 'dsaym55pt';
@@ -712,7 +817,8 @@ async function uploadPhotos(files){
   var prog = document.getElementById('photoUploadProgress');
   prog.innerHTML = '';
 
-  var MAX_VIDEO_BYTES = 100 * 1024 * 1024; /* 100MB — typical Cloudinary plan cap */
+  var MAX_VIDEO_BYTES         = 100 * 1024 * 1024; /* 100MB — typical Cloudinary plan cap */
+  var MAX_COMPRESSIBLE_BYTES  = 1.5 * 1024 * 1024 * 1024; /* 1.5GB — above this, in-browser compression is unreliable */
 
   for(var i = 0; i < files.length; i++){
     var file    = files[i];
@@ -723,8 +829,8 @@ async function uploadPhotos(files){
       toast('⚠️', 'Skipped ' + file.name, 'Not a supported photo or video type');
       continue;
     }
-    if(isVideo && file.size > MAX_VIDEO_BYTES){
-      toast('⚠️', 'Skipped ' + file.name, 'Video over 100MB — trim it and try again');
+    if(isVideo && file.size > MAX_COMPRESSIBLE_BYTES){
+      toast('⚠️', 'Skipped ' + file.name, 'Video too large to compress in-browser — trim it and try again');
       continue;
     }
 
@@ -750,11 +856,24 @@ async function uploadPhotos(files){
       var folder = selectedEventId;
 
       if(isVideo){
-        /* Videos: single upload, no client-side re-encoding.
-           Poster thumbnail is derived from the video URL itself
-           (no extra upload/API call needed). */
-        setStatus('Uploading video…', 30, '');
-        var vidResult  = await uploadVideoToCloudinary(file, folder + '/original');
+        /* Videos over the plan's cap get downscaled/re-encoded right in the
+           browser (ffmpeg.wasm) before upload. Files already under the cap
+           upload as-is, no re-encoding. Poster thumbnail is derived from the
+           video URL itself (no extra upload/API call needed). */
+        var uploadFile = file;
+        if(file.size > MAX_VIDEO_BYTES){
+          setStatus('Compressing video… 0%', 5, '');
+          uploadFile = await compressVideoToFit(file, MAX_VIDEO_BYTES, function(pct){
+            setStatus('Compressing video… ' + pct + '%', 5 + Math.round(pct * 0.5), '');
+          });
+          if(uploadFile.size > MAX_VIDEO_BYTES){
+            toast('⚠️', 'Skipped ' + file.name, 'Still over 100MB after compression — trim it and try again');
+            setStatus('Failed', 100, '#e33');
+            continue;
+          }
+        }
+        setStatus('Uploading video…', 60, '');
+        var vidResult  = await uploadVideoToCloudinary(uploadFile, folder + '/original');
         var posterUrl  = cloudinaryVideoPosterUrl(vidResult.secure_url);
 
         setStatus('Saving record…', 85, '');
