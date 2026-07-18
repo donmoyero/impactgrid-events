@@ -90,6 +90,22 @@
   let hasGreeted  = false;
   let isReturning = false; /* true if visitor has chat history from a previous session */
 
+  /* ── Live services list — always reflects what's in admin, no hardcoded list ── */
+  let serviceOptions = [];
+  async function loadServiceOptions() {
+    try {
+      const sb = (typeof window.getSupabase === 'function') ? window.getSupabase() : null;
+      if (!sb) return;
+      const res = await sb
+        .from('services')
+        .select('id,title,icon')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if (!res.error && res.data) serviceOptions = res.data;
+    } catch (e) { /* quick-reply chips are a nice-to-have — fail silently */ }
+  }
+  loadServiceOptions();
+
   try {
     const saved = localStorage.getItem(HISTORY_KEY);
     if (saved) {
@@ -297,6 +313,32 @@
     .ig-typing span:nth-child(2) { animation-delay: 0.2s; }
     .ig-typing span:nth-child(3) { animation-delay: 0.4s; }
 
+    /* Service quick-reply chips */
+    .ig-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-self: flex-start;
+      max-width: 92%;
+      margin: 2px 0 4px;
+      animation: ig-msg-in 0.22s cubic-bezier(0.34,1.3,0.64,1) both;
+    }
+    .ig-chip {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 13px;
+      border-radius: 100px;
+      border: 1px solid #ffe600;
+      background: transparent;
+      color: var(--text, #0d1017);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .ig-chip:hover { background: rgba(255,230,0,0.16); transform: translateY(-1px); }
+    [data-theme="dark"] .ig-chip { color: var(--text, #eef0f6); }
+
     /* Input area */
     #ig-chat-input-row {
       display: flex;
@@ -441,6 +483,38 @@
   const sendBtn    = document.getElementById('ig-chat-send');
   const unreadDot  = document.getElementById('ig-chat-unread');
 
+  /* ── Service quick-reply chips — shown once, when Dijo asks which
+     service the visitor wants, sourced live from the services table.
+     They can tap a chip OR just type their own answer — both work. ── */
+  function removeServiceChips() {
+    const old = document.getElementById('ig-service-chips');
+    if (old) old.remove();
+  }
+
+  function renderServiceChips() {
+    if (!serviceOptions.length) return;
+    removeServiceChips();
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ig-chip-row';
+    wrap.id = 'ig-service-chips';
+
+    serviceOptions.forEach(function (s) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ig-chip';
+      btn.textContent = s.title;
+      btn.addEventListener('click', function () {
+        removeServiceChips();
+        sendMessage(s.title);
+      });
+      wrap.appendChild(btn);
+    });
+
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
   /* ── Render a message ── */
   function addMessage(text, role) {
     const msg = document.createElement('div');
@@ -481,6 +555,7 @@
     text = (text || '').trim();
     if (!text || isTyping) return;
 
+    removeServiceChips();
     addMessage(text, 'user');
     inputEl.value = '';
     inputEl.style.height = '38px';
@@ -519,6 +594,12 @@
         addMessage(data.reply, 'bot');
       } else {
         addMessage("Sorry, something went wrong. Try again in a sec!", 'bot');
+      }
+
+      /* Offer real service options as tappable chips — visitor can still
+         just type their own answer instead, both are handled server-side. */
+      if (data.stage === 'GATHER_EVENT' && !(collected && collected.event_type)) {
+        renderServiceChips();
       }
     } catch (e) {
       hideTyping();

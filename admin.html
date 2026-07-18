@@ -1154,7 +1154,7 @@ If you have any questions, just reply to this email.
               </div>
             </div>
           </div>
-          <div class="hint-box" style="margin-top:12px;"><strong>How this works</strong><br><br>When Dijo can't answer something, it asks for the visitor's email, flags the chat, and this page shows it here in red until you mark it resolved.</div>
+          <div class="hint-box" style="margin-top:12px;"><strong>How this works</strong><br><br>This preview knows it's you, not a customer — Dijo won't try to run you through the booking flow here. Ask it to simulate a customer conversation if you want to see that side.<br><br>On the live site, when Dijo can't answer something, it asks for the visitor's email, flags the chat, and this page shows it here in red until you mark it resolved.</div>
         </div>
       </div>
     </div>
@@ -2084,7 +2084,7 @@ async function rcpSendPreview(){
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         message:msg, codename:'AdminPreview', history:rcpPreviewHistory.slice(-14),
-        collected:rcpPreviewCollected, behaviour:{page:'admin-preview'}
+        collected:rcpPreviewCollected, behaviour:{page:'admin-preview'}, isAdminPreview:true
       })
     });
     var data=await res.json();
