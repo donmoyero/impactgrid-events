@@ -348,6 +348,12 @@ textarea { resize: vertical; min-height: 80px; }
                 </select>
               </div>
             </div>
+            <div class="field-group-full" id="bk-service-row">
+              <label class="field-label">Service</label>
+              <select id="bk-service">
+                <option value="">— Select a service (optional) —</option>
+              </select>
+            </div>
             <div class="field-row">
               <div class="field-group">
                 <label class="field-label">Guest Count</label>
@@ -409,6 +415,90 @@ var calYear      = today.getFullYear();
 var calMonth     = today.getMonth();
 var selectedDate = null;
 
+/* Maps a service title's keywords → an Event Type option value.
+   Shared by the query-param prefill banner and the live Service dropdown. */
+function mapServiceTitleToType(title) {
+  var typeMap = [
+    { keys: ['wedding'],                           value: 'Wedding'   },
+    { keys: ['corporate','business','conference'],  value: 'Corporate' },
+    { keys: ['portrait','headshot'],               value: 'Portrait'  },
+    { keys: ['social','party','content','creation','gallery','download','preview'], value: 'Social' },
+  ];
+  var lower   = (title || '').toLowerCase();
+  var matched = 'Other';
+  typeMap.forEach(function(m) {
+    m.keys.forEach(function(k) { if (lower.indexOf(k) !== -1) matched = m.value; });
+  });
+  return matched;
+}
+
+/* ── Live Service dropdown (always reflects the current services table —
+   add/remove a service in admin and it shows up here automatically) ── */
+var _bookServices = {}; // id -> {id,title,icon}
+
+async function loadServicesForBooking() {
+  var sel = document.getElementById('bk-service');
+  if (!sel) return;
+  try {
+    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if (!sb) return;
+    var res = await sb
+      .from('services')
+      .select('id,title,icon')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+    if (res.error || !res.data) return;
+
+    _bookServices = {};
+    res.data.forEach(function(s) { _bookServices[s.id] = s; });
+
+    var options = ['<option value="">— Select a service (optional) —</option>'];
+    res.data.forEach(function(s) {
+      var label = s.title + (s.icon ? ' — ' + s.icon : '');
+      options.push('<option value="' + s.id + '">' + label.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</option>');
+    });
+    sel.innerHTML = options.join('');
+
+    /* If we arrived via a services.html card link, try to match that title
+       to a live service so the dropdown reflects the same selection —
+       purely cosmetic since the banner already carries the real prefill. */
+    if (window._pendingServiceTitleMatch) {
+      var wanted = window._pendingServiceTitleMatch.toLowerCase();
+      var match = res.data.find(function(s) { return s.title.toLowerCase() === wanted; });
+      if (match) sel.value = match.id;
+    }
+  } catch (e) {
+    console.warn('[book-us] Failed to load services for dropdown:', e);
+  }
+}
+
+function onServiceSelect() {
+  var sel = document.getElementById('bk-service');
+  var s = sel && _bookServices[sel.value];
+  if (!s) return;
+
+  /* Pre-fill notes with the chosen service, replacing any previous
+     "Service:" line so re-selecting doesn't stack duplicates. */
+  var notes = document.getElementById('bk-notes');
+  if (notes) {
+    var lines = notes.value.split('\n').filter(function(l) { return l.indexOf('Service:') !== 0; });
+    var serviceLine = 'Service: ' + s.title + (s.icon ? ' (' + s.icon + ')' : '');
+    notes.value = [serviceLine].concat(lines).join('\n').replace(/^\n+/, '');
+  }
+
+  /* Default the Event Type to match, without locking it — the person can
+     still change it manually. */
+  var typeSel = document.getElementById('bk-type');
+  if (typeSel && !typeSel.value) typeSel.value = mapServiceTitleToType(s.title);
+}
+
+(function() {
+  var sel = document.getElementById('bk-service');
+  if (sel) sel.addEventListener('change', onServiceSelect);
+})();
+
+loadServicesForBooking();
+
 /* ── Pre-fill from service page (?service=...&price=...&desc=...) ── */
 (function() {
   var p        = new URLSearchParams(window.location.search);
@@ -429,6 +519,7 @@ var selectedDate = null;
   typeMap.forEach(function(m) {
     m.keys.forEach(function(k) { if (lower.indexOf(k) !== -1) matched = m.value; });
   });
+  window._pendingServiceTitleMatch = svcTitle;
 
   function applyService() {
     /* 1 — inject service summary card above the two-col layout */
@@ -491,6 +582,11 @@ var selectedDate = null;
     /* 4 — update form card header title */
     var formTitle = document.querySelector('.form-head-title');
     if (formTitle) formTitle.textContent = 'Your Details — ' + svcTitle;
+
+    /* 5 — hide the manual Service dropdown; the banner above already
+       carries the selection, no need to show both. */
+    var svcRow = document.getElementById('bk-service-row');
+    if (svcRow) svcRow.style.display = 'none';
   }
 
   window.clearServicePrefill = function() {
@@ -500,6 +596,8 @@ var selectedDate = null;
     if (notes && notes.value.indexOf('Service:') === 0) notes.value = '';
     var formTitle = document.querySelector('.form-head-title');
     if (formTitle) formTitle.textContent = 'Your Details';
+    var svcRow = document.getElementById('bk-service-row');
+    if (svcRow) svcRow.style.display = '';
     /* strip param from URL without reload */
     window.history.replaceState({}, '', window.location.pathname);
   };
