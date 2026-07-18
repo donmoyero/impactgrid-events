@@ -331,23 +331,11 @@ textarea { resize: vertical; min-height: 80px; }
                 <input type="email" id="bk-email" placeholder="you@email.com"/>
               </div>
             </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Phone *</label>
-                <input type="tel" id="bk-phone" placeholder="+44 7000 000000"/>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Event Type *</label>
-                <select id="bk-type">
-                  <option value="">— Select type —</option>
-                  <option value="Wedding">Wedding</option>
-                  <option value="Corporate">Corporate</option>
-                  <option value="Portrait">Portrait</option>
-                  <option value="Social">Social / Party</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+            <div class="field-group-full">
+              <label class="field-label">Phone *</label>
+              <input type="tel" id="bk-phone" placeholder="+44 7000 000000"/>
             </div>
+            <input type="hidden" id="bk-type" value="Other"/>
             <div class="field-group-full" id="bk-service-row">
               <label class="field-label">Service</label>
               <select id="bk-service">
@@ -565,13 +553,9 @@ loadServicesForBooking();
       clearServicePrefill();
     });
 
-    /* 2 — pre-fill Event Type and lock it */
+    /* 2 — track the matched category internally (hidden field, not shown to the customer) */
     var sel = document.getElementById('bk-type');
-    if (sel) {
-      sel.value = matched;
-      sel.style.opacity = '0.6';
-      sel.style.pointerEvents = 'none';
-    }
+    if (sel) sel.value = matched;
 
     /* 3 — pre-fill Notes with package info */
     var notes = document.getElementById('bk-notes');
@@ -591,7 +575,7 @@ loadServicesForBooking();
 
   window.clearServicePrefill = function() {
     var sel = document.getElementById('bk-type');
-    if (sel) { sel.value = ''; sel.style.opacity = ''; sel.style.pointerEvents = ''; }
+    if (sel) { sel.value = 'Other'; }
     var notes = document.getElementById('bk-notes');
     if (notes && notes.value.indexOf('Service:') === 0) notes.value = '';
     var formTitle = document.querySelector('.form-head-title');
@@ -720,7 +704,6 @@ async function submitBooking() {
   if (!name)         { showAlert('Please enter your full name.', false); return; }
   if (!email || !email.includes('@')) { showAlert('Please enter a valid email address.', false); return; }
   if (!phone)        { showAlert('Please enter a phone number.', false); return; }
-  if (!type)         { showAlert('Please select an event type.', false); return; }
 
   var btn = document.getElementById('submitBtn');
   var lbl = document.getElementById('submitLabel');
@@ -740,7 +723,7 @@ async function submitBooking() {
     var parts = selectedDate.split('-');
     var readableDate = MONTH_NAMES[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
     document.getElementById('successDetail').innerHTML =
-      row('Name', name) + row('Email', email) + row('Date', readableDate) + row('Event Type', type) + (guests ? row('Guest Count', guests) : '');
+      row('Name', name) + row('Email', email) + row('Date', readableDate) + (guests ? row('Guest Count', guests) : '');
     document.getElementById('successUI').style.display = 'block';
     window.scrollTo({ top: document.getElementById('booking').offsetTop - 80, behavior:'smooth' });
 
@@ -765,7 +748,7 @@ function resetBooking() {
   ['bk-name','bk-email','bk-phone','bk-guests','bk-location','bk-notes'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value = '';
   });
-  document.getElementById('bk-type').value = '';
+  document.getElementById('bk-type').value = 'Other';
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitLabel').textContent = '✦ Send Booking Request';
   document.getElementById('formAlert').style.display = 'none';
