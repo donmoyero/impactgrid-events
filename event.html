@@ -929,7 +929,7 @@ input,textarea,select{font-family:inherit;}
   </nav>
   <div class="gate">
     <div class="gate-box" id="gateBox">
-      <div class="gate-icon" id="gateIcon">📸</div>
+      <div class="gate-icon" id="gateIcon"></div>
       <div class="gate-title" id="gateTitle">Event Gallery</div>
       <div class="gate-sub" id="gateSub">Enter your access code to view the photos.</div>
       <div class="gate-alert gate-alert-error" id="gateAlert"></div>
@@ -992,9 +992,9 @@ input,textarea,select{font-family:inherit;}
         <button class="share-btn" id="shareBtn" onclick="shareEvent()" title="Share this gallery">↗ Share</button>
         <button class="btn-outline" id="selectAllBtn" onclick="toggleSelectAll()">☐ Select All</button>
         <button class="btn-primary" id="downloadSelectedBtn" onclick="downloadSelected()" style="display:none;">
-          ⬇ Download (<span id="selectedCount">0</span>)
+          Download (<span id="selectedCount">0</span>)
         </button>
-        <button class="btn-primary" id="downloadAllBtn" onclick="downloadAllPhotos()">⬇ Download All</button>
+        <button class="btn-primary" id="downloadAllBtn" onclick="downloadAllPhotos()">Download All</button>
       </div>
     </div>
 
@@ -1025,7 +1025,7 @@ input,textarea,select{font-family:inherit;}
   </div>
   <div class="lb-counter" id="lbCounter">1 / 10</div>
   <div class="lightbox-actions" onclick="event.stopPropagation()">
-    <button id="lbDownloadBtn" class="lb-btn lb-btn-dl" onclick="lbDownload()">⬇ Save Photo</button>
+    <button id="lbDownloadBtn" class="lb-btn lb-btn-dl" onclick="lbDownload()">Save Photo</button>
     <button class="lb-btn lb-btn-ghost" onclick="closeLightbox()">✕ Close</button>
   </div>
 </div>
@@ -1038,7 +1038,7 @@ input,textarea,select{font-family:inherit;}
     <!-- Header -->
     <div class="ios-dl-header">
       <div class="ios-dl-title">
-        <div class="ios-dl-title-icon">📲</div>
+        <div class="ios-dl-title-icon"></div>
         <span id="iosDlTitle">Save Photos</span>
       </div>
       <div class="ios-dl-subtitle" id="iosDlSubtitle">Saving in batches of 9 — tap the button after each share sheet</div>
@@ -1064,7 +1064,7 @@ input,textarea,select{font-family:inherit;}
 
     <!-- Instruction card -->
     <div class="ios-dl-instruction" id="iosDlInstruction">
-      <div class="ios-dl-instruction-icon">👆</div>
+      <div class="ios-dl-instruction-icon"></div>
       <div class="ios-dl-instruction-text" id="iosDlInstructionText">
         Tap <strong>"Save to Device"</strong> — your Share Sheet opens. Tap <strong>"Save Image"</strong> to save all photos in this batch to your Camera Roll.
       </div>
@@ -1076,7 +1076,7 @@ input,textarea,select{font-family:inherit;}
     <!-- Buttons -->
     <div class="ios-dl-btn-area" id="iosDlBtnArea">
       <button class="ios-dl-save-btn" id="iosDlSaveBtn" onclick="iosDlTriggerShare()">
-        <span id="iosDlSaveBtnIcon">📲</span>
+        <span id="iosDlSaveBtnIcon"></span>
         <span id="iosDlSaveBtnText">Save to Device</span>
       </button>
       <button class="ios-dl-next-btn hidden" id="iosDlNextBtn" onclick="iosDlNextBatch()">
@@ -1087,7 +1087,7 @@ input,textarea,select{font-family:inherit;}
 
     <!-- Done state -->
     <div class="ios-dl-done hidden" id="iosDlDone">
-      <span class="ios-dl-done-icon">🎉</span>
+      <span class="ios-dl-done-icon"></span>
       <div class="ios-dl-done-title" id="iosDlDoneTitle">All Photos Saved!</div>
       <div class="ios-dl-done-sub" id="iosDlDoneSub">Check your Camera Roll — all photos are there.</div>
       <button class="ios-dl-done-btn" onclick="iosDlClose()">Done ✓</button>
@@ -1099,7 +1099,7 @@ input,textarea,select{font-family:inherit;}
 <div class="ios-modal-backdrop hidden" id="iosModal" onclick="closeIosModal(event)">
   <div class="ios-modal-box" onclick="event.stopPropagation()">
     <div class="ios-modal-handle"></div>
-    <div class="ios-modal-title" id="iosModalTitle">📱 Save Your Photos</div>
+    <div class="ios-modal-title" id="iosModalTitle">Save Your Photos</div>
     <div class="ios-modal-sub" id="iosModalSub">Here's how to save photos on your device</div>
     <div id="iosSteps">
       <div class="ios-step">
@@ -1112,12 +1112,12 @@ input,textarea,select{font-family:inherit;}
       </div>
       <div class="ios-step">
         <div class="ios-step-num">3</div>
-        <div class="ios-step-text" id="iosStep3Text">Tap <strong>"Save to Photos"</strong> — saves directly to Camera Roll 📷</div>
+        <div class="ios-step-text" id="iosStep3Text">Tap <strong>"Save to Photos"</strong> — saves directly to Camera Roll</div>
       </div>
     </div>
     <div class="ios-photos-grid" id="iosPhotosGrid"></div>
     <button class="ios-open-all-btn" id="iosOpenAllBtn" onclick="iosOpenAll()">
-      📂 Open All Photos
+      Open All Photos
     </button>
     <button class="ios-cancel-btn" onclick="closeIosModal()">Cancel</button>
   </div>
@@ -1126,7 +1126,7 @@ input,textarea,select{font-family:inherit;}
 <!-- ══════════════════════════════════════ FLOATING DOWNLOAD BAR ══════════════════════════════════════ -->
 <div class="dl-bar" id="dlBar">
   <div class="dl-bar-left">
-    <div class="dl-bar-icon">📥</div>
+    <div class="dl-bar-icon"></div>
     <div class="dl-bar-info">
       <div class="dl-bar-count"><span id="dlBarCount">0</span> photos selected</div>
       <div class="dl-bar-sub" id="dlBarSub">Tap photos to select them</div>
@@ -1134,13 +1134,12 @@ input,textarea,select{font-family:inherit;}
   </div>
   <div class="dl-bar-actions">
     <button class="btn-outline" onclick="clearSelection()" style="font-size:12px;padding:9px 16px;">✕ Clear</button>
-    <button class="btn-primary" onclick="downloadSelected()" style="padding:10px 20px;">⬇ Save</button>
+    <button class="btn-primary" onclick="downloadSelected()" style="padding:10px 20px;">Save</button>
   </div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
-  <span id="toastIcon">✅</span>
   <div>
     <div id="toastMsg" style="font-weight:700;"></div>
     <div id="toastSub" style="font-size:11px;opacity:.7;margin-top:2px;"></div>
@@ -1153,14 +1152,14 @@ input,textarea,select{font-family:inherit;}
 ══════════════════════════════════════ */
 var EVENTS_API   = 'https://impactgrid-events-api.onrender.com';
 var TPL_MAP = {
-  professional : { cls:'tpl-professional', icon:'📸', heroType:'dark-text'  },
-  wedding      : { cls:'tpl-wedding',      icon:'💍', heroType:'elegant'    },
-  birthday     : { cls:'tpl-birthday',     icon:'🎂', heroType:'colorful'   },
-  kids         : { cls:'tpl-birthday',     icon:'🎉', heroType:'colorful'   },
+  professional : { cls:'tpl-professional', icon:'', heroType:'dark-text'  },
+  wedding      : { cls:'tpl-wedding',      icon:'', heroType:'elegant'    },
+  birthday     : { cls:'tpl-birthday',     icon:'', heroType:'colorful'   },
+  kids         : { cls:'tpl-birthday',     icon:'', heroType:'colorful'   },
   gala         : { cls:'tpl-gala',         icon:'✦',  heroType:'luxury'     },
-  nightlife    : { cls:'tpl-nightlife',    icon:'🎧', heroType:'neon'       },
-  sports       : { cls:'tpl-professional', icon:'🏆', heroType:'dark-text'  },
-  ceremony     : { cls:'tpl-professional', icon:'🎓', heroType:'dark-text'  },
+  nightlife    : { cls:'tpl-nightlife',    icon:'', heroType:'neon'       },
+  sports       : { cls:'tpl-professional', icon:'', heroType:'dark-text'  },
+  ceremony     : { cls:'tpl-professional', icon:'', heroType:'dark-text'  },
 };
 
 var eventData    = null;
@@ -1273,18 +1272,18 @@ document.addEventListener('DOMContentLoaded', async function(){
    GATE
 ══════════════════════════════════════ */
 function styleGate(type, name){
-  var icons = { wedding:'💍', birthday:'🎂', kids:'🎉', gala:'✦', nightlife:'🎧', sports:'🏆', ceremony:'🎓', professional:'📸' };
+  var icons = { wedding:'', birthday:'', kids:'', gala:'✦', nightlife:'', sports:'', ceremony:'', professional:'' };
   var subs  = {
     wedding    : 'Please enter your access code to view the gallery.',
-    birthday   : '🎉 Enter your code to join the celebration!',
-    kids       : '🔑 Enter your magic code to see the photos!',
+    birthday   : 'Enter your code to join the celebration!',
+    kids       : 'Enter your magic code to see the photos!',
     gala       : 'Please present your access code to enter.',
     nightlife  : 'Enter your exclusive access code.',
     professional: 'Enter your access code to view the event photos.',
     sports     : 'Enter your team access code.',
     ceremony   : 'Enter your access code to view the ceremony gallery.',
   };
-  document.getElementById('gateIcon').textContent = icons[type] || '📸';
+  document.getElementById('gateIcon').textContent = icons[type] || '';
   document.getElementById('gateTitle').textContent = name;
   document.getElementById('gateSub').textContent   = subs[type] || subs.professional;
 }
@@ -1389,7 +1388,7 @@ async function loadPhotos(){
     if(pg){
       pg.style.display = '';
       pg.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">'
-        + '<div class="empty-state-icon">⚠️</div>'
+        + '<div class="empty-state-icon"></div>'
         + '<div class="empty-state-title">Could not load photos</div>'
         + '<p style="font-size:14px;opacity:.6;">Please refresh the page and try again.</p>'
         + '</div>';
@@ -1452,7 +1451,7 @@ function buildHero(){
   } else if(tpl.heroType === 'colorful'){
     html = '<span class="hero-emoji">' + tpl.icon + '</span>'
       + '<h1 class="hero-title">' + esc(ev.name) + '</h1>'
-      + '<p class="hero-sub">Tap any photo to view &amp; download · ' + days + ' days remaining ✨</p>';
+      + '<p class="hero-sub">Tap any photo to view &amp; download · ' + days + ' days remaining</p>';
   } else if(tpl.heroType === 'luxury'){
     html = '<div class="hero-ornament">✦ ✦ ✦</div>'
       + '<h1 class="hero-title"><em>' + esc(ev.name) + '</em></h1>'
@@ -1566,7 +1565,7 @@ function shareEvent(){
   }
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(url).then(function(){
-      toast('🔗', 'Link copied!', 'Share it with your guests');
+      toast('Link copied!', 'Share it with your guests');
     }).catch(function(){ fallbackCopy(url); });
   } else {
     fallbackCopy(url);
@@ -1577,8 +1576,8 @@ function fallbackCopy(text){
   var ta = document.createElement('textarea');
   ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
   document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); toast('🔗', 'Link copied!', 'Share it with your guests'); }
-  catch(e){ toast('📋', 'Copy this link:', text.substring(0,40) + '…'); }
+  try{ document.execCommand('copy'); toast('Link copied!', 'Share it with your guests'); }
+  catch(e){ toast('Copy this link:', text.substring(0,40) + '…'); }
   document.body.removeChild(ta);
 }
 
@@ -1593,7 +1592,7 @@ function renderPhotos(photos){
 
   if(!photos.length){
     grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;column-span:all;">'
-      + '<div class="empty-state-icon">📷</div>'
+      + '<div class="empty-state-icon"></div>'
       + '<div class="empty-state-title">No photos yet</div>'
       + '<p style="font-size:14px;opacity:.6;">The photographer hasn\'t uploaded photos yet. Check back soon.</p>'
       + '</div>';
@@ -1609,7 +1608,7 @@ function renderPhotos(photos){
       + '<img src="' + esc(p.preview_url) + '" alt="" loading="lazy"/>'
       + (isVid ? '<div class="video-play-badge">▶</div>' : '')
       + '<div class="photo-card-overlay">'
-      + '<button class="lb-btn lb-btn-dl" style="font-size:11px;padding:7px 14px;" onclick="event.stopPropagation();quickDownload(\'' + esc(p.original_url||p.preview_url) + '\',' + i + ')">⬇ Save</button>'
+      + '<button class="lb-btn lb-btn-dl" style="font-size:11px;padding:7px 14px;" onclick="event.stopPropagation();quickDownload(\'' + esc(p.original_url||p.preview_url) + '\',' + i + ')">Save</button>'
       + '</div>'
       + '</div>';
   }).join('');
@@ -1746,7 +1745,7 @@ function showDlProgress(total){
   box.id = 'dlProgressOverlay';
   box.innerHTML =
     '<div class="dl-progress-box">'
-    + '<span class="dl-progress-icon">⬇️</span>'
+    + '<span class="dl-progress-icon"></span>'
     + '<div class="dl-progress-title">Saving Photos</div>'
     + '<div class="dl-progress-sub">Files downloading to your device — keep this page open.</div>'
     + '<div class="dl-progress-bar-wrap"><div class="dl-progress-bar-fill" id="dlProgressFill" style="width:0%"></div></div>'
@@ -1771,7 +1770,7 @@ function removeDlProgress(){
 function cancelDl(){
   dlCancelled = true;
   removeDlProgress();
-  toast('✕', 'Download cancelled', '');
+  toast('Download cancelled', '');
 }
 
 function quickDownload(url, idx){
@@ -1782,10 +1781,10 @@ function quickDownload(url, idx){
     return;
   }
   var filename = 'ImpactGrid-' + (isVid ? 'Video-' : 'Photo-') + (parseInt(idx) + 1) + (isVid ? '.mp4' : '.jpg');
-  toast('⬇', isVid ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
+  toast(isVid ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
   blobDownload(url, filename)
-    .then(function(){ toast('✅', isVid ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([_qdPhoto]); })
-    .catch(function(){ toast('⚠️', 'Download failed', 'Try again or check your connection'); });
+    .then(function(){ toast(isVid ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([_qdPhoto]); })
+    .catch(function(){ toast('Download failed', 'Try again or check your connection'); });
 }
 
 async function downloadBatch(photos){
@@ -1797,10 +1796,10 @@ async function downloadBatch(photos){
   if(photos.length === 1){
     var isVid0 = photos[0].media_type === 'video';
     var url = photos[0].original_url || photos[0].preview_url;
-    toast('⬇', isVid0 ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
+    toast(isVid0 ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
     blobDownload(url, 'ImpactGrid-' + (isVid0 ? 'Video-001.mp4' : 'Photo-001.jpg'))
-      .then(function(){ toast('✅', isVid0 ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload(photos); })
-      .catch(function(){ toast('⚠️', 'Download failed', 'Try again'); });
+      .then(function(){ toast(isVid0 ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload(photos); })
+      .catch(function(){ toast('Download failed', 'Try again'); });
     return;
   }
 
@@ -1832,21 +1831,21 @@ async function downloadBatch(photos){
     var saved = photos.length - failed;
     trackDownload(photos.slice(0, saved));
     if(failed === 0){
-      toast('✅', 'All ' + photos.length + ' saved!', 'Check your Downloads / Gallery');
+      toast('All ' + photos.length + ' saved!', 'Check your Downloads / Gallery');
     } else {
-      toast('⚠️', saved + ' of ' + photos.length + ' saved', failed + ' failed — try again');
+      toast(saved + ' of ' + photos.length + ' saved', failed + ' failed — try again');
     }
   }
 }
 
 function downloadSelected(){
   var toDownload = allPhotos.filter(function(p){ return selectedIds.has(p.id); });
-  if(!toDownload.length){ toast('⚠️', 'Select photos first', 'Tap photos to select them'); return; }
+  if(!toDownload.length){ toast('Select photos first', 'Tap photos to select them'); return; }
   downloadBatch(toDownload);
 }
 
 function downloadAllPhotos(){
-  if(!allPhotos.length){ toast('⚠️', 'No photos yet', ''); return; }
+  if(!allPhotos.length){ toast('No photos yet', ''); return; }
   downloadBatch(allPhotos);
 }
 
@@ -1924,7 +1923,7 @@ function showIosModal(photos){
 
   document.getElementById('iosDlSaveBtn').disabled = false;
   document.getElementById('iosDlSaveBtn').className = 'ios-dl-save-btn';
-  document.getElementById('iosDlSaveBtnIcon').textContent = '📲';
+  document.getElementById('iosDlSaveBtnIcon').textContent = '';
   document.getElementById('iosDlSaveBtnText').textContent =
     totalBatches === 1
       ? 'Save All to Camera Roll'
@@ -1992,11 +1991,11 @@ async function iosDlTriggerShare(){
   var btn = document.getElementById('iosDlSaveBtn');
   btn.disabled = true;
   btn.className = 'ios-dl-save-btn loading';
-  document.getElementById('iosDlSaveBtnIcon').textContent = '⏳';
+  document.getElementById('iosDlSaveBtnIcon').textContent = '';
   document.getElementById('iosDlSaveBtnText').textContent = 'Fetching photos…';
   document.getElementById('iosDlNextBtn').classList.add('hidden');
   document.getElementById('iosDlInstructionText').innerHTML =
-    '⏳ Preparing ' + batch.length + ' photo' + (batch.length > 1 ? 's' : '') + ' for sharing…';
+    'Preparing ' + batch.length + ' photo' + (batch.length > 1 ? 's' : '') + ' for sharing…';
 
   var offset = batchIdx * iosDl.BATCH_SIZE;
 
@@ -2047,10 +2046,10 @@ async function iosDlTriggerShare(){
   if(files.length === 0){
     btn.disabled = false;
     btn.className = 'ios-dl-save-btn';
-    document.getElementById('iosDlSaveBtnIcon').textContent = '🔄';
+    document.getElementById('iosDlSaveBtnIcon').textContent = '';
     document.getElementById('iosDlSaveBtnText').textContent = 'Retry Batch';
     document.getElementById('iosDlInstructionText').innerHTML =
-      '⚠️ Could not fetch photos. Check your connection and <strong>try again</strong>.';
+      'Could not fetch photos. Check your connection and <strong>try again</strong>.';
     batch.forEach(function(_, i){
       var el = document.getElementById('iosDlThumb-' + (offset + i));
       if(el) el.classList.remove('saving');
@@ -2071,7 +2070,7 @@ async function iosDlTriggerShare(){
   /* Update status */
   btn.disabled = false;
   btn.className = 'ios-dl-save-btn';
-  document.getElementById('iosDlSaveBtnIcon').textContent = '📤';
+  document.getElementById('iosDlSaveBtnIcon').textContent = '';
   document.getElementById('iosDlSaveBtnText').textContent = 'Opening Share Sheet…';
   document.getElementById('iosDlInstructionText').innerHTML =
     'Share Sheet opening — tap <strong>' + shareSheetActionLabel(batch) + '</strong> to save all ' + files.length + ' ' + mediaLabel(batch, true).toLowerCase() + ' to Camera Roll.';
@@ -2107,7 +2106,7 @@ async function iosDlTriggerShare(){
 
       btn.disabled = true;
       btn.className = 'ios-dl-save-btn';
-      document.getElementById('iosDlSaveBtnIcon').textContent = '✅';
+      document.getElementById('iosDlSaveBtnIcon').textContent = '';
       document.getElementById('iosDlSaveBtnText').textContent =
         'Batch ' + iosDl.batchIdx + ' of ' + totalBatches + ' saved!';
 
@@ -2117,7 +2116,7 @@ async function iosDlTriggerShare(){
         'Photos ' + nextBatchStart + '–' + nextBatchEnd;
 
       document.getElementById('iosDlInstructionText').innerHTML =
-        '✅ <strong>' + iosDl.saved + ' of ' + iosDl.total + '</strong> photos saved so far. '
+        '<strong>' + iosDl.saved + ' of ' + iosDl.total + '</strong> photos saved so far. '
         + 'Tap <strong>"Next Batch"</strong> to continue.';
     }
 
@@ -2131,18 +2130,18 @@ async function iosDlTriggerShare(){
     btn.className = 'ios-dl-save-btn';
 
     if(e.name === 'AbortError'){
-      document.getElementById('iosDlSaveBtnIcon').textContent = '📲';
+      document.getElementById('iosDlSaveBtnIcon').textContent = '';
       document.getElementById('iosDlSaveBtnText').textContent =
         'Try Batch ' + (iosDl.batchIdx + 1) + ' Again';
       document.getElementById('iosDlInstructionText').innerHTML =
         'Looks like you cancelled. Tap the button again, then tap <strong>' + shareSheetActionLabel(batch) + '</strong> on the Share Sheet.';
     } else {
       console.warn('Share error:', e);
-      document.getElementById('iosDlSaveBtnIcon').textContent = '🔄';
+      document.getElementById('iosDlSaveBtnIcon').textContent = '';
       document.getElementById('iosDlSaveBtnText').textContent =
         'Retry Batch ' + (iosDl.batchIdx + 1);
       document.getElementById('iosDlInstructionText').innerHTML =
-        '⚠️ Couldn\'t open the Share Sheet. Tap to try again — if it keeps happening, '
+        'Couldn\'t open the Share Sheet. Tap to try again — if it keeps happening, '
         + 'make sure you opened this gallery directly in Safari (not inside Instagram/WhatsApp/Messenger).';
     }
   }
@@ -2153,7 +2152,7 @@ function iosDlNextBatch(){
   var btn = document.getElementById('iosDlSaveBtn');
   btn.disabled = false;
   btn.className = 'ios-dl-save-btn';
-  document.getElementById('iosDlSaveBtnIcon').textContent = '📲';
+  document.getElementById('iosDlSaveBtnIcon').textContent = '';
   document.getElementById('iosDlSaveBtnText').textContent =
     'Save Batch ' + (iosDl.batchIdx + 1) + ' of ' + totalBatches;
   document.getElementById('iosDlNextBtn').classList.add('hidden');
@@ -2166,7 +2165,7 @@ function iosDlShowDone(){
   document.getElementById('iosDlBtnArea').classList.add('hidden');
   document.getElementById('iosDlInstruction').style.display = 'none';
   document.getElementById('iosDlDone').classList.remove('hidden');
-  document.getElementById('iosDlDoneTitle').textContent = '🎉 All ' + iosDl.saved + ' ' + mediaLabel(iosDl.photos, true) + ' Saved!';
+  document.getElementById('iosDlDoneTitle').textContent = 'All ' + iosDl.saved + ' ' + mediaLabel(iosDl.photos, true) + ' Saved!';
   document.getElementById('iosDlDoneSub').textContent   = 'Check your Camera Roll — everything is there.';
   iosDlUpdateProgress();
 }
@@ -2193,10 +2192,10 @@ document.addEventListener('DOMContentLoaded', function(){
 function iosFallbackTabs(photos){
   iosPendingPhotos = photos;
 
-  document.getElementById('iosModalTitle').textContent = '📱 Save Your Photos';
+  document.getElementById('iosModalTitle').textContent = 'Save Your Photos';
   document.getElementById('iosModalSub').textContent   = 'Save ' + photos.length + ' photo' + (photos.length > 1 ? 's' : '') + ' to your Camera Roll';
   document.getElementById('iosStep2Text').innerHTML    = '<strong>Long-press</strong> the photo until a menu appears';
-  document.getElementById('iosStep3Text').innerHTML    = 'Tap <strong>"Save to Photos"</strong> — saves to Camera Roll 📷';
+  document.getElementById('iosStep3Text').innerHTML    = 'Tap <strong>"Save to Photos"</strong> — saves to Camera Roll';
 
   var grid  = document.getElementById('iosPhotosGrid');
   var shown = photos.slice(0, 8);
@@ -2209,7 +2208,7 @@ function iosFallbackTabs(photos){
   grid.style.display = 'grid';
 
   var btn = document.getElementById('iosOpenAllBtn');
-  btn.textContent = photos.length > 1 ? '📂 Open All ' + photos.length + ' Photos' : '📂 Open Photo';
+  btn.textContent = photos.length > 1 ? 'Open All ' + photos.length + ' Photos' : 'Open Photo';
 
   document.getElementById('iosModal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -2219,7 +2218,7 @@ function iosTapThumb(idx){
   var p = iosPendingPhotos[idx];
   if(!p) return;
   window.open(p.original_url || p.preview_url, '_blank');
-  toast('📱', 'Photo opened!', 'Long-press → "Save to Photos"');
+  toast('Photo opened!', 'Long-press → "Save to Photos"');
 }
 
 function iosOpenAll(){
@@ -2227,7 +2226,7 @@ function iosOpenAll(){
   for(var i = 0; i < iosPendingPhotos.length; i++){
     window.open(iosPendingPhotos[i].original_url || iosPendingPhotos[i].preview_url, '_blank');
   }
-  toast('📱', iosPendingPhotos.length + ' photos opened!', 'Long-press each → "Save to Photos"');
+  toast(iosPendingPhotos.length + ' photos opened!', 'Long-press each → "Save to Photos"');
   closeIosModal();
 }
 
@@ -2272,7 +2271,7 @@ function showLightboxAt(idx){
     imgEl.src = p.preview_url;
   }
 
-  if(dlBtn) dlBtn.textContent = isVid ? '⬇ Save Video' : '⬇ Save Photo';
+  if(dlBtn) dlBtn.textContent = isVid ? 'Save Video' : 'Save Photo';
   document.getElementById('lbCounter').textContent = (lbIndex+1) + ' / ' + allPhotos.length;
 }
 
@@ -2296,11 +2295,11 @@ function lbDownload(){
     showIosModal([p]);
     return;
   }
-  toast('⬇', isVid ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
+  toast(isVid ? 'Saving video…' : 'Saving photo…', 'Check your Downloads / Gallery');
   var filename = 'ImpactGrid-' + (isVid ? 'Video-' : 'Photo-') + (lbIndex + 1) + (isVid ? '.mp4' : '.jpg');
   blobDownload(url, filename)
-    .then(function(){ toast('✅', isVid ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([p]); })
-    .catch(function(){ toast('⚠️', 'Download failed', 'Try again or check your connection'); });
+    .then(function(){ toast(isVid ? 'Video saved!' : 'Photo saved!', 'Check your Downloads / Gallery'); trackDownload([p]); })
+    .catch(function(){ toast('Download failed', 'Try again or check your connection'); });
 }
 
 function closeLightbox(){
@@ -2346,9 +2345,8 @@ document.addEventListener('keydown', function(e){
    TOAST
 ══════════════════════════════════════ */
 var toastTimer = null;
-function toast(icon, msg, sub){
+function toast(msg, sub){
   var t = document.getElementById('toast');
-  document.getElementById('toastIcon').textContent = icon;
   document.getElementById('toastMsg').textContent  = msg;
   document.getElementById('toastSub').textContent  = sub || '';
   t.classList.add('show');
@@ -2365,7 +2363,7 @@ function showError(msg){
     '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;'
     + 'font-family:\'DM Sans\',sans-serif;text-align:center;padding:40px;background:#f6f7fb;">'
     + '<div>'
-    + '<div style="font-size:48px;margin-bottom:16px;">🔍</div>'
+    + '<div style="font-size:48px;margin-bottom:16px;"></div>'
     + '<div style="font-size:22px;font-weight:700;margin-bottom:8px;color:#0c0e1a;">Event Not Found</div>'
     + '<div style="font-size:14px;color:#4a5068;margin-bottom:24px;">' + esc(msg) + '</div>'
     + '<a href="index.html" style="display:inline-block;padding:10px 24px;background:#3b4eff;'
@@ -2495,14 +2493,14 @@ async function submitContact(e){
 
 <!-- Contact Us Button -->
 <button onclick="toggleContact()" id="contact-fab" style="position:fixed;bottom:24px;left:24px;z-index:900;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:100px;background:#0d1017;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.25);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.35)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.25)';">
-  <span style="font-size:16px;">✉️</span> Contact Us
+  Contact Us
 </button>
 
 <!-- Contact Modal -->
 <div id="contact-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:20px;padding:28px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.2);position:relative;">
     <button onclick="toggleContact()" style="position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-    <div style="font-size:20px;margin-bottom:4px;">✉️</div>
+    <div style="font-size:20px;margin-bottom:4px;"></div>
     <div style="font-size:17px;font-weight:800;margin-bottom:4px;">Get in touch</div>
     <div style="font-size:12px;color:#666;margin-bottom:20px;">We'll get back to you as soon as possible.</div>
 
@@ -2516,7 +2514,7 @@ async function submitContact(e){
     </div>
 
     <div id="contact-success" style="display:none;text-align:center;padding:20px 0;">
-      <div style="font-size:36px;margin-bottom:12px;">✅</div>
+      <div style="font-size:36px;margin-bottom:12px;"></div>
       <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Message sent!</div>
       <div style="font-size:12px;color:#666;margin-bottom:20px;">We'll be in touch soon.</div>
       <button onclick="toggleContact();document.getElementById('contact-form').style.display='';document.getElementById('contact-success').style.display='none';" style="padding:9px 20px;background:#0d1017;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>
@@ -2527,7 +2525,7 @@ async function submitContact(e){
 <script src="/js/impactgrid-chat-bubble.js"></script>
 <!-- ══════════════════════════════════════ REVIEW MODAL ══════════════════════════════════════ -->
 <button id="review-fab" onclick="openReviewModal()" style="display:none;position:fixed;bottom:24px;right:24px;z-index:800;display:none;align-items:center;gap:8px;padding:11px 18px;border-radius:100px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.22);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.22)';">
-  ⭐ Leave a Review
+  Leave a Review
 </button>
 
 <div id="review-modal" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeReviewModal()">
@@ -2573,7 +2571,7 @@ async function submitContact(e){
       <div style="display:flex;gap:8px;">
         <button onclick="submitReview()" id="rev-submit-btn"
           style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .2s;">
-          Submit Review ⭐
+          Submit Review
         </button>
         <button onclick="closeReviewModal()"
           style="padding:12px 18px;border-radius:10px;background:transparent;border:1px solid var(--border2,rgba(0,0,0,0.13));color:var(--text2,#4a5068);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;"
@@ -2585,7 +2583,7 @@ async function submitContact(e){
 
     <!-- Success state -->
     <div id="review-success" style="display:none;text-align:center;padding:10px 0;">
-      <div style="font-size:42px;margin-bottom:12px;">🎉</div>
+      <div style="font-size:42px;margin-bottom:12px;"></div>
       <h4 style="font-size:17px;font-weight:900;margin-bottom:8px;">Thanks for your review!</h4>
       <p style="font-size:13px;color:var(--text2,#4a5068);line-height:1.6;margin-bottom:20px;">It may appear on our homepage. We really appreciate the feedback.</p>
       <button onclick="closeReviewModal()" style="padding:10px 28px;border-radius:10px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;">Done ✓</button>
@@ -2624,7 +2622,7 @@ function openReviewModal() {
   document.getElementById('rev-message').value = '';
   document.getElementById('rev-char-count').textContent = '0 / 400';
   document.getElementById('rev-submit-btn').disabled = false;
-  document.getElementById('rev-submit-btn').textContent = 'Submit Review ⭐';
+  document.getElementById('rev-submit-btn').textContent = 'Submit Review';
 }
 
 function closeReviewModal() {
@@ -2685,7 +2683,7 @@ async function submitReview() {
     errEl.textContent = 'Something went wrong — please try again.';
     errEl.style.display = '';
     btn.disabled = false;
-    btn.textContent = 'Submit Review ⭐';
+    btn.textContent = 'Submit Review';
   }
 }
 </script>
