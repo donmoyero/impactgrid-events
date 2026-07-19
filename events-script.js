@@ -459,6 +459,7 @@ async function loadEvents(){
             + '<a class="btn btn-ghost btn-sm" href="event.html?event=' + ev.event_slug + '&code=' + ev.event_code + '" target="_blank">👁 View Event</a>'
             + '<button class="btn btn-ghost btn-sm" onclick="goUploadForEvent(\'' + ev.id + '\')">📤 Upload</button>'
             + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="resendOwnerEmail(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">📧 Resend Email</button>' : '')
+            + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="sendEventReminder(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">⏰ Send Reminder</button>' : '')
             + '<button class="btn ' + (ev.is_active ? 'btn-red' : 'btn-green') + ' btn-sm" onclick="toggleEvent(\'' + ev.id + '\',' + ev.is_active + ')">'
             + (ev.is_active ? 'Deactivate' : 'Activate') + '</button>'
             + '<button class="btn btn-red btn-icon btn-sm" onclick="deleteEvent(\'' + ev.id + '\')">✕</button>'
@@ -481,6 +482,21 @@ async function resendOwnerEmail(ownerEmail, eventName){
     });
     var data = await res.json();
     if(data.success) toast('✅', 'Email sent!', '');
+    else toast('⚠️', 'Failed', data.error || '');
+  }catch(e){ toast('⚠️', 'Error', e.message); }
+}
+
+async function sendEventReminder(ownerEmail, eventName){
+  if(!confirm('Send a gallery reminder to ' + ownerEmail + ' for "' + eventName + '"?')) return;
+  toast('⏰', 'Sending…', 'Sending reminder', true);
+  try{
+    var res  = await fetch(EVENTS_API + '/api/send-reminder', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ ownerEmail })
+    });
+    var data = await res.json();
+    if(data.success) toast('✅', 'Reminder sent!', '');
     else toast('⚠️', 'Failed', data.error || '');
   }catch(e){ toast('⚠️', 'Error', e.message); }
 }
@@ -1260,3 +1276,4 @@ window.toggleRequireCode    = toggleRequireCode;
 window.setDefaultExpiry     = setDefaultExpiry;
 window.uploadCelebrantPhoto = uploadCelebrantPhoto;
 window.resendOwnerEmail     = resendOwnerEmail;
+window.sendEventReminder    = sendEventReminder;
