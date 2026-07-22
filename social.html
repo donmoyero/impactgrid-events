@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social — Impact Grid Group</title>
+  <link rel="canonical" href="https://impactgridgroup.com/social.html"/>
+  <meta name="description" content="Watch our latest videos — Impact Grid Group, Manchester." />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Impact Grid Group" />
+  <meta property="og:title" content="Social — Impact Grid Group" />
+  <meta property="og:description" content="Watch our latest videos — Impact Grid Group, Manchester." />
+  <meta property="og:url" content="https://impactgridgroup.com/social.html" />
+  <meta property="og:image" content="https://impactgridgroup.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://impactgridgroup.com/logo.png" />
+
+  <link rel="stylesheet" href="shared.css" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KVJC5DE2WT');
+  </script>
+
+  <style>
+    .social-page{padding:70px 24px 100px;max-width:1200px;margin:0 auto;}
+    .social-label{font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:10px;}
+    .social-title{font-family:var(--fb);font-weight:800;font-size:clamp(28px,4vw,42px);text-align:center;color:var(--text);margin-bottom:36px;}
+
+    /* 4 across on desktop, 2 across on phone — per spec */
+    .social-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+    @media(max-width:700px){
+      .social-page{padding:50px 16px 70px;}
+      .social-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+    }
+
+    .social-card{position:relative;aspect-ratio:9/16;border-radius:var(--r);overflow:hidden;cursor:pointer;background:var(--card);border:1px solid var(--border);display:block;text-decoration:none;transition:transform .25s,box-shadow .25s;}
+    .social-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.18);}
+    .social-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .social-card-fallback{position:absolute;inset:0;background:linear-gradient(135deg,var(--gold-dim,rgba(170,152,3,.15)),var(--bg2,#eee));display:flex;align-items:center;justify-content:center;color:var(--text3);font-family:var(--fm);font-size:10px;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:10px;}
+    .social-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.65) 0%,rgba(0,0,0,.05) 45%,rgba(0,0,0,.15) 100%);}
+    .social-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;color:#111;font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+    .social-play::after{content:'';border-style:solid;border-width:8px 0 8px 13px;border-color:transparent transparent transparent #111;margin-left:3px;}
+    .social-platform{position:absolute;top:10px;left:10px;font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.5);padding:4px 9px;border-radius:100px;}
+    .social-caption{position:absolute;left:10px;right:10px;bottom:10px;color:#fff;font-size:12px;font-weight:600;line-height:1.35;text-shadow:0 1px 6px rgba(0,0,0,.5);}
+
+    .social-empty{grid-column:1/-1;text-align:center;font-family:var(--fm);font-size:12px;color:var(--text3);padding:60px 0;}
+    .social-skel{position:relative;aspect-ratio:9/16;border-radius:var(--r);background:linear-gradient(90deg,var(--bg2,#eee) 25%,var(--border,#ddd) 50%,var(--bg2,#eee) 75%);background-size:200% 100%;animation:socialShimmer 1.4s infinite;}
+    @keyframes socialShimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  </style>
+</head>
+<body>
+
+  <script src="plan-config.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
+
+  <div id="ig-nav"></div>
+  <script src="nav.js"></script>
+  <script>renderNav('social.html');</script>
+
+  <div class="page-wrap">
+    <div class="social-page">
+      <div class="social-label">Follow Along</div>
+      <h1 class="social-title">Recent Videos</h1>
+      <div class="social-grid" id="socialGrid">
+        <div class="social-skel"></div>
+        <div class="social-skel"></div>
+        <div class="social-skel"></div>
+        <div class="social-skel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ig-footer"></div>
+  <script>renderFooter();</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    /* Reads social_videos (written by the Social Grid tab in admin.html) and
+       renders a grid of cards. Clicking a card never plays anything on this
+       site — it just opens the real Instagram/TikTok post in a new tab. */
+    function escSocial(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+    async function loadSocialGrid(){
+      var el = document.getElementById('socialGrid');
+      try{
+        var sb = getContentClient();
+        var { data, error } = await sb.from('social_videos').select('*').order('sort_order', { ascending: true });
+        if (error) throw error;
+        if (!data || !data.length){
+          el.innerHTML = '<div class="social-empty">No videos yet — check back soon.</div>';
+          return;
+        }
+        el.innerHTML = data.map(function(v){
+          var platformLabel = v.platform === 'tiktok' ? 'TikTok' : 'Instagram';
+          var cover = v.cover_image
+            ? '<img src="' + escSocial(v.cover_image) + '" alt="" loading="lazy">'
+            : '<div class="social-card-fallback">' + escSocial(platformLabel) + '</div>';
+          return '<a class="social-card" href="' + escSocial(v.post_url) + '" target="_blank" rel="noopener">' +
+            cover +
+            '<div class="social-card-overlay"></div>' +
+            '<div class="social-platform">' + escSocial(platformLabel) + '</div>' +
+            '<div class="social-play"></div>' +
+            (v.caption ? '<div class="social-caption">' + escSocial(v.caption) + '</div>' : '') +
+          '</a>';
+        }).join('');
+      }catch(e){
+        el.innerHTML = '<div class="social-empty">Couldn\'t load videos right now.</div>';
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadSocialGrid);
+  </script>
+</body>
+</html>

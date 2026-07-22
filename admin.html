@@ -332,6 +332,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('about',this)"><span class="sb-ico"></span>About Page</a>
         <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico"></span>Portfolio Events</a>
         <a href="#" onclick="return nav('blog',this)"><span class="sb-ico"></span>Blog</a>
+        <a href="#" onclick="return nav('social',this)"><span class="sb-ico"></span>Social Grid</a>
       </nav>
     </div>
     <div class="sb-section">
@@ -920,6 +921,39 @@ If you have any questions, just reply to this email.
         </div>
       </div>
     </div>
+
+    <!-- ═══════ SOCIAL GRID (link-in-bio video grid → opens the real IG/TikTok post) ═══════ -->
+    <div class="page" id="page-social">
+      <div class="page-header">
+        <div class="page-title">Social Grid</div>
+        <div class="page-sub">The page you link from your Instagram/TikTok bio. Shows a grid of your videos — clicking one opens the real post on Instagram or TikTok in a new tab. 4 across on desktop, 2 across on phone.</div>
+      </div>
+      <div class="ws-layout">
+        <div>
+          <div class="card">
+            <div class="card-head">
+              <h2>🎬 Videos</h2>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="socialAddVideo()">+ Add Video</button>
+                <button class="btn btn-gold btn-sm" onclick="socialSaveAll()">💾 Save Grid</button>
+              </div>
+            </div>
+            <div class="card-body" id="socialVideosList">
+              <div class="empty"><div class="empty-ico">🎬</div><div class="empty-txt">No videos yet — click "Add Video" above.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="ws-sticky">
+          <div class="hint-box">
+            <strong>How this works</strong><br><br>
+            Upload a cover image (a still/thumbnail of the video), paste the actual Instagram or TikTok post link, then Save. On the public page, tapping a card opens that link in a new tab — it doesn't try to play the video on your own site.<br><br>
+            Drag a card by its ⠿⠿ handle to reorder — that's the order it shows in the grid.
+          </div>
+          <a href="social.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Social Grid</a>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-services">
       <div class="page-header">
         <div class="page-title">Services</div>
@@ -1902,6 +1936,7 @@ function nav(id,el){
     bookings:'loadBookings',
     vouchers:'initVouchersPage',
     blog:'loadBlogPosts',
+    social:'loadSocialVideos',
     receptionist:'loadReceptionist'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
@@ -4809,6 +4844,171 @@ window.blogDragLeave      = blogDragLeave;
 window.blogDrop           = blogDrop;
 window.blogDragEnd        = blogDragEnd;
 window.blogPageImageFile  = blogPageImageFile;
+
+/* ════════════════════════════════════════
+   SOCIAL GRID ADMIN
+   Storage: Cloudinary (cover images) · DB: Supabase (getContentClient())
+     social_videos { id, platform, post_url, cover_image, cover_public_id, caption, sort_order }
+   The public page never embeds the actual video — a card is a cover image
+   with a play-button overlay that opens post_url in a new tab.
+════════════════════════════════════════ */
+var socialVideos = [];      // in-memory working list, index = display order
+var socialSeq = 0;
+
+async function loadSocialVideos() {
+  var el = document.getElementById('socialVideosList');
+  if (!el) return;
+  el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div></div>';
+  try {
+    var sb = getContentClient();
+    var { data, error } = await sb.from('social_videos').select('*').order('sort_order', { ascending: true });
+    if (error) throw error;
+    socialVideos = (data || []).map(function(r) {
+      return {
+        _localId: 'sv' + (socialSeq++),
+        id: r.id,
+        platform: r.platform || 'instagram',
+        postUrl: r.post_url || '',
+        coverImage: r.cover_image || '',
+        coverPublicId: r.cover_public_id || '',
+        caption: r.caption || ''
+      };
+    });
+    socialRenderList();
+  } catch(e) { el.innerHTML = '<div class="empty"><div class="empty-txt">Failed to load: ' + esc(e.message) + '</div></div>'; }
+}
+
+function socialAddVideo() {
+  socialVideos.push({ _localId: 'sv' + (socialSeq++), id: null, platform: 'instagram', postUrl: '', coverImage: '', coverPublicId: '', caption: '' });
+  socialRenderList();
+}
+
+function socialDeleteVideo(idx) { socialVideos.splice(idx, 1); socialRenderList(); }
+
+function socialMoveVideo(idx, dir) {
+  var newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= socialVideos.length) return;
+  var tmp = socialVideos[idx]; socialVideos[idx] = socialVideos[newIdx]; socialVideos[newIdx] = tmp;
+  socialRenderList();
+}
+
+function socialUpdateField(idx, field, value) { if (socialVideos[idx]) socialVideos[idx][field] = value; }
+
+async function socialCoverFile(e, idx) {
+  var f = e.target.files && e.target.files[0];
+  if (!f) return;
+  try {
+    toast('', 'Uploading cover…', '');
+    var result = await uploadToCloudinaryBlog(f, 'social');
+    socialVideos[idx].coverImage = result.secure_url;
+    socialVideos[idx].coverPublicId = result.public_id;
+    socialRenderList();
+    toast('', 'Cover added', '');
+  } catch(err) { toast('', 'Upload failed', err.message); }
+  try { e.target.value = ''; } catch(ex) {}
+}
+
+/* drag-reorder — same pattern as the blog pages list */
+var _socialDragIdx = null;
+function socialDragStart(e, idx) {
+  _socialDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', String(idx)); } catch(err) {}
+  e.currentTarget.classList.add('blog-page-dragging');
+}
+function socialDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('blog-page-dragover'); }
+function socialDragLeave(e) { e.currentTarget.classList.remove('blog-page-dragover'); }
+function socialDrop(e, idx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('blog-page-dragover');
+  if (_socialDragIdx === null || _socialDragIdx === idx) return;
+  var moved = socialVideos.splice(_socialDragIdx, 1)[0];
+  socialVideos.splice(idx, 0, moved);
+  _socialDragIdx = null;
+  socialRenderList();
+}
+function socialDragEnd(e) {
+  e.currentTarget.classList.remove('blog-page-dragging');
+  document.querySelectorAll('.blog-page-card.blog-page-dragover').forEach(function(el){ el.classList.remove('blog-page-dragover'); });
+  _socialDragIdx = null;
+}
+
+function socialRenderList() {
+  var el = document.getElementById('socialVideosList');
+  if (!el) return;
+  if (!socialVideos.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🎬</div><div class="empty-txt">No videos yet — click "Add Video" above.</div></div>';
+    return;
+  }
+  el.innerHTML = socialVideos.map(function(v, idx) {
+    return '<div class="blog-page-card" draggable="true"' +
+        ' ondragstart="socialDragStart(event,' + idx + ')"' +
+        ' ondragover="socialDragOver(event)"' +
+        ' ondragleave="socialDragLeave(event)"' +
+        ' ondrop="socialDrop(event,' + idx + ')"' +
+        ' ondragend="socialDragEnd(event)"' +
+        ' style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;background:var(--bg2);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+        '<span style="display:flex;align-items:center;gap:8px;">' +
+          '<span class="blog-page-handle" title="Drag to reorder">⠿⠿</span>' +
+          '<span class="chip chip-gold">Video ' + (idx + 1) + '</span>' +
+        '</span>' +
+        '<div style="display:flex;gap:4px;">' +
+          '<button class="btn btn-ghost btn-sm" onclick="socialMoveVideo(' + idx + ',-1)" ' + (idx===0?'disabled':'') + '>↑</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="socialMoveVideo(' + idx + ',1)" ' + (idx===socialVideos.length-1?'disabled':'') + '>↓</button>' +
+          '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="socialDeleteVideo(' + idx + ')">Delete</button>' +
+        '</div>' +
+      '</div>' +
+      (v.coverImage ? '<img src="' + esc(v.coverImage) + '" style="width:140px;height:140px;object-fit:cover;border-radius:var(--r);margin-bottom:8px;display:block;">' : '') +
+      '<input type="file" accept="image/*" style="margin-bottom:8px;" onchange="socialCoverFile(event,' + idx + ')">' +
+      '<select onchange="socialUpdateField(' + idx + ',\'platform\',this.value)" style="margin-bottom:8px;width:100%;">' +
+        '<option value="instagram"' + (v.platform==='instagram'?' selected':'') + '>Instagram</option>' +
+        '<option value="tiktok"' + (v.platform==='tiktok'?' selected':'') + '>TikTok</option>' +
+      '</select>' +
+      '<input type="text" placeholder="Post link (paste the Instagram/TikTok URL)" value="' + esc(v.postUrl) + '" oninput="socialUpdateField(' + idx + ',\'postUrl\',this.value)" style="margin-bottom:8px;">' +
+      '<input type="text" placeholder="Caption (optional)" value="' + esc(v.caption) + '" oninput="socialUpdateField(' + idx + ',\'caption\',this.value)">' +
+    '</div>';
+  }).join('');
+}
+
+async function socialSaveAll() {
+  var missing = socialVideos.find(function(v){ return !v.postUrl.trim(); });
+  if (missing) { toast('', 'Every video needs a post link', ''); return; }
+  try {
+    var sb = getContentClient();
+    var { error: delErr } = await sb.from('social_videos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (delErr) throw delErr;
+    var rows = socialVideos.map(function(v, i) {
+      return {
+        platform: v.platform,
+        post_url: v.postUrl.trim(),
+        cover_image: v.coverImage || '',
+        cover_public_id: v.coverPublicId || '',
+        caption: v.caption || '',
+        sort_order: i
+      };
+    });
+    if (rows.length) {
+      var { error: insErr } = await sb.from('social_videos').insert(rows);
+      if (insErr) throw insErr;
+    }
+    toast('', 'Social grid saved', '');
+    loadSocialVideos();
+  } catch(e) { toast('', 'Save failed', e.message); }
+}
+
+window.loadSocialVideos = loadSocialVideos;
+window.socialAddVideo   = socialAddVideo;
+window.socialDeleteVideo= socialDeleteVideo;
+window.socialMoveVideo  = socialMoveVideo;
+window.socialUpdateField= socialUpdateField;
+window.socialCoverFile  = socialCoverFile;
+window.socialDragStart  = socialDragStart;
+window.socialDragOver   = socialDragOver;
+window.socialDragLeave  = socialDragLeave;
+window.socialDrop       = socialDrop;
+window.socialDragEnd    = socialDragEnd;
+window.socialSaveAll    = socialSaveAll;
 window.blogSavePost       = blogSavePost;
 /* Close modal on backdrop click */
 document.getElementById('svcModal').addEventListener('click', function(e){
