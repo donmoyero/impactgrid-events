@@ -314,8 +314,7 @@
     .post-listen-btn:hover { background: var(--gold); color: #fff; }
     .post-listen-btn:disabled { opacity:.6; cursor:default; }
     .post-listen-btn.playing { background: var(--gold); color:#fff; }
-    #postListenAudio { max-width: 320px; height: 34px; }
-    @media (max-width:700px){ .post-listen{ padding:14px 16px 0; } #postListenAudio{ max-width:100%; } }
+    @media (max-width:700px){ .post-listen{ padding:14px 16px 0; } }
 
     /* No-image fallback: plain dark header */
     .post-hero-wrap.no-image {
@@ -597,7 +596,6 @@
         <span id="postListenIcon">🔊</span>
         <span id="postListenLabel">Listen to this post</span>
       </button>
-      <audio id="postListenAudio" style="display:none" controls></audio>
     </div>
 
     <div class="post-body" id="postBody"></div>
@@ -965,69 +963,68 @@
   }
 
   /* ── Open post ── */
-  /* ── Listen to this post (Groq TTS via the backend API) ── */
-  var EVENTS_API = 'https://impactgrid-events-api.onrender.com';
+  /* ── Listen to this post (browser's built-in text-to-speech —
+       no server call, no cost, works immediately on any device) ── */
+  var _speechSupported = 'speechSynthesis' in window;
 
   function resetPostListen() {
-    var audio = document.getElementById('postListenAudio');
+    if (_speechSupported) window.speechSynthesis.cancel();
     var btn = document.getElementById('postListenBtn');
     var icon = document.getElementById('postListenIcon');
     var label = document.getElementById('postListenLabel');
-    audio.pause();
-    audio.removeAttribute('src');
-    audio.style.display = 'none';
     btn.disabled = false;
     btn.classList.remove('playing');
     icon.textContent = '🔊';
     label.textContent = 'Listen to this post';
   }
 
-  function toggleListenToPost() {
-    var audio = document.getElementById('postListenAudio');
-    // Already have audio loaded — this click is just play/pause
-    if (audio.src) {
-      if (audio.paused) { audio.play(); } else { audio.pause(); }
-      return;
+  function buildPostSpeechText(post) {
+    var scratch = document.createElement('div');
+    function stripHtml(html) {
+      scratch.innerHTML = html || '';
+      return (scratch.textContent || scratch.innerText || '').replace(/\s+/g, ' ').trim();
     }
-    if (!activePost) return;
-    generateAndPlayPostAudio();
+    var parts = [];
+    if (post.title) parts.push(post.title);
+    (post.pages || []).forEach(function(pg) {
+      if (pg.type !== 'text') return; // skip image/video blocks — nothing to read
+      if (pg.heading) parts.push(stripHtml(pg.heading));
+      if (pg.body)    parts.push(stripHtml(pg.body));
+    });
+    return parts.join('. ');
   }
 
-  async function generateAndPlayPostAudio() {
+  function toggleListenToPost() {
     var btn = document.getElementById('postListenBtn');
     var icon = document.getElementById('postListenIcon');
     var label = document.getElementById('postListenLabel');
-    var audio = document.getElementById('postListenAudio');
 
-    btn.disabled = true;
-    icon.textContent = '⏳';
-    label.textContent = 'Generating audio…';
-
-    try {
-      var res = await fetch(EVENTS_API + '/api/blog/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId: activePost.id })
-      });
-      var data = await res.json();
-      if (!res.ok || !data.audioUrl) throw new Error(data.error || 'Failed to generate audio');
-
-      audio.src = data.audioUrl;
-      audio.style.display = 'inline-block';
-      btn.disabled = false;
-      icon.textContent = '🔊';
-      label.textContent = 'Listen to this post';
-      audio.play();
-
-      audio.onplay  = function() { btn.classList.add('playing'); icon.textContent = '⏸'; };
-      audio.onpause = function() { btn.classList.remove('playing'); icon.textContent = '🔊'; };
-      audio.onended = function() { btn.classList.remove('playing'); icon.textContent = '🔊'; };
-    } catch (e) {
-      btn.disabled = false;
-      icon.textContent = '🔊';
-      label.textContent = 'Couldn\'t generate audio — try again';
-      console.error('[postListen]', e.message);
+    if (!_speechSupported) {
+      label.textContent = 'Not supported on this browser';
+      return;
     }
+    var synth = window.speechSynthesis;
+
+    // Already reading — this click pauses or resumes
+    if (synth.speaking) {
+      if (synth.paused) { synth.resume(); } else { synth.pause(); }
+      return;
+    }
+    if (!activePost) return;
+
+    var text = buildPostSpeechText(activePost);
+    if (!text) { label.textContent = 'Nothing to read on this post yet'; return; }
+
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 1;
+    utter.onstart  = function() { btn.classList.add('playing'); icon.textContent = '⏸'; label.textContent = 'Listening…'; };
+    utter.onpause  = function() { icon.textContent = '🔊'; label.textContent = 'Paused — tap to resume'; };
+    utter.onresume = function() { icon.textContent = '⏸'; label.textContent = 'Listening…'; };
+    utter.onend    = function() { resetPostListen(); };
+    utter.onerror  = function() { resetPostListen(); label.textContent = 'Couldn\'t read this post — try again'; };
+
+    synth.cancel(); // clear anything queued from a previous post
+    synth.speak(utter);
   }
 
   function openPost(i) {
