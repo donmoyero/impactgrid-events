@@ -382,6 +382,68 @@
       </div>
     </section>
 
+    <!-- FAQ — helps both visitors and AI/search engines understand your services -->
+    <section class="sv-section" aria-labelledby="svcFaqHeading">
+      <div class="divider" style="margin-bottom:40px;"></div>
+      <h2 id="svcFaqHeading" style="font-family:var(--fb);font-weight:800;font-size:clamp(22px,3vw,30px);text-align:center;color:var(--text);margin-bottom:28px;">Frequently Asked Questions</h2>
+      <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px;">
+        <details style="border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;background:var(--card);">
+          <summary style="cursor:pointer;font-weight:700;color:var(--text);">What areas do you cover?</summary>
+          <p style="margin-top:10px;color:var(--text2);line-height:1.6;">We're based in Manchester and cover events across the city and surrounding area. Get in touch to check availability for your location.</p>
+        </details>
+        <details style="border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;background:var(--card);">
+          <summary style="cursor:pointer;font-weight:700;color:var(--text);">What services do you offer?</summary>
+          <p style="margin-top:10px;color:var(--text2);line-height:1.6;">Professional event photography and content creation, with every shoot delivered through an organised, easy-to-share online gallery. See the full list of services above.</p>
+        </details>
+        <details style="border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;background:var(--card);">
+          <summary style="cursor:pointer;font-weight:700;color:var(--text);">How do we receive our photos after the event?</summary>
+          <p style="margin-top:10px;color:var(--text2);line-height:1.6;">Every shoot is delivered through a private, organised online gallery — no messy file transfers or lost downloads. You and your guests can view and download from there.</p>
+        </details>
+        <details style="border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;background:var(--card);">
+          <summary style="cursor:pointer;font-weight:700;color:var(--text);">How do we book you for an event?</summary>
+          <p style="margin-top:10px;color:var(--text2);line-height:1.6;">Head to our <a href="book-us.html" style="color:var(--gold);">Book Us</a> page, or email us directly at <a href="mailto:events@impactgridgroup.com" style="color:var(--gold);">events@impactgridgroup.com</a> and we'll take it from there.</p>
+        </details>
+        <details style="border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;background:var(--card);">
+          <summary style="cursor:pointer;font-weight:700;color:var(--text);">Can you travel outside Manchester for an event?</summary>
+          <p style="margin-top:10px;color:var(--text2);line-height:1.6;">In most cases, yes — get in touch with your event details and location and we'll confirm availability.</p>
+        </details>
+      </div>
+    </section>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What areas do you cover?",
+          "acceptedAnswer": { "@type": "Answer", "text": "We're based in Manchester and cover events across the city and surrounding area. Get in touch to check availability for your location." }
+        },
+        {
+          "@type": "Question",
+          "name": "What services do you offer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Professional event photography and content creation, with every shoot delivered through an organised, easy-to-share online gallery." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do we receive our photos after the event?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Every shoot is delivered through a private, organised online gallery, so clients and guests can view and download without messy file transfers." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do we book you for an event?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Visit the Book Us page on impactgridgroup.com, or email events@impactgridgroup.com to get started." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can you travel outside Manchester for an event?",
+          "acceptedAnswer": { "@type": "Answer", "text": "In most cases yes — contact Impact Grid with your event details and location to confirm availability." }
+        }
+      ]
+    }
+    </script>
+
     <!-- SERVICE DETAIL MODAL -->
     <div class="sv-modal-overlay" id="svcDetailOverlay" onclick="if(event.target===this) closeServiceDetail();">
       <div class="sv-modal">
