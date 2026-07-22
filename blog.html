@@ -303,6 +303,20 @@
     }
     .post-meta-dot { opacity: 0.4; }
 
+    /* Listen to this post — TTS button + player */
+    .post-listen { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:18px 24px 0; max-width:720px; margin:0 auto; }
+    .post-listen-btn {
+      display:flex; align-items:center; gap:8px;
+      font-family: var(--fm); font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+      color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold);
+      border-radius: 100px; padding: 9px 16px; cursor:pointer; transition: all .2s;
+    }
+    .post-listen-btn:hover { background: var(--gold); color: #fff; }
+    .post-listen-btn:disabled { opacity:.6; cursor:default; }
+    .post-listen-btn.playing { background: var(--gold); color:#fff; }
+    #postListenAudio { max-width: 320px; height: 34px; }
+    @media (max-width:700px){ .post-listen{ padding:14px 16px 0; } #postListenAudio{ max-width:100%; } }
+
     /* No-image fallback: plain dark header */
     .post-hero-wrap.no-image {
       height: auto;
@@ -576,6 +590,14 @@
           <span id="postViewCount"></span>
         </div>
       </div>
+    </div>
+
+    <div class="post-listen" id="postListen">
+      <button class="post-listen-btn" id="postListenBtn" onclick="toggleListenToPost()">
+        <span id="postListenIcon">🔊</span>
+        <span id="postListenLabel">Listen to this post</span>
+      </button>
+      <audio id="postListenAudio" style="display:none" controls></audio>
     </div>
 
     <div class="post-body" id="postBody"></div>
@@ -943,6 +965,71 @@
   }
 
   /* ── Open post ── */
+  /* ── Listen to this post (Groq TTS via the backend API) ── */
+  var EVENTS_API = 'https://impactgrid-events-api.onrender.com';
+
+  function resetPostListen() {
+    var audio = document.getElementById('postListenAudio');
+    var btn = document.getElementById('postListenBtn');
+    var icon = document.getElementById('postListenIcon');
+    var label = document.getElementById('postListenLabel');
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.style.display = 'none';
+    btn.disabled = false;
+    btn.classList.remove('playing');
+    icon.textContent = '🔊';
+    label.textContent = 'Listen to this post';
+  }
+
+  function toggleListenToPost() {
+    var audio = document.getElementById('postListenAudio');
+    // Already have audio loaded — this click is just play/pause
+    if (audio.src) {
+      if (audio.paused) { audio.play(); } else { audio.pause(); }
+      return;
+    }
+    if (!activePost) return;
+    generateAndPlayPostAudio();
+  }
+
+  async function generateAndPlayPostAudio() {
+    var btn = document.getElementById('postListenBtn');
+    var icon = document.getElementById('postListenIcon');
+    var label = document.getElementById('postListenLabel');
+    var audio = document.getElementById('postListenAudio');
+
+    btn.disabled = true;
+    icon.textContent = '⏳';
+    label.textContent = 'Generating audio…';
+
+    try {
+      var res = await fetch(EVENTS_API + '/api/blog/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId: activePost.id })
+      });
+      var data = await res.json();
+      if (!res.ok || !data.audioUrl) throw new Error(data.error || 'Failed to generate audio');
+
+      audio.src = data.audioUrl;
+      audio.style.display = 'inline-block';
+      btn.disabled = false;
+      icon.textContent = '🔊';
+      label.textContent = 'Listen to this post';
+      audio.play();
+
+      audio.onplay  = function() { btn.classList.add('playing'); icon.textContent = '⏸'; };
+      audio.onpause = function() { btn.classList.remove('playing'); icon.textContent = '🔊'; };
+      audio.onended = function() { btn.classList.remove('playing'); icon.textContent = '🔊'; };
+    } catch (e) {
+      btn.disabled = false;
+      icon.textContent = '🔊';
+      label.textContent = 'Couldn\'t generate audio — try again';
+      console.error('[postListen]', e.message);
+    }
+  }
+
   function openPost(i) {
     activePost = posts[i];
     activePostIdx = i;
@@ -975,6 +1062,7 @@
     trackBlogView(activePost.id);
     loadViewCount(activePost.id);
     loadComments(activePost.id);
+    resetPostListen();
 
     document.getElementById('postView').classList.add('show');
     document.getElementById('postView').scrollTop = 0;
@@ -1067,6 +1155,7 @@
     document.body.style.overflow = '';
     stopProgress();
     removeJsonLd();
+    resetPostListen();
     activePost = null;
     activePostIdx = -1;
     if (updateHistory !== false) clearPostState();
