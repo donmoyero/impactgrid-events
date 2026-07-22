@@ -930,6 +930,26 @@ If you have any questions, just reply to this email.
       </div>
       <div class="ws-layout">
         <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head">
+              <h2>📝 Page Text</h2>
+              <button class="btn btn-gold btn-sm" onclick="socialSaveSettings()">💾 Save Text</button>
+            </div>
+            <div class="card-body">
+              <div class="field-group">
+                <div class="field-label">Small label (above the heading)</div>
+                <input type="text" id="socialLabelInput" placeholder="Follow Along">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Heading</div>
+                <input type="text" id="socialTitleInput" placeholder="Recent Videos">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Intro text (optional — shows above the video grid)</div>
+                <textarea id="socialIntroInput" rows="3" placeholder="A short line or two introducing your videos…"></textarea>
+              </div>
+            </div>
+          </div>
           <div class="card">
             <div class="card-head">
               <h2>🎬 Videos</h2>
@@ -1936,7 +1956,7 @@ function nav(id,el){
     bookings:'loadBookings',
     vouchers:'initVouchersPage',
     blog:'loadBlogPosts',
-    social:'loadSocialVideos',
+    social:'loadSocialPage',
     receptionist:'loadReceptionist'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
@@ -4855,6 +4875,40 @@ window.blogPageImageFile  = blogPageImageFile;
 var socialVideos = [];      // in-memory working list, index = display order
 var socialSeq = 0;
 
+/* Page text (label / heading / intro) — social_settings, single row id='main'.
+   Same content Supabase project + client as social_videos, so the public
+   page can read both with getContentClient() without any extra setup. */
+async function loadSocialSettings() {
+  try {
+    var sb = getContentClient();
+    var { data, error } = await sb.from('social_settings').select('*').eq('id', 'main').maybeSingle();
+    if (error) throw error;
+    document.getElementById('socialLabelInput').value = (data && data.label) || 'Follow Along';
+    document.getElementById('socialTitleInput').value = (data && data.title) || 'Recent Videos';
+    document.getElementById('socialIntroInput').value = (data && data.intro_text) || '';
+  } catch(e) { /* leave fields blank/default if the table isn't set up yet */ }
+}
+
+async function socialSaveSettings() {
+  try {
+    var sb = getContentClient();
+    var row = {
+      id: 'main',
+      label: document.getElementById('socialLabelInput').value.trim() || 'Follow Along',
+      title: document.getElementById('socialTitleInput').value.trim() || 'Recent Videos',
+      intro_text: document.getElementById('socialIntroInput').value.trim()
+    };
+    var { error } = await sb.from('social_settings').upsert(row, { onConflict: 'id' });
+    if (error) throw error;
+    toast('', 'Page text saved', '');
+  } catch(e) { toast('', 'Save failed', e.message); }
+}
+
+function loadSocialPage() {
+  loadSocialSettings();
+  loadSocialVideos();
+}
+
 async function loadSocialVideos() {
   var el = document.getElementById('socialVideosList');
   if (!el) return;
@@ -4997,6 +5051,9 @@ async function socialSaveAll() {
   } catch(e) { toast('', 'Save failed', e.message); }
 }
 
+window.loadSocialPage    = loadSocialPage;
+window.loadSocialSettings= loadSocialSettings;
+window.socialSaveSettings= socialSaveSettings;
 window.loadSocialVideos = loadSocialVideos;
 window.socialAddVideo   = socialAddVideo;
 window.socialDeleteVideo= socialDeleteVideo;
