@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Event Owner Portal — Impact Grid</title>
+<title>Login to Your Event — Impact Grid</title>
 <link rel="icon" href="favicon.ico"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -103,20 +103,19 @@ img{display:block;max-width:100%;}
 
 .login-crest{
   width:56px;height:56px;border-radius:16px;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  background:#fff;padding:6px;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--fm);font-size:14px;font-weight:500;
-  color:#fff;letter-spacing:.1em;
+  overflow:hidden;
   margin-bottom:28px;
   box-shadow:0 6px 24px var(--gold-glo);
 }
-[data-theme="dark"] .login-crest{color:#0e0c09;}
+.login-crest img{width:100%;height:100%;object-fit:contain;border-radius:inherit;}
 .login-title{
   font-family:var(--fd);font-weight:700;font-size:36px;
   letter-spacing:-.01em;line-height:1.1;
   margin-bottom:10px;color:var(--text);
 }
-.login-title em{font-style:italic;color:var(--gold);}
+.login-title em{font-style:italic;color:var(--text);}
 .login-sub{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:32px;font-weight:300;}
 
 .field-label{
@@ -158,7 +157,6 @@ img{display:block;max-width:100%;}
 .login-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 36px var(--gold-glo);}
 .login-btn:active:not(:disabled){transform:translateY(0);}
 .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.login-btn-icon{font-size:20px;}
 
 .login-error{
   background:var(--red-dim);border:1px solid rgba(192,57,43,.18);
@@ -197,11 +195,11 @@ img{display:block;max-width:100%;}
 }
 .nav-logo-mark{
   width:30px;height:30px;border-radius:8px;
-  background:linear-gradient(135deg,var(--gold3),var(--gold2));
+  background:#fff;padding:3px;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--fm);font-size:10px;font-weight:500;color:#fff;
+  overflow:hidden;
 }
-[data-theme="dark"] .nav-logo-mark{color:#0e0c09;}
+.nav-logo-mark img{width:100%;height:100%;object-fit:contain;border-radius:inherit;}
 .nav-divider{width:1px;height:22px;background:var(--border2);}
 .nav-event-name{
   font-family:var(--fd);font-size:15px;font-weight:400;
@@ -419,7 +417,7 @@ img{display:block;max-width:100%;}
   font-family:var(--fd);font-size:22px;font-weight:700;
   letter-spacing:-.01em;
 }
-.sec-title em{font-style:italic;color:var(--gold);}
+.sec-title em{font-style:italic;color:var(--text);}
 .sec-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
 /* ══ BUTTONS ══ */
@@ -680,12 +678,12 @@ img{display:block;max-width:100%;}
     <div class="login-bg"></div>
     <div class="login-bg-lines"></div>
     <div class="login-box">
-      <div class="login-crest">IG</div>
-      <div class="login-title">Owner <em>Portal</em></div>
+      <div class="login-crest"><img src="logo.png" alt="ImpactGrid"></div>
+      <div class="login-title">Login to Your <em>Event</em></div>
       <div class="login-sub">Enter your private access code to view and download your full-quality event photos.</div>
 
       <div class="login-error" id="loginError">
-        <span>⚠️</span>
+        <span></span>
         <span id="loginErrorMsg">Invalid code. Please try again.</span>
       </div>
 
@@ -701,7 +699,6 @@ img{display:block;max-width:100%;}
       </div>
 
       <button class="login-btn" id="loginBtn" onclick="doLogin()">
-        <span class="login-btn-icon">🔑</span>
         Access My Gallery
       </button>
 
@@ -719,15 +716,15 @@ img{display:block;max-width:100%;}
   <!-- NAV -->
   <nav class="portal-nav">
     <div class="nav-logo">
-      <div class="nav-logo-mark">IG</div>
+      <div class="nav-logo-mark"><img src="logo.png" alt="ImpactGrid"></div>
       Impact Grid
     </div>
     <div class="nav-divider"></div>
     <span class="nav-event-name" id="navEvent">My Event</span>
     <div class="nav-right">
       <span class="nav-code-badge" id="navCode">——</span>
-      <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
-      <button class="btn-signout" onclick="doSignOut()">⎋ Sign Out</button>
+      <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="Toggle theme"></button>
+      <button class="btn-signout" onclick="doSignOut()">Sign Out</button>
     </div>
   </nav>
 
@@ -786,18 +783,18 @@ img{display:block;max-width:100%;}
 
     <!-- SECTION HEAD -->
     <div class="sec-head">
-      <div class="sec-title">📸 All <em>Photos</em></div>
+      <div class="sec-title">All <em>Photos</em></div>
       <div class="sec-actions">
         <button class="btn btn-select-all" id="btnSelectAll" onclick="toggleSelectAll()">☐ Select All</button>
         <button class="btn btn-outline" onclick="doRefresh()">↻ Refresh</button>
-        <button class="btn btn-gold" onclick="doDownloadAll()">⬇ Download All</button>
+        <button class="btn btn-gold" onclick="doDownloadAll()">Download All</button>
       </div>
     </div>
 
     <!-- GRID -->
     <div class="photo-grid" id="photoGrid">
       <div class="empty-state">
-        <div class="empty-icon">⏳</div>
+        <div class="empty-icon"></div>
         <div class="empty-title">Loading your gallery…</div>
       </div>
     </div>
@@ -810,7 +807,7 @@ img{display:block;max-width:100%;}
   <div class="lb-close" onclick="closeLb()">✕</div>
   <img class="lb-img" id="lbImg" src="" alt=""/>
   <div class="lb-actions" onclick="event.stopPropagation()">
-    <a id="lbDl" href="" class="lb-btn lb-btn-gold" onclick="handleLbDl(event)">⬇ Save Photo</a>
+    <a id="lbDl" href="" class="lb-btn lb-btn-gold" onclick="handleLbDl(event)">Save Photo</a>
     <button class="lb-btn lb-btn-ghost" onclick="closeLb()">✕ Close</button>
   </div>
 </div>
@@ -823,14 +820,14 @@ img{display:block;max-width:100%;}
   </div>
   <div class="sel-actions">
     <button class="sel-clear" onclick="clearSelection()">✕ Clear</button>
-    <button class="sel-dl-btn" onclick="downloadSelected()">⬇ Download Selected</button>
+    <button class="sel-dl-btn" onclick="downloadSelected()">Download Selected</button>
   </div>
 </div>
 
 <!-- ══ iOS TIP ══ -->
 <div class="ios-overlay hidden" id="iosOverlay" onclick="closeIosTip()"></div>
 <div class="ios-tip hidden" id="iosTip">
-  <div class="ios-tip-icon">📱</div>
+  <div class="ios-tip-icon"></div>
   <h3>Save to Your Photos</h3>
   <p>Your photo is opening in a new tab.<br/>
   <strong>Long-press the image → "Save to Photos"</strong><br/>
@@ -840,7 +837,6 @@ img{display:block;max-width:100%;}
 
 <!-- ══ TOAST ══ -->
 <div class="toast" id="toast">
-  <span class="toast-icon" id="tIcon">✅</span>
   <div class="toast-body">
     <div class="toast-msg" id="tMsg"></div>
     <div class="toast-sub" id="tSub"></div>
@@ -867,7 +863,7 @@ function applyTheme(t){
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem('ig_theme', t);
   var btn = document.getElementById('themeBtn');
-  if(btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+  if(btn) btn.textContent = t === 'dark' ? '' : '';
 }
 function toggleTheme(){
   var cur = document.documentElement.getAttribute('data-theme') || 'light';
@@ -895,7 +891,7 @@ async function doLogin(){
     return;
   }
   btn.disabled = true;
-  btn.innerHTML = '<span style="opacity:.6">⏳ Checking…</span>';
+  btn.innerHTML = '<span style="opacity:.6">Checking…</span>';
 
   try{
     var r = await fetch(API + '/api/owner-login', {
@@ -908,7 +904,7 @@ async function doLogin(){
       document.getElementById('loginErrorMsg').textContent = d.error || 'Invalid code. Please try again.';
       err.classList.add('show');
       btn.disabled = false;
-      btn.innerHTML = '<span class="login-btn-icon">🔑</span> Access My Gallery';
+      btn.innerHTML = 'Access My Gallery';
       return;
     }
     state = d;
@@ -919,7 +915,7 @@ async function doLogin(){
     document.getElementById('loginErrorMsg').textContent = 'Could not connect. Check your internet and try again.';
     err.classList.add('show');
     btn.disabled = false;
-    btn.innerHTML = '<span class="login-btn-icon">🔑</span> Access My Gallery';
+    btn.innerHTML = 'Access My Gallery';
   }
 }
 
@@ -958,8 +954,8 @@ function buildPortal(){
 
   // hero meta
   var meta = [];
-  if(ev.event_date) meta.push('📅 ' + new Date(ev.event_date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}));
-  meta.push('📷 ' + photos.length + ' photos');
+  if(ev.event_date) meta.push('' + new Date(ev.event_date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}));
+  meta.push('' + photos.length + ' photos');
   document.getElementById('heroMeta').innerHTML = meta.join('<span class="hero-meta-dot"> · </span>');
 
   // celebrant
@@ -1035,7 +1031,7 @@ function slidePrev(){ goToSlide(slideIndex - 1); }
 function renderGrid(photos){
   var grid = document.getElementById('photoGrid');
   if(!photos || !photos.length){
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📷</div><div class="empty-title">No photos yet</div><div class="empty-sub">Your photographer will upload soon.</div></div>';
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon"></div><div class="empty-title">No photos yet</div><div class="empty-sub">Your photographer will upload soon.</div></div>';
     return;
   }
   grid.innerHTML = photos.map(function(p, i){
@@ -1048,13 +1044,13 @@ function renderGrid(photos){
         '<img src="' + esc(prev) + '" alt="Photo ' + n + '" loading="lazy"/>' +
         '<div class="photo-check-wrap"><div class="photo-checkbox" id="chk-' + i + '">✓</div></div>' +
         '<div class="photo-overlay">' +
-          '<button class="photo-action-btn" onclick="openLb(\'' + esc(orig) + '\',event)" title="View">🔍</button>' +
-          '<button class="photo-action-btn" onclick="savePhoto(\'' + esc(orig) + '\',\'' + n + '\',event)" title="Save">⬇</button>' +
+          '<button class="photo-action-btn" onclick="openLb(\'' + esc(orig) + '\',event)" title="View"></button>' +
+          '<button class="photo-action-btn" onclick="savePhoto(\'' + esc(orig) + '\',\'' + n + '\',event)" title="Save"></button>' +
         '</div>' +
       '</div>' +
       '<div class="photo-footer">' +
         '<span class="photo-num">Photo ' + n + '</span>' +
-        '<button class="photo-save-btn" onclick="savePhoto(\'' + esc(orig) + '\',\'' + n + '\',event)">⬇ Save</button>' +
+        '<button class="photo-save-btn" onclick="savePhoto(\'' + esc(orig) + '\',\'' + n + '\',event)">Save</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -1134,10 +1130,10 @@ function savePhoto(url, num, e){
 function downloadSelected(){
   var photos = state ? (state.photos || []) : [];
   var arr = Array.from(selectedPhotos).sort(function(a,b){return a-b;});
-  if(!arr.length){ showToast('⚠️','Nothing selected','Tap photos to select them'); return; }
+  if(!arr.length){ showToast('Nothing selected','Tap photos to select them'); return; }
 
   if(isIOS){
-    showToast('📱', arr.length + ' photos', 'Opening each — long-press to save');
+    showToast(arr.length + ' photos', 'Opening each — long-press to save');
     arr.forEach(function(i, idx){
       setTimeout(function(){
         var p = photos[i];
@@ -1146,7 +1142,7 @@ function downloadSelected(){
     });
     if(arr.length > 1) showIosTip();
   } else {
-    showToast('📥','Downloading ' + arr.length + ' photos…','Saving to your device');
+    showToast('Downloading ' + arr.length + ' photos…','Saving to your device');
     arr.forEach(function(i, idx){
       setTimeout(function(){
         var p = photos[i];
@@ -1166,15 +1162,15 @@ function downloadSelected(){
 
 function doDownloadAll(){
   var photos = state ? (state.photos || []) : [];
-  if(!photos.length){ showToast('⚠️','No photos yet',''); return; }
+  if(!photos.length){ showToast('No photos yet',''); return; }
   if(isIOS){
-    showToast('📱','Opening ' + photos.length + ' photos…','Long-press each to save to Photos');
+    showToast('Opening ' + photos.length + ' photos…','Long-press each to save to Photos');
     photos.forEach(function(p, i){
       setTimeout(function(){ window.open(p.original_url || p.preview_url, '_blank'); }, i * 700);
     });
     if(photos.length > 1) showIosTip();
   } else {
-    showToast('📥','Downloading all ' + photos.length + ' photos…','Files saving to your device');
+    showToast('Downloading all ' + photos.length + ' photos…','Files saving to your device');
     photos.forEach(function(p, i){
       setTimeout(function(){
         var a = document.createElement('a');
@@ -1229,7 +1225,7 @@ function closeIosTip(){
 ══════════════════════════════════ */
 async function doRefresh(){
   if(!state) return;
-  showToast('↻','Refreshing…','');
+  showToast('Refreshing…','');
   try{
     var r = await fetch(API + '/api/owner-login', {
       method:'POST',
@@ -1241,12 +1237,12 @@ async function doRefresh(){
       state = d;
       selectedPhotos.clear();
       buildPortal();
-      showToast('✅','Gallery refreshed','');
+      showToast('Gallery refreshed','');
     } else {
-      showToast('⚠️','Could not refresh','Try again');
+      showToast('Could not refresh','Try again');
     }
   }catch(e){
-    showToast('⚠️','No connection','');
+    showToast('No connection','');
   }
 }
 
@@ -1257,7 +1253,7 @@ function doSignOut(){
   var inp = document.getElementById('codeInput');
   if(inp) inp.value = '';
   var btn = document.getElementById('loginBtn');
-  if(btn){ btn.disabled = false; btn.innerHTML = '<span class="login-btn-icon">🔑</span> Access My Gallery'; }
+  if(btn){ btn.disabled = false; btn.innerHTML = 'Access My Gallery'; }
   var err = document.getElementById('loginError');
   if(err) err.classList.remove('show');
   show('sLogin');
@@ -1267,9 +1263,8 @@ function doSignOut(){
    TOAST
 ══════════════════════════════════ */
 var toastTimer = null;
-function showToast(icon, msg, sub){
+function showToast(msg, sub){
   var t = document.getElementById('toast');
-  document.getElementById('tIcon').textContent = icon;
   document.getElementById('tMsg').textContent  = msg;
   document.getElementById('tSub').textContent  = sub || '';
   t.classList.add('show');
