@@ -966,8 +966,11 @@
   /* ── Listen to this post (browser's built-in text-to-speech —
        no server call, no cost, works immediately on any device) ── */
   var _speechSupported = 'speechSynthesis' in window;
+  var _speechWatchdog = null; // Chrome/Edge silently stop long utterances after ~15s
+                               // unless nudged with pause()+resume() periodically
 
   function resetPostListen() {
+    if (_speechWatchdog) { clearInterval(_speechWatchdog); _speechWatchdog = null; }
     if (_speechSupported) window.speechSynthesis.cancel();
     var btn = document.getElementById('postListenBtn');
     var icon = document.getElementById('postListenIcon');
@@ -1017,14 +1020,25 @@
 
     var utter = new SpeechSynthesisUtterance(text);
     utter.rate = 1;
-    utter.onstart  = function() { btn.classList.add('playing'); icon.textContent = '⏸'; label.textContent = 'Listening…'; };
+    utter.onstart  = function() {
+      btn.classList.add('playing'); icon.textContent = '⏸'; label.textContent = 'Listening…';
+      // Chrome/Edge bug workaround: nudge the engine every 10s or it goes silent
+      // partway through longer posts without firing onend/onerror.
+      if (_speechWatchdog) clearInterval(_speechWatchdog);
+      _speechWatchdog = setInterval(function() {
+        if (!synth.speaking) { clearInterval(_speechWatchdog); _speechWatchdog = null; return; }
+        if (!synth.paused) { synth.pause(); synth.resume(); }
+      }, 10000);
+    };
     utter.onpause  = function() { icon.textContent = '🔊'; label.textContent = 'Paused — tap to resume'; };
     utter.onresume = function() { icon.textContent = '⏸'; label.textContent = 'Listening…'; };
     utter.onend    = function() { resetPostListen(); };
     utter.onerror  = function() { resetPostListen(); label.textContent = 'Couldn\'t read this post — try again'; };
 
-    synth.cancel(); // clear anything queued from a previous post
-    synth.speak(utter);
+    // Chrome/Edge bug: calling speak() in the same tick as cancel() can be
+    // silently dropped. synth.speaking is already false here (checked above),
+    // so there's nothing to cancel — go straight to speak() on its own tick.
+    setTimeout(function() { synth.speak(utter); }, 0);
   }
 
   function openPost(i) {
