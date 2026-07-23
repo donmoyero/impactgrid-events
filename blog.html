@@ -316,6 +316,14 @@
     .post-listen-btn.playing { background: var(--gold); color:#fff; }
     @media (max-width:700px){ .post-listen{ padding:14px 16px 0; } }
 
+    /* Currently-narrated paragraph, while "Listen to this post" is playing */
+    .post-block-text.tts-active {
+      background: var(--gold-dim);
+      border-radius: 8px;
+      box-shadow: inset 3px 0 0 var(--gold);
+      transition: background .25s ease;
+    }
+
     /* No-image fallback: plain dark header */
     .post-hero-wrap.no-image {
       height: auto;
@@ -966,12 +974,22 @@
   /* ── Listen to this post (browser's built-in text-to-speech —
        no server call, no cost, works immediately on any device) ── */
   var _speechSupported = 'speechSynthesis' in window;
-  var _speechWatchdog = null; // Chrome/Edge silently stop long utterances after ~15s
-                               // unless nudged with pause()+resume() periodically
+  var _speechWatchdog = null;   // Chrome/Edge silently stop long utterances after ~15s
+                                 // unless nudged with pause()+resume() periodically
+  var _speechQueue = [];        // [{ text, blockIndex }] — one entry per paragraph
+  var _speechQueueIdx = -1;
+  var _speechCurrentEl = null;  // paragraph element currently highlighted
+
+  function clearSpeechHighlight() {
+    if (_speechCurrentEl) { _speechCurrentEl.classList.remove('tts-active'); _speechCurrentEl = null; }
+  }
 
   function resetPostListen() {
     if (_speechWatchdog) { clearInterval(_speechWatchdog); _speechWatchdog = null; }
     if (_speechSupported) window.speechSynthesis.cancel();
+    _speechQueue = [];
+    _speechQueueIdx = -1;
+    clearSpeechHighlight();
     var btn = document.getElementById('postListenBtn');
     var icon = document.getElementById('postListenIcon');
     var label = document.getElementById('postListenLabel');
@@ -981,25 +999,78 @@
     label.textContent = 'Listen to this post';
   }
 
-  function buildPostSpeechText(post) {
+  // Builds one speech "chunk" per paragraph/heading block, instead of one
+  // giant string for the whole post — this is what lets playback pause at
+  // paragraph boundaries and highlight the paragraph being read.
+  function buildPostSpeechQueue(post) {
     var scratch = document.createElement('div');
     function stripHtml(html) {
       scratch.innerHTML = html || '';
       return (scratch.textContent || scratch.innerText || '').replace(/\s+/g, ' ').trim();
     }
-    var parts = [];
-    if (post.title) parts.push(post.title);
+    var queue = [];
+    if (post.title) queue.push({ text: stripHtml(post.title), blockIndex: -1 });
+    var blockIndex = 0;
     (post.pages || []).forEach(function(pg) {
       if (pg.type !== 'text') return; // skip image/video blocks — nothing to read
-      if (pg.heading) parts.push(stripHtml(pg.heading));
-      if (pg.body)    parts.push(stripHtml(pg.body));
+      var pieces = [];
+      if (pg.heading) pieces.push(stripHtml(pg.heading));
+      if (pg.body)    pieces.push(stripHtml(pg.body));
+      var text = pieces.join('. ');
+      if (text) queue.push({ text: text, blockIndex: blockIndex });
+      blockIndex++;
     });
-    return parts.join('. ');
+    return queue;
+  }
+
+  function speakNextInQueue() {
+    clearSpeechHighlight();
+    _speechQueueIdx++;
+    if (_speechQueueIdx >= _speechQueue.length) { resetPostListen(); return; }
+
+    var item = _speechQueue[_speechQueueIdx];
+    if (item.blockIndex >= 0) {
+      var el = document.querySelector('#postBody [data-tts-block="' + item.blockIndex + '"]');
+      if (el) {
+        el.classList.add('tts-active');
+        _speechCurrentEl = el;
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    var btn = document.getElementById('postListenBtn');
+    var icon = document.getElementById('postListenIcon');
+    var label = document.getElementById('postListenLabel');
+    var synth = window.speechSynthesis;
+
+    var utter = new SpeechSynthesisUtterance(item.text);
+    utter.rate = 1;
+    utter.onstart  = function() {
+      btn.classList.add('playing'); icon.textContent = '⏸'; label.textContent = 'Listening…';
+      // Chrome/Edge bug workaround: nudge the engine every 10s or it goes silent
+      // partway through a paragraph without firing onend/onerror.
+      if (_speechWatchdog) clearInterval(_speechWatchdog);
+      _speechWatchdog = setInterval(function() {
+        if (!synth.speaking) { clearInterval(_speechWatchdog); _speechWatchdog = null; return; }
+        if (!synth.paused) { synth.pause(); synth.resume(); }
+      }, 10000);
+    };
+    utter.onpause  = function() { icon.textContent = '🔊'; label.textContent = 'Paused — tap to resume'; };
+    utter.onresume = function() { icon.textContent = '⏸'; label.textContent = 'Listening…'; };
+    utter.onend    = function() { speakNextInQueue(); };
+    utter.onerror  = function(e) {
+      // 'interrupted'/'canceled' just means we (or the user closing the post)
+      // called cancel() on purpose — not a real failure, don't show an error.
+      if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
+      resetPostListen(); label.textContent = 'Couldn\'t read this post — try again';
+    };
+
+    // Chrome/Edge bug: calling speak() in the same tick as cancel() can be
+    // silently dropped, so give it its own tick.
+    setTimeout(function() { synth.speak(utter); }, 0);
   }
 
   function toggleListenToPost() {
-    var btn = document.getElementById('postListenBtn');
-    var icon = document.getElementById('postListenIcon');
     var label = document.getElementById('postListenLabel');
 
     if (!_speechSupported) {
@@ -1015,30 +1086,11 @@
     }
     if (!activePost) return;
 
-    var text = buildPostSpeechText(activePost);
-    if (!text) { label.textContent = 'Nothing to read on this post yet'; return; }
+    _speechQueue = buildPostSpeechQueue(activePost);
+    _speechQueueIdx = -1;
+    if (!_speechQueue.length) { label.textContent = 'Nothing to read on this post yet'; return; }
 
-    var utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 1;
-    utter.onstart  = function() {
-      btn.classList.add('playing'); icon.textContent = '⏸'; label.textContent = 'Listening…';
-      // Chrome/Edge bug workaround: nudge the engine every 10s or it goes silent
-      // partway through longer posts without firing onend/onerror.
-      if (_speechWatchdog) clearInterval(_speechWatchdog);
-      _speechWatchdog = setInterval(function() {
-        if (!synth.speaking) { clearInterval(_speechWatchdog); _speechWatchdog = null; return; }
-        if (!synth.paused) { synth.pause(); synth.resume(); }
-      }, 10000);
-    };
-    utter.onpause  = function() { icon.textContent = '🔊'; label.textContent = 'Paused — tap to resume'; };
-    utter.onresume = function() { icon.textContent = '⏸'; label.textContent = 'Listening…'; };
-    utter.onend    = function() { resetPostListen(); };
-    utter.onerror  = function() { resetPostListen(); label.textContent = 'Couldn\'t read this post — try again'; };
-
-    // Chrome/Edge bug: calling speak() in the same tick as cancel() can be
-    // silently dropped. synth.speaking is already false here (checked above),
-    // so there's nothing to cancel — go straight to speak() on its own tick.
-    setTimeout(function() { synth.speak(utter); }, 0);
+    speakNextInQueue();
   }
 
   function openPost(i) {
@@ -1245,7 +1297,7 @@
   }
 
   /* ── Block HTML ── */
-  function blockHTML(pg, isFirst) {
+  function blockHTML(pg, isFirst, ttsIndex) {
     if (pg.type === 'image') {
       return '<div class="post-block post-block-image reveal">' +
         '<img src="' + esc(pg.url) + '" alt="' + esc(pg.caption || '') + '" onclick="openLightbox(this.src)">' +
@@ -1264,7 +1316,7 @@
     }
     // text
     var firstClass = isFirst ? ' first-text' : '';
-    return '<div class="post-block post-block-text' + firstClass + ' reveal">' +
+    return '<div class="post-block post-block-text' + firstClass + ' reveal" data-tts-block="' + ttsIndex + '">' +
       (pg.heading ? '<div class="pb-heading">' + esc(pg.heading) + '</div>' : '') +
       '<div class="pb-body">' + esc(pg.body || '') + '</div>' +
       '</div>';
@@ -1278,10 +1330,13 @@
       return;
     }
     var firstTextSeen = false;
+    var ttsIndex = 0;
     body.innerHTML = pages.map(function(pg) {
       var isFirst = false;
       if (pg.type === 'text' && !firstTextSeen) { isFirst = true; firstTextSeen = true; }
-      return blockHTML(pg, isFirst);
+      var html = blockHTML(pg, isFirst, pg.type === 'text' ? ttsIndex : -1);
+      if (pg.type === 'text') ttsIndex++;
+      return html;
     }).join('');
   }
 
