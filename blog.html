@@ -593,8 +593,6 @@
           <span id="postDate"></span>
           <span class="post-meta-dot" id="postMetaDot" style="display:none">·</span>
           <span id="postReadTime"></span>
-          <span class="post-meta-dot" id="postMetaDot2" style="display:none">·</span>
-          <span id="postViewCount"></span>
         </div>
       </div>
     </div>
@@ -1122,8 +1120,8 @@
 
     renderPostBody();
     renderRelated();
-    trackBlogView(activePost.id);
-    loadViewCount(activePost.id);
+    trackBlogView(activePost.id); // still logged for admin dashboard analytics
+    // loadViewCount(activePost.id); // view count no longer shown on the public blog page
     loadComments(activePost.id);
     resetPostListen();
 
