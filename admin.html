@@ -2360,12 +2360,7 @@ async function saveCaption(id){
 }
 
 /*  UPDATES  */
-var DEFAULT_UPDATES=[
-  {icon:'',color:'#c97e08',badge:'New Release',title:'ImpactGrid V3.0 Is Here',desc:'AI-powered risk scoring, performance matrix, enhanced forecasting, and Dijo built directly into your dashboard.',cta:'Explore V3.0 →',cta_url:'analytics.html',num:'01',ver:'V3.0 · 2026'},
-  {icon:'',color:'#2d6edb',badge:'Live Now',title:'Meet Dijo — Your AI Business Adviser',desc:'Always on. Direct answers about your business health, risks, and growth strategy.',cta:'Talk to Dijo →',cta_url:'ai.html',num:'02',ver:'AI · 2026'},
-  {icon:'',color:'#0fa876',badge:'New Feature',title:'ImpactGrid Network Is Open',desc:'Professionals, analysts, creators, and employers connecting through one intelligent network.',cta:'Join the Network →',cta_url:'network.html',num:'03',ver:'Network · 2026'},
-  {icon:'',color:'#7c3aed',badge:'New',title:'Creator Intelligence Engine',desc:'Real trend signals. AI-powered hooks, captions, and posting windows.',cta:'Open Creator Studio →',cta_url:'creator-studio.html',num:'04',ver:'Studio · 2026'}
-];
+var DEFAULT_UPDATES=[];
 async function loadUpdateCards(){
   var el=document.getElementById('updateCardsEditor');
   try{
