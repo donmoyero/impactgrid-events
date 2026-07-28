@@ -19,6 +19,7 @@ Disallow: /accounts.html
 Disallow: /settings.html
 Disallow: /storage-tools.html
 Disallow: /login.html
+Disallow: /reset-password.html
 Disallow: /register.html
 Disallow: /join.html
 Disallow: /event.html
