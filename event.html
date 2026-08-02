@@ -984,7 +984,7 @@ input,textarea,select{font-family:inherit;}
 <div class="section" id="section-gate">
   <nav class="ev-nav">
     <a href="index.html" class="nav-logo">
-      <div class="nav-logo-mark"><img src="logo.png" alt="ImpactGrid"></div>
+      <div class="nav-logo-mark"><img src="logo.png" alt="ImpactGrid" fetchpriority="low" loading="lazy"></div>
       ImpactGrid
     </a>
   </nav>
@@ -1011,7 +1011,7 @@ input,textarea,select{font-family:inherit;}
 
   <nav class="ev-nav" id="mainNav">
     <a href="index.html" class="nav-logo">
-      <div class="nav-logo-mark"><img src="logo.png" alt="ImpactGrid"></div>
+      <div class="nav-logo-mark"><img src="logo.png" alt="ImpactGrid" fetchpriority="low" loading="lazy"></div>
       ImpactGrid
     </a>
     <div class="nav-divider"></div>
@@ -1259,11 +1259,43 @@ async function applyEventTemplate(ev, db){
   }
 
   /* Background — applied behind the whole gallery experience (page chrome,
-     gate screen, and anywhere the photo layout leaves gaps, e.g. masonry). */
-  var bgCss = activeTemplate.background_type === 'image'
-    ? 'center / cover no-repeat fixed url("' + (activeTemplate.background_value||'').replace(/"/g,'') + '")'
-    : (activeTemplate.background_value || DEFAULT_TEMPLATE.background_value);
-  document.body.style.background = bgCss;
+     gate screen, and anywhere the photo layout leaves gaps, e.g. masonry).
+     Plain colors are free, so those apply immediately. Image backgrounds are
+     deferred (see applyTemplateBackgroundDeferred, called after photos start
+     loading) so they don't steal bandwidth from the real event photos and
+     slideshow on first load. */
+  if(activeTemplate.background_type === 'image'){
+    document.body.style.background = DEFAULT_TEMPLATE.background_value; /* safe placeholder until the deferred load below swaps it in */
+  } else {
+    document.body.style.background = activeTemplate.background_value || DEFAULT_TEMPLATE.background_value;
+  }
+}
+
+/* Inserts Cloudinary delivery transformations (auto format, auto quality,
+   capped width) into a Cloudinary URL, so a background image uploaded at
+   full camera/original resolution is served as a small, web-sized file
+   instead. Leaves non-Cloudinary URLs untouched (e.g. a manually pasted
+   external image link). */
+function cloudinaryOptimizedUrl(url){
+  if(!url || url.indexOf('/image/upload/') === -1) return url;
+  if(url.indexOf('/upload/f_auto') !== -1) return url; /* already transformed */
+  return url.replace('/image/upload/', '/image/upload/f_auto,q_auto,w_1920/');
+}
+
+/* Loads an image-type template background at LOW fetch priority, after
+   photos/slideshow have already begun loading — so on a slow connection
+   the real event photos always win the bandwidth race. No-op for color
+   backgrounds (those are applied instantly in applyEventTemplate above). */
+function applyTemplateBackgroundDeferred(){
+  if(activeTemplate.background_type !== 'image' || !activeTemplate.background_value) return;
+  var url = cloudinaryOptimizedUrl(activeTemplate.background_value);
+  var img = new Image();
+  img.fetchPriority = 'low';
+  img.decoding = 'async';
+  img.onload = function(){
+    document.body.style.background = 'center / cover no-repeat fixed url("' + url.replace(/"/g,'') + '")';
+  };
+  img.src = url;
 
   /* Transition — read by buildSlideshow()/goSlide() via activeTemplate.transition_style */
   var wrap = document.getElementById('slideshowWrap');
@@ -1372,6 +1404,10 @@ document.addEventListener('DOMContentLoaded', async function(){
     } else {
       showSection('section-gate');
     }
+
+    /* Fired after the above, so photos/slideshow requests are already
+       in flight and win priority over the (often much larger) background image. */
+    applyTemplateBackgroundDeferred();
 
   }catch(e){ showError('Could not load event: ' + e.message); }
 });
