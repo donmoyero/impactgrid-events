@@ -4768,6 +4768,16 @@ async function blogDeletePost(id, coverPublicId) {
   try {
     var sb = getContentClient();
 
+    /* 0 — grab each page's Cloudinary image before the rows are gone.
+       (Previously these were only ever removed from the database, never
+       Cloudinary — page images just piled up as orphans.) video_id is a
+       YouTube video ID, not a Cloudinary asset, so it's excluded here. */
+    var pageCloudinaryIds = [];
+    try {
+      var { data: pageRows } = await sb.from('blog_pages').select('cloudinary_id').eq('post_id', id);
+      pageCloudinaryIds = (pageRows || []).map(function(p){ return p.cloudinary_id; }).filter(Boolean);
+    } catch(e) { console.warn('Could not read page images before delete:', e.message); }
+
     /* 1 — delete pages first (in case CASCADE isn't set up in Supabase yet) */
     var { error: pagesErr } = await sb.from('blog_pages').delete().eq('post_id', id);
     if (pagesErr) console.warn('Pages delete warning:', pagesErr.message);
@@ -4776,12 +4786,17 @@ async function blogDeletePost(id, coverPublicId) {
     var { error } = await sb.from('blog_posts').delete().eq('id', id);
     if (error) throw error;
 
-    /* 3 — clean up Cloudinary cover image in the background (non-blocking) */
-    if (coverPublicId) {
+    /* 3 — clean up Cloudinary cover + page images in the background
+       (non-blocking). Blog images live on a separate Cloudinary account
+       (dsaym55pt) from events/portfolio, so account:'blog' is required —
+       without it the delete call silently hits the wrong account. */
+    var blogCloudinaryIds = pageCloudinaryIds.slice();
+    if (coverPublicId) blogCloudinaryIds.push(coverPublicId);
+    if (blogCloudinaryIds.length) {
       fetch(EVENTS_API + '/api/delete-photo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ publicId: coverPublicId })
+        body: JSON.stringify({ publicIds: blogCloudinaryIds, account: 'blog' })
       }).catch(function(){});
     }
 
