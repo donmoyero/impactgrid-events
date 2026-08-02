@@ -264,11 +264,13 @@ window.initInvoiceDefaults = initInvoiceDefaults;
    CREATE EVENT
 ════════════════════════════════════════════════════ */
 async function igCreateEvent(){
-  var name     = document.getElementById('ev-name').value.trim();
-  var expiry   = document.getElementById('ev-expiry').value;
-  var code     = document.getElementById('ev-code').value.trim().toUpperCase();
-  var template = document.getElementById('ev-template').value;
-  var alertEl  = document.getElementById('createEventAlert');
+  var name       = document.getElementById('ev-name').value.trim();
+  var expiry     = document.getElementById('ev-expiry').value;
+  var code       = document.getElementById('ev-code').value.trim().toUpperCase();
+  var templateId = document.getElementById('ev-template') ? document.getElementById('ev-template').value : '';
+  var eventDate  = document.getElementById('ev-date') ? document.getElementById('ev-date').value : '';
+  var serviceId  = document.getElementById('ev-service') ? document.getElementById('ev-service').value : '';
+  var alertEl    = document.getElementById('createEventAlert');
 
   function showAlert(msg, ok){
     alertEl.textContent = msg;
@@ -281,6 +283,7 @@ async function igCreateEvent(){
   if(!db){ showAlert("⚠️ Database not ready yet. Please wait a moment and try again.", false); return; }
 
   if(!name){ showAlert('Event name is required.', false); return; }
+  if(!eventDate){ showAlert('Event date is required — this is what shows up in the client\'s reminder email.', false); return; }
   if(!code){ generateCode(); code = document.getElementById('ev-code').value; }
   if(!expiry){ setDefaultExpiry(); expiry = document.getElementById('ev-expiry').value; }
 
@@ -306,8 +309,9 @@ async function igCreateEvent(){
     /* Save event to Firestore */
     var evRef = await addDoc(collection(db, 'events'), {
       name             : name,
-      type             : template,
-      template         : template,
+      template_id      : templateId || null,
+      service_id       : serviceId || null,
+      event_date       : eventDate,
       owner_email      : document.getElementById('ev-owner')      ? document.getElementById('ev-owner').value.trim()      || null : null,
       owner_name       : document.getElementById('ev-owner-name') ? document.getElementById('ev-owner-name').value.trim() || null : null,
       owner_avatar_url : ownerAvatarUrl,
@@ -331,7 +335,7 @@ async function igCreateEvent(){
     await addDoc(collection(db, 'event_settings'), {
       event_id          : evRef.id,
       require_code      : evRequireCode,
-      template          : template,
+      template_id       : templateId || null,
       watermark_enabled : evWatermark,
       created_at        : serverTimestamp()
     });
@@ -343,9 +347,11 @@ async function igCreateEvent(){
     var ownerName  = document.getElementById('ev-owner-name') ? document.getElementById('ev-owner-name').value.trim() : '';
 
     /* Reset form */
-    ['ev-name','ev-owner','ev-owner-name','ev-code'].forEach(function(id){
+    ['ev-name','ev-owner','ev-owner-name','ev-code','ev-date'].forEach(function(id){
       var el = document.getElementById(id); if(el) el.value = '';
     });
+    var evSvcEl = document.getElementById('ev-service'); if(evSvcEl) evSvcEl.value = '';
+    var evTplEl = document.getElementById('ev-template'); if(evTplEl) evTplEl.value = '';
     resetInvoiceForm();
     /* Reset email fields */
     var subj = document.getElementById('ev-email-subject');
@@ -366,6 +372,161 @@ async function igCreateEvent(){
     showAlert('Error: ' + err.message, false);
   }
 }
+
+/* ════════════════════════════════════════════════════
+   TEMPLATES — layout / transition / background, live in
+   Firestore `templates` collection. Services point at one
+   of these (default_template_id), events can override it.
+════════════════════════════════════════════════════ */
+var _templatesCache = []; // [{id,name,layout_style,transition_style,background_type,background_value,is_default}]
+
+var LAYOUT_STYLES = [
+  { value:'grid',      label:'Grid'            },
+  { value:'masonry',   label:'Masonry'         },
+  { value:'justified', label:'Justified Rows'  },
+  { value:'collage',   label:'Collage'         },
+  { value:'filmstrip', label:'Filmstrip'       },
+];
+var TRANSITION_STYLES = [
+  { value:'fade',  label:'Fade'        },
+  { value:'slide', label:'Slide'       },
+  { value:'zoom',  label:'Zoom'        },
+  { value:'none',  label:'Instant / None' },
+];
+
+async function loadTemplates(){
+  if(!db) return;
+  try{
+    var snap = await getDocs(query(collection(db,'templates'), orderBy('created_at','asc')));
+    _templatesCache = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+  }catch(e){
+    console.error('[loadTemplates] error:', e);
+    _templatesCache = [];
+  }
+  renderTemplatesAdmin();
+  populateTemplateSelects();
+  if(window.updateTemplatePreview) window.updateTemplatePreview();
+}
+
+function renderTemplatesAdmin(){
+  var wrap = document.getElementById('templatesList');
+  if(!wrap) return;
+  if(!_templatesCache.length){
+    wrap.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px;">No templates yet. Create your first one — it controls photo layout, slideshow transition and background for any event or service that uses it.</div>';
+    return;
+  }
+  wrap.innerHTML = _templatesCache.map(function(t){
+    var bgPreview = t.background_type === 'image'
+      ? '<div style="width:34px;height:34px;border-radius:6px;background-image:url(\'' + esc(t.background_value||'') + '\');background-size:cover;background-position:center;border:1px solid var(--border2);"></div>'
+      : '<div style="width:34px;height:34px;border-radius:6px;background:' + esc(t.background_value||'#111') + ';border:1px solid var(--border2);"></div>';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);">'
+      + bgPreview
+      + '<div style="flex:1;min-width:0;">'
+        + '<div style="font-weight:700;font-size:13px;">' + esc(t.name||'Untitled') + (t.is_default ? ' <span class="pill pill-applied" style="font-size:9px;">DEFAULT</span>' : '') + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">Layout: ' + esc(t.layout_style||'grid') + ' · Transition: ' + esc(t.transition_style||'fade') + '</div>'
+      + '</div>'
+      + '<button class="btn btn-ghost btn-sm" onclick=\'editTemplate(' + JSON.stringify(t).replace(/'/g,"&#39;") + ')\'>Edit</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="deleteTemplate(\'' + t.id + '\',\'' + esc(t.name||'').replace(/'/g,"\\'") + '\')">🗑</button>'
+    + '</div>';
+  }).join('');
+}
+
+/* Fills every <select data-template-select> in the DOM with the current
+   template list, preserving whatever value was already selected. */
+function populateTemplateSelects(){
+  document.querySelectorAll('select[data-template-select]').forEach(function(sel){
+    var current = sel.value;
+    var opts = ['<option value="">— No template (use defaults) —</option>'];
+    _templatesCache.forEach(function(t){
+      opts.push('<option value="' + t.id + '">' + esc(t.name||'Untitled') + (t.is_default ? ' (default)' : '') + '</option>');
+    });
+    sel.innerHTML = opts.join('');
+    if(current && _templatesCache.some(function(t){ return t.id === current; })) sel.value = current;
+  });
+}
+
+function openTemplateModal(prefill){
+  var m = document.getElementById('templateModal');
+  if(!m) return;
+  document.getElementById('tpl-id').value = prefill ? (prefill.id||'') : '';
+  document.getElementById('tpl-name').value = prefill ? (prefill.name||'') : '';
+  document.getElementById('tpl-layout').value = prefill ? (prefill.layout_style||'grid') : 'grid';
+  document.getElementById('tpl-transition').value = prefill ? (prefill.transition_style||'fade') : 'fade';
+  document.getElementById('tpl-bg-type').value = prefill ? (prefill.background_type||'color') : 'color';
+  document.getElementById('tpl-bg-value').value = prefill ? (prefill.background_value||'#0f1020') : '#0f1020';
+  document.getElementById('tpl-default').checked = !!(prefill && prefill.is_default);
+  document.getElementById('templateModalTitle').textContent = prefill ? 'Edit Template' : 'New Template';
+  m.style.display = 'flex';
+}
+function closeTemplateModal(){ var m = document.getElementById('templateModal'); if(m) m.style.display = 'none'; }
+function editTemplate(t){ openTemplateModal(t); }
+
+async function saveTemplate(){
+  var name = document.getElementById('tpl-name').value.trim();
+  if(!name){ alert('Template name is required.'); return; }
+  var id = document.getElementById('tpl-id').value;
+  var payload = {
+    name             : name,
+    layout_style     : document.getElementById('tpl-layout').value,
+    transition_style : document.getElementById('tpl-transition').value,
+    background_type  : document.getElementById('tpl-bg-type').value,
+    background_value : document.getElementById('tpl-bg-value').value.trim(),
+    is_default       : document.getElementById('tpl-default').checked,
+  };
+  try{
+    /* Only one default template at a time */
+    if(payload.is_default){
+      var others = _templatesCache.filter(function(t){ return t.is_default && t.id !== id; });
+      for(var i=0;i<others.length;i++){ await updateDoc(doc(db,'templates',others[i].id), {is_default:false}); }
+    }
+    if(id){
+      await updateDoc(doc(db,'templates',id), payload);
+    } else {
+      payload.created_at = serverTimestamp();
+      await addDoc(collection(db,'templates'), payload);
+    }
+    toast('✅', id ? 'Template updated!' : 'Template created!', name);
+    closeTemplateModal();
+    loadTemplates();
+  }catch(e){
+    alert('Save failed: ' + e.message);
+  }
+}
+
+async function deleteTemplate(id, name){
+  if(!confirm('Delete template "' + name + '"? Events and services still linked to it will fall back to grid layout / fade transition.')) return;
+  try{
+    await deleteDoc(doc(db,'templates',id));
+    toast('🗑', 'Template deleted', name);
+    loadTemplates();
+  }catch(e){
+    alert('Delete failed: ' + e.message);
+  }
+}
+
+window.loadTemplates      = loadTemplates;
+window.openTemplateModal  = openTemplateModal;
+window.closeTemplateModal = closeTemplateModal;
+window.editTemplate       = editTemplate;
+window.saveTemplate       = saveTemplate;
+window.deleteTemplate     = deleteTemplate;
+window.populateTemplateSelects = populateTemplateSelects;
+
+/* When a service is chosen on the Create Event form, default the
+   template select to that service's default_template_id (still
+   overridable — this mirrors the same pattern used on book-us.html). */
+async function onEventServiceSelect(){
+  var sel = document.getElementById('ev-service');
+  var tplSel = document.getElementById('ev-template');
+  if(!sel || !sel.value || !tplSel) return;
+  try{
+    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(!sb) return;
+    var res = await sb.from('services').select('default_template_id').eq('id', sel.value).single();
+    if(res.data && res.data.default_template_id) tplSel.value = res.data.default_template_id;
+  }catch(e){ console.warn('[onEventServiceSelect]', e); }
+}
+window.onEventServiceSelect = onEventServiceSelect;
 
 async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode, eventSlug, emailSubject, emailBody){
   if(!ownerEmail) return;

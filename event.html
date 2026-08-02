@@ -923,6 +923,49 @@ input,textarea,select{font-family:inherit;}
   .gallery-actions{gap:6px;}
   #downloadAllBtn{display:none!important;}
 }
+
+/* ══════════════════════════════════════
+   TEMPLATE-DRIVEN LAYOUT & TRANSITIONS
+   Applied per event from its linked Template (Templates page in
+   admin). These rules come last so they override the legacy
+   .tpl-* grid/card rules above for any event using a template.
+══════════════════════════════════════ */
+
+/* — Photo layouts — */
+.photo-grid.layout-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:3px;background:var(--border);border-radius:var(--r2);overflow:hidden;}
+.photo-grid.layout-grid .photo-card{position:relative;aspect-ratio:3/2;overflow:hidden;cursor:pointer;background:var(--bg2);}
+
+.photo-grid.layout-masonry{display:block;columns:4;column-gap:10px;background:none;}
+.photo-grid.layout-masonry .photo-card{break-inside:avoid;margin-bottom:10px;position:relative;overflow:hidden;border-radius:6px;cursor:pointer;display:block;aspect-ratio:auto;}
+.photo-grid.layout-masonry .photo-card img{width:100%;height:auto;object-fit:initial;}
+
+.photo-grid.layout-justified{display:flex;flex-wrap:wrap;gap:6px;background:none;}
+.photo-grid.layout-justified .photo-card{position:relative;overflow:hidden;cursor:pointer;flex:1 1 260px;aspect-ratio:3/2;background:var(--bg2);}
+
+.photo-grid.layout-collage{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:110px;gap:6px;background:none;}
+.photo-grid.layout-collage .photo-card{position:relative;overflow:hidden;cursor:pointer;border-radius:6px;background:var(--bg2);grid-column:span 2;grid-row:span 1;}
+.photo-grid.layout-collage .photo-card:nth-child(6n+1){grid-column:span 4;grid-row:span 2;}
+.photo-grid.layout-collage .photo-card:nth-child(6n+4){grid-row:span 2;}
+
+.photo-grid.layout-filmstrip{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;background:none;}
+.photo-grid.layout-filmstrip .photo-card{position:relative;overflow:hidden;cursor:pointer;flex:0 0 260px;aspect-ratio:3/2;scroll-snap-align:start;background:var(--bg2);}
+
+@media(max-width:640px){
+  .photo-grid.layout-masonry{columns:2;}
+  .photo-grid.layout-collage{grid-template-columns:repeat(2,1fr);}
+  .photo-grid.layout-collage .photo-card{grid-column:span 1!important;grid-row:span 1!important;}
+}
+
+/* — Slideshow transitions — */
+[data-transition="slide"] .slide{opacity:1;transform:translateX(100%);transition:transform .7s cubic-bezier(.4,0,.2,1);z-index:1;}
+[data-transition="slide"] .slide.active{transform:translateX(0);z-index:2;}
+[data-transition="slide"] .slide.slide-exit-fwd{transform:translateX(-100%);z-index:2;}
+[data-transition="slide"] .slide.slide-exit-back{transform:translateX(100%);z-index:2;}
+
+[data-transition="zoom"] .slide{opacity:0;transform:scale(1.2);transition:opacity .9s ease,transform 1.1s ease;}
+[data-transition="zoom"] .slide.active{opacity:1;transform:scale(1);z-index:2;}
+
+[data-transition="none"] .slide{transition:none!important;}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
@@ -1184,6 +1227,48 @@ var eventData    = null;
 var allPhotos    = [];
 var selectedIds  = new Set();
 var currentSlide = 0;
+
+/* ══════════════════════════════════════
+   EVENT TEMPLATE — layout / transition / background
+   Fetched fresh per page load from the `templates` collection so
+   edits to a template apply to every event that uses it immediately.
+══════════════════════════════════════ */
+var DEFAULT_TEMPLATE = { layout_style:'grid', transition_style:'fade', background_type:'color', background_value:'#0d1020' };
+var activeTemplate = DEFAULT_TEMPLATE;
+
+async function applyEventTemplate(ev, db){
+  var tpl = null;
+  try{
+    var templateId = ev.template_id || (ev.event_settings && ev.event_settings.template_id) || null;
+    if(templateId){
+      var tSnap = await db.collection('templates').doc(templateId).get();
+      if(tSnap.exists) tpl = Object.assign({id:tSnap.id}, tSnap.data());
+    }
+    if(!tpl){
+      var defSnap = await db.collection('templates').where('is_default','==',true).limit(1).get();
+      if(!defSnap.empty) tpl = Object.assign({id:defSnap.docs[0].id}, defSnap.docs[0].data());
+    }
+  }catch(e){ console.warn('[applyEventTemplate] could not load template, using defaults:', e.message); }
+
+  activeTemplate = Object.assign({}, DEFAULT_TEMPLATE, tpl || {});
+
+  /* Layout — applied to the photo grid container */
+  var pg = document.getElementById('photoGrid');
+  if(pg){
+    pg.className = 'photo-grid layout-' + (activeTemplate.layout_style || 'grid');
+  }
+
+  /* Background — applied behind the whole gallery experience (page chrome,
+     gate screen, and anywhere the photo layout leaves gaps, e.g. masonry). */
+  var bgCss = activeTemplate.background_type === 'image'
+    ? 'center / cover no-repeat fixed url("' + (activeTemplate.background_value||'').replace(/"/g,'') + '")'
+    : (activeTemplate.background_value || DEFAULT_TEMPLATE.background_value);
+  document.body.style.background = bgCss;
+
+  /* Transition — read by buildSlideshow()/goSlide() via activeTemplate.transition_style */
+  var wrap = document.getElementById('slideshowWrap');
+  if(wrap) wrap.setAttribute('data-transition', activeTemplate.transition_style || 'fade');
+}
 var slideTimer   = null;
 var lbIndex      = 0;
 var allSelected  = false;
@@ -1266,9 +1351,14 @@ document.addEventListener('DOMContentLoaded', async function(){
     /* ── VISIT TRACKING ── */
     trackVisit(ev.id, ev.name);
 
+    /* Base skin stays constant — layout, slideshow transition and
+       background are now driven per-event by applyEventTemplate(),
+       sourced from the event's linked Template (set on the service
+       at booking time, or overridden per event in admin). */
     var type = ev.type || ev.template || 'professional';
     var tpl  = TPL_MAP[type] || TPL_MAP.professional;
     document.body.className = tpl.cls;
+    await applyEventTemplate(ev, db);
 
     document.getElementById('navEventName').textContent = ev.name;
     document.getElementById('navCodeBadge').textContent = ev.event_code;
@@ -1544,21 +1634,35 @@ function buildSlideshow(photos){
   }, { passive:true });
 }
 
-function goSlide(idx){
+function goSlide(idx, forward){
   var slides = document.querySelectorAll('.slide');
   var dots   = document.querySelectorAll('.dot');
   if(!slides.length) return;
-  slides[currentSlide].classList.remove('active');
-  if(dots[currentSlide]) dots[currentSlide].classList.remove('active');
-  currentSlide = (idx + slides.length) % slides.length;
+  if(forward === undefined) forward = idx >= currentSlide;
+  var prevIdx = currentSlide;
+  var nextIdx = (idx + slides.length) % slides.length;
+
+  slides.forEach(function(s){ s.classList.remove('slide-exit-fwd','slide-exit-back'); });
+  slides[prevIdx].classList.remove('active');
+  slides[prevIdx].classList.add(forward ? 'slide-exit-fwd' : 'slide-exit-back');
+  if(dots[prevIdx]) dots[prevIdx].classList.remove('active');
+
+  currentSlide = nextIdx;
   slides[currentSlide].classList.add('active');
   if(dots[currentSlide]) dots[currentSlide].classList.add('active');
+
   document.getElementById('slideCounter').textContent = (currentSlide+1) + ' / ' + slides.length;
   clearInterval(slideTimer);
   slideTimer = setInterval(function(){ nextSlide(); }, 5000);
+
+  /* Reset exit classes once the transition has finished so the slide
+     returns to its neutral "waiting" position for next time. */
+  setTimeout(function(){
+    slides.forEach(function(s){ if(!s.classList.contains('active')) s.classList.remove('slide-exit-fwd','slide-exit-back'); });
+  }, 900);
 }
-function nextSlide(){ goSlide(currentSlide + 1); }
-function prevSlide(){ goSlide(currentSlide - 1); }
+function nextSlide(){ goSlide(currentSlide + 1, true); }
+function prevSlide(){ goSlide(currentSlide - 1, false); }
 
 function scrollToGallery(){
   var gw = document.getElementById('galleryWrap');
@@ -1603,10 +1707,9 @@ function fallbackCopy(text){
    PHOTO GRID
 ══════════════════════════════════════ */
 function renderPhotos(photos){
-  var type    = eventData ? (eventData.type || eventData.template || 'professional') : 'professional';
-  var grid    = document.getElementById('photoGrid');
-  var masonry = ['wedding','gala'].includes(type);
-  grid.style.display = masonry ? 'block' : '';
+  var grid = document.getElementById('photoGrid');
+  grid.className = 'photo-grid layout-' + (activeTemplate.layout_style || 'grid');
+  grid.style.display = '';
 
   if(!photos.length){
     grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;column-span:all;">'
