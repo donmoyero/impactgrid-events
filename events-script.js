@@ -770,10 +770,11 @@ async function deleteEvent(id){
     for(var pd of pSnap.docs){
       /* Delete from Cloudinary via your backend (optional) */
       var pData = pd.data();
-      if(pData.cloudinary_id){
+      var idsToDelete = [pData.cloudinary_id, pData.web_public_id, pData.thumb_public_id].filter(Boolean);
+      if(idsToDelete.length){
         try{ await fetch(EVENTS_API + '/api/delete-photo', {
           method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ publicId: pData.cloudinary_id })
+          body: JSON.stringify({ publicIds: idsToDelete, resourceType: pData.media_type === 'video' ? 'video' : 'image' })
         }); }catch(e){}
       }
       await deleteDoc(doc(db, 'photos', pd.id));
@@ -1187,6 +1188,8 @@ async function uploadPhotos(files){
         web_url       : webResult.secure_url,
         original_url  : origResult.secure_url,
         cloudinary_id : origResult.public_id,
+        web_public_id : webResult.public_id,
+        thumb_public_id: thumbResult.public_id,
         created_at    : serverTimestamp()
       });
 
@@ -1205,7 +1208,7 @@ async function uploadPhotos(files){
    LOAD EVENT PHOTOS (thumbnail grid in admin)
 ════════════════════════════════════════════════════ */
 var epSelectedPhotoIds = new Set();
-var epPhotoMap = {}; /* id -> cloudinary_id, rebuilt on every load */
+var epPhotoMap = {}; /* id -> {cloudinary_id, web_public_id, thumb_public_id, media_type}, rebuilt on every load */
 
 async function loadEventPhotos(){
   var el = document.getElementById('eventPhotosList');
@@ -1235,7 +1238,12 @@ async function loadEventPhotos(){
 
     el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;">'
       + data.map(function(p){
-          epPhotoMap[p.id] = p.cloudinary_id || '';
+          epPhotoMap[p.id] = {
+            cloudinary_id   : p.cloudinary_id || '',
+            web_public_id   : p.web_public_id || '',
+            thumb_public_id : p.thumb_public_id || '',
+            media_type      : p.media_type || 'photo'
+          };
           var viewUrl = p.web_url || p.preview_url;
           var dlUrl   = p.original_url || viewUrl;
           var isVid   = p.media_type === 'video';
@@ -1246,7 +1254,7 @@ async function loadEventPhotos(){
             + (isVid ? '<div style="position:absolute;top:4px;right:28px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;">▶ Video</div>' : '')
             + '<a href="' + esc(viewUrl) + '" target="_blank" style="position:absolute;bottom:22px;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;"> View</a>'
             + '<a href="' + esc(dlUrl) + '" download target="_blank" style="position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;"> Download</a>'
-            + '<button onclick="deletePhoto(\'' + esc(p.id) + '\',\'' + esc(p.cloudinary_id||'') + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;z-index:2;">&times;</button>'
+            + '<button onclick="deletePhoto(\'' + esc(p.id) + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;z-index:2;">&times;</button>'
             + '</div>';
         }).join('')
       + '</div>';
@@ -1311,22 +1319,29 @@ async function epBulkDeleteSelected(){
   loadEventPhotos();
 }
 
-/* Shared deletion logic (Cloudinary asset + Firestore doc), used by
-   both the single button and bulk delete so there's one code path. */
-async function deletePhotoCore(id, cloudinaryId){
-  if(cloudinaryId){
+/* Shared deletion logic (Cloudinary asset(s) + Firestore doc), used by
+   both the single button and bulk delete so there's one code path.
+   `meta` is the photo doc's data (or a subset): { cloudinary_id,
+   web_public_id, thumb_public_id, media_type }. A photo has three
+   separate Cloudinary uploads (original/web/thumb) — all three must be
+   deleted or two of them orphan permanently. A video has just one, but
+   needs resource_type:'video' or Cloudinary silently no-ops the delete. */
+async function deletePhotoCore(id, meta){
+  meta = meta || {};
+  var ids = [meta.cloudinary_id, meta.web_public_id, meta.thumb_public_id].filter(Boolean);
+  if(ids.length){
     await fetch(EVENTS_API + '/api/delete-photo', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ publicId: cloudinaryId })
+      body: JSON.stringify({ publicIds: ids, resourceType: meta.media_type === 'video' ? 'video' : 'image' })
     });
   }
   await deleteDoc(doc(db, 'photos', id));
 }
 
-async function deletePhoto(id, cloudinaryId){
+async function deletePhoto(id){
   if(!confirm('Delete this photo?')) return;
   try{
-    await deletePhotoCore(id, cloudinaryId);
+    await deletePhotoCore(id, epPhotoMap[id]);
     toast(' ', 'Photo deleted', '');
     loadEventPhotos();
   }catch(e){ toast(' ', 'Error', e.message); }
