@@ -1,8 +1,8 @@
 /* ════════════════════════════════════════════════════
    EVENTS MANAGEMENT — Firebase Firestore + Cloudinary
    Replaces Supabase entirely.
-   DB  → Firebase Firestore
-   Storage → Cloudinary (free 25GB)
+   DB  Firebase Firestore
+   Storage Cloudinary (free 25GB)
 ════════════════════════════════════════════════════ */
 
 /* Firebase is loaded via CDN <script> tags in admin.html before this file.
@@ -62,11 +62,11 @@ function normSnap(snap) {
 
 /* ════════════════════════════════════════════════════
    CLOUDINARY CONFIG
-   Sign up free at cloudinary.com → get your cloud name
+   Sign up free at cloudinary.com get your cloud name
    Replace YOUR_CLOUD_NAME below
 ════════════════════════════════════════════════════ */
 var CLOUDINARY_CLOUD_NAME  = 'dr7wqaqbm';
-var CLOUDINARY_UPLOAD_PRESET = 'impactgrid_photos'; /* ← create unsigned preset in Cloudinary dashboard */
+var CLOUDINARY_UPLOAD_PRESET = 'impactgrid_photos'; /* create unsigned preset in Cloudinary dashboard */
 
 var EVENTS_API      = 'https://impactgrid-events-api.onrender.com';
 var evWatermark     = true;
@@ -185,7 +185,7 @@ function addInvLineItem(desc, qty, rate){
     '<input type="number" value="' + (qty||1) + '" min="0" step="0.01" oninput="updateInvTotals()" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;color:var(--text);font-size:12px;text-align:center;" class="inv-qty"/>'+
     '<input type="number" value="' + (rate||0) + '" min="0" step="0.01" oninput="updateInvTotals()" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;color:var(--text);font-size:12px;text-align:right;" class="inv-rate"/>'+
     '<div class="inv-amount" style="display:flex;align-items:center;justify-content:flex-end;font-size:12px;font-weight:600;color:var(--text2);">£0.00</div>'+
-    '<button onclick="removeInvLineItem(\'inv-row-'+id+'\')" style="background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);border-radius:var(--r);cursor:pointer;font-size:12px;" title="Remove">✕</button>';
+    '<button onclick="removeInvLineItem(\'inv-row-'+id+'\')" style="background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);border-radius:var(--r);cursor:pointer;font-size:12px;" title="Remove">&times;</button>';
   container.appendChild(row);
   updateInvTotals();
 }
@@ -280,7 +280,7 @@ async function igCreateEvent(){
         : 'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
   }
 
-  if(!db){ showAlert("⚠️ Database not ready yet. Please wait a moment and try again.", false); return; }
+  if(!db){ showAlert(" Database not ready yet. Please wait a moment and try again.", false); return; }
 
   if(!name){ showAlert('Event name is required.', false); return; }
   if(!eventDate){ showAlert('Event date is required — this is what shows up in the client\'s reminder email.', false); return; }
@@ -340,8 +340,8 @@ async function igCreateEvent(){
       created_at        : serverTimestamp()
     });
 
-    showAlert('✅ Event created! Code: ' + code, true);
-    toast('✅', 'Event created!', name + ' · Code: ' + code);
+    showAlert(' Event created! Code: ' + code, true);
+    toast(' ', 'Event created!', name + ' · Code: ' + code);
 
     var ownerEmail = document.getElementById('ev-owner') ? document.getElementById('ev-owner').value.trim() : '';
     var ownerName  = document.getElementById('ev-owner-name') ? document.getElementById('ev-owner-name').value.trim() : '';
@@ -357,7 +357,7 @@ async function igCreateEvent(){
     var subj = document.getElementById('ev-email-subject');
     var body = document.getElementById('ev-email-body');
     if(subj) subj.value = 'Your event is ready — {{event_name}}';
-    if(body) body.value = 'Hi {{owner_name}},\n\nYour event gallery is ready! Here are your access details:\n\n🎉 Event: {{event_name}}\n🔑 Access Code: {{event_code}}\n🔗 Gallery Link: {{event_url}}\n\nShare the link and code with your guests so they can find their photos.\n\nIf you have any questions, just reply to this email.\n\n— ImpactGrid Events Team';
+    if(body) body.value = 'Hi {{owner_name}},\n\nYour event gallery is ready! Here are your access details:\n\n Event: {{event_name}}\n Access Code: {{event_code}}\n Gallery Link: {{event_url}}\n\nShare the link and code with your guests so they can find their photos.\n\nIf you have any questions, just reply to this email.\n\n— ImpactGrid Events Team';
     setDefaultExpiry();
     evWatermark = true; evRequireCode = true;
     var wt = document.getElementById('ev-watermark-toggle'); if(wt) wt.classList.add('on');
@@ -427,7 +427,7 @@ function renderTemplatesAdmin(){
         + '<div style="font-size:11px;color:var(--text3);">Layout: ' + esc(t.layout_style||'grid') + ' · Transition: ' + esc(t.transition_style||'fade') + '</div>'
       + '</div>'
       + '<button class="btn btn-ghost btn-sm" onclick=\'editTemplate(' + JSON.stringify(t).replace(/'/g,"&#39;") + ')\'>Edit</button>'
-      + '<button class="btn btn-ghost btn-sm" onclick="deleteTemplate(\'' + t.id + '\',\'' + esc(t.name||'').replace(/'/g,"\\'") + '\')">🗑</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="deleteTemplate(\'' + t.id + '\',\'' + esc(t.name||'').replace(/'/g,"\\'") + '\')">Delete</button>'
     + '</div>';
   }).join('');
 }
@@ -480,7 +480,7 @@ async function editEventTemplate(eventId, templateId){
   openTemplateModal(t);
 
   if(!t){
-    toast('ℹ️', 'No template yet', 'Create one below — it\u2019ll be applied to this event automatically.');
+    toast('ℹ ', 'No template yet', 'Create one below — it\u2019ll be applied to this event automatically.');
   }
 }
 
@@ -510,7 +510,7 @@ async function saveTemplate(){
       var ref = await addDoc(collection(db,'templates'), payload);
       savedId = ref.id;
     }
-    toast('✅', id ? 'Template updated!' : 'Template created!', name);
+    toast(' ', id ? 'Template updated!' : 'Template created!', name);
 
     if(_templateEditEventId){
       try{
@@ -533,7 +533,7 @@ async function deleteTemplate(id, name){
   if(!confirm('Delete template "' + name + '"? Events and services still linked to it will fall back to grid layout / fade transition.')) return;
   try{
     await deleteDoc(doc(db,'templates',id));
-    toast('🗑', 'Template deleted', name);
+    toast(' ', 'Template deleted', name);
     loadTemplates();
   }catch(e){
     alert('Delete failed: ' + e.message);
@@ -594,12 +594,12 @@ async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode
     }
     var data = await res.json();
     if(data.success){
-      toast('📧', 'Owner notified!', 'Email sent to ' + ownerEmail);
+      toast(' ', 'Owner notified!', 'Email sent to ' + ownerEmail);
     } else {
       throw new Error(data.error || 'Notification failed');
     }
   }catch(e){
-    toast('⚠️', 'Owner email failed', e.message);
+    toast(' ', 'Owner email failed', e.message);
   }
 }
 
@@ -616,7 +616,7 @@ async function loadEvents(){
     var data     = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
 
     if(!data.length){
-      el.innerHTML = '<div class="empty"><div class="empty-ico">📅</div><div class="empty-txt">No events yet.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No events yet.</div></div>';
       return;
     }
 
@@ -624,7 +624,7 @@ async function loadEvents(){
       + data.map(function(ev){
           var expDate  = new Date(ev.expiry_date);
           var daysLeft = Math.ceil((expDate - new Date()) / (1000*60*60*24));
-          var expStr   = expDate.toLocaleDateString('en-GB') + (daysLeft > 0 ? ' (' + daysLeft + 'd)' : ' ⚠️ Expired');
+          var expStr   = expDate.toLocaleDateString('en-GB') + (daysLeft > 0 ? ' (' + daysLeft + 'd)' : ' Expired');
           var statusPill = ev.is_active
             ? '<span class="pill pill-active">Active</span>'
             : '<span class="pill pill-paused">Inactive</span>';
@@ -635,7 +635,7 @@ async function loadEvents(){
             if(ev.owner_avatar_url){
               ownerCell += '<img src="' + esc(ev.owner_avatar_url) + '" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display=\'none\'"/>';
             } else {
-              ownerCell += '<div style="width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">👤</div>';
+              ownerCell += '<div style="width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;"> </div>';
             }
             ownerCell += '<div>';
             if(ev.owner_name)  ownerCell += '<div style="font-size:12px;font-weight:600;color:var(--text);">'  + esc(ev.owner_name)  + '</div>';
@@ -654,14 +654,14 @@ async function loadEvents(){
             + '<td style="font-size:12px;color:' + (daysLeft < 5 ? 'var(--red)' : 'var(--text2)') + ';">' + expStr + '</td>'
             + '<td>' + statusPill + '</td>'
             + '<td><div class="td-actions">'
-            + '<a class="btn btn-ghost btn-sm" href="event.html?event=' + ev.event_slug + '&code=' + ev.event_code + '" target="_blank">👁 View Event</a>'
+            + '<a class="btn btn-ghost btn-sm" href="event.html?event=' + ev.event_slug + '&code=' + ev.event_code + '" target="_blank"> View Event</a>'
             + '<button class="btn btn-ghost btn-sm" onclick="editEventTemplate(\'' + ev.id + '\',\'' + (ev.template_id||'') + '\')">Edit Template</button>'
-            + '<button class="btn btn-ghost btn-sm" onclick="goUploadForEvent(\'' + ev.id + '\')">📤 Upload</button>'
-            + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="resendOwnerEmail(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">📧 Resend Email</button>' : '')
+            + '<button class="btn btn-ghost btn-sm" onclick="goUploadForEvent(\'' + ev.id + '\')"> Upload</button>'
+            + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="resendOwnerEmail(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')"> Resend Email</button>' : '')
             + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="sendEventReminder(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">⏰ Send Reminder</button>' : '')
             + '<button class="btn ' + (ev.is_active ? 'btn-red' : 'btn-green') + ' btn-sm" onclick="toggleEvent(\'' + ev.id + '\',' + ev.is_active + ')">'
             + (ev.is_active ? 'Deactivate' : 'Activate') + '</button>'
-            + '<button class="btn btn-red btn-icon btn-sm" onclick="deleteEvent(\'' + ev.id + '\')">✕</button>'
+            + '<button class="btn btn-red btn-icon btn-sm" onclick="deleteEvent(\'' + ev.id + '\')">&times;</button>'
             + '</div></td></tr>';
         }).join('')
       + '</tbody></table>';
@@ -672,7 +672,7 @@ async function loadEvents(){
 
 async function resendOwnerEmail(ownerEmail, eventName){
   if(!confirm('Resend access email to ' + ownerEmail + '?')) return;
-  toast('📧', 'Sending…', 'Resending', true);
+  toast(' ', 'Sending…', 'Resending', true);
   try{
     var res  = await fetch(EVENTS_API + '/api/resend-owner-email', {
       method : 'POST',
@@ -680,9 +680,9 @@ async function resendOwnerEmail(ownerEmail, eventName){
       body   : JSON.stringify({ ownerEmail })
     });
     var data = await res.json();
-    if(data.success) toast('✅', 'Email sent!', '');
-    else toast('⚠️', 'Failed', data.error || '');
-  }catch(e){ toast('⚠️', 'Error', e.message); }
+    if(data.success) toast(' ', 'Email sent!', '');
+    else toast(' ', 'Failed', data.error || '');
+  }catch(e){ toast(' ', 'Error', e.message); }
 }
 
 async function sendEventReminder(ownerEmail, eventName){
@@ -695,15 +695,15 @@ async function sendEventReminder(ownerEmail, eventName){
       body   : JSON.stringify({ ownerEmail })
     });
     var data = await res.json();
-    if(data.success) toast('✅', 'Reminder sent!', '');
-    else toast('⚠️', 'Failed', data.error || '');
-  }catch(e){ toast('⚠️', 'Error', e.message); }
+    if(data.success) toast(' ', 'Reminder sent!', '');
+    else toast(' ', 'Failed', data.error || '');
+  }catch(e){ toast(' ', 'Error', e.message); }
 }
 
 async function toggleEvent(id, cur){
   await updateDoc(doc(db, 'events', id), { is_active: !cur });
   loadEvents(); loadStats();
-  toast(cur ? '⏸' : '▶️', cur ? 'Event deactivated' : 'Event activated', '');
+  toast(cur ? '⏸' : '▶ ', cur ? 'Event deactivated' : 'Event activated', '');
 }
 
 async function deleteEvent(id){
@@ -727,7 +727,7 @@ async function deleteEvent(id){
     for(var sd of sSnap.docs) await deleteDoc(doc(db, 'event_settings', sd.id));
   }catch(e){}
   await deleteDoc(doc(db, 'events', id));
-  toast('🗑️', 'Event deleted', '');
+  toast(' ', 'Event deleted', '');
   loadEvents(); loadStats();
 }
 
@@ -774,7 +774,7 @@ function onUploadEventChange(){
   document.getElementById('upload-event-info').style.display       = id ? 'block' : 'none';
   if(id){
     var opt = sel.options[sel.selectedIndex];
-    document.getElementById('upload-event-meta').textContent = '📅 ' + opt.textContent;
+    document.getElementById('upload-event-meta').textContent = ' ' + opt.textContent;
     loadEventPhotos();
   }
 }
@@ -814,9 +814,9 @@ function resizeImageToWebVersion(file) { return resizeImage(file, 1400, 0.82); }
      always read. iOS's web file-picker hands over an already-compatible
      format in the first place; the old code relied on that, not on
      converting anything itself.
-   - File already under Cloudinary's 10MB cap → return it completely
+   - File already under Cloudinary's 10MB cap return it completely
      untouched, zero quality loss, exact original bytes.
-   - File too big → re-encode at FULL resolution first, only stepping
+   - File too big re-encode at FULL resolution first, only stepping
      JPEG quality down in small increments until it fits. Dimensions are
      only reduced as an absolute last resort, so "original" stays as
      close to true original quality as possible. */
@@ -847,7 +847,7 @@ function resizeImageForBlog(file) { return resizeImage(file, 1920, 0.88); }
    'format' isn't one of them (it's silently ignored if you try).
    To mirror the old Supabase `contentType: 'image/jpeg'` override,
    set Format: jpg directly in the impactgrid_photos preset itself
-   (Cloudinary dashboard → Optimize and Deliver → Format). That
+   (Cloudinary dashboard Optimize and Deliver Format). That
    applies server-side regardless of source format, for every upload
    through this preset. */
 async function uploadToCloudinary(blob, folder){
@@ -888,7 +888,7 @@ async function uploadVideoToCloudinary(file, folder){
    purely via URL manipulation — no extra upload/transformation call
    needed. Cloudinary generates the frame on first request and caches it.
    e.g. .../video/upload/v123/impactgrid/evt/original/abc.mp4
-     →   .../video/upload/so_0/v123/impactgrid/evt/original/abc.jpg */
+       .../video/upload/so_0/v123/impactgrid/evt/original/abc.jpg */
 function cloudinaryVideoPosterUrl(secureUrl){
   var withOffset = secureUrl.replace('/video/upload/', '/video/upload/so_0/');
   return withOffset.replace(/\.[a-zA-Z0-9]+($|\?)/, '.jpg$1');
@@ -1028,7 +1028,7 @@ async function uploadToCloudinaryBlog(blob, folder){
 window.uploadToCloudinaryBlog = uploadToCloudinaryBlog;
 
 async function uploadPhotos(files){
-  if(!selectedEventId){ toast('⚠️', 'No event selected', 'Pick an event first'); return; }
+  if(!selectedEventId){ toast(' ', 'No event selected', 'Pick an event first'); return; }
   var prog = document.getElementById('photoUploadProgress');
   prog.innerHTML = '';
 
@@ -1041,11 +1041,11 @@ async function uploadPhotos(files){
     var allowedVideo = ['video/mp4','video/quicktime','video/webm'];
     var isVideo = allowedVideo.includes(file.type);
     if(!allowedImage.includes(file.type) && !isVideo){
-      toast('⚠️', 'Skipped ' + file.name, 'Not a supported photo or video type');
+      toast(' ', 'Skipped ' + file.name, 'Not a supported photo or video type');
       continue;
     }
     if(isVideo && file.size > MAX_COMPRESSIBLE_BYTES){
-      toast('⚠️', 'Skipped ' + file.name, 'Video too large to compress in-browser — trim it and try again');
+      toast(' ', 'Skipped ' + file.name, 'Video too large to compress in-browser — trim it and try again');
       continue;
     }
 
@@ -1082,7 +1082,7 @@ async function uploadPhotos(files){
             setStatus('Compressing video… ' + pct + '%', 5 + Math.round(pct * 0.5), '');
           });
           if(uploadFile.size > MAX_VIDEO_BYTES){
-            toast('⚠️', 'Skipped ' + file.name, 'Still over 100MB after compression — trim it and try again');
+            toast(' ', 'Skipped ' + file.name, 'Still over 100MB after compression — trim it and try again');
             setStatus('Failed', 100, '#e33');
             continue;
           }
@@ -1102,7 +1102,7 @@ async function uploadPhotos(files){
           created_at    : serverTimestamp()
         });
 
-        setStatus('✅ Done', 100, 'var(--green)');
+        setStatus(' Done', 100, 'var(--green)');
         continue;
       }
 
@@ -1134,14 +1134,14 @@ async function uploadPhotos(files){
         created_at    : serverTimestamp()
       });
 
-      setStatus('✅ Done', 100, 'var(--green)');
+      setStatus(' Done', 100, 'var(--green)');
 
     }catch(err){
-      setStatus('⚠️ ' + err.message, 100, 'var(--red)');
+      setStatus(' ' + err.message, 100, 'var(--red)');
     }
   }
 
-  toast('✅', 'Upload complete!', files.length + ' file' + (files.length > 1 ? 's' : '') + ' added');
+  toast(' ', 'Upload complete!', files.length + ' file' + (files.length > 1 ? 's' : '') + ' added');
   loadEventPhotos();
 }
 
@@ -1172,7 +1172,7 @@ async function loadEventPhotos(){
     });
 
     if(!data.length){
-      el.innerHTML = '<div class="empty"><div class="empty-ico">📸</div><div class="empty-txt">No photos yet.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet.</div></div>';
       epUpdateBulkUI();
       return;
     }
@@ -1188,9 +1188,9 @@ async function loadEventPhotos(){
             + 'style="position:absolute;top:4px;left:4px;width:18px;height:18px;cursor:pointer;z-index:2;"/>'
             + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:90px;object-fit:cover;" onerror="this.style.background=\'var(--bg3)\'"/>'
             + (isVid ? '<div style="position:absolute;top:4px;right:28px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;">▶ Video</div>' : '')
-            + '<a href="' + esc(viewUrl) + '" target="_blank" style="position:absolute;bottom:22px;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;">👁 View</a>'
-            + '<a href="' + esc(dlUrl) + '" download target="_blank" style="position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;">⬇ Download</a>'
-            + '<button onclick="deletePhoto(\'' + esc(p.id) + '\',\'' + esc(p.cloudinary_id||'') + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;z-index:2;">✕</button>'
+            + '<a href="' + esc(viewUrl) + '" target="_blank" style="position:absolute;bottom:22px;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;"> View</a>'
+            + '<a href="' + esc(dlUrl) + '" download target="_blank" style="position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;"> Download</a>'
+            + '<button onclick="deletePhoto(\'' + esc(p.id) + '\',\'' + esc(p.cloudinary_id||'') + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;z-index:2;">&times;</button>'
             + '</div>';
         }).join('')
       + '</div>';
@@ -1247,16 +1247,16 @@ async function epBulkDeleteSelected(){
   }
 
   if(failed){
-    toast('⚠️', (ids.length - failed) + ' deleted, ' + failed + ' failed', 'Check console for details');
+    toast(' ', (ids.length - failed) + ' deleted, ' + failed + ' failed', 'Check console for details');
   } else {
-    toast('🗑️', ids.length + ' photo' + (ids.length > 1 ? 's' : '') + ' deleted', '');
+    toast(' ', ids.length + ' photo' + (ids.length > 1 ? 's' : '') + ' deleted', '');
   }
 
   loadEventPhotos();
 }
 
 /* Shared deletion logic (Cloudinary asset + Firestore doc), used by
-   both the single ✕ button and bulk delete so there's one code path. */
+   both the single button and bulk delete so there's one code path. */
 async function deletePhotoCore(id, cloudinaryId){
   if(cloudinaryId){
     await fetch(EVENTS_API + '/api/delete-photo', {
@@ -1271,9 +1271,9 @@ async function deletePhoto(id, cloudinaryId){
   if(!confirm('Delete this photo?')) return;
   try{
     await deletePhotoCore(id, cloudinaryId);
-    toast('🗑️', 'Photo deleted', '');
+    toast(' ', 'Photo deleted', '');
     loadEventPhotos();
-  }catch(e){ toast('⚠️', 'Error', e.message); }
+  }catch(e){ toast(' ', 'Error', e.message); }
 }
 
 /* ════════════════════════════════════════════════════
@@ -1307,7 +1307,7 @@ async function loadDownloadRequests(){
     if(badge){ badge.textContent = pending; badge.style.display = pending > 0 ? 'inline-flex' : 'none'; }
 
     if(!allRequests.length){
-      el.innerHTML = '<div class="empty"><div class="empty-ico">📥</div><div class="empty-txt">No download requests yet.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No download requests yet.</div></div>';
       return;
     }
 
@@ -1330,7 +1330,7 @@ function filterRequests(status, btn){
 function renderRequestsTable(data){
   var el = document.getElementById('downloadRequestsList');
   if(!data || !data.length){
-    el.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No requests found.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No requests found.</div></div>';
     return;
   }
   el.innerHTML = '<table><thead><tr><th>Guest Email</th><th>Event</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>'
@@ -1342,9 +1342,9 @@ function renderRequestsTable(data){
           + '<td><span class="pill ' + pc + '">' + (r.status||'pending') + '</span></td>'
           + '<td style="color:var(--text3);">' + (r.created_at && r.created_at.toDate ? r.created_at.toDate().toLocaleDateString('en-GB') : '—') + '</td>'
           + '<td><div class="td-actions">'
-          + (r.status !== 'approved' ? '<button class="btn btn-green btn-sm" onclick="approveRequest(\'' + r.id + '\',\'' + esc(r.user_email) + '\',\'' + r.event_id + '\')">✓ Approve</button>' : '')
-          + (r.status !== 'rejected' ? '<button class="btn btn-red btn-sm" onclick="rejectRequest(\'' + r.id + '\')">✕ Reject</button>' : '')
-          + (r.status === 'approved' ? '<button class="btn btn-sm" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);" onclick="sendReviewRequest(\'' + r.id + '\',\'' + esc(r.user_email) + '\')">⭐ Send Review Request</button>' : '')
+          + (r.status !== 'approved' ? '<button class="btn btn-green btn-sm" onclick="approveRequest(\'' + r.id + '\',\'' + esc(r.user_email) + '\',\'' + r.event_id + '\')"> Approve</button>' : '')
+          + (r.status !== 'rejected' ? '<button class="btn btn-red btn-sm" onclick="rejectRequest(\'' + r.id + '\')"> Reject</button>' : '')
+          + (r.status === 'approved' ? '<button class="btn btn-sm" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);" onclick="sendReviewRequest(\'' + r.id + '\',\'' + esc(r.user_email) + '\')"> Send Review Request</button>' : '')
           + '</div></td></tr>';
       }).join('')
     + '</tbody></table>';
@@ -1352,7 +1352,7 @@ function renderRequestsTable(data){
 
 async function approveRequest(id, email, eventId){
   if(!confirm('Approve download for ' + email + '? This will email them their photos.')) return;
-  toast('📤', 'Approving…', '', true);
+  toast(' ', 'Approving…', '', true);
   try{
     var res  = await fetch(EVENTS_API + '/api/approve-request', {
       method : 'POST',
@@ -1361,10 +1361,10 @@ async function approveRequest(id, email, eventId){
     });
     var data = await res.json();
     if(!res.ok) throw new Error(data.error || 'Server error');
-    toast('✅', 'Approved & email sent!', email + ' will receive their photos');
+    toast(' ', 'Approved & email sent!', email + ' will receive their photos');
   }catch(e){
     await updateDoc(doc(db, 'download_requests', id), { status: 'approved' });
-    toast('✅', 'Approved (email may have failed)', e.message);
+    toast(' ', 'Approved (email may have failed)', e.message);
   }
   loadDownloadRequests();
 }
@@ -1372,7 +1372,7 @@ async function approveRequest(id, email, eventId){
 async function rejectRequest(id){
   if(!confirm('Reject this download request?')) return;
   await updateDoc(doc(db, 'download_requests', id), { status: 'rejected' });
-  toast('🗑️', 'Request rejected', '');
+  toast(' ', 'Request rejected', '');
   loadDownloadRequests();
 }
 
@@ -1404,7 +1404,7 @@ async function confirmSendReviewRequest(){
   var btn     = document.getElementById('srm-sendBtn');
 
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
-  toast('📤', 'Sending…', '', true);
+  toast(' ', 'Sending…', '', true);
   try{
     var c = getSupabase();
     var { data: sessionData } = await c.auth.getSession();
@@ -1416,12 +1416,12 @@ async function confirmSendReviewRequest(){
     });
     var data = await res.json();
     if(!res.ok) throw new Error(data.error || 'Server error');
-    toast('✅', 'Review request sent!', email + ' will get an email asking for a review');
+    toast(' ', 'Review request sent!', email + ' will get an email asking for a review');
     closeSendReviewServiceModal();
   }catch(e){
-    toast('⚠️', 'Failed to send', e.message);
+    toast(' ', 'Failed to send', e.message);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '📤 Send'; }
+    if (btn) { btn.disabled = false; btn.textContent = ' Send'; }
   }
 }
 
