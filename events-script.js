@@ -772,10 +772,13 @@ async function deleteEvent(id){
       var pData = pd.data();
       var idsToDelete = [pData.cloudinary_id, pData.web_public_id, pData.thumb_public_id].filter(Boolean);
       if(idsToDelete.length){
-        try{ await fetch(EVENTS_API + '/api/delete-photo', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ publicIds: idsToDelete, resourceType: pData.media_type === 'video' ? 'video' : 'image' })
-        }); }catch(e){}
+        try{
+          var pres = await fetch(EVENTS_API + '/api/delete-photo', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ publicIds: idsToDelete, resourceType: pData.media_type === 'video' ? 'video' : 'image' })
+          });
+          if(!pres.ok) console.warn('[deleteEvent] Cloudinary delete failed for', pd.id, idsToDelete);
+        }catch(e){ console.warn('[deleteEvent] Cloudinary delete request failed for', pd.id, e.message); }
       }
       await deleteDoc(doc(db, 'photos', pd.id));
     }
@@ -1305,13 +1308,19 @@ async function epBulkDeleteSelected(){
   if(btn){ btn.disabled = true; btn.textContent = 'Deleting…'; }
 
   var failed = 0;
+  var cloudinaryFailed = 0;
   for(var i = 0; i < ids.length; i++){
-    try{ await deletePhotoCore(ids[i], epPhotoMap[ids[i]]); }
+    try{
+      var r = await deletePhotoCore(ids[i], epPhotoMap[ids[i]]);
+      if(!r.cloudinaryOk) cloudinaryFailed++;
+    }
     catch(e){ failed++; console.warn('Failed to delete', ids[i], e); }
   }
 
   if(failed){
     toast(' ', (ids.length - failed) + ' deleted, ' + failed + ' failed', 'Check console for details');
+  } else if(cloudinaryFailed){
+    toast(' ', ids.length + ' removed from gallery', cloudinaryFailed + ' Cloudinary file' + (cloudinaryFailed > 1 ? 's' : '') + ' failed to delete — Cloudinary Cleanup will catch ' + (cloudinaryFailed > 1 ? 'them' : 'it') + ' later');
   } else {
     toast(' ', ids.length + ' photo' + (ids.length > 1 ? 's' : '') + ' deleted', '');
   }
@@ -1325,24 +1334,46 @@ async function epBulkDeleteSelected(){
    web_public_id, thumb_public_id, media_type }. A photo has three
    separate Cloudinary uploads (original/web/thumb) — all three must be
    deleted or two of them orphan permanently. A video has just one, but
-   needs resource_type:'video' or Cloudinary silently no-ops the delete. */
+   needs resource_type:'video' or Cloudinary silently no-ops the delete.
+
+   Always removes the Firestore doc (so the admin can always clean up
+   their gallery even if Cloudinary is misconfigured) but reports back
+   whether the Cloudinary side actually succeeded, instead of silently
+   swallowing that failure the way this used to — orphans left behind
+   by a failed call here still show up later in Cloudinary Cleanup. */
 async function deletePhotoCore(id, meta){
   meta = meta || {};
   var ids = [meta.cloudinary_id, meta.web_public_id, meta.thumb_public_id].filter(Boolean);
+  var cloudinaryOk = true;
   if(ids.length){
-    await fetch(EVENTS_API + '/api/delete-photo', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ publicIds: ids, resourceType: meta.media_type === 'video' ? 'video' : 'image' })
-    });
+    try{
+      var res = await fetch(EVENTS_API + '/api/delete-photo', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ publicIds: ids, resourceType: meta.media_type === 'video' ? 'video' : 'image' })
+      });
+      if(!res.ok){
+        cloudinaryOk = false;
+        var errData = await res.json().catch(function(){ return {}; });
+        console.warn('[deletePhotoCore] Cloudinary delete failed for', id, ids, errData.error || res.status);
+      }
+    }catch(e){
+      cloudinaryOk = false;
+      console.warn('[deletePhotoCore] Cloudinary delete request failed for', id, e.message);
+    }
   }
   await deleteDoc(doc(db, 'photos', id));
+  return { cloudinaryOk: cloudinaryOk };
 }
 
 async function deletePhoto(id){
   if(!confirm('Delete this photo?')) return;
   try{
-    await deletePhotoCore(id, epPhotoMap[id]);
-    toast(' ', 'Photo deleted', '');
+    var result = await deletePhotoCore(id, epPhotoMap[id]);
+    if(result.cloudinaryOk){
+      toast(' ', 'Photo deleted', '');
+    } else {
+      toast(' ', 'Removed from gallery', 'Cloudinary file cleanup failed — Cloudinary Cleanup will catch it later');
+    }
     loadEventPhotos();
   }catch(e){ toast(' ', 'Error', e.message); }
 }
