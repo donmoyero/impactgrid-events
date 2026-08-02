@@ -1547,3 +1547,125 @@ window.setDefaultExpiry     = setDefaultExpiry;
 window.uploadCelebrantPhoto = uploadCelebrantPhoto;
 window.resendOwnerEmail     = resendOwnerEmail;
 window.sendEventReminder    = sendEventReminder;
+
+/* ════════════════════════════════════════════════════
+   CLOUDINARY CLEANUP
+   Scans for Cloudinary files nothing in the database references
+   anymore, and lets the admin review + selectively delete them.
+   See routes/api.js (/api/cloudinary-scan, /api/cloudinary-cleanup)
+   for the safety rules (48h grace period, active/inactive events
+   both protected as long as their photo docs exist, impactgrid/
+   folder scoping).
+════════════════════════════════════════════════════ */
+var _ccOrphans  = [];
+var _ccSelected = new Set();
+
+function ccFormatBytes(n){
+  if(!n) return '0 KB';
+  if(n < 1024*1024) return (n/1024).toFixed(0) + ' KB';
+  return (n/(1024*1024)).toFixed(1) + ' MB';
+}
+
+async function ccScan(){
+  var btn = document.getElementById('ccScanBtn');
+  var summary = document.getElementById('ccSummary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Scanning…'; }
+  try{
+    var res  = await fetch(EVENTS_API + '/api/cloudinary-scan');
+    var data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Scan failed');
+
+    _ccOrphans  = data.orphans || [];
+    _ccSelected = new Set();
+
+    document.getElementById('ccScannedCount').textContent = data.scannedCount;
+    document.getElementById('ccInUseCount').textContent   = data.inUseCount;
+    document.getElementById('ccOrphanCount').textContent  = data.orphanCount;
+    document.getElementById('ccOrphanSize').textContent   = ccFormatBytes(data.orphanBytes);
+    if(summary) summary.style.display = '';
+
+    ccRenderList();
+    toast(' ', 'Scan complete', data.orphanCount + ' unused file' + (data.orphanCount === 1 ? '' : 's') + ' found');
+  }catch(e){
+    toast(' ', 'Scan failed', e.message);
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Scan for Unused Files'; }
+  }
+}
+
+function ccRenderList(){
+  var el = document.getElementById('ccOrphanList');
+  if(!el) return;
+  if(!_ccOrphans.length){
+    el.innerHTML = '<div style="grid-column:1/-1;opacity:.6;font-size:13px;">Nothing found — everything in Cloudinary is still in use.</div>';
+    ccUpdateSelectedCount();
+    return;
+  }
+  el.innerHTML = _ccOrphans.map(function(o, i){
+    var isVid = o.resourceType === 'video';
+    var thumb = isVid
+      ? '<div style="width:100%;height:90px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);">▶ Video</div>'
+      : '<img src="' + o.url + '" style="width:100%;height:90px;object-fit:cover;" onerror="this.style.background=\'var(--bg3)\'"/>';
+    return '<label style="display:block;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);cursor:pointer;">'
+      + '<div style="position:relative;">'
+      + thumb
+      + '<input type="checkbox" data-cc-idx="' + i + '" onchange="ccToggleSelect(' + i + ',this)" style="position:absolute;top:4px;left:4px;width:18px;height:18px;cursor:pointer;"/>'
+      + '</div>'
+      + '<div style="padding:6px 8px;font-size:10px;color:var(--text3);word-break:break-all;">' + esc(o.publicId) + '</div>'
+      + '<div style="padding:0 8px 8px;font-size:10px;color:var(--text3);">' + ccFormatBytes(o.bytes) + ' · ' + new Date(o.createdAt).toLocaleDateString() + '</div>'
+      + '</label>';
+  }).join('');
+  ccUpdateSelectedCount();
+}
+
+function ccToggleSelect(idx, cb){
+  if(cb.checked) _ccSelected.add(idx); else _ccSelected.delete(idx);
+  ccUpdateSelectedCount();
+}
+
+function ccSelectAll(state){
+  document.querySelectorAll('#ccOrphanList input[type=checkbox]').forEach(function(cb){
+    cb.checked = state;
+    var idx = Number(cb.getAttribute('data-cc-idx'));
+    if(state) _ccSelected.add(idx); else _ccSelected.delete(idx);
+  });
+  ccUpdateSelectedCount();
+}
+
+function ccUpdateSelectedCount(){
+  var el = document.getElementById('ccSelectedCount');
+  if(el) el.textContent = _ccSelected.size;
+}
+
+async function ccDeleteSelected(){
+  if(!_ccSelected.size){ toast(' ', 'Nothing selected', 'Tick the files you want to delete first'); return; }
+  var items = Array.from(_ccSelected).map(function(i){ return _ccOrphans[i]; });
+  if(!confirm('Permanently delete ' + items.length + ' file' + (items.length === 1 ? '' : 's') + ' from Cloudinary? This cannot be undone.')) return;
+
+  var btn = document.getElementById('ccDeleteBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Deleting…'; }
+  try{
+    var res = await fetch(EVENTS_API + '/api/cloudinary-cleanup', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ items: items.map(function(o){ return { publicId: o.publicId, resourceType: o.resourceType }; }) })
+    });
+    var data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Delete failed');
+
+    var deletedIdx = new Set(Array.from(_ccSelected));
+    _ccOrphans  = _ccOrphans.filter(function(_, i){ return !deletedIdx.has(i); });
+    _ccSelected = new Set();
+    ccRenderList();
+    document.getElementById('ccOrphanCount').textContent = _ccOrphans.length;
+    toast(' ', 'Deleted', items.length + ' file' + (items.length === 1 ? '' : 's') + ' removed from Cloudinary');
+  }catch(e){
+    toast(' ', 'Delete failed', e.message);
+  }finally{
+    if(btn){ btn.disabled = false; btn.innerHTML = 'Delete Selected (<span id="ccSelectedCount">' + _ccSelected.size + '</span>)'; }
+  }
+}
+
+window.ccScan           = ccScan;
+window.ccSelectAll      = ccSelectAll;
+window.ccToggleSelect   = ccToggleSelect;
+window.ccDeleteSelected = ccDeleteSelected;
