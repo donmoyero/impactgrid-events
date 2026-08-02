@@ -1094,15 +1094,24 @@ If you have any questions, just reply to this email.
           <div class="form-grid">
             <div class="field-group">
               <div class="field-label">Background Type</div>
-              <select id="tpl-bg-type" style="width:100%;" onchange="var isImg=this.value==='image';document.getElementById('tpl-bg-value').type=isImg?'text':'color';document.getElementById('tpl-bg-value').placeholder=isImg?'https://…jpg':'';">
+              <select id="tpl-bg-type" style="width:100%;" onchange="tplBgTypeChanged()">
                 <option value="color">Color</option>
-                <option value="image">Image URL</option>
+                <option value="image">Image</option>
               </select>
             </div>
             <div class="field-group">
               <div class="field-label">Background Value</div>
-              <input type="color" id="tpl-bg-value" value="#0f1020" style="width:100%;height:40px;"/>
+              <input type="color" id="tpl-bg-value" value="#0f1020" style="width:100%;height:40px;" oninput="updateTplBgPreview()"/>
             </div>
+          </div>
+          <div class="field-group" id="tpl-bg-upload-row" style="display:none;">
+            <div class="field-label">Background Image</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('tpl-bg-file').click()">Upload Image</button>
+              <input type="file" id="tpl-bg-file" accept="image/*" style="display:none;" onchange="handleTplBgUpload(this)"/>
+              <span id="tpl-bg-upload-status" style="font-size:11px;"></span>
+            </div>
+            <div id="tpl-bg-preview" style="display:none;margin-top:10px;width:100%;height:100px;border-radius:var(--r);border:1px solid var(--border2);background-size:cover;background-position:center;"></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
             <input type="checkbox" id="tpl-default" style="width:18px;height:18px;"/>
