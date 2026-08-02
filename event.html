@@ -1421,13 +1421,6 @@ async function enterGallery(){
   /* Show review FAB once gallery is visible */
   if (typeof initReviewFab === 'function' && eventData) {
     initReviewFab(eventData.id, eventData.name);
-
-    /* Deep-link support: emailed review requests link here with ?review=1
-       so guests land straight in the review modal instead of hunting for the FAB. */
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('review') === '1') {
-      setTimeout(function(){ openReviewModal(); }, 400);
-    }
   }
 }
 
@@ -2644,168 +2637,37 @@ async function submitContact(e){
 </div>
 
 <script src="/js/impactgrid-chat-bubble.js"></script>
-<!-- ══════════════════════════════════════ REVIEW MODAL ══════════════════════════════════════ -->
-<button id="review-fab" onclick="openReviewModal()" style="display:none;position:fixed;bottom:24px;right:24px;z-index:800;display:none;align-items:center;gap:8px;padding:11px 18px;border-radius:100px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.22);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.22)';">
+<!-- ══════════════════════════════════════ REVIEW FAB ══════════════════════════════════════ -->
+<button id="review-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:800;align-items:center;gap:8px;padding:11px 18px;border-radius:100px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.22);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.22)';">
   Leave a Review
 </button>
 
-<div id="review-modal" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeReviewModal()">
-  <div style="background:var(--card,#fff);border:1px solid var(--border,rgba(0,0,0,0.08));border-radius:20px;padding:32px 28px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,0.18);animation:reviewModalIn .3s cubic-bezier(.16,1,.3,1) both;" onclick="event.stopPropagation()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <h3 style="font-size:18px;font-weight:900;letter-spacing:-.02em;">Leave a Review</h3>
-      <button onclick="closeReviewModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3,#999);line-height:1;padding:4px;">✕</button>
-    </div>
-
-    <div id="review-form-inner">
-      <!-- Name -->
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:11px;font-weight:700;color:var(--text3,#999);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Your Name</label>
-        <input id="rev-name" type="text" placeholder="e.g. Sarah Johnson" maxlength="80"
-          style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border2,rgba(0,0,0,0.13));background:var(--bg,#f8f9fc);color:var(--text,#0d1017);font-size:14px;outline:none;transition:border-color .2s;box-sizing:border-box;"
-          onfocus="this.style.borderColor='var(--accent,#c97e08)'" onblur="this.style.borderColor=''"/>
-      </div>
-
-      <!-- Star rating -->
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:11px;font-weight:700;color:var(--text3,#999);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Rating</label>
-        <div id="rev-stars" style="display:flex;gap:6px;">
-          <span data-val="1" onclick="setReviewStar(1)" style="font-size:28px;cursor:pointer;transition:transform .15s;opacity:.35;" onmouseover="hoverStar(1)" onmouseout="unhoverStar()">★</span>
-          <span data-val="2" onclick="setReviewStar(2)" style="font-size:28px;cursor:pointer;transition:transform .15s;opacity:.35;" onmouseover="hoverStar(2)" onmouseout="unhoverStar()">★</span>
-          <span data-val="3" onclick="setReviewStar(3)" style="font-size:28px;cursor:pointer;transition:transform .15s;opacity:.35;" onmouseover="hoverStar(3)" onmouseout="unhoverStar()">★</span>
-          <span data-val="4" onclick="setReviewStar(4)" style="font-size:28px;cursor:pointer;transition:transform .15s;opacity:.35;" onmouseover="hoverStar(4)" onmouseout="unhoverStar()">★</span>
-          <span data-val="5" onclick="setReviewStar(5)" style="font-size:28px;cursor:pointer;transition:transform .15s;opacity:.35;" onmouseover="hoverStar(5)" onmouseout="unhoverStar()">★</span>
-        </div>
-      </div>
-
-      <!-- Message -->
-      <div style="margin-bottom:20px;">
-        <label style="display:block;font-size:11px;font-weight:700;color:var(--text3,#999);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Your Review <span style="font-weight:400;opacity:.6;">(optional)</span></label>
-        <textarea id="rev-message" rows="3" placeholder="How was the experience? Tell other guests…" maxlength="400"
-          style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border2,rgba(0,0,0,0.13));background:var(--bg,#f8f9fc);color:var(--text,#0d1017);font-size:14px;resize:none;outline:none;font-family:inherit;transition:border-color .2s;box-sizing:border-box;"
-          onfocus="this.style.borderColor='var(--accent,#c97e08)'" onblur="this.style.borderColor=''"></textarea>
-        <div style="text-align:right;font-size:11px;color:var(--text3,#999);margin-top:3px;font-family:monospace;" id="rev-char-count">0 / 400</div>
-      </div>
-
-      <div id="rev-error" style="display:none;font-size:13px;color:#d94f3b;background:rgba(217,79,59,0.08);border:1px solid rgba(217,79,59,0.2);border-radius:8px;padding:10px 13px;margin-bottom:14px;"></div>
-
-      <!-- Buttons -->
-      <div style="display:flex;gap:8px;">
-        <button onclick="submitReview()" id="rev-submit-btn"
-          style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .2s;">
-          Submit Review
-        </button>
-        <button onclick="closeReviewModal()"
-          style="padding:12px 18px;border-radius:10px;background:transparent;border:1px solid var(--border2,rgba(0,0,0,0.13));color:var(--text2,#4a5068);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;"
-          onmouseover="this.style.borderColor='var(--accent,#c97e08)';this.style.color='var(--accent,#c97e08)'" onmouseout="this.style.borderColor='';this.style.color=''">
-          Cancel
-        </button>
-      </div>
-    </div>
-
-    <!-- Success state -->
-    <div id="review-success" style="display:none;text-align:center;padding:10px 0;">
-      <div style="font-size:42px;margin-bottom:12px;"></div>
-      <h4 style="font-size:17px;font-weight:900;margin-bottom:8px;">Thanks for your review!</h4>
-      <p style="font-size:13px;color:var(--text2,#4a5068);line-height:1.6;margin-bottom:20px;">It may appear on our homepage. We really appreciate the feedback.</p>
-      <button onclick="closeReviewModal()" style="padding:10px 28px;border-radius:10px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;">Done ✓</button>
-    </div>
-  </div>
-</div>
-
-<style>
-@keyframes reviewModalIn { from { opacity:0; transform:scale(.96) translateY(10px); } to { opacity:1; transform:none; } }
-</style>
-
 <script>
-/* ── Review modal state ── */
-var _revRating  = 0;
-var _revEventId = null;
-var _revEventName = null;
-var _revServiceId = new URLSearchParams(window.location.search).get('service') || null;
-var _revServiceTitle = new URLSearchParams(window.location.search).get('sname') || null;
-
-/* Called by enterGallery() once the event is loaded */
-function initReviewFab(eventId, eventName) {
-  _revEventId   = eventId;
-  _revEventName = eventName;
+/* Called by enterGallery() once the event is loaded. Sends guests to the
+   same leave-review.html page used by review-request emails, so every
+   review -- regardless of entry point -- lands in one event_reviews row
+   shape and shows up in the same admin list. */
+async function initReviewFab(eventId, eventName) {
   var fab = document.getElementById('review-fab');
-  if (fab) fab.style.display = 'flex';
-}
+  if (!fab) return;
 
-function openReviewModal() {
-  document.getElementById('review-modal').style.display = 'flex';
-  document.getElementById('review-form-inner').style.display = '';
-  document.getElementById('review-success').style.display    = 'none';
-  document.getElementById('rev-error').style.display = 'none';
-  _revRating = 0;
-  _renderStars(0);
-  document.getElementById('rev-name').value    = '';
-  document.getElementById('rev-message').value = '';
-  document.getElementById('rev-char-count').textContent = '0 / 400';
-  document.getElementById('rev-submit-btn').disabled = false;
-  document.getElementById('rev-submit-btn').textContent = 'Submit Review';
-}
+  var serviceId = eventData && eventData.service_id ? eventData.service_id : null;
+  var serviceTitle = null;
 
-function closeReviewModal() {
-  document.getElementById('review-modal').style.display = 'none';
-}
-
-/* Star interactions */
-function setReviewStar(n) {
-  _revRating = n;
-  _renderStars(n);
-}
-function hoverStar(n) { _renderStars(n, true); }
-function unhoverStar() { _renderStars(_revRating); }
-function _renderStars(n, hover) {
-  document.querySelectorAll('#rev-stars span').forEach(function(s) {
-    var v = parseInt(s.dataset.val);
-    s.style.opacity   = v <= n ? '1' : '0.25';
-    s.style.color     = v <= n ? 'var(--accent,#c97e08)' : '';
-    s.style.transform = (hover && v === n) ? 'scale(1.2)' : 'scale(1)';
-  });
-}
-
-/* Char counter */
-document.getElementById('rev-message').addEventListener('input', function() {
-  document.getElementById('rev-char-count').textContent = this.value.length + ' / 400';
-});
-
-/* Submit */
-async function submitReview() {
-  var name    = document.getElementById('rev-name').value.trim();
-  var message = document.getElementById('rev-message').value.trim();
-  var errEl   = document.getElementById('rev-error');
-  var btn     = document.getElementById('rev-submit-btn');
-
-  errEl.style.display = 'none';
-
-  if (!name)       { errEl.textContent = 'Please enter your name.';    errEl.style.display = ''; return; }
-  if (!_revRating) { errEl.textContent = 'Please select a star rating.'; errEl.style.display = ''; return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Submitting…';
-
-  try {
-    var { error } = await getContentClient().from('event_reviews').insert({
-      event_id:      _revEventId,
-      event_name:    _revEventName,
-      service_id:    _revServiceId,
-      service_title: _revServiceTitle,
-      reviewer_name: name,
-      rating:        _revRating,
-      message:       message || null
-    });
-    if (error) throw error;
-
-    document.getElementById('review-form-inner').style.display = 'none';
-    document.getElementById('review-success').style.display    = '';
-  } catch(e) {
-    errEl.textContent = 'Something went wrong — please try again.';
-    errEl.style.display = '';
-    btn.disabled = false;
-    btn.textContent = 'Submit Review';
+  if (serviceId) {
+    try {
+      var { data: svc } = await getContentClient()
+        .from('services').select('title').eq('id', serviceId).maybeSingle();
+      serviceTitle = svc ? svc.title : null;
+    } catch (e) { /* no service name available -- link still works fine */ }
   }
+
+  var url = 'leave-review.html?review=1';
+  if (serviceId)    url += '&service=' + encodeURIComponent(serviceId);
+  if (serviceTitle) url += '&sname=' + encodeURIComponent(serviceTitle);
+
+  fab.onclick = function () { window.location.href = url; };
+  fab.style.display = 'flex';
 }
 </script>
 
