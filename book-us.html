@@ -354,6 +354,7 @@ textarea { resize: vertical; min-height: 80px; }
               <input type="tel" id="bk-phone" placeholder="+44 7000 000000"/>
             </div>
             <input type="hidden" id="bk-type" value="Other"/>
+            <input type="hidden" id="bk-service-id" value=""/>
             <div class="field-group-full" id="bk-service-row">
               <label class="field-label">Service</label>
               <select id="bk-service">
@@ -421,23 +422,6 @@ var calYear      = today.getFullYear();
 var calMonth     = today.getMonth();
 var selectedDate = null;
 
-/* Maps a service title's keywords → an Event Type option value.
-   Shared by the query-param prefill banner and the live Service dropdown. */
-function mapServiceTitleToType(title) {
-  var typeMap = [
-    { keys: ['wedding'],                           value: 'Wedding'   },
-    { keys: ['corporate','business','conference'],  value: 'Corporate' },
-    { keys: ['portrait','headshot'],               value: 'Portrait'  },
-    { keys: ['social','party','content','creation','gallery','download','preview'], value: 'Social' },
-  ];
-  var lower   = (title || '').toLowerCase();
-  var matched = 'Other';
-  typeMap.forEach(function(m) {
-    m.keys.forEach(function(k) { if (lower.indexOf(k) !== -1) matched = m.value; });
-  });
-  return matched;
-}
-
 /* ── Live Service dropdown (always reflects the current services table —
    add/remove a service in admin and it shows up here automatically) ── */
 var _bookServices = {}; // id -> {id,title,icon}
@@ -492,10 +476,13 @@ function onServiceSelect() {
     notes.value = [serviceLine].concat(lines).join('\n').replace(/^\n+/, '');
   }
 
-  /* Default the Event Type to match, without locking it — the person can
-     still change it manually. */
+  /* Event Type is now just the real service title/id — no more bucketed
+     Wedding/Corporate/Portrait/Social/Other categories that never matched
+     what was actually booked. */
   var typeSel = document.getElementById('bk-type');
-  if (typeSel && !typeSel.value) typeSel.value = mapServiceTitleToType(s.title);
+  if (typeSel) typeSel.value = s.title;
+  var svcIdEl = document.getElementById('bk-service-id');
+  if (svcIdEl) svcIdEl.value = s.id;
 }
 
 (function() {
@@ -505,26 +492,15 @@ function onServiceSelect() {
 
 loadServicesForBooking();
 
-/* ── Pre-fill from service page (?service=...&price=...&desc=...) ── */
+/* ── Pre-fill from service page (?service=...&id=...&price=...&desc=...) ── */
 (function() {
   var p        = new URLSearchParams(window.location.search);
   var svcTitle = (p.get('service') || '').replace(/[\r\n]+/g, ' ').trim();
+  var svcId    = (p.get('id')      || '').trim();
   var svcPrice = (p.get('price')   || '').replace(/[\r\n]+/g, ' ').trim();
   var svcDesc  = (p.get('desc')    || '').replace(/[\r\n]+/g, ' ').trim();
   if (!svcTitle) return;
 
-  /* Map title keywords → Event Type option values */
-  var typeMap = [
-    { keys: ['wedding'],                           value: 'Wedding'   },
-    { keys: ['corporate','business','conference'],  value: 'Corporate' },
-    { keys: ['portrait','headshot'],               value: 'Portrait'  },
-    { keys: ['social','party','content','creation','gallery','download','preview'], value: 'Social' },
-  ];
-  var lower   = svcTitle.toLowerCase();
-  var matched = 'Other';
-  typeMap.forEach(function(m) {
-    m.keys.forEach(function(k) { if (lower.indexOf(k) !== -1) matched = m.value; });
-  });
   window._pendingServiceTitleMatch = svcTitle;
 
   function applyService() {
@@ -571,9 +547,13 @@ loadServicesForBooking();
       clearServicePrefill();
     });
 
-    /* 2 — track the matched category internally (hidden field, not shown to the customer) */
+    /* 2 — Event Type is just the real service title now; also carry the
+       real id through if we have one so the backend can look up the
+       service directly (e.g. for its linked gallery template). */
     var sel = document.getElementById('bk-type');
-    if (sel) sel.value = matched;
+    if (sel) sel.value = svcTitle;
+    var svcIdEl = document.getElementById('bk-service-id');
+    if (svcIdEl && svcId) svcIdEl.value = svcId;
 
     /* 3 — pre-fill Notes with package info */
     var notes = document.getElementById('bk-notes');
@@ -594,6 +574,8 @@ loadServicesForBooking();
   window.clearServicePrefill = function() {
     var sel = document.getElementById('bk-type');
     if (sel) { sel.value = 'Other'; }
+    var svcIdEl = document.getElementById('bk-service-id');
+    if (svcIdEl) svcIdEl.value = '';
     var notes = document.getElementById('bk-notes');
     if (notes && notes.value.indexOf('Service:') === 0) notes.value = '';
     var formTitle = document.querySelector('.form-head-title');
@@ -710,13 +692,14 @@ async function submitBooking() {
   }
   alertEl.style.display = 'none';
 
-  var name     = document.getElementById('bk-name').value.trim();
-  var email    = document.getElementById('bk-email').value.trim();
-  var phone    = document.getElementById('bk-phone').value.trim();
-  var type     = document.getElementById('bk-type').value;
-  var guests   = document.getElementById('bk-guests').value.trim();
-  var location = document.getElementById('bk-location').value.trim();
-  var notes    = document.getElementById('bk-notes').value.trim();
+  var name      = document.getElementById('bk-name').value.trim();
+  var email     = document.getElementById('bk-email').value.trim();
+  var phone     = document.getElementById('bk-phone').value.trim();
+  var type      = document.getElementById('bk-type').value;
+  var serviceId = document.getElementById('bk-service-id') ? document.getElementById('bk-service-id').value.trim() : '';
+  var guests    = document.getElementById('bk-guests').value.trim();
+  var location  = document.getElementById('bk-location').value.trim();
+  var notes     = document.getElementById('bk-notes').value.trim();
 
   if (!selectedDate) { showAlert('Please select a date on the calendar first.', false); return; }
   if (!name)         { showAlert('Please enter your full name.', false); return; }
@@ -732,7 +715,7 @@ async function submitBooking() {
     const res  = await fetch(EVENTS_API + '/api/booking-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, event_type: type, event_date: selectedDate, guest_count: guests||null, location: location||null, notes: notes||null })
+      body: JSON.stringify({ name, email, phone, event_type: type, service_id: serviceId||null, event_date: selectedDate, guest_count: guests||null, location: location||null, notes: notes||null })
     });
     const data = await res.json();
     if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed');
@@ -767,6 +750,7 @@ function resetBooking() {
     var el = document.getElementById(id); if(el) el.value = '';
   });
   document.getElementById('bk-type').value = 'Other';
+  var svcIdEl = document.getElementById('bk-service-id'); if(svcIdEl) svcIdEl.value = '';
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitLabel').textContent = '✦ Send Booking Request';
   document.getElementById('formAlert').style.display = 'none';

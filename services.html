@@ -671,6 +671,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
     var cleanDesc = (s.description || '').replace(/[\r\n]+/g, ' ').trim();
     var params = 'service=' + encodeURIComponent(s.title || '')
+      + '&id=' + encodeURIComponent(s.id || id || '')
       + (s.icon    ? '&price='+ encodeURIComponent(s.icon)   : '')
       + (cleanDesc ? '&desc=' + encodeURIComponent(cleanDesc) : '');
     document.getElementById('svcDetailBookBtn').href = 'book-us.html?' + params;
