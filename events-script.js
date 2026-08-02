@@ -454,10 +454,63 @@ function openTemplateModal(prefill){
   document.getElementById('tpl-layout').value = prefill ? (prefill.layout_style||'grid') : 'grid';
   document.getElementById('tpl-transition').value = prefill ? (prefill.transition_style||'fade') : 'fade';
   document.getElementById('tpl-bg-type').value = prefill ? (prefill.background_type||'color') : 'color';
+  tplBgTypeChanged(); /* sets tpl-bg-value's input type (color vs text) before we set its value below */
   document.getElementById('tpl-bg-value').value = prefill ? (prefill.background_value||'#0f1020') : '#0f1020';
+  var statusEl = document.getElementById('tpl-bg-upload-status');
+  if(statusEl) statusEl.textContent = '';
+  updateTplBgPreview();
   document.getElementById('tpl-default').checked = !!(prefill && prefill.is_default);
   document.getElementById('templateModalTitle').textContent = prefill ? 'Edit Template' : 'New Template';
   m.style.display = 'flex';
+}
+
+/* Background Type select (Color / Image) — swaps tpl-bg-value between a color
+   swatch and a URL field, and shows/hides the upload control + preview. */
+function tplBgTypeChanged(){
+  var sel = document.getElementById('tpl-bg-type');
+  if(!sel) return;
+  var isImg = sel.value === 'image';
+  var valEl = document.getElementById('tpl-bg-value');
+  if(valEl){
+    valEl.type = isImg ? 'text' : 'color';
+    valEl.placeholder = isImg ? 'https://\u2026jpg or upload below' : '';
+    if(!isImg && !/^#/.test(valEl.value)) valEl.value = '#0f1020';
+  }
+  var row = document.getElementById('tpl-bg-upload-row');
+  if(row) row.style.display = isImg ? '' : 'none';
+  updateTplBgPreview();
+}
+
+function updateTplBgPreview(){
+  var typeEl = document.getElementById('tpl-bg-type');
+  var valEl  = document.getElementById('tpl-bg-value');
+  var prev   = document.getElementById('tpl-bg-preview');
+  if(!typeEl || !valEl || !prev) return;
+  var isImg = typeEl.value === 'image';
+  if(isImg && valEl.value){
+    prev.style.backgroundImage = "url('" + valEl.value.replace(/'/g, "%27") + "')";
+    prev.style.display = 'block';
+  } else {
+    prev.style.display = 'none';
+  }
+}
+
+/* Uploads a background image to Cloudinary and drops the resulting URL
+   straight into tpl-bg-value, same folder convention as the rest of the app. */
+async function handleTplBgUpload(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  var statusEl = document.getElementById('tpl-bg-upload-status');
+  if(statusEl){ statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Uploading\u2026'; }
+  try{
+    var result = await uploadToCloudinary(file, 'templates');
+    document.getElementById('tpl-bg-value').value = result.secure_url;
+    if(statusEl){ statusEl.style.color = 'var(--green)'; statusEl.textContent = 'Uploaded'; }
+    updateTplBgPreview();
+  }catch(e){
+    if(statusEl){ statusEl.style.color = 'var(--red)'; statusEl.textContent = 'Upload failed: ' + e.message; }
+  }
+  input.value = '';
 }
 function closeTemplateModal(){ var m = document.getElementById('templateModal'); if(m) m.style.display = 'none'; _templateEditEventId = null; }
 function editTemplate(t){ openTemplateModal(t); }
@@ -542,6 +595,9 @@ async function deleteTemplate(id, name){
 
 window.loadTemplates      = loadTemplates;
 window.openTemplateModal  = openTemplateModal;
+window.tplBgTypeChanged   = tplBgTypeChanged;
+window.updateTplBgPreview = updateTplBgPreview;
+window.handleTplBgUpload  = handleTplBgUpload;
 window.closeTemplateModal = closeTemplateModal;
 window.editTemplate       = editTemplate;
 window.editEventTemplate  = editEventTemplate;
