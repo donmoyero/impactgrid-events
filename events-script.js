@@ -1617,9 +1617,6 @@ async function ccScan(){
 
     ccRenderList();
     toast(' ', 'Scan complete', data.orphanCount + ' unused file' + (data.orphanCount === 1 ? '' : 's') + ' found');
-    if (data.blogScanWarning) {
-      toast(' ', 'Blog account not scanned', data.blogScanWarning);
-    }
   }catch(e){
     toast(' ', 'Scan failed', e.message);
   }finally{
@@ -1646,7 +1643,7 @@ function ccRenderList(){
       + '<input type="checkbox" data-cc-idx="' + i + '" onchange="ccToggleSelect(' + i + ',this)" style="position:absolute;top:4px;left:4px;width:18px;height:18px;cursor:pointer;"/>'
       + '</div>'
       + '<div style="padding:6px 8px;font-size:10px;color:var(--text3);word-break:break-all;">' + esc(o.publicId) + '</div>'
-      + '<div style="padding:0 8px 8px;font-size:10px;color:var(--text3);">' + ccFormatBytes(o.bytes) + ' · ' + new Date(o.createdAt).toLocaleDateString() + ' · ' + (o.account === 'blog' ? 'Blog account' : 'Events account') + '</div>'
+      + '<div style="padding:0 8px 8px;font-size:10px;color:var(--text3);">' + ccFormatBytes(o.bytes) + ' · ' + new Date(o.createdAt).toLocaleDateString() + '</div>'
       + '</label>';
   }).join('');
   ccUpdateSelectedCount();
