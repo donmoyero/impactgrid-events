@@ -357,6 +357,7 @@ tr:hover td{background:var(--bg2);}
       <div class="sb-section-label">Account</div>
       <nav class="sb-nav">
         <a href="#" onclick="return nav('bizsettings',this)"><span class="sb-ico"> </span>Business Settings</a>
+        <a href="#" onclick="return nav('cloudinarycleanup',this)"><span class="sb-ico"></span>Cloudinary Cleanup</a>
       </nav>
     </div>
     <div class="sb-spacer"></div>
@@ -1055,6 +1056,34 @@ If you have any questions, just reply to this email.
             Set a <strong>Default Gallery Template</strong> on any service (Services page) — bookings made against that service will use it automatically. You can still override the template on any individual event when you create it.<br><br>
             Mark one template <strong>Default</strong> to use as the fallback when an event has no template linked.
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLOUDINARY CLEANUP -->
+    <div class="page" id="page-cloudinarycleanup">
+      <div class="page-header">
+        <div class="page-title">Cloudinary Cleanup</div>
+        <div class="page-sub">Finds Cloudinary files that nothing in your database references anymore. Deactivated events are NOT touched — their photos stay in the database and are always protected. Files uploaded in the last 48 hours are never flagged, in case an upload is still in progress. Nothing is deleted until you tick items below and confirm.</div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h2> Scan</h2>
+          <button class="btn btn-gold btn-sm" id="ccScanBtn" onclick="ccScan()">Scan for Unused Files</button>
+        </div>
+        <div class="card-body" id="ccSummary" style="display:none;">
+          <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;">
+            <div><strong id="ccScannedCount">0</strong> files scanned</div>
+            <div><strong id="ccInUseCount">0</strong> still in use</div>
+            <div><strong id="ccOrphanCount">0</strong> unused</div>
+            <div><strong id="ccOrphanSize">0</strong> reclaimable</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;" id="ccActionsRow">
+            <button class="btn btn-ghost btn-sm" onclick="ccSelectAll(true)">Select All</button>
+            <button class="btn btn-ghost btn-sm" onclick="ccSelectAll(false)">Select None</button>
+            <button class="btn" style="background:var(--red);color:#fff;" id="ccDeleteBtn" onclick="ccDeleteSelected()">Delete Selected (<span id="ccSelectedCount">0</span>)</button>
+          </div>
+          <div id="ccOrphanList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;"></div>
         </div>
       </div>
     </div>
