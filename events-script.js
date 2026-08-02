@@ -379,6 +379,7 @@ async function igCreateEvent(){
    of these (default_template_id), events can override it.
 ════════════════════════════════════════════════════ */
 var _templatesCache = []; // [{id,name,layout_style,transition_style,background_type,background_value,is_default}]
+var _templateEditEventId = null; // set when the template modal was opened via an event row's "Edit Template" action
 
 var LAYOUT_STYLES = [
   { value:'grid',      label:'Grid'            },
@@ -458,8 +459,30 @@ function openTemplateModal(prefill){
   document.getElementById('templateModalTitle').textContent = prefill ? 'Edit Template' : 'New Template';
   m.style.display = 'flex';
 }
-function closeTemplateModal(){ var m = document.getElementById('templateModal'); if(m) m.style.display = 'none'; }
+function closeTemplateModal(){ var m = document.getElementById('templateModal'); if(m) m.style.display = 'none'; _templateEditEventId = null; }
 function editTemplate(t){ openTemplateModal(t); }
+
+/* Opens the template editor from an event row's Actions menu.
+   eventId    – the event this template applies to
+   templateId – the event's currently-assigned template_id (may be '' / undefined)
+   If the event has no template of its own yet, falls back to the default
+   template (or a blank "new template" form if none exists). Saving from
+   this context also links the resulting template back onto the event. */
+async function editEventTemplate(eventId, templateId){
+  if(!db) return;
+  if(!_templatesCache.length) await loadTemplates();
+
+  var t = null;
+  if(templateId) t = _templatesCache.find(function(x){ return x.id === templateId; }) || null;
+  if(!t) t = _templatesCache.find(function(x){ return x.is_default; }) || null;
+
+  _templateEditEventId = eventId;
+  openTemplateModal(t);
+
+  if(!t){
+    toast('ℹ️', 'No template yet', 'Create one below — it\u2019ll be applied to this event automatically.');
+  }
+}
 
 async function saveTemplate(){
   var name = document.getElementById('tpl-name').value.trim();
@@ -479,13 +502,26 @@ async function saveTemplate(){
       var others = _templatesCache.filter(function(t){ return t.is_default && t.id !== id; });
       for(var i=0;i<others.length;i++){ await updateDoc(doc(db,'templates',others[i].id), {is_default:false}); }
     }
+    var savedId = id;
     if(id){
       await updateDoc(doc(db,'templates',id), payload);
     } else {
       payload.created_at = serverTimestamp();
-      await addDoc(collection(db,'templates'), payload);
+      var ref = await addDoc(collection(db,'templates'), payload);
+      savedId = ref.id;
     }
     toast('✅', id ? 'Template updated!' : 'Template created!', name);
+
+    if(_templateEditEventId){
+      try{
+        await updateDoc(doc(db,'events',_templateEditEventId), { template_id: savedId });
+      }catch(e){
+        console.error('[saveTemplate] failed to link template to event:', e);
+      }
+      _templateEditEventId = null;
+      if(typeof loadEvents === 'function') loadEvents();
+    }
+
     closeTemplateModal();
     loadTemplates();
   }catch(e){
@@ -508,6 +544,7 @@ window.loadTemplates      = loadTemplates;
 window.openTemplateModal  = openTemplateModal;
 window.closeTemplateModal = closeTemplateModal;
 window.editTemplate       = editTemplate;
+window.editEventTemplate  = editEventTemplate;
 window.saveTemplate       = saveTemplate;
 window.deleteTemplate     = deleteTemplate;
 window.populateTemplateSelects = populateTemplateSelects;
@@ -618,6 +655,7 @@ async function loadEvents(){
             + '<td>' + statusPill + '</td>'
             + '<td><div class="td-actions">'
             + '<a class="btn btn-ghost btn-sm" href="event.html?event=' + ev.event_slug + '&code=' + ev.event_code + '" target="_blank">👁 View Event</a>'
+            + '<button class="btn btn-ghost btn-sm" onclick="editEventTemplate(\'' + ev.id + '\',\'' + (ev.template_id||'') + '\')">Edit Template</button>'
             + '<button class="btn btn-ghost btn-sm" onclick="goUploadForEvent(\'' + ev.id + '\')">📤 Upload</button>'
             + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="resendOwnerEmail(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">📧 Resend Email</button>' : '')
             + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="sendEventReminder(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">⏰ Send Reminder</button>' : '')
