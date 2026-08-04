@@ -1735,6 +1735,14 @@ If you have any questions, just reply to this email.
           </div>
 
           <div class="field-group">
+            <div class="field-label">Linked Service <span style="font-weight:400;color:var(--text3);">(controls whether this review counts on the Services page)</span></div>
+            <select id="revEdit-service" style="width:100%;">
+              <option value="">— No linked service —</option>
+            </select>
+            <div class="field-hint" id="revEdit-service-hint" style="display:none;color:var(--red,#e5484d);">This review currently has no linked service, so it isn't showing on the Services page. Pick one above and save to fix it.</div>
+          </div>
+
+          <div class="field-group">
             <div class="field-label">Review Message</div>
             <textarea id="revEdit-message" rows="4" placeholder="What the guest said…"></textarea>
           </div>
