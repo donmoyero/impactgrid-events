@@ -11,6 +11,7 @@
 
   var _reviews = [];
   var _loading = false;
+  var _services = []; /* [{id, title}] — cached for the "Linked Service" picker */
 
   /* ── Load & render ──────────────────────────────────────── */
   window.loadEventReviews = async function () {
@@ -21,7 +22,7 @@
     try {
       var c = getSupabase();
       var q = c.from('event_reviews')
-        .select('id, reviewer_name, event_name, service_title, rating, message, position, created_at')
+        .select('id, reviewer_name, event_name, service_id, service_title, rating, message, position, created_at')
         .order('position', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
 
@@ -30,12 +31,22 @@
 
       _reviews = data || [];
       _renderTable();
+      _loadServicesForPicker(); /* fire-and-forget, only needed if an edit modal opens */
     } catch (e) {
       _renderError(e.message);
     } finally {
       _loading = false;
     }
   };
+
+  /* ── Services cache (for the "Linked Service" dropdown) ─── */
+  function _loadServicesForPicker() {
+    return getSupabase().from('services').select('id,title').order('sort_order', { ascending: true })
+      .then(function (res) {
+        _services = (res && res.data) || [];
+      })
+      .catch(function () { /* dropdown just stays empty-ish, edit still works */ });
+  }
 
   /* ── Delete ─────────────────────────────────────────────── */
   window.deleteReview = async function (id) {
@@ -137,6 +148,7 @@
               '<span style="font-size:14px;font-weight:700;">' + _esc(r.reviewer_name || 'Anonymous') + '</span>' +
               (r.event_name ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">📸 ' + _esc(r.event_name) + '</span>' : '') +
               (r.service_title ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">🛠 ' + _esc(r.service_title) + '</span>' : '') +
+              (!r.service_id ? '<span title="Not linked to a service — hidden from the Services page" style="font-size:10px;font-weight:700;color:var(--red,#e5484d);background:var(--red-dim,rgba(217,79,59,0.12));border:1px solid var(--red-glo,rgba(217,79,59,0.3));padding:1px 7px;border-radius:100px;font-family:var(--fm);">⚠ no service — hidden</span>' : '') +
               '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">' + date + '</span>' +
             '</div>' +
             '<div style="color:var(--gold);font-size:14px;margin-bottom:6px;">' + _stars(r.rating) + '</div>' +
@@ -152,7 +164,7 @@
   }
 
   /* ── Edit ───────────────────────────────────────────────── */
-  window.editReview = function (id) {
+  window.editReview = async function (id) {
     var r = _reviews.find(function (x) { return x.id === id; });
     if (!r) return;
 
@@ -162,9 +174,29 @@
     document.getElementById('revEdit-message').value      = r.message || '';
     _setEditStars(r.rating || 5);
 
+    if (!_services.length) { try { await _loadServicesForPicker(); } catch (e) {} }
+    _populateServicePicker(r.service_id || '');
+
+    var hint = document.getElementById('revEdit-service-hint');
+    if (hint) hint.style.display = r.service_id ? 'none' : 'block';
+
     var modal = document.getElementById('reviewEditModal');
     if (modal) modal.style.display = 'flex';
   };
+
+  function _populateServicePicker(selectedId) {
+    var sel = document.getElementById('revEdit-service');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— No linked service —</option>' +
+      _services.map(function (s) {
+        return '<option value="' + _esc(s.id) + '"' + (s.id === selectedId ? ' selected' : '') + '>' + _esc(s.title) + '</option>';
+      }).join('');
+    /* Toggle the "hidden from Services page" hint live as the admin changes the picker */
+    sel.onchange = function () {
+      var hint = document.getElementById('revEdit-service-hint');
+      if (hint) hint.style.display = sel.value ? 'none' : 'block';
+    };
+  }
 
   window.closeReviewEditModal = function () {
     var modal = document.getElementById('reviewEditModal');
@@ -186,10 +218,13 @@
   window.saveReviewEdit = async function () {
     var id       = document.getElementById('revEdit-id').value;
     var btn      = document.getElementById('revEdit-saveBtn');
-    var reviewer = document.getElementById('revEdit-reviewer').value.trim();
-    var eventNm  = document.getElementById('revEdit-event').value.trim();
-    var message  = document.getElementById('revEdit-message').value.trim();
-    var rating   = parseInt(document.getElementById('revEdit-rating').value, 10) || 5;
+    var reviewer  = document.getElementById('revEdit-reviewer').value.trim();
+    var eventNm   = document.getElementById('revEdit-event').value.trim();
+    var message   = document.getElementById('revEdit-message').value.trim();
+    var rating    = parseInt(document.getElementById('revEdit-rating').value, 10) || 5;
+    var svcSel    = document.getElementById('revEdit-service');
+    var serviceId = svcSel ? svcSel.value : '';
+    var svcObj    = serviceId ? _services.find(function (s) { return s.id === serviceId; }) : null;
 
     if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
     try {
@@ -199,13 +234,18 @@
           reviewer_name: reviewer || null,
           event_name   : eventNm || null,
           message      : message || null,
-          rating       : rating
+          rating       : rating,
+          service_id   : serviceId || null,
+          service_title: svcObj ? svcObj.title : null
         })
         .eq('id', id);
       if (error) throw error;
 
       var r = _reviews.find(function (x) { return x.id === id; });
-      if (r) { r.reviewer_name = reviewer; r.event_name = eventNm; r.message = message; r.rating = rating; }
+      if (r) {
+        r.reviewer_name = reviewer; r.event_name = eventNm; r.message = message; r.rating = rating;
+        r.service_id = serviceId || null; r.service_title = svcObj ? svcObj.title : null;
+      }
       _renderTable();
       closeReviewEditModal();
       toast('✅', 'Review updated', '');
