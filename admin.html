@@ -3205,7 +3205,7 @@ var VT = (function(){
     }
 
     var { error } = await sbClient.from('campaigns').insert({
-      name: name, prefix: prefix || null, slug: slug, active: true,
+      name: name, prefix: prefix || '', slug: slug, active: true,
       page_design: { form_type: type, fields: _defaultFields() }
     });
 
