@@ -2058,6 +2058,19 @@ var EVENTS_API  = 'https://impactgrid-events-api.onrender.com';
 /*  Supabase client: getSupabase() / getContentClient() from supabase-config.js  */
 var heroSlides=[], heroEditId=null, tickerItems=[], testimonials=[], updateCards=[];
 
+/*  GLOBAL ERROR CATCHER — surfaces JS errors as a visible toast instead of
+    silently failing in the console. Helps catch things like a missing
+    function/script-load failure the moment it happens. */
+window.addEventListener('error', function(e){
+  console.error('[global error]', e.message, 'at', e.filename+':'+e.lineno+':'+e.colno, e.error);
+  if(typeof toast === 'function'){
+    try{ toast('','Something went wrong', e.message); }catch(_){}
+  }
+});
+window.addEventListener('unhandledrejection', function(e){
+  console.error('[unhandled promise rejection]', e.reason);
+});
+
 /*  BOOT  */
 document.addEventListener('DOMContentLoaded', async function(){
   initAdminTheme();
@@ -3185,13 +3198,20 @@ var VT = (function(){
       return;
     }
 
-    var { error } = await getSupabase().from('campaigns').insert({
+    var sbClient = getSupabase();
+    if(!sbClient){
+      toast('','Could not create campaign', 'Not connected to Supabase — refresh the page and try again.');
+      return;
+    }
+
+    var { error } = await sbClient.from('campaigns').insert({
       name: name, prefix: prefix || null, slug: slug, active: true,
       page_design: { form_type: type, fields: _defaultFields() }
     });
 
     if(error){
-      toast('','Could not create campaign', error.message);
+      console.error('[createCampaign] Supabase error:', error);
+      toast('','Could not create campaign', error.message + (error.hint ? ' — ' + error.hint : '') + (error.code ? ' (code ' + error.code + ')' : ''));
       return;
     }
 
@@ -3204,13 +3224,21 @@ var VT = (function(){
     var listEl = document.getElementById('vtCampaignList');
     if(!listEl) return;
 
-    var { data, error } = await getSupabase()
+    var sbClient = getSupabase();
+    if(!sbClient){
+      listEl.innerHTML = '<div class="empty"><div class="empty-txt">Not connected to Supabase — refresh the page and try again.</div></div>';
+      return;
+    }
+
+    var { data, error } = await sbClient
       .from('campaigns')
       .select('*')
       .order('created_at', { ascending:false });
 
     if(error){
-      listEl.innerHTML = '<div class="empty"><div class="empty-txt">Could not load campaigns: '+esc(error.message)+'</div></div>';
+      console.error('[loadCampaigns] Supabase error:', error);
+      var detail = error.message + (error.hint ? ' — ' + error.hint : '') + (error.code ? ' (code ' + error.code + ')' : '');
+      listEl.innerHTML = '<div class="empty"><div class="empty-txt">Could not load campaigns: '+esc(detail)+'</div></div>';
       return;
     }
 
@@ -3257,7 +3285,11 @@ var VT = (function(){
     var { data: row } = await sb.from('campaigns').select('page_design').eq('id', id).single();
 
     var { error } = await sb.from('campaigns').delete().eq('id', id);
-    if(error){ toast('','Could not delete', error.message); return; }
+    if(error){
+      console.error('[deleteCampaign] Supabase error:', error);
+      toast('','Could not delete', error.message + (error.hint ? ' — ' + error.hint : ''));
+      return;
+    }
 
     if(row && row.page_design){
       var text = JSON.stringify(row.page_design);
@@ -3273,7 +3305,12 @@ var VT = (function(){
   }
 
   async function toggleActive(id, newState){
-    await getSupabase().from('campaigns').update({ active:newState }).eq('id', id);
+    var { error } = await getSupabase().from('campaigns').update({ active:newState }).eq('id', id);
+    if(error){
+      console.error('[toggleActive] Supabase error:', error);
+      toast('','Could not update status', error.message + (error.hint ? ' — ' + error.hint : ''));
+      return;
+    }
     await loadCampaigns();
   }
 
