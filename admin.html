@@ -4593,7 +4593,11 @@ async function portfolioUploadCover(file) {
   if (!portfolioCurrentCat) return;
   try {
     toast('', 'Uploading cover…', '');
-    var result = await uploadToCloudinary(file, 'portfolio');
+    /* Resize before upload — Cloudinary's plan caps uploads at ~10MB and
+       raw phone photos routinely exceed that, which is what was causing
+       silent 400 Bad Request failures here. */
+    var webBlob = await resizeImageForBlog(file);
+    var result = await uploadToCloudinary(webBlob, 'portfolio');
     portfolioCurrentCat.coverImage = result.secure_url;
     portfolioCurrentCat.coverPublicId = result.public_id;
     document.getElementById('portfolioCoverPreview').src = result.secure_url;
@@ -4690,7 +4694,8 @@ async function portfolioAddImageFiles(e) {
   for (var i = 0; i < files.length; i++) {
     try {
       toast('', 'Uploading photo ' + (i+1) + ' of ' + files.length + '…', '');
-      var result = await uploadToCloudinary(files[i], 'portfolio');
+      var webBlob = await resizeImageForBlog(files[i]);
+      var result = await uploadToCloudinary(webBlob, 'portfolio');
       portfolioCurrentCat.images.push({
         _localId: 'npi' + (portfolioImageSeq++),
         url: result.secure_url, cloudinaryId: result.public_id,
