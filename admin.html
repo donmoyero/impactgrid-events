@@ -383,13 +383,13 @@ tr:hover td{background:var(--bg2);}
     </div>
     <!-- HOMEPAGE CONTENT -->
     <div class="page" id="page-homepage">
-      <div class="page-header"><div class="page-title">Homepage Text</div><div class="page-sub">Edit the hero headline, "How We Work" steps, review quotes, trust badge labels, and newsletter heading.</div></div>
+      <div class="page-header"><div class="page-title">Homepage Text</div><div class="page-sub">Edit the hero eyebrow, headline, subtitle, buttons, note, and the newsletter banner heading.</div></div>
       <div class="ws-layout">
         <div>
           <div class="card"><div class="card-head"><h2> Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()"> Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div></div></div></div>
         </div>
         <div class="ws-sticky">
-          <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds. For the trust badge labels, use a line break where you want the text to wrap onto a second line.</div>
+          <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds.</div>
           <a href="index.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Homepage</a>
         </div>
       </div>
@@ -2414,19 +2414,7 @@ var CONTENT_DEFS=[
     {key:'hero_btn2_href',label:'Secondary button link',type:'text'},
     {key:'hero_note',label:'Small note below buttons',type:'text'}
   ]},
-  {section:' Why Us Cards',fields:[
-    {key:'why_card1',label:'Card 1 text',type:'textarea'},
-    {key:'why_card2',label:'Card 2 text',type:'textarea'},
-    {key:'why_card3',label:'Card 3 text',type:'textarea'}
-  ]},
-  {section:' Trust Badges',fields:[
-    {key:'trust_badge1',label:'Badge 1 label',type:'text'},
-    {key:'trust_badge2',label:'Badge 2 label',type:'text'},
-    {key:'trust_badge3',label:'Badge 3 label',type:'text'},
-    {key:'trust_badge4',label:'Badge 4 label',type:'text'}
-  ]},
-  {section:' CTA Banner',fields:[{key:'cta_title',label:'Banner Heading',type:'text'},{key:'cta_subtitle',label:'Banner Subtitle',type:'textarea'}]},
-  {section:' Testimonials Section',fields:[{key:'trust_title',label:'Section Heading',type:'text'},{key:'trust_label',label:'Label Tag',type:'text'}]}
+  {section:' CTA Banner',fields:[{key:'cta_title',label:'Banner Heading',type:'text'}]}
 ];
 var ECO_CARDS=[
   {prefix:'eco_consulting',label:' Consulting'},{prefix:'eco_analytics',label:' Analytics'},
