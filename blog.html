@@ -21,18 +21,20 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog — Impact Grid Group</title>
-<link rel="canonical" href="https://impactgridgroup.com/blog.html"/>
-  <meta name="description" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
+  <title id="blogPageTitle">Blog — Impact Grid Group</title>
+<link rel="canonical" id="blogCanonical" href="https://impactgridgroup.com/blog.html"/>
+  <meta name="description" id="blogMetaDesc" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
 
   <!-- Default Open Graph (overridden per-post by JS) -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Impact Grid Group" />
-  <meta property="og:title" content="Blog — Impact Grid Group" />
-  <meta property="og:description" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
-  <meta property="og:url" content="https://impactgridgroup.com/blog.html" />
-  <meta property="og:image" content="https://impactgridgroup.com/logo.png" />
+  <meta property="og:title" id="blogOgTitle" content="Blog — Impact Grid Group" />
+  <meta property="og:description" id="blogOgDesc" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
+  <meta property="og:url" id="blogOgUrl" content="https://impactgridgroup.com/blog.html" />
+  <meta property="og:image" id="blogOgImage" content="https://impactgridgroup.com/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" id="blogTwTitle" content="Blog — Impact Grid Group" />
+  <meta name="twitter:description" id="blogTwDesc" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
   <meta name="twitter:image" content="https://impactgridgroup.com/logo.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -732,6 +734,59 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     } catch(e) { return ''; }
   }
 
+  /* ── SEO: rewrite title/canonical/meta/og tags for the open post ──
+     Without this, every post shared canonical/blog.html, so Google saw
+     each ?post= URL as a duplicate of the listing page rather than a
+     page worth indexing on its own. */
+  var _blogDefaultMeta = null;
+  function captureBlogDefaultMeta() {
+    if (_blogDefaultMeta) return;
+    _blogDefaultMeta = {
+      title: document.getElementById('blogPageTitle').textContent,
+      canonical: document.getElementById('blogCanonical').href,
+      desc: document.getElementById('blogMetaDesc').content,
+      ogTitle: document.getElementById('blogOgTitle').content,
+      ogDesc: document.getElementById('blogOgDesc').content,
+      ogUrl: document.getElementById('blogOgUrl').content,
+      ogImage: document.getElementById('blogOgImage').content,
+      twTitle: document.getElementById('blogTwTitle').content,
+      twDesc: document.getElementById('blogTwDesc').content
+    };
+  }
+  function setPostMeta(post) {
+    captureBlogDefaultMeta();
+    var title = post.title + ' — Impact Grid Group';
+    var desc = '';
+    (post.pages || []).some(function(pg) {
+      if (pg.type === 'text' && pg.body) { desc = pg.body.replace(/\s+/g, ' ').trim().slice(0, 160); return true; }
+    });
+    if (!desc) desc = _blogDefaultMeta.desc;
+    var url = 'https://impactgridgroup.com/blog.html?post=' + encodeURIComponent(slugify(post.title));
+    document.title = title;
+    document.getElementById('blogPageTitle').textContent = title;
+    document.getElementById('blogCanonical').href = url;
+    document.getElementById('blogMetaDesc').content = desc;
+    document.getElementById('blogOgTitle').content = title;
+    document.getElementById('blogOgDesc').content = desc;
+    document.getElementById('blogOgUrl').content = url;
+    document.getElementById('blogTwTitle').content = title;
+    document.getElementById('blogTwDesc').content = desc;
+    if (post.coverImage) document.getElementById('blogOgImage').content = post.coverImage;
+  }
+  function restoreBlogDefaultMeta() {
+    if (!_blogDefaultMeta) return;
+    document.title = _blogDefaultMeta.title;
+    document.getElementById('blogPageTitle').textContent = _blogDefaultMeta.title;
+    document.getElementById('blogCanonical').href = _blogDefaultMeta.canonical;
+    document.getElementById('blogMetaDesc').content = _blogDefaultMeta.desc;
+    document.getElementById('blogOgTitle').content = _blogDefaultMeta.ogTitle;
+    document.getElementById('blogOgDesc').content = _blogDefaultMeta.ogDesc;
+    document.getElementById('blogOgUrl').content = _blogDefaultMeta.ogUrl;
+    document.getElementById('blogOgImage').content = _blogDefaultMeta.ogImage;
+    document.getElementById('blogTwTitle').content = _blogDefaultMeta.twTitle;
+    document.getElementById('blogTwDesc').content = _blogDefaultMeta.twDesc;
+  }
+
   /* ── Slug for URL ── */
   function slugify(title) {
     return String(title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -741,13 +796,12 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   function pushPostState(post) {
     var slug = slugify(post.title);
     history.pushState({ postSlug: slug }, '', '?post=' + encodeURIComponent(slug));
-    // Update OG tags best-effort (helps for re-sharing after navigation)
-    document.title = post.title + ' — Impact Grid Group';
+    setPostMeta(post);
   }
 
   function clearPostState() {
     history.pushState({}, '', 'blog.html');
-    document.title = 'Blog — Impact Grid Group';
+    restoreBlogDefaultMeta();
   }
 
   function checkUrlPost() {
