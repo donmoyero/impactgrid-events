@@ -1031,25 +1031,25 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     </div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <div class="hero-eyebrow" id="heroEyebrow">Impact Grid Events — Manchester</div>
-      <h1 class="hero-headline" id="heroHeadline">
-        <span id="heroHeadlineLine1">We capture your event.</span><br><em id="heroHeadlineLine2">Your guests keep it.</em>
+      <div class="hero-eyebrow">Impact Grid Events — Manchester</div>
+      <h1 class="hero-headline">
+        We capture your event.<br><em>Your guests keep it.</em>
       </h1>
-      <p class="hero-sub" id="heroSub">
+      <p class="hero-sub">
         Professional photography, high-quality content creation, and organised online galleries — delivered fast, so every guest walks away with their moment.
       </p>
       <div class="hero-actions">
-        <a href="book-us.html" class="hero-btn-primary" id="heroBtn1">
+        <a href="book-us.html" class="hero-btn-primary">
           <span class="hero-btn-inner">
-            <span class="hero-btn-text" id="heroBtn1Text">Book Us for Your Event</span>
+            <span class="hero-btn-text">Book Us for Your Event</span>
             <span class="hero-btn-arrow">→</span>
           </span>
         </a>
-        <a href="services.html" class="hero-btn-secondary" id="heroBtn2">
-          <span id="heroBtn2Text">See What We Offer</span>
+        <a href="services.html" class="hero-btn-secondary">
+          <span>See What We Offer</span>
         </a>
       </div>
-      <p class="hero-note" id="heroNote">Based in Manchester &nbsp;·&nbsp; Covering UK events &nbsp;·&nbsp; events@impactgridgroup.com</p>
+      <p class="hero-note">Based in Manchester &nbsp;·&nbsp; Covering UK events &nbsp;·&nbsp; events@impactgridgroup.com</p>
     </div>
   </section>
 
@@ -1154,7 +1154,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <section class="cta-section full-bleed">
     <div class="cta-bg"></div>
     <div class="cta-inner">
-      <h2 class="cta-title" id="ctaTitle">Newsletter</h2>
+      <h2 class="cta-title">Newsletter</h2>
       <div class="nl-form">
         <input class="nl-input" type="email" id="nlEmail" placeholder="Enter your email address" autocomplete="email"/>
         <button class="nl-btn" id="nlBtn" onclick="submitNewsletter()">Send It</button>
@@ -1417,44 +1417,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       }
     }
 
-    /* ── Dynamic homepage TEXT from Supabase site_content ──
-       Keys map 1:1 to the admin "Homepage Text" editor. Falls back to
-       whatever is already hardcoded in the HTML above if a row is
-       missing, so a blank/never-saved field never wipes real text. */
-    var HOMEPAGE_TEXT_KEYS = [
-      'hero_eyebrow','hero_headline_line1','hero_headline_line2','hero_sub',
-      'hero_btn1_text','hero_btn1_href','hero_btn2_text','hero_btn2_href',
-      'hero_note','cta_title'
-    ];
-    function setText(id, val){ var el = document.getElementById(id); if(el && val) el.textContent = val; }
-    function setHref(id, val){ var el = document.getElementById(id); if(el && val) el.setAttribute('href', val); }
-
-    async function loadHomepageText(){
-      try {
-        var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-        if(!sb) return;
-        var res = await sb.from('site_content').select('key,value').in('key', HOMEPAGE_TEXT_KEYS);
-        var rows = (res && res.data) ? res.data : [];
-        var kv = {};
-        rows.forEach(function(r){ kv[r.key] = r.value; });
-
-        setText('heroEyebrow',       kv['hero_eyebrow']);
-        setText('heroHeadlineLine1', kv['hero_headline_line1']);
-        setText('heroHeadlineLine2', kv['hero_headline_line2']);
-        setText('heroSub',           kv['hero_sub']);
-        setText('heroBtn1Text',      kv['hero_btn1_text']);
-        setHref('heroBtn1',          kv['hero_btn1_href']);
-        setText('heroBtn2Text',      kv['hero_btn2_text']);
-        setHref('heroBtn2',          kv['hero_btn2_href']);
-        setText('heroNote',          kv['hero_note']);
-        setText('ctaTitle',          kv['cta_title']);
-      } catch(e) { /* keep hardcoded fallback text on any error */ }
-    }
-
     if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', loadHomepageText);
+      document.addEventListener('DOMContentLoaded', loadHomepageImages);
     } else {
-      loadHomepageText();
+      loadHomepageImages();
     }
   })();
   </script>
