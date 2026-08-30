@@ -342,7 +342,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('homepage',this)"><span class="sb-ico"></span>Homepage Text</a>
         <a href="#" onclick="return nav('services',this)"><span class="sb-ico"></span>Services</a>
         <a href="#" onclick="return nav('about',this)"><span class="sb-ico"></span>About Page</a>
-        <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico"></span>Portfolio Events</a>
+        <a href="#" onclick="return nav('portfolio',this)"><span class="sb-ico"></span>Portfolio</a>
         <a href="#" onclick="return nav('blog',this)"><span class="sb-ico"></span>Blog</a>
         <a href="#" onclick="return nav('social',this)"><span class="sb-ico"></span>Social Grid</a>
       </nav>
@@ -805,53 +805,89 @@ If you have any questions, just reply to this email.
     </div>
 
 
-    <!-- PORTFOLIO -->
+    <!-- PORTFOLIO (SEO) -->
     <div class="page" id="page-portfolio">
       <div class="page-header">
-        <div class="page-title">Portfolio Photos</div>
-        <div class="page-sub">Upload photos to your public portfolio flip-book. Drop them in, they go live instantly.</div>
+        <div class="page-title">Portfolio</div>
+        <div class="page-sub">Each portfolio category is its own book — name it after the service and area you want to rank for, add photos, and it goes live as its own SEO page.</div>
       </div>
-      <div class="ws-layout">
-        <div>
-          <div class="card">
-            <div class="card-head"><h2> Upload Photos</h2></div>
-            <div class="card-body">
-              <div class="upload-zone" id="pfDropZone"
-                onclick="document.getElementById('pfFileIn').click()"
-                ondragover="onDragOver(event,'pfDropZone')"
-                ondragleave="onDragLeave(event,'pfDropZone')"
-                ondrop="onDrop(event,'pfDropZone',pfHandleDrop)">
-                <div class="upload-zone-ico"></div>
-                <div class="upload-zone-title">Drop photos here or click to browse</div>
-                <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div>
-                <input type="file" id="pfFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="pfHandleInput(event)"/>
-              </div>
-              <div id="pfUploadProgress" style="margin-top:12px;"></div>
+
+      <!-- LIST VIEW -->
+      <div id="portfolioListView">
+        <div class="card">
+          <div class="card-head">
+            <h2> All Categories</h2>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm" onclick="loadPortfolioCategories()"> Refresh</button>
+              <button class="btn btn-gold" onclick="portfolioNewCategory()">+ New Portfolio</button>
             </div>
           </div>
-          <div class="card" id="pfPhotosCard">
-            <div class="card-head">
-              <h2>Your Portfolio Photos</h2>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <button class="btn btn-ghost btn-sm" id="pfSelectToggleBtn" onclick="pfToggleSelectMode()" style="display:none;">Select</button>
-                <button class="btn btn-ghost btn-sm" id="pfSelectAllBtn" onclick="pfSelectAll()" style="display:none;">Select All</button>
-                <button class="btn btn-sm" id="pfDeleteSelectedBtn" onclick="pfDeleteSelected()" style="display:none;background:var(--red);color:#fff;border:none;">Delete Selected (<span id="pfSelectedCount">0</span>)</button>
-                <button class="btn btn-ghost btn-sm" id="pfCancelSelectBtn" onclick="pfCancelSelect()" style="display:none;">Cancel</button>
-                <button class="btn btn-ghost btn-sm" onclick="pfReshuffle()" title="Randomize the display order so photos aren't grouped"> Reshuffle</button>
-                <button class="btn btn-ghost btn-sm" onclick="pfLoadPhotos()"> Refresh</button>
-              </div>
-            </div>
-            <div class="card-body" id="pfPhotosList">
-              <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>
-            </div>
+          <div class="card-body" id="portfolioCategoriesList">
+            <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>
           </div>
         </div>
-        <div class="ws-sticky">
-          <div class="hint-box">
-            <strong>How it works</strong><br><br>
-            Drop in as many photos as you like. Each one uploads to Cloudinary and saves to Firebase instantly.<br><br>
-            They appear in the flip-book on the portfolio page in the order uploaded — newest first — until you hit <strong> Reshuffle</strong>, which randomizes the order so similar photos don't cluster together. New uploads always show up even before a reshuffle.<br><br>
-            Click <strong></strong> on any photo to remove it.
+      </div>
+
+      <!-- EDITOR VIEW -->
+      <div id="portfolioEditorView" style="display:none;">
+        <div class="ws-layout">
+          <div>
+            <div class="card">
+              <div class="card-head">
+                <h2 id="portfolioEditorTitle"> Portfolio Details</h2>
+                <button class="btn btn-ghost btn-sm" onclick="portfolioBackToList()"> Back to list</button>
+              </div>
+              <div class="card-body">
+                <div class="field-group" style="margin-bottom:12px;">
+                  <div class="field-label">Name — make this SEO-focused</div>
+                  <input type="text" id="portfolioTitleInput" placeholder="e.g. Portrait Photography Manchester" oninput="portfolioUpdateSlugPreview()">
+                  <div style="font-size:11px;color:var(--text3);margin-top:6px;">URL: portfolio.html?category=<span id="portfolioSlugPreview">portrait-photography-manchester</span></div>
+                </div>
+
+                <div class="field-group" style="margin-bottom:14px;">
+                  <div class="field-label">Short SEO description (shown under the title)</div>
+                  <textarea id="portfolioDescInput" rows="2" placeholder="e.g. Professional portrait photography in Manchester for models and businesses."></textarea>
+                </div>
+
+                <div class="field-label">Cover image (shown on the closed book)</div>
+                <label for="portfolioCoverFileIn" class="upload-zone" id="portfolioCoverDropZone"
+                  ondragover="onDragOver(event,'portfolioCoverDropZone')"
+                  ondragleave="onDragLeave(event,'portfolioCoverDropZone')"
+                  ondrop="onDrop(event,'portfolioCoverDropZone',portfolioUploadCover)"
+                  style="display:block;cursor:pointer;">
+                  <div class="upload-zone-ico"></div>
+                  <div class="upload-zone-title">Tap or click to choose a cover image</div>
+                  <div class="upload-zone-sub">JPG · PNG · WebP</div>
+                  <input type="file" id="portfolioCoverFileIn" accept="image/*" onchange="portfolioCoverFileChange(event)"
+                    style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;"/>
+                </label>
+                <div id="portfolioCoverPreviewWrap" style="margin-top:10px;display:none;">
+                  <img id="portfolioCoverPreview" style="width:140px;height:auto;border-radius:var(--r);display:block;" />
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h2> Photos</h2>
+                <label class="btn btn-ghost btn-sm" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
+                  <input type="file" id="portfolioAddImageIn" accept="image/*" multiple style="display:none;" onchange="portfolioAddImageFiles(event)">
+                </label>
+              </div>
+              <div class="card-body" id="portfolioImagesList">
+                <div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet — add some above.</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="ws-sticky">
+            <div class="hint-box">
+              <strong>How this works</strong><br><br>
+              The name you give a portfolio becomes its own SEO page — so name it after what you want to rank for, e.g. "Event Photography Manchester" or "Fashion Photography Manchester".<br><br>
+              Every photo needs alt text — a plain description of what's in the shot. This is what actually gets your images found in Google Images.<br><br>
+              Drag a photo by its ⠿⠿ handle to reorder it.
+            </div>
+            <button class="btn btn-gold" onclick="portfolioSaveCategory()" style="display:flex;justify-content:center;margin-top:12px;padding:10px;width:100%;"> Save Portfolio</button>
+            <a href="portfolio.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:10px;padding:10px;"> Preview Portfolio</a>
           </div>
         </div>
       </div>
@@ -2137,6 +2173,7 @@ function nav(id,el){
     hero:'loadAllHomepageSections',
     bookings:'loadBookings',
     vouchers:'initVouchersPage',
+    portfolio:'loadPortfolioCategories',
     blog:'loadBlogPosts',
     social:'loadSocialPage',
     receptionist:'loadReceptionist',
@@ -4387,68 +4424,63 @@ var _origNav = window.nav;
 window.nav = function(page, el){
   var result = _origNav ? _origNav(page, el) : false;
   if(page === 'services') setTimeout(loadServices, 50);
-  if(page === 'portfolio') setTimeout(pfLoadPhotos, 50);
   return result;
 };
 
 /* ════════════════════════════════════════
-   PORTFOLIO ADMIN
-   Upload photos directly — no event grouping.
-   Storage: Cloudinary  ·  DB: Firebase (portfolio_photos)
+   PORTFOLIO ADMIN (SEO)
+   Storage: Cloudinary (impactgrid/portfolio folder) · DB: Supabase (getContentClient())
+     portfolio_categories { id, title, slug, meta_description, cover_image, cover_public_id, created_at, updated_at }
+     portfolio_images     { id, category_id, order, url, cloudinary_id, alt_text, caption }
 ════════════════════════════════════════ */
 
-var _pfSelectMode = false;
-var _pfSelected   = new Set();
+var portfolioCategories   = [];
+var portfolioCurrentCat   = null;  // { id, title, slug, metaDescription, coverImage, coverPublicId, images:[...] }
+var portfolioImageSeq     = 0;
 
-/* Same on-the-fly Cloudinary transform used on the public portfolio page —
-   keeps the admin grid snappy too, and keeps both pages' URLs consistent. */
-function pfCldOptimize(url, width){
-  if (!url || url.indexOf('res.cloudinary.com') === -1) return url;
-  if (url.indexOf('/upload/') === -1) return url;
-  return url.replace('/upload/', '/upload/f_auto,q_auto,w_' + (width || 260) + '/');
+function portfolioSlugify(title) {
+  return String(title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-async function pfLoadPhotos() {
-  var el = document.getElementById('pfPhotosList');
+async function loadPortfolioCategories() {
+  var el = document.getElementById('portfolioCategoriesList');
   if (!el) return;
-  _pfSelectMode = false;
-  _pfSelected.clear();
-  pfUpdateSelectUI();
+  portfolioShowList();
   el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>';
   try {
-    if (!db) throw new Error('Firebase not ready — refresh.');
-    var q    = query(collection(db, 'portfolio_photos'));
-    var snap = await getDocs(q);
-    var rows = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
-    if (!rows.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet. Drop some in above!</div></div>';
-      document.getElementById('pfSelectToggleBtn').style.display = 'none';
+    var sb = getContentClient();
+    var { data, error } = await sb.from('portfolio_categories').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    portfolioCategories = data || [];
+    if (!portfolioCategories.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No portfolios yet — click "New Portfolio" to add your first, e.g. "Portrait Photography Manchester".</div></div>';
       return;
     }
 
-    /* Mirror the sort used on the public portfolio page: respect a
-       persisted shuffle order when present, falling back to newest-first
-       for anything uploaded since the last reshuffle. Keeping this in
-       sync with portfolio.html is what makes "Reshuffle" here actually
-       match what visitors see. */
-    rows.sort(function(a, b){
-      var ao = (typeof a.order === 'number') ? a.order : Infinity;
-      var bo = (typeof b.order === 'number') ? b.order : Infinity;
-      if (ao !== bo) return ao - bo;
-      var at = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
-      var bt = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
-      return bt - at;
-    });
+    /* Image counts per category, for the card subtitle */
+    var countByCategory = {};
+    try {
+      var { data: imgRows, error: imgErr } = await sb.from('portfolio_images').select('category_id');
+      if (imgErr) throw imgErr;
+      (imgRows || []).forEach(function(r){ countByCategory[r.category_id] = (countByCategory[r.category_id] || 0) + 1; });
+    } catch (countErr) { console.warn('Portfolio image counts failed:', countErr); }
 
-    document.getElementById('pfSelectToggleBtn').style.display = '';
-    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;" id="pfPhotosGrid">' +
-      rows.map(function(p) {
-        var safeId  = esc(p.id);
-        var safeCid = esc(p.cloudinary_id || '');
-        return '<div id="pfcard-' + safeId + '" data-id="' + safeId + '" data-cid="' + safeCid + '" onclick="pfCardClick(this)" style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:2px solid var(--border);cursor:pointer;transition:border-color .15s;">' +
-          '<img src="' + esc(pfCldOptimize(p.url, 260)) + '" loading="lazy" style="width:100%;height:100px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--bg3)\'" />' +
-          '<div class="pf-check" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;font-size:22px;color:#fff;">&#10003;</div>' +
-          '<button data-id="' + safeId + '" data-cid="' + safeCid + '" onclick="event.stopPropagation();pfDeletePhoto(this.dataset.id,this.dataset.cid)" class="pf-del-btn" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;line-height:1;">x</button>' +
+    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">' +
+      portfolioCategories.map(function(c) {
+        var safeId = esc(c.id);
+        var count = countByCategory[c.id] || 0;
+        return '<div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);">' +
+          (c.cover_image
+            ? '<img src="' + esc(c.cover_image) + '" style="width:100%;height:110px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
+            : '<div style="width:100%;height:110px;background:var(--bg3);"></div>') +
+          '<div style="padding:12px 14px;">' +
+            '<div style="font-size:14px;font-weight:700;margin-bottom:6px;">' + esc(c.title || 'Untitled') + '</div>' +
+            '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">' + count + ' photo' + (count === 1 ? '' : 's') + ' · /portfolio.html?category=' + esc(c.slug || '') + '</div>' +
+            '<div style="display:flex;gap:6px;">' +
+              '<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="portfolioEditCategory(\'' + safeId + '\')">Edit</button>' +
+              '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" data-cat-id="' + safeId + '" data-cover-id="' + esc(c.cover_public_id||'') + '" onclick="portfolioDeleteCategory(this.dataset.catId, this.dataset.coverId)">Delete</button>' +
+            '</div>' +
+          '</div>' +
         '</div>';
       }).join('') +
     '</div>';
@@ -4457,204 +4489,290 @@ async function pfLoadPhotos() {
   }
 }
 
-/* Randomize display order so similar/sequential photos don't cluster
-   together, and persist it so the public portfolio page picks up the
-   same order (see the `order` sort in loadEvents() in portfolio.html). */
-async function pfReshuffle() {
+function portfolioShowList() {
+  document.getElementById('portfolioListView').style.display = '';
+  document.getElementById('portfolioEditorView').style.display = 'none';
+}
+function portfolioShowEditor() {
+  document.getElementById('portfolioListView').style.display = 'none';
+  document.getElementById('portfolioEditorView').style.display = '';
+}
+function portfolioBackToList() { portfolioShowList(); }
+
+function portfolioUpdateSlugPreview() {
+  var title = document.getElementById('portfolioTitleInput').value;
+  document.getElementById('portfolioSlugPreview').textContent = portfolioSlugify(title) || 'your-portfolio-name';
+}
+
+function portfolioNewCategory() {
+  portfolioCurrentCat = { id: null, title: '', slug: '', metaDescription: '', coverImage: '', coverPublicId: '', images: [] };
+  document.getElementById('portfolioEditorTitle').textContent = ' New Portfolio';
+  document.getElementById('portfolioTitleInput').value = '';
+  document.getElementById('portfolioDescInput').value = '';
+  document.getElementById('portfolioSlugPreview').textContent = 'your-portfolio-name';
+  document.getElementById('portfolioCoverPreviewWrap').style.display = 'none';
+  portfolioRenderImages();
+  portfolioShowEditor();
+}
+
+async function portfolioEditCategory(id) {
   try {
-    if (!db) throw new Error('Firebase not ready — refresh.');
-    var q    = query(collection(db, 'portfolio_photos'));
-    var snap = await getDocs(q);
-    var ids  = snap.docs.map(function(d){ return d.id; });
-    if (!ids.length) { toast('', 'Nothing to reshuffle', 'Upload some photos first.'); return; }
-
-    /* Fisher–Yates shuffle */
-    for (var i = ids.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = ids[i]; ids[i] = ids[j]; ids[j] = tmp;
-    }
-
-    /* Firestore batches cap at 500 writes — chunk just in case a
-       portfolio ever grows past that. */
-    for (var start = 0; start < ids.length; start += 450) {
-      var batch = db.batch();
-      var chunk = ids.slice(start, start + 450);
-      chunk.forEach(function(id, idx){
-        batch.update(db.collection('portfolio_photos').doc(id), { order: start + idx });
-      });
-      await batch.commit();
-    }
-
-    toast('', 'Reshuffled', ids.length + ' photos reordered.');
-    pfLoadPhotos();
-  } catch(e) {
-    toast('', 'Reshuffle failed', e.message || '');
-  }
+    var cat = portfolioCategories.find(function(c){ return c.id === id; }) || {};
+    var sb = getContentClient();
+    var { data: images, error } = await sb.from('portfolio_images')
+      .select('*').eq('category_id', id).order('order', { ascending: true });
+    if (error) throw error;
+    portfolioCurrentCat = {
+      id: id,
+      title: cat.title || '',
+      slug: cat.slug || '',
+      metaDescription: cat.meta_description || '',
+      coverImage: cat.cover_image || '',
+      coverPublicId: cat.cover_public_id || '',
+      images: (images || []).map(function(img) {
+        return { _dbId: img.id, url: img.url, cloudinaryId: img.cloudinary_id || '', altText: img.alt_text || '', caption: img.caption || '' };
+      })
+    };
+    document.getElementById('portfolioEditorTitle').textContent = ' Edit Portfolio';
+    document.getElementById('portfolioTitleInput').value = portfolioCurrentCat.title;
+    document.getElementById('portfolioDescInput').value = portfolioCurrentCat.metaDescription;
+    document.getElementById('portfolioSlugPreview').textContent = portfolioCurrentCat.slug || 'your-portfolio-name';
+    var pv = document.getElementById('portfolioCoverPreviewWrap');
+    if (portfolioCurrentCat.coverImage) {
+      document.getElementById('portfolioCoverPreview').src = portfolioCurrentCat.coverImage;
+      pv.style.display = '';
+    } else { pv.style.display = 'none'; }
+    portfolioRenderImages();
+    portfolioShowEditor();
+  } catch(e) { toast('', 'Could not load portfolio', e.message); }
 }
 
-function pfCardClick(card) {
-  if (!_pfSelectMode) return;
-  var id = card.dataset.id;
-  if (_pfSelected.has(id)) {
-    _pfSelected.delete(id);
-    card.style.borderColor = 'var(--border)';
-    card.querySelector('.pf-check').style.display = 'none';
-  } else {
-    _pfSelected.add(id);
-    card.style.borderColor = 'var(--gold)';
-    card.querySelector('.pf-check').style.display = 'flex';
-  }
-  document.getElementById('pfSelectedCount').textContent = _pfSelected.size;
-}
+async function portfolioDeleteCategory(id, coverPublicId) {
+  if (!confirm('Delete this portfolio and all its photos? This cannot be undone.')) return;
+  try {
+    var sb = getContentClient();
 
-function pfToggleSelectMode() {
-  _pfSelectMode = true;
-  _pfSelected.clear();
-  document.getElementById('pfSelectedCount').textContent = '0';
-  document.getElementById('pfSelectToggleBtn').style.display  = 'none';
-  document.getElementById('pfSelectAllBtn').style.display     = '';
-  document.getElementById('pfDeleteSelectedBtn').style.display = '';
-  document.getElementById('pfCancelSelectBtn').style.display  = '';
-  /* hide individual delete buttons */
-  document.querySelectorAll('.pf-del-btn').forEach(function(b){ b.style.display = 'none'; });
-}
-
-function pfCancelSelect() {
-  _pfSelectMode = false;
-  _pfSelected.clear();
-  pfUpdateSelectUI();
-  /* reset card styles */
-  document.querySelectorAll('#pfPhotosGrid [data-id]').forEach(function(card){
-    card.style.borderColor = 'var(--border)';
-    card.querySelector('.pf-check').style.display = 'none';
-  });
-  document.querySelectorAll('.pf-del-btn').forEach(function(b){ b.style.display = ''; });
-}
-
-function pfSelectAll() {
-  document.querySelectorAll('#pfPhotosGrid [data-id]').forEach(function(card){
-    var id = card.dataset.id;
-    _pfSelected.add(id);
-    card.style.borderColor = 'var(--gold)';
-    card.querySelector('.pf-check').style.display = 'flex';
-  });
-  document.getElementById('pfSelectedCount').textContent = _pfSelected.size;
-}
-
-function pfUpdateSelectUI() {
-  document.getElementById('pfSelectToggleBtn').style.display   = _pfSelectMode ? 'none' : '';
-  document.getElementById('pfSelectAllBtn').style.display      = _pfSelectMode ? '' : 'none';
-  document.getElementById('pfDeleteSelectedBtn').style.display = _pfSelectMode ? '' : 'none';
-  document.getElementById('pfCancelSelectBtn').style.display   = _pfSelectMode ? '' : 'none';
-}
-
-async function pfDeleteSelected() {
-  if (!_pfSelected.size) return;
-  if (!confirm('Delete ' + _pfSelected.size + ' photo' + (_pfSelected.size > 1 ? 's' : '') + '?')) return;
-  var ids = Array.from(_pfSelected);
-  var grid = document.getElementById('pfPhotosGrid');
-  var failed = 0;
-  for (var i = 0; i < ids.length; i++) {
-    var id   = ids[i];
-    var card = document.getElementById('pfcard-' + id);
-    var cid  = card ? card.dataset.cid : '';
+    var imageCloudinaryIds = [];
     try {
-      if (cid) {
-        await fetch(EVENTS_API + '/api/delete-photo', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ publicId: cid })
-        });
-      }
-      await deleteDoc(doc(db, 'portfolio_photos', id));
-      if (card) card.remove();
-    } catch(e) { failed++; }
+      var { data: imgRows } = await sb.from('portfolio_images').select('cloudinary_id').eq('category_id', id);
+      imageCloudinaryIds = (imgRows || []).map(function(p){ return p.cloudinary_id; }).filter(Boolean);
+    } catch(e) { console.warn('Could not read portfolio images before delete:', e.message); }
+
+    var { error: imgErr } = await sb.from('portfolio_images').delete().eq('category_id', id);
+    if (imgErr) console.warn('Images delete warning:', imgErr.message);
+
+    var { error } = await sb.from('portfolio_categories').delete().eq('id', id);
+    if (error) throw error;
+
+    var cloudinaryIds = imageCloudinaryIds.slice();
+    if (coverPublicId) cloudinaryIds.push(coverPublicId);
+    if (cloudinaryIds.length) {
+      fetch(EVENTS_API + '/api/delete-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicIds: cloudinaryIds })
+      }).catch(function(){});
+    }
+
+    toast('', 'Portfolio deleted', '');
+    loadPortfolioCategories();
+  } catch(e) {
+    toast('', 'Delete failed', e.message);
+    console.error('portfolioDeleteCategory error:', e);
   }
-  _pfSelected.clear();
-  _pfSelectMode = false;
-  pfUpdateSelectUI();
-  document.querySelectorAll('.pf-del-btn').forEach(function(b){ b.style.display = ''; });
-  document.getElementById('pfSelectedCount').textContent = '0';
-  toast('', failed ? failed + ' failed to delete' : 'Deleted successfully', '');
-  /* if grid is now empty reload to show empty state */
-  if (!document.querySelectorAll('#pfPhotosGrid [data-id]').length) pfLoadPhotos();
 }
 
-function pfHandleDrop(files) {
-  var imgs = Array.from(files).filter(function(f){ return f.type.startsWith('image/'); });
-  if (imgs.length) pfUploadFiles(imgs);
+/* ── Cover image upload ── */
+async function portfolioCoverFileChange(e) {
+  var f = e.target.files && e.target.files[0];
+  if (!f) return;
+  await portfolioUploadCover(f);
+  try { e.target.value = ''; } catch(ex) {}
+}
+async function portfolioUploadCover(file) {
+  if (!portfolioCurrentCat) return;
+  try {
+    toast('', 'Uploading cover…', '');
+    var result = await uploadToCloudinary(file, 'portfolio');
+    portfolioCurrentCat.coverImage = result.secure_url;
+    portfolioCurrentCat.coverPublicId = result.public_id;
+    document.getElementById('portfolioCoverPreview').src = result.secure_url;
+    document.getElementById('portfolioCoverPreviewWrap').style.display = '';
+    toast('', 'Cover updated', '');
+  } catch(e) { toast('', 'Upload failed', e.message); }
 }
 
-function pfHandleInput(e) {
+/* ── Images editor ── */
+function portfolioDeleteImage(idx) {
+  portfolioCurrentCat.images.splice(idx, 1);
+  portfolioRenderImages();
+}
+function portfolioMoveImage(idx, dir) {
+  var arr = portfolioCurrentCat.images;
+  var newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= arr.length) return;
+  var tmp = arr[idx]; arr[idx] = arr[newIdx]; arr[newIdx] = tmp;
+  portfolioRenderImages();
+}
+function portfolioUpdateImageField(idx, field, value) {
+  if (portfolioCurrentCat && portfolioCurrentCat.images[idx]) portfolioCurrentCat.images[idx][field] = value;
+}
+
+/* ── Drag-and-drop reordering ── */
+var _portfolioDragIdx = null;
+function portfolioDragStart(e, idx) {
+  _portfolioDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', String(idx)); } catch(err) {}
+  e.currentTarget.classList.add('blog-page-dragging');
+}
+function portfolioDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('blog-page-dragover');
+}
+function portfolioDragLeave(e) {
+  e.currentTarget.classList.remove('blog-page-dragover');
+}
+function portfolioDrop(e, idx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('blog-page-dragover');
+  if (_portfolioDragIdx === null || _portfolioDragIdx === idx) return;
+  var arr = portfolioCurrentCat.images;
+  var moved = arr.splice(_portfolioDragIdx, 1)[0];
+  arr.splice(idx, 0, moved);
+  _portfolioDragIdx = null;
+  portfolioRenderImages();
+}
+function portfolioDragEnd(e) {
+  e.currentTarget.classList.remove('blog-page-dragging');
+  document.querySelectorAll('.blog-page-card.blog-page-dragover').forEach(function(el){ el.classList.remove('blog-page-dragover'); });
+  _portfolioDragIdx = null;
+}
+
+function portfolioRenderImages() {
+  var el = document.getElementById('portfolioImagesList');
+  var images = portfolioCurrentCat ? portfolioCurrentCat.images : [];
+  if (!images.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet — add some above.</div></div>';
+    return;
+  }
+  el.innerHTML = images.map(function(img, idx) {
+    return '<div class="blog-page-card" draggable="true"' +
+        ' ondragstart="portfolioDragStart(event,' + idx + ')"' +
+        ' ondragover="portfolioDragOver(event)"' +
+        ' ondragleave="portfolioDragLeave(event)"' +
+        ' ondrop="portfolioDrop(event,' + idx + ')"' +
+        ' ondragend="portfolioDragEnd(event)"' +
+        ' style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;background:var(--bg2);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+        '<span style="display:flex;align-items:center;gap:8px;">' +
+          '<span class="blog-page-handle" title="Drag to reorder">⠿⠿</span>' +
+          '<span class="chip chip-gold">Photo ' + (idx + 1) + '</span>' +
+        '</span>' +
+        '<div style="display:flex;gap:4px;">' +
+          '<button class="btn btn-ghost btn-sm" onclick="portfolioMoveImage(' + idx + ',-1)" ' + (idx===0?'disabled':'') + '>&#9650;</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="portfolioMoveImage(' + idx + ',1)" ' + (idx===images.length-1?'disabled':'') + '>&#9660;</button>' +
+          '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="portfolioDeleteImage(' + idx + ')">Delete</button>' +
+        '</div>' +
+      '</div>' +
+      (img.url ? '<img src="' + esc(img.url) + '" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--r);margin-bottom:8px;display:block;">' : '') +
+      '<input type="text" placeholder="Alt text — describe what\'s in the photo (this is your image SEO)" value="' + esc(img.altText) + '" oninput="portfolioUpdateImageField(' + idx + ',\'altText\',this.value)" style="margin-bottom:8px;">' +
+      '<input type="text" placeholder="Caption (optional, shown under the photo)" value="' + esc(img.caption) + '" oninput="portfolioUpdateImageField(' + idx + ',\'caption\',this.value)">' +
+    '</div>';
+  }).join('');
+}
+
+async function portfolioAddImageFiles(e) {
   var files = Array.from(e.target.files || []);
   e.target.value = '';
-  if (files.length) pfUploadFiles(files);
-}
-
-async function pfUploadFiles(files) {
-  var prog = document.getElementById('pfUploadProgress');
-  prog.innerHTML = '';
+  if (!files.length || !portfolioCurrentCat) return;
   for (var i = 0; i < files.length; i++) {
-    var file = files[i];
-    var allowed = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowed.includes(file.type)) { toast('', 'Skipped ' + file.name, 'Unsupported type'); continue; }
-
-    var rowId = 'pfprog-' + i;
-    prog.innerHTML += '<div id="' + rowId + '" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:6px;">' +
-      '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
-      '<span style="font-size:12px;font-weight:600;">' + esc(file.name) + '</span>' +
-      '<span id="' + rowId + '-pct" style="font-size:11px;color:var(--text3);">Uploading…</span>' +
-      '</div><div class="prog-track"><div class="prog-fill" id="' + rowId + '-bar" style="width:0%;"></div></div></div>';
-
-    var setStatus = (function(id){ return function(msg, pct, color){
-      var el = document.getElementById(id + '-pct');
-      var bar = document.getElementById(id + '-bar');
-      if (el)  el.textContent  = msg;
-      if (bar) { bar.style.width = pct + '%'; if (color) bar.style.background = color; }
-    }; })(rowId);
-
     try {
-      setStatus('Uploading…', 40, '');
-      var result = await uploadToCloudinary(file, 'portfolio');
-      setStatus('Saving…', 80, '');
-      await addDoc(collection(db, 'portfolio_photos'), {
-        url:           result.secure_url,
-        cloudinary_id: result.public_id,
-        created_at:    serverTimestamp()
+      toast('', 'Uploading photo ' + (i+1) + ' of ' + files.length + '…', '');
+      var result = await uploadToCloudinary(files[i], 'portfolio');
+      portfolioCurrentCat.images.push({
+        _localId: 'npi' + (portfolioImageSeq++),
+        url: result.secure_url, cloudinaryId: result.public_id,
+        altText: '', caption: ''
       });
-      setStatus(' Done', 100, 'var(--green)');
-    } catch(err) {
-      setStatus(' ' + err.message, 100, 'var(--red)');
-    }
+    } catch(err) { toast('', 'Upload failed', err.message); }
   }
-  toast('', 'Upload complete!', files.length + ' photo' + (files.length > 1 ? 's' : '') + ' added');
-  pfLoadPhotos();
+  portfolioRenderImages();
+  toast('', 'Photos added', 'Don\u2019t forget to add alt text before saving.');
 }
 
-async function pfDeletePhoto(id, cloudinaryId) {
-  if (!confirm('Remove this photo from the portfolio?')) return;
+/* ── Save category + images ── */
+async function portfolioSaveCategory() {
+  if (!portfolioCurrentCat) return;
+  var title = document.getElementById('portfolioTitleInput').value.trim();
+  var metaDescription = document.getElementById('portfolioDescInput').value.trim();
+  if (!title) { toast('', 'Name required', ''); return; }
+  var slug = portfolioSlugify(title);
+  portfolioCurrentCat.title = title;
+  portfolioCurrentCat.slug = slug;
+  portfolioCurrentCat.metaDescription = metaDescription;
+
   try {
-    if (cloudinaryId) {
-      await fetch(EVENTS_API + '/api/delete-photo', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ publicId: cloudinaryId })
-      });
+    var sb = getContentClient();
+    var catId = portfolioCurrentCat.id;
+
+    if (catId) {
+      var { error: upErr } = await sb.from('portfolio_categories').update({
+        title: title,
+        slug: slug,
+        meta_description: metaDescription,
+        cover_image: portfolioCurrentCat.coverImage || '',
+        cover_public_id: portfolioCurrentCat.coverPublicId || '',
+        updated_at: new Date().toISOString()
+      }).eq('id', catId);
+      if (upErr) throw upErr;
+      var { error: delErr } = await sb.from('portfolio_images').delete().eq('category_id', catId);
+      if (delErr) throw delErr;
+    } else {
+      var { data: newCat, error: insErr } = await sb.from('portfolio_categories').insert({
+        title: title,
+        slug: slug,
+        meta_description: metaDescription,
+        cover_image: portfolioCurrentCat.coverImage || '',
+        cover_public_id: portfolioCurrentCat.coverPublicId || ''
+      }).select('id').single();
+      if (insErr) throw insErr;
+      catId = newCat.id;
+      portfolioCurrentCat.id = catId;
     }
-    await deleteDoc(doc(db, 'portfolio_photos', id));
-    toast('', 'Photo removed', '');
-    pfLoadPhotos();
-  } catch(e) { toast('', 'Delete failed', e.message); }
+
+    if (portfolioCurrentCat.images.length) {
+      var imageRows = portfolioCurrentCat.images.map(function(img, i) {
+        return {
+          category_id: catId,
+          order: i,
+          url: img.url || '',
+          cloudinary_id: img.cloudinaryId || '',
+          alt_text: img.altText || '',
+          caption: img.caption || ''
+        };
+      });
+      var { error: imgErr } = await sb.from('portfolio_images').insert(imageRows);
+      if (imgErr) throw imgErr;
+    }
+
+    toast('', 'Portfolio saved', '');
+    portfolioBackToList();
+    loadPortfolioCategories();
+  } catch(e) { toast('', 'Save failed', e.message); }
 }
 
-window.pfLoadPhotos        = pfLoadPhotos;
-window.pfReshuffle         = pfReshuffle;
-window.pfHandleDrop        = pfHandleDrop;
-window.pfHandleInput       = pfHandleInput;
-window.pfDeletePhoto       = pfDeletePhoto;
-window.pfCardClick         = pfCardClick;
-window.pfToggleSelectMode  = pfToggleSelectMode;
-window.pfCancelSelect      = pfCancelSelect;
-window.pfSelectAll         = pfSelectAll;
-window.pfDeleteSelected    = pfDeleteSelected;
+window.loadPortfolioCategories = loadPortfolioCategories;
+window.portfolioNewCategory    = portfolioNewCategory;
+window.portfolioEditCategory   = portfolioEditCategory;
+window.portfolioDeleteCategory = portfolioDeleteCategory;
+window.portfolioBackToList     = portfolioBackToList;
+window.portfolioUpdateSlugPreview = portfolioUpdateSlugPreview;
+window.portfolioCoverFileChange   = portfolioCoverFileChange;
+window.portfolioUploadCover       = portfolioUploadCover;
+window.portfolioAddImageFiles     = portfolioAddImageFiles;
+window.portfolioSaveCategory      = portfolioSaveCategory;
 
 /* ════════════════════════════════════════
    BLOG ADMIN
