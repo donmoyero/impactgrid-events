@@ -21,19 +21,20 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio — Impact Grid Events</title>
-<link rel="canonical" href="https://impactgridgroup.com/portfolio.html"/>
-  <meta name="description" content="Our portfolio of event photography and content creation. Impact Grid Events — Manchester." />
-<meta property="og:type" content="website"/>
-<meta property="og:site_name" content="Impact Grid"/>
-<meta property="og:title" content="Portfolio — Impact Grid Events"/>
-<meta property="og:description" content="Our portfolio of event photography and content creation. Impact Grid Events — Manchester."/>
-<meta property="og:url" content="https://impactgridgroup.com/portfolio.html"/>
-<meta property="og:image" content="https://impactgridgroup.com/logo.png"/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Portfolio — Impact Grid Events"/>
-<meta name="twitter:description" content="Our portfolio of event photography and content creation. Impact Grid Events — Manchester."/>
-<meta name="twitter:image" content="https://impactgridgroup.com/logo.png"/>
+  <title id="pfPageTitle">Photography Portfolio in Manchester — Impact Grid</title>
+  <link rel="canonical" id="pfCanonical" href="https://impactgridgroup.com/portfolio.html"/>
+  <meta name="description" id="pfMetaDesc" content="Explore our portrait, event, fashion and commercial photography from Manchester and across the UK." />
+  <meta property="og:type" content="website" id="pfOgType"/>
+  <meta property="og:site_name" content="Impact Grid"/>
+  <meta property="og:title" id="pfOgTitle" content="Photography Portfolio in Manchester — Impact Grid"/>
+  <meta property="og:description" id="pfOgDesc" content="Explore our portrait, event, fashion and commercial photography from Manchester and across the UK."/>
+  <meta property="og:url" id="pfOgUrl" content="https://impactgridgroup.com/portfolio.html"/>
+  <meta property="og:image" id="pfOgImage" content="https://impactgridgroup.com/logo.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" id="pfTwTitle" content="Photography Portfolio in Manchester — Impact Grid"/>
+  <meta name="twitter:description" id="pfTwDesc" content="Explore our portrait, event, fashion and commercial photography from Manchester and across the UK."/>
+  <meta name="twitter:image" content="https://impactgridgroup.com/logo.png"/>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
@@ -50,355 +51,199 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <style>
     :root { --pf: 'Fraunces', Georgia, serif; }
 
-    /* ═══════════════════════════════════════
-       PAGE WRAPPER
-    ═══════════════════════════════════════ */
-    .pf-page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 80px 24px 100px;
-    }
-
+    .pf-page { padding: 80px 24px 100px; }
     .pf-label {
-      font-family: var(--fm);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text);
-      margin-bottom: 16px;
+      font-family: var(--fm); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--text); text-align: center; margin-bottom: 16px;
     }
     .pf-title {
-      font-family: var(--fb);
-      font-size: clamp(36px, 4.5vw, 64px);
-      font-weight: 900;
-      line-height: 1.04;
-      letter-spacing: -0.03em;
-      color: var(--text);
-      text-align: center;
-      margin-bottom: 64px;
+      font-family: var(--fb); font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 900; line-height: 1.04; letter-spacing: -0.03em;
+      color: var(--text); text-align: center; margin-bottom: 14px;
     }
-    .pf-title em { font-style: italic; color: var(--text); }
+    .pf-intro {
+      max-width: 620px; margin: 0 auto 44px; text-align: center;
+      font-family: var(--pf); font-size: 16px; line-height: 1.6;
+      color: var(--text2, #4a4234);
+    }
+
+    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    .skeleton-book {
+      aspect-ratio: 2 / 3; border-radius: 4px 8px 8px 4px;
+      background: linear-gradient(90deg, #e8e4dc 25%, #f0ede6 50%, #e8e4dc 75%);
+      background-size: 800px 100%; animation: shimmer 1.4s infinite;
+    }
+    .shelf {
+      max-width: var(--max-w); margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 36px 28px; align-items: end;
+    }
+    .closed-book {
+      position: relative; aspect-ratio: 2 / 3; border-radius: 4px 8px 8px 4px;
+      cursor: pointer; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .closed-book:hover { transform: translateY(-6px) rotate(-1deg); }
+    .closed-book.disabled { cursor: default; }
+    .closed-book.disabled:hover { transform: none; }
+    .closed-book-cover {
+      position: absolute; inset: 0; border-radius: 4px 8px 8px 4px;
+      background: linear-gradient(135deg, #1d1812 0%, #100d09 100%);
+      box-shadow: -4px 0 0 rgba(0,0,0,0.35) inset, 6px 10px 28px rgba(0,0,0,0.35);
+      overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .closed-book-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.78; }
+    .closed-book-cover::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 55%, transparent 80%);
+    }
+    .closed-book-spine {
+      position: absolute; top: 0; left: 0; bottom: 0; width: 10px;
+      background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(255,255,255,0.05)); z-index: 2;
+    }
+    .closed-book-info { position: relative; z-index: 1; padding: 16px 16px 18px; }
+    .closed-book-tag {
+      font-family: var(--fm); font-size: 8.5px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 6px;
+    }
+    .closed-book-title { font-family: var(--pf); font-size: 16px; font-weight: 400; line-height: 1.25; color: #fff; }
+    .closed-book-meta { font-family: var(--fm); font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 6px; }
+    .closed-book.placeholder .closed-book-cover { background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%); }
+    .closed-book.placeholder .closed-book-cover::after { background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 70%); }
+    .closed-book.placeholder .closed-book-title { font-size: 19px; }
 
     /* ═══════════════════════════════════════
-       BOOK SCENE
+       POST VIEW — one category, full page
     ═══════════════════════════════════════ */
-    .book-scene {
-      perspective: 2400px;
-      width: min(1400px, 98vw);
-      margin: 0 auto;
-      position: relative;
+    .post-view {
+      position: fixed; inset: 0; z-index: 2000; background: #fff; overflow-y: auto;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
     }
+    .post-view.show { opacity: 1; pointer-events: auto; }
 
-    /* Glow under the book */
-    .book-scene::after {
-      content: '';
-      position: absolute;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 55%;
-      height: 50px;
-      background: radial-gradient(ellipse, rgba(0,0,0,0.18) 0%, transparent 70%);
-      filter: blur(14px);
+    .post-topbar {
+      position: sticky; top: 0; left: 0; right: 0; z-index: 2010;
+      display: flex; align-items: center; justify-content: space-between; padding: 14px 20px;
+      background: rgba(var(--surface),0.92); backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(var(--ink),0.08);
+    }
+    .post-back {
+      font-family: var(--fm); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(var(--ink),0.65); display: flex; align-items: center; gap: 6px;
+      cursor: pointer; border: none; background: none; padding: 6px 10px; border-radius: 6px; transition: color 0.2s;
+    }
+    .post-back:hover { color: var(--text); background: rgba(var(--ink),0.06); }
+    .post-close {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(var(--ink),0.06); border: 1px solid rgba(var(--ink),0.14);
+      color: var(--text); font-size: 16px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .post-close:hover { background: rgba(var(--ink),0.12); }
+
+    .post-hero-wrap { position: relative; width: 100%; height: 460px; margin-top: 64px; overflow: hidden; background: #1a1612; }
+    .post-hero { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; opacity: 0.85; }
+    .post-hero-wrap::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,8,5,0.88) 0%, rgba(10,8,5,0.45) 45%, rgba(10,8,5,0.08) 75%, transparent 100%);
       pointer-events: none;
     }
+    .post-header { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 0 40px 32px; }
+    .post-tag {
+      font-family: var(--fm); font-size: 9px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;
+    }
+    .post-title {
+      font-family: var(--fb); font-size: clamp(24px, 3.5vw, 42px); font-weight: 900;
+      line-height: 1.08; letter-spacing: -0.02em; color: #fff; max-width: 720px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+    .post-hero-wrap.no-image { height: auto; background: #1a1612; padding: 80px 0 0; }
+    .post-hero-wrap.no-image::after { display: none; }
+    .post-hero-wrap.no-image .post-header { position: relative; padding: 36px 40px 40px; }
 
-    .book-root {
-      position: relative;
-      width: 100%;
-      /* 2:3 aspect per page, two pages side by side */
-      aspect-ratio: 2 / 1.1;
-      transform-style: preserve-3d;
-    }
-
-    /* ── FIXED LEFT & RIGHT HALVES ── */
-    /* These are the "resting" pages always visible */
-    .book-half {
-      position: absolute;
-      top: 0;
-      width: 50%;
-      height: 100%;
-      overflow: hidden;
-    }
-    .book-half-left {
-      left: 0;
-      border-radius: 6px 0 0 6px;
-      box-shadow: -6px 8px 40px rgba(0,0,0,0.45), -2px 0 8px rgba(0,0,0,0.2);
-      background: #1a1410;
-    }
-    .book-half-right {
-      right: 0;
-      border-radius: 0 6px 6px 0;
-      box-shadow: 6px 8px 40px rgba(0,0,0,0.45), 2px 0 8px rgba(0,0,0,0.2);
-      background: #1a1410;
-    }
-    .book-half img {
-      width: 100%; height: 100%;
-      object-fit: contain;
-      display: block;
-      background: #0d0d0d;
-    }
-
-    /* Page number badges */
-    .book-pg-num {
-      position: absolute;
-      bottom: 14px;
-      font-family: var(--fm);
-      font-size: 11px;
-      color: rgba(255,255,255,0.55);
-      background: rgba(0,0,0,0.35);
-      padding: 3px 10px;
-      border-radius: 100px;
-      backdrop-filter: blur(4px);
-      pointer-events: none;
-    }
-    .book-half-left .book-pg-num  { left: 18px; }
-    .book-half-right .book-pg-num { right: 18px; }
-
-    /* Event label overlay bottom-left / bottom-right */
-    .book-ev-ov {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, transparent 50%);
-      pointer-events: none;
-    }
-    .book-ev-info {
-      position: absolute;
-      bottom: 36px;
-      left: 24px;
-      pointer-events: none;
-    }
-    .book-ev-info.right { left: auto; right: 24px; text-align: right; }
-    .book-ev-tag {
-      font-family: var(--fm);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 4px;
-    }
-    .book-ev-name {
-      font-family: var(--pf);
-      font-size: clamp(13px, 1.6vw, 20px);
-      font-weight: 300;
-      color: #fff;
-      line-height: 1.2;
-    }
-
-    /* ── SPINE ── */
-    .book-spine {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 18px;
-      height: 100%;
-      z-index: 50;
-      pointer-events: none;
-      /* dark groove */
-      background: linear-gradient(to right,
-        rgba(0,0,0,0.55) 0%,
-        rgba(0,0,0,0.15) 30%,
-        rgba(255,255,255,0.04) 50%,
-        rgba(0,0,0,0.15) 70%,
-        rgba(0,0,0,0.55) 100%
-      );
-    }
-
-    /* ── FLIPPING PAGE ── */
-    /* This sits on top and animates */
-    .flip-leaf {
-      position: absolute;
-      top: 0;
-      width: 50%;
-      height: 100%;
-      transform-style: preserve-3d;
-      transform-origin: left center;
-      transition: transform 0.75s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-      z-index: 30;
-      pointer-events: none;
-    }
-    .flip-leaf.from-right {
-      left: 50%;
-      transform-origin: left center;
-    }
-    .flip-leaf.flipping-fwd {
-      animation: flipFwd 0.75s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
-    }
-    .flip-leaf.flipping-back {
-      animation: flipBack 0.75s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
-    }
-
-    @keyframes flipFwd {
-      0%   { transform: rotateY(0deg); left: 50%; transform-origin: left center; }
-      100% { transform: rotateY(-180deg); left: 50%; transform-origin: left center; }
-    }
-    @keyframes flipBack {
-      0%   { transform: rotateY(-180deg); left: 0%; transform-origin: right center; }
-      100% { transform: rotateY(0deg); left: 0%; transform-origin: right center; }
-    }
-
-    .flip-leaf-face, .flip-leaf-back {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      overflow: hidden;
-    }
-    .flip-leaf-face {
-      border-radius: 0 4px 4px 0;
-      box-shadow: 6px 0 20px rgba(0,0,0,0.3);
-    }
-    .flip-leaf-back {
-      transform: rotateY(180deg);
-      border-radius: 6px 0 0 6px;
-      box-shadow: -6px 0 20px rgba(0,0,0,0.3);
-    }
-    .flip-leaf-face img, .flip-leaf-back img {
-      width: 100%; height: 100%;
-      object-fit: contain; display: block;
-      background: #0d0d0d;
-    }
-    /* page-turn shadow / curl shading */
-    .flip-leaf-face::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to left, rgba(0,0,0,0.28) 0%, transparent 35%);
-      pointer-events: none;
-    }
-    .flip-leaf-back::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right, rgba(0,0,0,0.28) 0%, transparent 35%);
-      pointer-events: none;
-    }
-
-    /* ── CLICK ZONES ── */
-    .book-click-left,
-    .book-click-right {
-      position: absolute;
-      top: 0; width: 50%; height: 100%;
-      z-index: 40;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .book-click-left  { left: 0; }
-    .book-click-right { right: 0; }
-
-    .book-arrow {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.18);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: rgba(255,255,255,0.7);
-      transition: all 0.2s;
-      opacity: 0;
-    }
-    .book-click-left:hover  .book-arrow,
-    .book-click-right:hover .book-arrow { opacity: 1; background: rgba(255,255,255,0.16); }
-    .book-click-left.disabled,
-    .book-click-right.disabled { cursor: default; }
-    .book-click-left.disabled  .book-arrow,
-    .book-click-right.disabled .book-arrow { display: none; }
-
-    /* ── BOOK STATUS BAR ── */
-    .book-status {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 28px;
-      margin-top: 36px;
-    }
-    .book-status-label {
-      font-family: var(--pf);
-      font-size: 15px;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--text2);
-      min-width: 160px;
-      text-align: center;
-    }
-    .book-status-dots {
-      display: flex; gap: 7px; align-items: center;
-    }
-    .book-status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--border2);
-      border: none; cursor: pointer; padding: 0;
-      transition: all 0.25s;
-    }
-    .book-status-dot.active {
-      background: var(--text);
-      transform: scale(1.45);
-    }
-
-    /* ── HINT TEXT ── */
-    .book-hint {
-      margin-top: 20px;
-      font-family: var(--fm);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text3);
-    }
-
-    /* ── LOADING / EMPTY ── */
-    .book-loading {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--card);
-      border-radius: 6px;
-      font-family: var(--fm);
-      font-size: 11px;
-      color: var(--text3);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
-      .pf-page { padding: 60px 12px 80px; }
-      .pf-title { margin-bottom: 44px; }
-      .book-ev-name { font-size: 12px; }
-      .book-arrow { width: 34px; height: 34px; font-size: 14px; }
+      .post-hero-wrap { height: 340px; }
+      .post-header { padding: 0 20px 26px; }
+      .post-hero-wrap.no-image .post-header { padding: 28px 20px 32px; }
+    }
 
-      /* ── SINGLE PAGE MODE ──
-         The two-page spread needs real horizontal room to stay
-         readable; on a phone it just shrinks until you have to zoom.
-         Navigation already tracks one "current page" index and slides
-         a left/right window over it (see renderSpread()), so showing
-         only the right half — full width, one photo at a time — needs
-         zero JS changes. Tap zones (left half = prev, right half =
-         next) are separate overlay elements already spanning the full
-         book, so they keep working exactly as before. */
-      .book-root { aspect-ratio: 3 / 4; }
-      .book-half-left, .book-spine { display: none; }
-      .book-half-right {
-        width: 100%;
-        left: 0;
-        border-radius: 6px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.45);
-      }
-      .book-ev-info { bottom: 26px; left: 14px; }
-      .book-ev-info.right { left: 14px; right: auto; text-align: left; }
+    .post-intro {
+      max-width: 720px; margin: 0 auto; padding: 40px 24px 8px;
+      font-family: var(--fb); font-size: 16px; line-height: 1.85; color: var(--text2, #4a4234);
+    }
+
+    .pf-gallery {
+      max-width: 1040px; margin: 24px auto 0; padding: 0 24px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;
+    }
+    .pf-gallery figure { margin: 0; }
+    .pf-gallery img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 10px; display: block; cursor: zoom-in; }
+    .pf-gallery figcaption { margin-top: 6px; font-family: var(--fm); font-size: 11px; color: rgba(var(--ink),0.5); text-align: center; }
+
+    .post-empty { text-align: center; font-family: var(--fm); font-size: 12px; color: rgba(var(--ink),0.4); padding: 60px 0; }
+
+    /* ── Related categories ── */
+    .related-section {
+      max-width: 1040px; margin: 60px auto 0; padding: 0 24px;
+      border-top: 1px solid rgba(var(--ink),0.1); padding-top: 44px;
+    }
+    .related-heading {
+      font-family: var(--fm); font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(var(--ink),0.45); margin-bottom: 20px;
+    }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+    .related-card { cursor: pointer; border-radius: 8px; overflow: hidden; background: var(--bg2, #f7f4ef); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+    .related-card:hover { transform: translateY(-4px); }
+    .related-card-img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; background: var(--bg3, #e8e4dc); }
+    .related-card-info { padding: 12px 14px 14px; }
+    .related-card-title { font-family: var(--pf); font-size: 14px; line-height: 1.3; color: var(--text); }
+
+    .post-cta { max-width: 720px; margin: 48px auto 80px; padding: 0 24px; }
+    .post-cta-inner {
+      background: linear-gradient(135deg, #1d1812 0%, #2e2518 100%); border-radius: 14px;
+      padding: 44px 36px; text-align: center; position: relative; overflow: hidden;
+    }
+    .post-cta-inner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(184,150,74,0.18) 0%, transparent 60%); }
+    .post-cta-label { font-family: var(--fm); font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold, #b8964a); margin-bottom: 12px; position: relative; }
+    .post-cta-heading { font-family: var(--fb); font-size: clamp(20px, 3vw, 28px); font-weight: 900; line-height: 1.1; letter-spacing: -0.02em; color: #fff; margin-bottom: 22px; position: relative; }
+    .post-cta-btn {
+      display: inline-block; font-family: var(--fm); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 13px 28px; border-radius: 28px; background: var(--gold, #b8964a); color: #fff;
+      text-decoration: none; border: none; cursor: pointer; transition: opacity 0.2s; position: relative;
+    }
+    .post-cta-btn:hover { opacity: 0.88; }
+
+    .lightbox {
+      position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.92);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.22s;
+    }
+    .lightbox.show { opacity: 1; pointer-events: auto; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 80px rgba(0,0,0,0.6); }
+    .lightbox-close {
+      position: fixed; top: 20px; right: 24px; width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 18px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.22); }
+
+    @media (max-width: 700px) {
+      .pf-page { padding: 56px 14px 80px; }
+      .shelf { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 22px 16px; }
+      .post-intro { padding: 30px 18px 8px; }
+      .pf-gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); padding: 0 14px; }
+      .post-cta-inner { padding: 32px 22px; }
+      .related-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+      .post-topbar { padding: 10px 14px; }
     }
   </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
-     crossorigin="anonymous"></script>
 </head>
 <body>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="plan-config.js"></script>
+  <script src="supabase-config.js"></script>
   <script src="auth.js"></script>
 
   <div id="ig-nav"></div>
@@ -407,416 +252,335 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
   <div class="page-wrap">
     <div class="pf-page">
+      <div class="pf-label">Our Work</div>
+      <h1 class="pf-title">Photography Portfolio in Manchester</h1>
+      <p class="pf-intro">Explore our portrait, event, fashion and commercial photography from Manchester and across the UK.</p>
 
-      <h1 class="pf-title">Portfolio</h1>
-
-      <!-- THE BOOK -->
-      <div class="book-scene" id="bookScene">
-
-        <div class="book-root" id="bookRoot">
-          <!-- Loading state -->
-          <div class="book-loading" id="bookLoading">Loading portfolio…</div>
-
-          <!-- Left fixed half (shows "previous right page" or cover) -->
-          <div class="book-half book-half-left" id="bookLeft">
-            <img id="bookLeftImg" src="" alt=""/>
-            <div class="book-ev-ov"></div>
-            <div class="book-ev-info" id="bookLeftInfo"></div>
-            <div class="book-pg-num" id="bookLeftNum"></div>
-          </div>
-
-          <!-- Right fixed half (shows current right page) -->
-          <div class="book-half book-half-right" id="bookRight">
-            <img id="bookRightImg" src="" alt=""/>
-            <div class="book-ev-ov"></div>
-            <div class="book-ev-info right" id="bookRightInfo"></div>
-            <div class="book-pg-num" id="bookRightNum"></div>
-          </div>
-
-          <!-- Spine -->
-          <div class="book-spine"></div>
-
-          <!-- Flip leaf (cloned in JS during animation) -->
-          <div class="flip-leaf" id="flipLeaf" style="display:none;">
-            <div class="flip-leaf-face"><img id="flipFaceImg" src="" alt=""/></div>
-            <div class="flip-leaf-back"><img id="flipBackImg" src="" alt=""/></div>
-          </div>
-
-          <!-- Click zones -->
-          <div class="book-click-left" id="clickLeft" onclick="bookFlip(-1)">
-            <div class="book-arrow">←</div>
-          </div>
-          <div class="book-click-right" id="clickRight" onclick="bookFlip(1)">
-            <div class="book-arrow">→</div>
-          </div>
-        </div>
-
-        <!-- Status bar below book -->
-        <div class="book-status">
-          <div class="book-status-label" id="bookStatusLabel"></div>
-          <div class="book-status-dots" id="bookDots"></div>
-        </div>
-
-        <div class="book-hint">← Flip the pages →  &nbsp;·&nbsp;  Click anywhere on the book</div>
+      <div class="shelf" id="shelf">
+        <div class="skeleton-book"></div>
+        <div class="skeleton-book"></div>
+        <div class="skeleton-book"></div>
+        <div class="skeleton-book"></div>
       </div>
-
     </div>
   </div>
 
   <div id="ig-footer"></div>
   <script>renderFooter();</script>
 
+  <!-- CATEGORY VIEW -->
+  <div class="post-view" id="postView">
+    <div class="post-topbar">
+      <button class="post-back" id="postBackBtn" aria-label="Back to full portfolio">← All portfolio</button>
+      <button class="post-close" id="postCloseBtn" aria-label="Close">✕</button>
+    </div>
+
+    <div class="post-hero-wrap no-image" id="postHeroWrap">
+      <img class="post-hero" id="postHero" src="" alt="" style="display:none;">
+      <div class="post-header">
+        <div class="post-tag">Portfolio</div>
+        <h1 class="post-title" id="postTitle"></h1>
+      </div>
+    </div>
+
+    <div class="post-intro" id="postIntro"></div>
+
+    <div class="pf-gallery" id="pfGallery"></div>
+
+    <!-- Related categories -->
+    <div class="related-section" id="relatedSection" style="display:none">
+      <div class="related-heading">More from our portfolio</div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </div>
+
+    <div class="post-cta">
+      <div class="post-cta-inner">
+        <div class="post-cta-label">Work with us</div>
+        <div class="post-cta-heading">Ready to book your shoot?</div>
+        <a class="post-cta-btn" href="book-us.html">Book a session →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <img id="lightboxImg" src="" alt="" />
+  </div>
+
   <script>
   /* ════════════════════════════════════════
-     PORTFOLIO BOOK ENGINE
-     
-     Model: one "spread" = two facing photos.
-     Each event's photos are split into spreads:
-       spread 0 → photos[0] (right) + cover photo left side
-       spread 1 → photos[0] left + photos[1] right
-       spread 2 → photos[1] left + photos[2] right …
-     
-     When user flips forward:
-       - animate: right page peels left
-       - left becomes old right, right advances
-     When user flips back:
-       - animate: left page peels right
+     PORTFOLIO ENGINE
+     portfolio_categories { id, title, slug, meta_description, cover_image, created_at }
+     portfolio_images     { id, category_id, order, url, cloudinary_id, alt_text, caption }
   ════════════════════════════════════════ */
 
-  var FALLBACK_EVENTS = [
-    {
-      id: 'e1',
-      title: 'Summer Social — Outdoor Gathering',
-      description: 'Candid photography for a vibrant community event in Manchester.',
-      category: 'Social Event',
-      date: 'May 2026',
-      cover: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900&q=85&fit=crop',
-      photos: [
-        'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=85&fit=crop',
-      ]
-    },
-    {
-      id: 'e2',
-      title: 'Editorial Portrait Session',
-      description: 'Styled portrait and fashion photography with branded content delivery.',
-      category: 'Portrait Session',
-      date: 'Dec 2025',
-      cover: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85&fit=crop',
-      photos: [
-        'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=900&q=85&fit=crop',
-        'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=900&q=85&fit=crop',
-      ]
-    }
-  ];
+  var categories = [];
+  var activeCategory = null;
+  var activeCategoryIdx = -1;
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  /* ── Build a flat list of page-images from all events ── */
-  /* Page 0 = special cover page (first event cover, full spread)
-     Then each photo is one page in sequence, with events interleaved */
-  var allPages = []; // {url, label, sublabel, isFirst}
-  var allEvents = [];
-  var spreadIdx = 0;   // current left page index (0 = cover left)
-  var totalPages = 0;
-  var isFlipping = false;
-
-  function buildPages(events) {
-    allPages = [];
-    events.forEach(function(ev) {
-      var photos = ev.photos || [];
-      photos.forEach(function(url, i) {
-        allPages.push({
-          url: url,
-          label: ev.title,
-          sublabel: ev.category + '  ·  ' + ev.date,
-          isFirst: i === 0
-        });
-      });
-    });
-    totalPages = allPages.length;
+  /* ── Slug for URL ── */
+  function slugifyLocal(title) {
+    return String(title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   }
 
-  /* ── Render the static left/right halves for spreadIdx ── */
-  /* Left shows page[spreadIdx-1] (or blank for cover)
-     Right shows page[spreadIdx] */
-  function renderSpread(idx) {
-    var leftImg  = document.getElementById('bookLeftImg');
-    var rightImg = document.getElementById('bookRightImg');
-    var leftInfo  = document.getElementById('bookLeftInfo');
-    var rightInfo = document.getElementById('bookRightInfo');
-    var leftNum  = document.getElementById('bookLeftNum');
-    var rightNum = document.getElementById('bookRightNum');
-
-    /* LEFT page = idx - 1 */
-    if (idx === 0) {
-      /* Cover: show first photo on both sides or a dark cover */
-      var firstPg = allPages[0] || null;
-      leftImg.src  = firstPg ? firstPg.url : '';
-      leftImg.style.opacity = firstPg ? '1' : '0';
-      setInfo(leftInfo, firstPg, false);
-      leftNum.textContent = '';
-    } else {
-      var lpg = allPages[idx - 1];
-      leftImg.src = lpg ? lpg.url : '';
-      leftImg.style.opacity = lpg ? '1' : '0';
-      setInfo(leftInfo, lpg, false);
-      leftNum.textContent = lpg ? (idx) + ' / ' + totalPages : '';
+  /* ── Render shelf ── */
+  function renderShelf() {
+    var shelf = document.getElementById('shelf');
+    if (!categories.length) {
+      shelf.innerHTML =
+        '<div class="closed-book disabled placeholder">' +
+          '<div class="closed-book-cover">' +
+            '<div class="closed-book-info">' +
+              '<div class="closed-book-tag">Coming soon</div>' +
+              '<div class="closed-book-title">Impact Grid Portfolio</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      return;
     }
-
-    /* RIGHT page = idx */
-    var rpg = allPages[idx];
-    if (rpg) {
-      rightImg.src = rpg.url;
-      rightImg.style.opacity = '1';
-      setInfo(rightInfo, rpg, true);
-      rightNum.textContent = (idx + 1) + ' / ' + totalPages;
-    } else {
-      /* End of book */
-      rightImg.src = '';
-      rightImg.style.opacity = '0';
-      rightInfo.innerHTML = '';
-      rightNum.textContent = '';
-    }
-
-    updateStatus(idx);
-    updateClickZones(idx);
-  }
-
-  function setInfo(el, pg, right) {
-    if (!pg) { el.innerHTML = ''; return; }
-    if (pg.isFirst) {
-      el.innerHTML =
-        '<div class="book-ev-tag">' + esc(pg.sublabel) + '</div>' +
-        '<div class="book-ev-name">' + esc(pg.label) + '</div>';
-    } else {
-      el.innerHTML = '';
-    }
-  }
-
-  function updateStatus(idx) {
-    var lbl = document.getElementById('bookStatusLabel');
-    var dots = document.getElementById('bookDots');
-    /* Which event are we currently on? */
-    var pg = allPages[idx] || allPages[idx - 1];
-    if (pg) {
-      lbl.textContent = pg.label;
-    } else {
-      lbl.textContent = '';
-    }
-    /* Dots = one per event */
-    /* Figure out which event the current spread is from */
-    var evIdx = 0;
-    if (allEvents.length) {
-      var count = 0;
-      for (var e = 0; e < allEvents.length; e++) {
-        count += (allEvents[e].photos || []).length;
-        if (idx < count) { evIdx = e; break; }
-        evIdx = e;
-      }
-    }
-    dots.innerHTML = allEvents.map(function(_, i) {
-      return '<button class="book-status-dot' + (i === evIdx ? ' active' : '') + '" onclick="jumpToEvent(' + i + ')" aria-label="Event ' + (i+1) + '"></button>';
+    shelf.innerHTML = categories.map(function(c, i) {
+      return '<div class="closed-book" data-idx="' + i + '" onclick="openCategory(' + i + ')">' +
+        '<div class="closed-book-cover">' +
+          (c.coverImage ? '<img src="' + esc(c.coverImage) + '" alt="' + esc(c.title) + '">' : '') +
+          '<div class="closed-book-spine"></div>' +
+          '<div class="closed-book-info">' +
+            '<div class="closed-book-tag">Portfolio</div>' +
+            '<div class="closed-book-title">' + esc(c.title) + '</div>' +
+            '<div class="closed-book-meta">' + c.images.length + (c.images.length === 1 ? ' photo' : ' photos') + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     }).join('');
   }
 
-  function updateClickZones(idx) {
-    document.getElementById('clickLeft').classList.toggle('disabled', idx <= 0);
-    document.getElementById('clickRight').classList.toggle('disabled', idx >= totalPages - 1);
+  /* ── SEO: rewrite title/canonical/meta/og tags for the open category ── */
+  var _defaultMeta = null;
+  function captureDefaultMeta() {
+    if (_defaultMeta) return;
+    _defaultMeta = {
+      title: document.getElementById('pfPageTitle').textContent,
+      canonical: document.getElementById('pfCanonical').href,
+      desc: document.getElementById('pfMetaDesc').content,
+      ogTitle: document.getElementById('pfOgTitle').content,
+      ogDesc: document.getElementById('pfOgDesc').content,
+      ogUrl: document.getElementById('pfOgUrl').content,
+      ogImage: document.getElementById('pfOgImage').content,
+      twTitle: document.getElementById('pfTwTitle').content,
+      twDesc: document.getElementById('pfTwDesc').content
+    };
+  }
+  function setCategoryMeta(cat) {
+    captureDefaultMeta();
+    var title = cat.title + ' — Impact Grid Portfolio';
+    var desc = cat.metaDescription || ('Professional ' + cat.title.toLowerCase() + ' by Impact Grid.');
+    var url = 'https://impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug);
+    document.title = title;
+    document.getElementById('pfPageTitle').textContent = title;
+    document.getElementById('pfCanonical').href = url;
+    document.getElementById('pfMetaDesc').content = desc;
+    document.getElementById('pfOgTitle').content = title;
+    document.getElementById('pfOgDesc').content = desc;
+    document.getElementById('pfOgUrl').content = url;
+    document.getElementById('pfTwTitle').content = title;
+    document.getElementById('pfTwDesc').content = desc;
+    if (cat.coverImage) document.getElementById('pfOgImage').content = cat.coverImage;
+  }
+  function restoreDefaultMeta() {
+    if (!_defaultMeta) return;
+    document.title = _defaultMeta.title;
+    document.getElementById('pfPageTitle').textContent = _defaultMeta.title;
+    document.getElementById('pfCanonical').href = _defaultMeta.canonical;
+    document.getElementById('pfMetaDesc').content = _defaultMeta.desc;
+    document.getElementById('pfOgTitle').content = _defaultMeta.ogTitle;
+    document.getElementById('pfOgDesc').content = _defaultMeta.ogDesc;
+    document.getElementById('pfOgUrl').content = _defaultMeta.ogUrl;
+    document.getElementById('pfOgImage').content = _defaultMeta.ogImage;
+    document.getElementById('pfTwTitle').content = _defaultMeta.twTitle;
+    document.getElementById('pfTwDesc').content = _defaultMeta.twDesc;
   }
 
-  /* ── Jump to the first photo of an event ── */
-  function jumpToEvent(evIdx) {
-    var target = 0;
-    for (var i = 0; i < evIdx; i++) {
-      target += (allEvents[i].photos || []).length;
+  /* ── JSON-LD ── */
+  function injectJsonLd(cat) {
+    removeJsonLd();
+    if (!cat) return;
+    var script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'pf-jsonld';
+    var data = {
+      '@context': 'https://schema.org',
+      '@type': 'ImageGallery',
+      'name': cat.title,
+      'description': cat.metaDescription || '',
+      'url': 'https://impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug),
+      'author': { '@type': 'Organization', 'name': 'Impact Grid', 'url': 'https://impactgridgroup.com' },
+      'image': cat.images.map(function(img){ return img.url; })
+    };
+    script.textContent = JSON.stringify(data);
+    document.head.appendChild(script);
+  }
+  function removeJsonLd() {
+    var el = document.getElementById('pf-jsonld');
+    if (el) el.remove();
+  }
+
+  /* ── URL routing ── */
+  function pushCategoryState(cat) {
+    history.pushState({ categorySlug: cat.slug }, '', '?category=' + encodeURIComponent(cat.slug));
+  }
+  function clearCategoryState() {
+    history.pushState({}, '', 'portfolio.html');
+  }
+  function checkUrlCategory() {
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('category');
+    if (!slug || !categories.length) return;
+    for (var i = 0; i < categories.length; i++) {
+      if (categories[i].slug === slug) { openCategory(i); return; }
     }
-    if (target === spreadIdx) return;
-    spreadIdx = target;
-    renderSpread(spreadIdx);
   }
+  window.addEventListener('popstate', function(e) {
+    if (!(e.state && e.state.categorySlug) && activeCategory) closeCategory(false);
+  });
 
-  /* ── Flip animation ── */
-  function bookFlip(dir) {
-    if (isFlipping) return;
-    var newIdx = spreadIdx + dir;
-    if (newIdx < 0 || newIdx > totalPages - 1) return;
-
-    /* On mobile the book shows one full-width page (see the
-       max-width:700px CSS) instead of a left/right spread. Reuse the
-       same flip-leaf mechanism, just resized to the full width — same
-       page-turn feel, correctly sized for a single page. */
-    if (window.innerWidth <= 700) {
-      isFlipping = true;
-      var mLeaf = document.getElementById('flipLeaf');
-      var mFace = document.getElementById('flipFaceImg');
-      var mBack = document.getElementById('flipBackImg');
-      var curPg = allPages[spreadIdx];
-      var tgtPg = allPages[newIdx];
-
-      mFace.src = curPg ? curPg.url : '';
-      mBack.src = tgtPg ? tgtPg.url : '';
-
-      mLeaf.style.left  = '0%';
-      mLeaf.style.width = '100%';
-      mLeaf.style.transformOrigin = (dir > 0) ? 'left center' : 'right center';
-      mLeaf.style.transform = 'rotateY(0deg)';
-      mLeaf.style.display = 'block';
-
-      setTimeout(function() {
-        mLeaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
-        mLeaf.style.transform = (dir > 0) ? 'rotateY(-180deg)' : 'rotateY(180deg)';
-      }, 16);
-
-      setTimeout(function() {
-        spreadIdx = newIdx;
-        renderSpread(spreadIdx);
-        mLeaf.style.display = 'none';
-        mLeaf.style.transition = '';
-        mLeaf.style.transform  = '';
-        mLeaf.style.width      = '';
-        isFlipping = false;
-      }, 780);
-
+  /* ── Gallery + related ── */
+  function renderGallery() {
+    var el = document.getElementById('pfGallery');
+    var images = activeCategory.images;
+    if (!images.length) {
+      el.innerHTML = '<div class="post-empty">No photos yet.</div>';
       return;
     }
+    el.innerHTML = images.map(function(img) {
+      return '<figure>' +
+        '<img src="' + esc(img.url) + '" alt="' + esc(img.altText || activeCategory.title) + '" onclick="openLightbox(this.src)">' +
+        (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') +
+        '</figure>';
+    }).join('');
+  }
+  function renderRelated() {
+    var section = document.getElementById('relatedSection');
+    var grid = document.getElementById('relatedGrid');
+    var related = categories.filter(function(c, i) { return i !== activeCategoryIdx; }).slice(0, 4);
+    if (!related.length) { section.style.display = 'none'; return; }
+    section.style.display = '';
+    grid.innerHTML = related.map(function(c) {
+      var idx = categories.indexOf(c);
+      return '<div class="related-card" onclick="openCategory(' + idx + ')">' +
+        (c.coverImage ? '<img class="related-card-img" src="' + esc(c.coverImage) + '" alt="' + esc(c.title) + '">' :
+          '<div class="related-card-img"></div>') +
+        '<div class="related-card-info"><div class="related-card-title">' + esc(c.title) + '</div></div>' +
+      '</div>';
+    }).join('');
+  }
 
-    isFlipping = true;
+  /* ── Open / close ── */
+  function openCategory(i) {
+    activeCategory = categories[i];
+    activeCategoryIdx = i;
+    if (!activeCategory) return;
 
-    var leaf = document.getElementById('flipLeaf');
-    var faceImg = document.getElementById('flipFaceImg');
-    var backImg = document.getElementById('flipBackImg');
+    document.getElementById('postTitle').textContent = activeCategory.title;
+    document.getElementById('postIntro').textContent = activeCategory.metaDescription || '';
 
-    if (dir > 0) {
-      /* Forward: right page peels to left */
-      /* Face = current right page, Back = next right page */
-      var curPg  = allPages[spreadIdx];
-      var nextPg = allPages[newIdx];
-
-      faceImg.src = curPg ? curPg.url : '';
-      backImg.src = nextPg ? nextPg.url : '';
-
-      leaf.style.left = '50%';
-      leaf.style.transformOrigin = 'left center';
-      leaf.style.transform = 'rotateY(0deg)';
-      leaf.style.display = 'block';
-
-      /* Immediately update underlying pages so they show through */
-      /* Left will show old right (page being turned) — keep until flip done */
-      /* Right will show new page */
-      setTimeout(function() {
-        leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
-        leaf.style.transform = 'rotateY(-180deg)';
-      }, 16);
-
-      setTimeout(function() {
-        spreadIdx = newIdx;
-        renderSpread(spreadIdx);
-        leaf.style.display = 'none';
-        leaf.style.transition = '';
-        leaf.style.transform = '';
-        isFlipping = false;
-      }, 780);
-
+    var hero = document.getElementById('postHero');
+    var heroWrap = document.getElementById('postHeroWrap');
+    if (activeCategory.coverImage) {
+      hero.src = activeCategory.coverImage;
+      hero.alt = activeCategory.title;
+      hero.style.display = 'block';
+      heroWrap.classList.remove('no-image');
     } else {
-      /* Backward: left page flips back to right */
-      var curLeftPg = allPages[spreadIdx - 1];
-      var prevPg    = allPages[newIdx - 1];
-
-      /* Face (seen from left side after flip) = prev left page
-         Back (seen from right before flip starts) = current left */
-      faceImg.src = prevPg    ? prevPg.url    : '';
-      backImg.src = curLeftPg ? curLeftPg.url : '';
-
-      leaf.style.left = '0%';
-      leaf.style.transformOrigin = 'right center';
-      leaf.style.transform = 'rotateY(-180deg)';
-      leaf.style.display = 'block';
-
-      setTimeout(function() {
-        leaf.style.transition = 'transform 0.75s cubic-bezier(0.645,0.045,0.355,1)';
-        leaf.style.transform = 'rotateY(0deg)';
-      }, 16);
-
-      setTimeout(function() {
-        spreadIdx = newIdx;
-        renderSpread(spreadIdx);
-        leaf.style.display = 'none';
-        leaf.style.transition = '';
-        leaf.style.transform = '';
-        isFlipping = false;
-      }, 780);
+      hero.style.display = 'none';
+      heroWrap.classList.add('no-image');
     }
+
+    renderGallery();
+    renderRelated();
+
+    document.getElementById('postView').classList.add('show');
+    document.getElementById('postView').scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+
+    pushCategoryState(activeCategory);
+    setCategoryMeta(activeCategory);
+    injectJsonLd(activeCategory);
   }
 
-  /* ── Touch / keyboard ── */
-  var _tx = 0;
-  document.getElementById('bookRoot').addEventListener('touchstart', function(e){ _tx = e.touches[0].clientX; }, {passive:true});
-  document.getElementById('bookRoot').addEventListener('touchend', function(e){
-    var dx = e.changedTouches[0].clientX - _tx;
-    if (Math.abs(dx) > 44) bookFlip(dx < 0 ? 1 : -1);
-  });
+  function closeCategory(updateHistory) {
+    document.getElementById('postView').classList.remove('show');
+    document.body.style.overflow = '';
+    removeJsonLd();
+    restoreDefaultMeta();
+    activeCategory = null;
+    activeCategoryIdx = -1;
+    if (updateHistory !== false) clearCategoryState();
+  }
+
+  document.getElementById('postCloseBtn').addEventListener('click', function(){ closeCategory(true); });
+  document.getElementById('postBackBtn').addEventListener('click', function(){ closeCategory(true); });
+
   document.addEventListener('keydown', function(e){
-    if (e.key === 'ArrowRight') bookFlip(1);
-    if (e.key === 'ArrowLeft')  bookFlip(-1);
+    if (e.key === 'Escape') {
+      if (document.getElementById('lightbox').classList.contains('show')) closeLightbox();
+      else if (activeCategory) closeCategory(true);
+    }
   });
 
-  /* ── Load photos from Firebase portfolio_photos flat collection ── */
-  var _pfDb = null;
-
-  async function loadEvents() {
-    try {
-      var cfg = await fetch('https://impactgrid-events-api.onrender.com/api/firebase-config').then(function(r){ return r.json(); });
-      if (!firebase.apps.length) firebase.initializeApp(cfg);
-      _pfDb = firebase.firestore();
-      var snap = await _pfDb.collection('portfolio_photos').get();
-      var rows = snap.docs.map(function(d){ return d.data(); });
-
-      /* Match admin.html's pfLoadPhotos() sort exactly: respect a persisted
-         shuffle order when present, falling back to newest-first for any
-         photo uploaded since the last reshuffle. This is what makes the
-         admin "Reshuffle" button actually change what visitors see here. */
-      rows.sort(function(a, b){
-        var ao = (typeof a.order === 'number') ? a.order : Infinity;
-        var bo = (typeof b.order === 'number') ? b.order : Infinity;
-        if (ao !== bo) return ao - bo;
-        var at = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
-        var bt = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
-        return bt - at;
-      });
-
-      var photos = rows.map(function(d){ return d.url; }).filter(Boolean);
-      if (photos.length) {
-        usePhotos(photos);
-      } else {
-        /* Fallback to demo photos */
-        usePhotos(FALLBACK_EVENTS.reduce(function(a,e){ return a.concat(e.photos); }, []));
-      }
-    } catch(e) {
-      console.warn('Portfolio Firebase fetch failed, using fallback:', e);
-      usePhotos(FALLBACK_EVENTS.reduce(function(a,e){ return a.concat(e.photos); }, []));
-    }
+  /* ── Lightbox ── */
+  function openLightbox(src) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.add('show');
   }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('show'); }
+  document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+  document.getElementById('lightbox').addEventListener('click', function(e){ if (e.target === this) closeLightbox(); });
 
-  function usePhotos(photoUrls) {
-    /* Wrap flat photo list into the single-event structure the book engine expects */
-    allEvents = [{ id: 'portfolio', title: 'Portfolio', category: '', date: '', photos: photoUrls }];
-    buildPages(allEvents);
-    document.getElementById('bookLoading').style.display = 'none';
-    spreadIdx = 0;
-    renderSpread(0);
+  /* ── Load from Supabase ── */
+  async function loadCategories() {
+    try {
+      var sb = getContentClient();
+      var { data: cats, error: catErr } = await sb
+        .from('portfolio_categories')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (catErr) throw catErr;
+
+      var loaded = [];
+      for (var i = 0; i < (cats || []).length; i++) {
+        var c = cats[i];
+        var { data: imgs, error: imgErr } = await sb
+          .from('portfolio_images')
+          .select('*')
+          .eq('category_id', c.id)
+          .order('order', { ascending: true });
+        if (imgErr) throw imgErr;
+        loaded.push({
+          id: c.id,
+          title: c.title || 'Untitled',
+          slug: c.slug || slugifyLocal(c.title),
+          metaDescription: c.meta_description || '',
+          coverImage: c.cover_image || '',
+          createdAt: c.created_at || '',
+          images: (imgs || []).map(function(img) {
+            return { id: img.id, url: img.url, altText: img.alt_text || '', caption: img.caption || '' };
+          })
+        });
+      }
+      categories = loaded;
+    } catch (e) {
+      console.warn('Portfolio fetch failed:', e);
+      categories = [];
+    }
+    renderShelf();
+    checkUrlCategory();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadEvents);
+    document.addEventListener('DOMContentLoaded', loadCategories);
   } else {
-    loadEvents();
+    loadCategories();
   }
   </script>
 
