@@ -870,9 +870,12 @@ If you have any questions, just reply to this email.
             <div class="card">
               <div class="card-head">
                 <h2> Photos</h2>
-                <label class="btn btn-ghost btn-sm" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
-                  <input type="file" id="portfolioAddImageIn" accept="image/*" multiple style="display:none;" onchange="portfolioAddImageFiles(event)">
-                </label>
+                <div style="display:flex;gap:6px;">
+                  <button class="btn btn-ghost btn-sm" onclick="portfolioShuffleImages()" title="Randomize photo order">&#128256; Shuffle</button>
+                  <label class="btn btn-ghost btn-sm" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
+                    <input type="file" id="portfolioAddImageIn" accept="image/*" multiple style="display:none;" onchange="portfolioAddImageFiles(event)">
+                  </label>
+                </div>
               </div>
               <div class="card-body" id="portfolioImagesList">
                 <div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet — add some above.</div></div>
@@ -4622,6 +4625,17 @@ function portfolioMoveImage(idx, dir) {
 function portfolioUpdateImageField(idx, field, value) {
   if (portfolioCurrentCat && portfolioCurrentCat.images[idx]) portfolioCurrentCat.images[idx][field] = value;
 }
+function portfolioShuffleImages() {
+  if (!portfolioCurrentCat || !portfolioCurrentCat.images.length) return;
+  var arr = portfolioCurrentCat.images;
+  /* Fisher–Yates — works as a simple button tap, no drag needed, so it's mobile-friendly */
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  portfolioRenderImages();
+  toast('', 'Photos shuffled', 'Tap Save Portfolio to keep this order.');
+}
 
 /* ── Drag-and-drop reordering ── */
 var _portfolioDragIdx = null;
@@ -4778,6 +4792,7 @@ window.portfolioUpdateSlugPreview = portfolioUpdateSlugPreview;
 window.portfolioCoverFileChange   = portfolioCoverFileChange;
 window.portfolioUploadCover       = portfolioUploadCover;
 window.portfolioAddImageFiles     = portfolioAddImageFiles;
+window.portfolioShuffleImages     = portfolioShuffleImages;
 window.portfolioSaveCategory      = portfolioSaveCategory;
 
 /* ════════════════════════════════════════
