@@ -978,3 +978,17 @@ body::after {
   /* Sidebar visibility on mobile is controlled per-page
      (e.g. creator-studio.css handles the slide-in). */
 }
+
+/* Image save/drag deterrent — scoped to pages with class "protect-page"
+   (currently: homepage, portfolio). This is a deterrent for casual
+   right-click/drag/long-press saving only; it cannot block screenshots
+   or screen recording, which happen outside the browser's control. */
+body.protect-page img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none; /* disables iOS long-press "Save Image" menu */
+  pointer-events: auto; /* keep clicks (e.g. lightbox) working */
+}
