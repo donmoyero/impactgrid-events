@@ -710,6 +710,7 @@ async function loadEvents(){
             + '<td style="font-size:12px;color:' + (daysLeft < 5 ? 'var(--red)' : 'var(--text2)') + ';">' + expStr + '</td>'
             + '<td>' + statusPill + '</td>'
             + '<td><div class="td-actions">'
+            + '<button class="btn btn-gold btn-sm" onclick="openManageGallery(\'' + ev.id + '\')"> Manage Gallery</button>'
             + '<a class="btn btn-ghost btn-sm" href="event.html?event=' + ev.event_slug + '&code=' + ev.event_code + '" target="_blank"> View Event</a>'
             + '<button class="btn btn-ghost btn-sm" onclick="editEventTemplate(\'' + ev.id + '\',\'' + (ev.template_id||'') + '\')">Edit Template</button>'
             + '<button class="btn btn-ghost btn-sm" onclick="goUploadForEvent(\'' + ev.id + '\')"> Upload</button>'
@@ -790,6 +791,90 @@ async function deleteEvent(id){
   toast(' ', 'Event deleted', '');
   loadEvents(); loadStats();
 }
+
+/* ════════════════════════════════════════════════════
+   MANAGE GALLERY — per-event hub (Overview built now;
+   Photos / Cover / Design / Branding / Client Experience /
+   Settings tabs are placeholders until their own phases)
+════════════════════════════════════════════════════ */
+var _mgEventId = null;
+
+function openManageGallery(eventId){
+  _mgEventId = eventId;
+  nav('managegallery', null);
+}
+
+async function loadManageGallery(){
+  if(!_mgEventId) { nav('events', null); return; }
+  var id = _mgEventId;
+  mgSwitchTab('overview');
+
+  var nameEl = document.getElementById('mgEventName');
+  var subEl  = document.getElementById('mgEventSub');
+  var prevEl = document.getElementById('mgPreviewLink');
+  var body   = document.getElementById('mgOverviewBody');
+  if(nameEl) nameEl.textContent = 'Gallery';
+  if(subEl)  subEl.textContent  = '';
+  if(body)   body.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:50%;"></div></div>';
+
+  try{
+    var evSnap = await getDoc(doc(db, 'events', id));
+    if(!evSnap.exists){ if(body) body.innerHTML = '<div class="empty"><div class="empty-txt">Event not found.</div></div>'; return; }
+    var ev = evSnap.data();
+
+    if(nameEl) nameEl.textContent = ev.name || 'Gallery';
+    if(subEl)  subEl.textContent  = 'Client Gallery';
+    if(prevEl) prevEl.href = 'event.html?event=' + ev.event_slug + '&code=' + ev.event_code;
+
+    var photoCountP = getDocs(query(collection(db, 'photos'), where('event_id','==',id)));
+    var templateNameP = ev.template_id
+      ? getDoc(doc(db, 'templates', ev.template_id)).then(function(t){ return t.exists ? (t.data().name || '—') : '—'; }).catch(function(){ return '—'; })
+      : Promise.resolve('Default');
+
+    var results = await Promise.all([photoCountP, templateNameP]);
+    var photoCount   = results[0].size;
+    var templateName = results[1];
+
+    var expDate  = ev.expiry_date ? new Date(ev.expiry_date) : null;
+    var expStr   = expDate ? expDate.toLocaleDateString('en-GB') : '—';
+    var evDate   = ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '—';
+
+    function stat(label, value){
+      return '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">' + esc(label) + '</div>'
+        + '<div style="font-size:15px;font-weight:700;">' + value + '</div></div>';
+    }
+
+    if(body){
+      body.innerHTML =
+          stat('Gallery Status', ev.is_active ? '<span class="pill pill-active"> Active</span>' : '<span class="pill pill-paused"> Inactive</span>')
+        + stat('Client', esc(ev.owner_name || '—') + (ev.owner_email ? '<br><span style="font-size:11px;font-weight:400;color:var(--text3);">' + esc(ev.owner_email) + '</span>' : ''))
+        + stat('Event Date', esc(evDate))
+        + stat('Photos', String(photoCount))
+        + stat('Template', esc(templateName))
+        + stat('Expiry', esc(expStr))
+        + '<div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">'
+        + '<button class="btn btn-gold btn-sm" onclick="goUploadForEvent(\'' + id + '\')"> Upload Photos</button>'
+        + '<button class="btn btn-ghost btn-sm" onclick="editEventTemplate(\'' + id + '\',\'' + (ev.template_id||'') + '\')">Edit Template</button>'
+        + '<button class="btn ' + (ev.is_active ? 'btn-red' : 'btn-green') + ' btn-sm" onclick="toggleEvent(\'' + id + '\',' + ev.is_active + ')">' + (ev.is_active ? 'Deactivate' : 'Activate') + '</button>'
+        + '</div>';
+    }
+  }catch(e){
+    if(body) body.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgSwitchTab(tab){
+  document.querySelectorAll('.mg-tab').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.mg-panel').forEach(function(p){ p.style.display = 'none'; });
+  var btn   = document.getElementById('mg-tab-' + tab);
+  var panel = document.getElementById('mg-panel-' + tab);
+  if(btn)   btn.classList.add('active');
+  if(panel) panel.style.display = 'block';
+}
+
+window.openManageGallery = openManageGallery;
+window.loadManageGallery = loadManageGallery;
+window.mgSwitchTab       = mgSwitchTab;
 
 function goUploadForEvent(eventId){
   selectedEventId = eventId;
