@@ -424,7 +424,7 @@ function renderTemplatesAdmin(){
       + bgPreview
       + '<div style="flex:1;min-width:0;">'
         + '<div style="font-weight:700;font-size:13px;">' + esc(t.name||'Untitled') + (t.is_default ? ' <span class="pill pill-applied" style="font-size:9px;">DEFAULT</span>' : '') + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">Layout: ' + esc(t.layout_style||'grid') + ' · Transition: ' + esc(t.transition_style||'fade') + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">Look: ' + esc(tplLookLabel(t.look_id)) + ' · Layout: ' + esc(t.layout_style||'grid') + ' · Transition: ' + esc(t.transition_style||'fade') + '</div>'
       + '</div>'
       + '<button class="btn btn-ghost btn-sm" onclick=\'editTemplate(' + JSON.stringify(t).replace(/'/g,"&#39;") + ')\'>Edit</button>'
       + '<button class="btn btn-ghost btn-sm" onclick="deleteTemplate(\'' + t.id + '\',\'' + esc(t.name||'').replace(/'/g,"\\'") + '\')">Delete</button>'
@@ -481,7 +481,7 @@ function tplMiniTransition(v){
   return '<div class="tpl-tr tpl-tr-' + v + '"><div class="tpl-tr-a"></div><div class="tpl-tr-b"></div></div>';
 }
 
-function tplRenderCards(containerId, inputId, styles, miniFn){
+function tplRenderCards(containerId, inputId, styles, miniFn, thumbClass){
   var wrap = document.getElementById(containerId);
   var inp  = document.getElementById(inputId);
   if(!wrap || !inp) return;
@@ -489,10 +489,54 @@ function tplRenderCards(containerId, inputId, styles, miniFn){
   wrap.innerHTML = styles.map(function(s){
     var on = s.value === cur;
     return '<button type="button" class="tpl-card' + (on ? ' sel' : '') + '" data-value="' + s.value + '" aria-pressed="' + on + '">'
-      + '<div class="tpl-card-thumb">' + miniFn(s.value) + '</div>'
+      + '<div class="tpl-card-thumb' + (thumbClass ? ' ' + thumbClass : '') + '">' + miniFn(s.value) + '</div>'
       + '<div class="tpl-card-label">' + esc(s.label) + '</div>'
+      + (s.tagline ? '<div class="tpl-card-sub">' + esc(s.tagline) + '</div>' : '')
     + '</button>';
   }).join('');
+}
+
+/* ── LOOK cards (Phase 4c) ─────────────────────────────────────────
+   Looks are defined once in gallery-looks.js (window.GALLERY_LOOKS) and
+   shared with event.html. '' = "Original" (the per-event-type skin). */
+function tplLookList(){
+  var list = [{ value:'', label:'Original', tagline:'Event-type style' }];
+  (window.GALLERY_LOOKS || []).forEach(function(l){ list.push({ value:l.id, label:l.label, tagline:l.tagline }); });
+  return list;
+}
+function tplLookLabel(id){
+  var l = (window.galleryLookById && id) ? galleryLookById(id) : null;
+  return l ? l.label : 'Original';
+}
+/* Tiny stand-in for a gallery in that look: its background, title font,
+   accent button and three photo tiles using its gap + corner radius. */
+function tplMiniLook(id){
+  var look = (window.galleryLookById && id) ? galleryLookById(id) : null;
+  if(!look){
+    return '<div class="tpl-lk tpl-lk-orig"><div class="tpl-lk-title">Original</div><div class="tpl-lk-btn"></div></div>';
+  }
+  var c = look.c, f = look.f, sh = look.s;
+  var g = Math.max(1, Math.round(sh.gap / 4));
+  var r = Math.min(6, Math.round(sh.radius / 2.5));
+  var tile = function(bg){ return '<div style="flex:1;background:' + bg + ';border-radius:' + r + 'px;"></div>'; };
+  return '<div class="tpl-lk" style="background:' + c.bg + ';">'
+    + '<div class="tpl-lk-title" style="font-family:' + f.head + ';font-weight:' + f.headWeight + ';text-transform:' + f.headCase + ';letter-spacing:' + f.headTrack + ';color:' + c.text + ';">Aa Wedding</div>'
+    + '<div class="tpl-lk-btn" style="background:' + c.accent + ';"></div>'
+    + '<div class="tpl-lk-row" style="gap:' + g + 'px;">' + tile(c.accent) + tile(c.text3) + tile(c.border2) + '</div>'
+  + '</div>';
+}
+/* Picking a look also drops in that look's background colour (an existing
+   image background is left alone). Layout / transition are NOT touched. */
+function tplApplyLookDefaults(id){
+  var look = (window.galleryLookById && id) ? galleryLookById(id) : null;
+  if(!look) return;
+  var typeEl = document.getElementById('tpl-bg-type');
+  var valEl  = document.getElementById('tpl-bg-value');
+  if(!typeEl || !valEl || typeEl.value === 'image') return;
+  typeEl.value = 'color';
+  tplBgTypeChanged();
+  valEl.value = look.c.bg;
+  updateTplBgPreview();
 }
 
 /* Re-reads #tpl-layout / #tpl-transition and redraws both card grids —
@@ -500,6 +544,7 @@ function tplRenderCards(containerId, inputId, styles, miniFn){
 function tplRenderPickers(){
   tplRenderCards('tpl-layout-cards',     'tpl-layout',     LAYOUT_STYLES,     tplMiniLayout);
   tplRenderCards('tpl-transition-cards', 'tpl-transition', TRANSITION_STYLES, tplMiniTransition);
+  tplRenderCards('tpl-look-cards',       'tpl-look',       tplLookList(),     tplMiniLook, 'tpl-look-thumb');
 }
 
 /* One delegated click handler for every card in either grid. */
@@ -517,8 +562,10 @@ document.addEventListener('click', function(e){
     c.classList.toggle('sel', on);
     c.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
+  if(inputId === 'tpl-look') tplApplyLookDefaults(inp.value);
 });
 window.tplRenderPickers = tplRenderPickers;
+window.tplLookLabel = tplLookLabel;
 
 function openTemplateModal(prefill){
   var m = document.getElementById('templateModal');
@@ -527,6 +574,7 @@ function openTemplateModal(prefill){
   document.getElementById('tpl-name').value = prefill ? (prefill.name||'') : '';
   document.getElementById('tpl-layout').value = prefill ? (prefill.layout_style||'grid') : 'grid';
   document.getElementById('tpl-transition').value = prefill ? (prefill.transition_style||'fade') : 'fade';
+  document.getElementById('tpl-look').value = prefill ? (prefill.look_id||'') : '';
   document.getElementById('tpl-bg-type').value = prefill ? (prefill.background_type||'color') : 'color';
   tplBgTypeChanged(); /* sets tpl-bg-value's input type (color vs text) before we set its value below */
   document.getElementById('tpl-bg-value').value = prefill ? (prefill.background_value||'#0f1020') : '#0f1020';
@@ -620,6 +668,7 @@ async function saveTemplate(){
     name             : name,
     layout_style     : document.getElementById('tpl-layout').value,
     transition_style : document.getElementById('tpl-transition').value,
+    look_id          : document.getElementById('tpl-look').value || '',
     background_type  : document.getElementById('tpl-bg-type').value,
     background_value : document.getElementById('tpl-bg-value').value.trim(),
     is_default       : document.getElementById('tpl-default').checked,
@@ -1260,7 +1309,7 @@ function mgRenderDesign(){
       + bgPreview
       + '<div style="flex:1;min-width:160px;">'
         + '<div style="font-weight:700;font-size:14px;">' + esc(t ? (t.name || 'Untitled') : 'No template') + (usingDefault && t ? ' <span class="pill pill-applied" style="font-size:9px;">DEFAULT</span>' : '') + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Layout: ' + esc(t ? (t.layout_style || 'grid') : 'grid') + ' · Transition: ' + esc(t ? (t.transition_style || 'fade') : 'fade') + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Look: ' + esc(t ? tplLookLabel(t.look_id) : 'Original') + ' · Layout: ' + esc(t ? (t.layout_style || 'grid') : 'grid') + ' · Transition: ' + esc(t ? (t.transition_style || 'fade') : 'fade') + '</div>'
       + '</div>'
       + '<button class="btn btn-gold btn-sm" onclick="editEventTemplate(_mgEventId, \'' + linkedId + '\')"> Edit Design</button>'
     + '</div>'
