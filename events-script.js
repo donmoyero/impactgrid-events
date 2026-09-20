@@ -40,6 +40,7 @@ var addDoc          = function(colRef, data)  { return colRef.add(data); };
 var getDoc          = function(docRef)        { return docRef.get(); };
 var getDocs         = function(q)             { return q.get(); };
 var updateDoc       = function(docRef, data)  { return docRef.update(data); };
+var setDoc          = function(docRef, data, opts) { return docRef.set(data, opts || {}); };
 var deleteDoc       = function(docRef)        { return docRef.delete(); };
 var serverTimestamp = function()              { return firebase.firestore.FieldValue.serverTimestamp(); };
 
@@ -267,7 +268,6 @@ async function igCreateEvent(){
   var name       = document.getElementById('ev-name').value.trim();
   var expiry     = document.getElementById('ev-expiry').value;
   var code       = document.getElementById('ev-code').value.trim().toUpperCase();
-  var templateId = document.getElementById('ev-template') ? document.getElementById('ev-template').value : '';
   var eventDate  = document.getElementById('ev-date') ? document.getElementById('ev-date').value : '';
   var serviceId  = document.getElementById('ev-service') ? document.getElementById('ev-service').value : '';
   var alertEl    = document.getElementById('createEventAlert');
@@ -309,7 +309,6 @@ async function igCreateEvent(){
     /* Save event to Firestore */
     var evRef = await addDoc(collection(db, 'events'), {
       name             : name,
-      template_id      : templateId || null,
       service_id       : serviceId || null,
       event_date       : eventDate,
       owner_email      : document.getElementById('ev-owner')      ? document.getElementById('ev-owner').value.trim()      || null : null,
@@ -335,7 +334,6 @@ async function igCreateEvent(){
     await addDoc(collection(db, 'event_settings'), {
       event_id          : evRef.id,
       require_code      : evRequireCode,
-      template_id       : templateId || null,
       watermark_enabled : evWatermark,
       created_at        : serverTimestamp()
     });
@@ -351,7 +349,6 @@ async function igCreateEvent(){
       var el = document.getElementById(id); if(el) el.value = '';
     });
     var evSvcEl = document.getElementById('ev-service'); if(evSvcEl) evSvcEl.value = '';
-    var evTplEl = document.getElementById('ev-template'); if(evTplEl) evTplEl.value = '';
     resetInvoiceForm();
     /* Reset email fields */
     var subj = document.getElementById('ev-email-subject');
@@ -374,13 +371,11 @@ async function igCreateEvent(){
 }
 
 /* ════════════════════════════════════════════════════
-   TEMPLATES — layout / transition / background, live in
-   Firestore `templates` collection. Services point at one
-   of these (default_template_id), events can override it.
+   DESIGN — layout / transition / background. Lives directly on each
+   event (event.design), edited from Manage Gallery → Design. A single
+   studio-wide fallback (studio_settings/design_defaults) covers any
+   gallery that hasn't been customized.
 ════════════════════════════════════════════════════ */
-var _templatesCache = []; // [{id,name,layout_style,transition_style,background_type,background_value,is_default}]
-var _templateEditEventId = null; // set when the template modal was opened via an event row's "Edit Template" action
-
 var LAYOUT_STYLES = [
   { value:'grid',      label:'Grid'            },
   { value:'masonry',   label:'Masonry'         },
@@ -395,56 +390,35 @@ var TRANSITION_STYLES = [
   { value:'none',  label:'Instant / None' },
 ];
 
-async function loadTemplates(){
-  if(!db) return;
+/* ── STUDIO DEFAULT DESIGN ─────────────────────────────────────────
+   There is no more shared "templates" collection. Design (Look, Layout,
+   Transition, Background) lives directly on each event under `design`,
+   edited from Manage Gallery → Design. The ONE thing that's still shared
+   studio-wide is a single fallback used by any gallery that hasn't been
+   customized yet — a single doc, studio_settings/design_defaults. */
+var STOCK_DEFAULT_DESIGN = { look_id:'', layout_style:'grid', transition_style:'fade', background_type:'color', background_value:'#0f1020' };
+var _studioDefaultDesign = null;
+
+async function loadStudioDefaultDesign(){
+  if(!db) return STOCK_DEFAULT_DESIGN;
   try{
-    var snap = await getDocs(query(collection(db,'templates'), orderBy('created_at','asc')));
-    _templatesCache = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    var snap = await getDoc(doc(db, 'studio_settings', 'design_defaults'));
+    _studioDefaultDesign = snap.exists ? Object.assign({}, STOCK_DEFAULT_DESIGN, snap.data()) : Object.assign({}, STOCK_DEFAULT_DESIGN);
   }catch(e){
-    console.error('[loadTemplates] error:', e);
-    _templatesCache = [];
+    console.error('[loadStudioDefaultDesign] error:', e);
+    _studioDefaultDesign = Object.assign({}, STOCK_DEFAULT_DESIGN);
   }
-  renderTemplatesAdmin();
-  populateTemplateSelects();
+  window._studioDefaultDesign = _studioDefaultDesign;
   if(window.updateTemplatePreview) window.updateTemplatePreview();
+  return _studioDefaultDesign;
 }
 
-function renderTemplatesAdmin(){
-  var wrap = document.getElementById('templatesList');
-  if(!wrap) return;
-  if(!_templatesCache.length){
-    wrap.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px;">No templates yet. Create your first one — it controls photo layout, slideshow transition and background for any event or service that uses it.</div>';
-    return;
-  }
-  wrap.innerHTML = _templatesCache.map(function(t){
-    var bgPreview = t.background_type === 'image'
-      ? '<div style="width:34px;height:34px;border-radius:6px;background-image:url(\'' + esc(t.background_value||'') + '\');background-size:cover;background-position:center;border:1px solid var(--border2);"></div>'
-      : '<div style="width:34px;height:34px;border-radius:6px;background:' + esc(t.background_value||'#111') + ';border:1px solid var(--border2);"></div>';
-    return '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);">'
-      + bgPreview
-      + '<div style="flex:1;min-width:0;">'
-        + '<div style="font-weight:700;font-size:13px;">' + esc(t.name||'Untitled') + (t.is_default ? ' <span class="pill pill-applied" style="font-size:9px;">DEFAULT</span>' : '') + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">Look: ' + esc(tplLookLabel(t.look_id)) + ' · Layout: ' + esc(t.layout_style||'grid') + ' · Transition: ' + esc(t.transition_style||'fade') + '</div>'
-      + '</div>'
-      + '<button class="btn btn-ghost btn-sm" onclick=\'editTemplate(' + JSON.stringify(t).replace(/'/g,"&#39;") + ')\'>Edit</button>'
-      + '<button class="btn btn-ghost btn-sm" onclick="deleteTemplate(\'' + t.id + '\',\'' + esc(t.name||'').replace(/'/g,"\\'") + '\')">Delete</button>'
-    + '</div>';
-  }).join('');
+async function saveStudioDefaultDesign(design){
+  await setDoc(doc(db, 'studio_settings', 'design_defaults'), design, { merge:true });
+  _studioDefaultDesign = Object.assign({}, STOCK_DEFAULT_DESIGN, design);
+  window._studioDefaultDesign = _studioDefaultDesign;
 }
-
-/* Fills every <select data-template-select> in the DOM with the current
-   template list, preserving whatever value was already selected. */
-function populateTemplateSelects(){
-  document.querySelectorAll('select[data-template-select]').forEach(function(sel){
-    var current = sel.value;
-    var opts = ['<option value="">— No template (use defaults) —</option>'];
-    _templatesCache.forEach(function(t){
-      opts.push('<option value="' + t.id + '">' + esc(t.name||'Untitled') + (t.is_default ? ' (default)' : '') + '</option>');
-    });
-    sel.innerHTML = opts.join('');
-    if(current && _templatesCache.some(function(t){ return t.id === current; })) sel.value = current;
-  });
-}
+window.loadStudioDefaultDesign = loadStudioDefaultDesign;
 
 /* ── VISUAL CARD PICKER (layout + transition) ─────────────────────
    Cards are built from LAYOUT_STYLES / TRANSITION_STYLES above and write
@@ -563,29 +537,43 @@ document.addEventListener('click', function(e){
     c.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
   if(inputId === 'tpl-look') tplApplyLookDefaults(inp.value);
+  if(window.mgPushLiveDraft) mgPushLiveDraft();
 });
 window.tplRenderPickers = tplRenderPickers;
 window.tplLookLabel = tplLookLabel;
 
-function openTemplateModal(prefill){
-  var m = document.getElementById('templateModal');
-  if(!m) return;
-  document.getElementById('tpl-id').value = prefill ? (prefill.id||'') : '';
-  document.getElementById('tpl-name').value = prefill ? (prefill.name||'') : '';
-  document.getElementById('tpl-layout').value = prefill ? (prefill.layout_style||'grid') : 'grid';
-  document.getElementById('tpl-transition').value = prefill ? (prefill.transition_style||'fade') : 'fade';
-  document.getElementById('tpl-look').value = prefill ? (prefill.look_id||'') : '';
-  document.getElementById('tpl-bg-type').value = prefill ? (prefill.background_type||'color') : 'color';
+/* Fills the (now inline, in the Design tab) tpl-look / tpl-layout /
+   tpl-transition / tpl-bg-type / tpl-bg-value fields from a design object,
+   then redraws the card pickers. Used by mgRenderDesign() below — this
+   replaces the old openTemplateModal(), minus anything modal-specific. */
+function mgFillDesignFields(design){
+  var d = Object.assign({}, STOCK_DEFAULT_DESIGN, design || {});
+  document.getElementById('tpl-layout').value = d.layout_style;
+  document.getElementById('tpl-transition').value = d.transition_style;
+  document.getElementById('tpl-look').value = d.look_id;
+  document.getElementById('tpl-bg-type').value = d.background_type;
   tplBgTypeChanged(); /* sets tpl-bg-value's input type (color vs text) before we set its value below */
-  document.getElementById('tpl-bg-value').value = prefill ? (prefill.background_value||'#0f1020') : '#0f1020';
+  document.getElementById('tpl-bg-value').value = d.background_value;
   var statusEl = document.getElementById('tpl-bg-upload-status');
   if(statusEl) statusEl.textContent = '';
   updateTplBgPreview();
   tplRenderPickers(); /* hidden #tpl-layout / #tpl-transition are set above — draw the cards + highlight the current pick */
-  document.getElementById('tpl-default').checked = !!(prefill && prefill.is_default);
-  document.getElementById('templateModalTitle').textContent = prefill ? 'Edit Template' : 'New Template';
-  m.style.display = 'flex';
 }
+window.mgFillDesignFields = mgFillDesignFields;
+
+/* Reads the current state of the Design tab's fields back into a plain
+   design object — used both to save to Firestore and to build the live
+   preview draft pushed into the iframe on every change. */
+function mgReadDesignFields(){
+  return {
+    layout_style     : document.getElementById('tpl-layout').value,
+    transition_style : document.getElementById('tpl-transition').value,
+    look_id          : document.getElementById('tpl-look').value || '',
+    background_type  : document.getElementById('tpl-bg-type').value,
+    background_value : document.getElementById('tpl-bg-value').value.trim(),
+  };
+}
+window.mgReadDesignFields = mgReadDesignFields;
 
 /* Background Type select (Color / Image) — swaps tpl-bg-value between a color
    swatch and a URL field, and shows/hides the upload control + preview. */
@@ -602,6 +590,7 @@ function tplBgTypeChanged(){
   var row = document.getElementById('tpl-bg-upload-row');
   if(row) row.style.display = isImg ? '' : 'none';
   updateTplBgPreview();
+  if(window.mgPushLiveDraft) mgPushLiveDraft();
 }
 
 function updateTplBgPreview(){
@@ -626,125 +615,51 @@ async function handleTplBgUpload(input){
   var statusEl = document.getElementById('tpl-bg-upload-status');
   if(statusEl){ statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Uploading\u2026'; }
   try{
-    var result = await uploadToCloudinary(file, 'templates');
+    var result = await uploadToCloudinary(file, 'gallery-design');
     document.getElementById('tpl-bg-value').value = result.secure_url;
     if(statusEl){ statusEl.style.color = 'var(--green)'; statusEl.textContent = 'Uploaded'; }
     updateTplBgPreview();
+    if(window.mgPushLiveDraft) mgPushLiveDraft();
   }catch(e){
     if(statusEl){ statusEl.style.color = 'var(--red)'; statusEl.textContent = 'Upload failed: ' + e.message; }
   }
   input.value = '';
 }
-function closeTemplateModal(){ var m = document.getElementById('templateModal'); if(m) m.style.display = 'none'; _templateEditEventId = null; }
-function editTemplate(t){ openTemplateModal(t); }
 
-/* Opens the template editor from an event row's Actions menu.
-   eventId    – the event this template applies to
-   templateId – the event's currently-assigned template_id (may be '' / undefined)
-   If the event has no template of its own yet, falls back to the default
-   template (or a blank "new template" form if none exists). Saving from
-   this context also links the resulting template back onto the event. */
-async function editEventTemplate(eventId, templateId){
-  if(!db) return;
-  if(!_templatesCache.length) await loadTemplates();
-
-  var t = null;
-  if(templateId) t = _templatesCache.find(function(x){ return x.id === templateId; }) || null;
-  if(!t) t = _templatesCache.find(function(x){ return x.is_default; }) || null;
-
-  _templateEditEventId = eventId;
-  openTemplateModal(t);
-
-  if(!t){
-    toast('ℹ ', 'No template yet', 'Create one below — it\u2019ll be applied to this event automatically.');
-  }
-}
-
-async function saveTemplate(){
-  var name = document.getElementById('tpl-name').value.trim();
-  if(!name){ alert('Template name is required.'); return; }
-  var id = document.getElementById('tpl-id').value;
-  var payload = {
-    name             : name,
-    layout_style     : document.getElementById('tpl-layout').value,
-    transition_style : document.getElementById('tpl-transition').value,
-    look_id          : document.getElementById('tpl-look').value || '',
-    background_type  : document.getElementById('tpl-bg-type').value,
-    background_value : document.getElementById('tpl-bg-value').value.trim(),
-    is_default       : document.getElementById('tpl-default').checked,
-  };
+/* ── DESIGN TAB — save / set-as-default ── (see mgLoadDesign/mgRenderDesign
+   further down, next to the rest of the Manage Gallery hub) */
+async function mgSaveDesign(){
+  if(!_mgEventId) return;
+  var design = mgReadDesignFields();
+  var btn = document.getElementById('mgDesignSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving\u2026'; }
   try{
-    /* Only one default template at a time */
-    if(payload.is_default){
-      var others = _templatesCache.filter(function(t){ return t.is_default && t.id !== id; });
-      for(var i=0;i<others.length;i++){ await updateDoc(doc(db,'templates',others[i].id), {is_default:false}); }
-    }
-    var savedId = id;
-    if(id){
-      await updateDoc(doc(db,'templates',id), payload);
-    } else {
-      payload.created_at = serverTimestamp();
-      var ref = await addDoc(collection(db,'templates'), payload);
-      savedId = ref.id;
-    }
-    toast(' ', id ? 'Template updated!' : 'Template created!', name);
-
-    if(_templateEditEventId){
-      try{
-        await updateDoc(doc(db,'events',_templateEditEventId), { template_id: savedId });
-      }catch(e){
-        console.error('[saveTemplate] failed to link template to event:', e);
-      }
-      var linkedEventId = _templateEditEventId;
-      _templateEditEventId = null;
-      if(typeof loadEvents === 'function') loadEvents();
-      if(linkedEventId === _mgEventId && typeof mgOnTemplateLinked === 'function') mgOnTemplateLinked();
-    }
-
-    closeTemplateModal();
-    loadTemplates();
+    await updateDoc(doc(db, 'events', _mgEventId), { design: design });
+    if(_mgEventData) _mgEventData.design = design;
+    toast(' ', 'Design saved', 'This gallery now uses its own look.');
+    mgRefreshPreview(); /* full reload, confirms what's actually persisted */
   }catch(e){
-    alert('Save failed: ' + e.message);
+    toast(' ', 'Save failed', e.message);
   }
+  if(btn){ btn.disabled = false; btn.textContent = 'Save Design'; }
 }
+window.mgSaveDesign = mgSaveDesign;
 
-async function deleteTemplate(id, name){
-  if(!confirm('Delete template "' + name + '"? Events and services still linked to it will fall back to grid layout / fade transition.')) return;
+async function mgSetDesignAsStudioDefault(){
+  if(!confirm('Make this the Studio Default? Every gallery that hasn\u2019t been customized will start looking like this.')) return;
   try{
-    await deleteDoc(doc(db,'templates',id));
-    toast(' ', 'Template deleted', name);
-    loadTemplates();
+    await saveStudioDefaultDesign(mgReadDesignFields());
+    toast(' ', 'Studio Default updated', '');
   }catch(e){
-    alert('Delete failed: ' + e.message);
+    toast(' ', 'Failed to update Studio Default', e.message);
   }
 }
+window.mgSetDesignAsStudioDefault = mgSetDesignAsStudioDefault;
 
-window.loadTemplates      = loadTemplates;
-window.openTemplateModal  = openTemplateModal;
-window.tplBgTypeChanged   = tplBgTypeChanged;
-window.updateTplBgPreview = updateTplBgPreview;
-window.handleTplBgUpload  = handleTplBgUpload;
-window.closeTemplateModal = closeTemplateModal;
-window.editTemplate       = editTemplate;
-window.editEventTemplate  = editEventTemplate;
-window.saveTemplate       = saveTemplate;
-window.deleteTemplate     = deleteTemplate;
-window.populateTemplateSelects = populateTemplateSelects;
-
-/* When a service is chosen on the Create Event form, default the
-   template select to that service's default_template_id (still
-   overridable — this mirrors the same pattern used on book-us.html). */
-async function onEventServiceSelect(){
-  var sel = document.getElementById('ev-service');
-  var tplSel = document.getElementById('ev-template');
-  if(!sel || !sel.value || !tplSel) return;
-  try{
-    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-    if(!sb) return;
-    var res = await sb.from('services').select('default_template_id').eq('id', sel.value).single();
-    if(res.data && res.data.default_template_id) tplSel.value = res.data.default_template_id;
-  }catch(e){ console.warn('[onEventServiceSelect]', e); }
-}
+/* Services no longer carry a default gallery design (that concept moved
+   into per-event Design + one Studio Default) — kept as a no-op so any
+   remaining onchange="onEventServiceSelect()" wiring doesn't error. */
+async function onEventServiceSelect(){}
 window.onEventServiceSelect = onEventServiceSelect;
 
 async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode, eventSlug, emailSubject, emailBody){
@@ -838,7 +753,7 @@ async function loadEvents(){
             + '<td><div class="td-actions">'
             + '<button class="btn btn-gold btn-sm" onclick="openManageGallery(\'' + ev.id + '\')"> Manage Gallery</button>'
             + '<a class="btn btn-ghost btn-sm" href="event.html?event=' + ev.event_slug + '&code=' + ev.event_code + '" target="_blank"> View Event</a>'
-            + '<button class="btn btn-ghost btn-sm" onclick="editEventTemplate(\'' + ev.id + '\',\'' + (ev.template_id||'') + '\')">Edit Template</button>'
+            + '<button class="btn btn-ghost btn-sm" onclick="openManageGallery(\'' + ev.id + '\');mgSwitchTab(\'design\')">Edit Design</button>'
             + '<button class="btn btn-ghost btn-sm" onclick="goUploadForEvent(\'' + ev.id + '\')"> Upload</button>'
             + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="resendOwnerEmail(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')"> Resend Email</button>' : '')
             + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="sendEventReminder(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">⏰ Send Reminder</button>' : '')
@@ -981,13 +896,10 @@ async function loadManageGallery(){
     mgRefreshPreview();
 
     var photoCountP = getDocs(query(collection(db, 'photos'), where('event_id','==',id)));
-    var templateNameP = ev.template_id
-      ? getDoc(doc(db, 'templates', ev.template_id)).then(function(t){ return t.exists ? (t.data().name || '—') : '—'; }).catch(function(){ return '—'; })
-      : Promise.resolve('Default');
+    var designLabel = ev.design ? (tplLookLabel(ev.design.look_id) + ' · ' + (ev.design.layout_style||'grid')) : 'Studio Default';
 
-    var results = await Promise.all([photoCountP, templateNameP]);
+    var results = await Promise.all([photoCountP]);
     var photoCount   = results[0].size;
-    var templateName = results[1];
 
     var expDate  = ev.expiry_date ? new Date(ev.expiry_date) : null;
     var expStr   = expDate ? expDate.toLocaleDateString('en-GB') : '—';
@@ -1004,11 +916,11 @@ async function loadManageGallery(){
         + stat('Client', esc(ev.owner_name || '—') + (ev.owner_email ? '<br><span style="font-size:11px;font-weight:400;color:var(--text3);">' + esc(ev.owner_email) + '</span>' : ''))
         + stat('Event Date', esc(evDate))
         + stat('Photos', String(photoCount))
-        + stat('Template', esc(templateName))
+        + stat('Design', esc(designLabel))
         + stat('Expiry', esc(expStr))
         + '<div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">'
         + '<button class="btn btn-gold btn-sm" onclick="goUploadForEvent(\'' + id + '\')"> Upload Photos</button>'
-        + '<button class="btn btn-ghost btn-sm" onclick="editEventTemplate(\'' + id + '\',\'' + (ev.template_id||'') + '\')">Edit Template</button>'
+        + '<button class="btn btn-ghost btn-sm" onclick="mgSwitchTab(\'design\')">Edit Design</button>'
         + '<button class="btn ' + (ev.is_active ? 'btn-red' : 'btn-green') + ' btn-sm" onclick="toggleEvent(\'' + id + '\',' + ev.is_active + ')">' + (ev.is_active ? 'Deactivate' : 'Activate') + '</button>'
         + '</div>';
     }
@@ -1028,6 +940,9 @@ function mgSwitchTab(tab){
   if(tab === 'photos') mgLoadPhotos();
   if(tab === 'cover')  mgLoadCover();
   if(tab === 'design') mgLoadDesign();
+  if(tab === 'branding')  mgLoadBranding();
+  if(tab === 'clientexp') mgLoadClientExp();
+  if(tab === 'settings')  mgLoadSettings();
 }
 
 /* ── PHOTOS TAB — featured / hide / drag-reorder ──
@@ -1273,10 +1188,10 @@ window.mgLoadCover  = mgLoadCover;
 window.mgSetCover   = mgSetCover;
 window.mgClearCover = mgClearCover;
 
-/* ── DESIGN TAB — wires the existing Templates picker into the hub ──
-   Doesn't rebuild the template editor: it summarizes the linked template
-   and reuses editEventTemplate()/the existing templateModal + saveTemplate()
-   flow that already links a template back onto an event. */
+/* ── DESIGN TAB — Look / Layout / Transition / Background live in the
+   Design panel itself now (moved out of the old Templates page + modal).
+   Editing anything here pushes a live draft into the preview iframe
+   instantly; nothing is written to Firestore until Save Design. */
 async function mgLoadDesign(){
   if(!_mgEventId) return;
   var el = document.getElementById('mgDesignBody');
@@ -1286,7 +1201,7 @@ async function mgLoadDesign(){
       var evSnap = await getDoc(doc(db, 'events', _mgEventId));
       if(evSnap.exists) _mgEventData = Object.assign({ id: _mgEventId }, evSnap.data());
     }
-    if(!_templatesCache.length) await loadTemplates();
+    if(!_studioDefaultDesign) await loadStudioDefaultDesign();
     mgRenderDesign();
   }catch(e){
     if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
@@ -1296,35 +1211,309 @@ async function mgLoadDesign(){
 function mgRenderDesign(){
   var el = document.getElementById('mgDesignBody');
   if(!el || !_mgEventData) return;
-  var linkedId  = _mgEventData.template_id || '';
-  var t         = linkedId ? _templatesCache.find(function(x){ return x.id === linkedId; }) : null;
-  var usingDefault = !t;
-  if(!t) t = _templatesCache.find(function(x){ return x.is_default; }) || null;
+  var usingDefault = !_mgEventData.design;
+  var current = _mgEventData.design || _studioDefaultDesign || STOCK_DEFAULT_DESIGN;
 
-  var bgPreview = (t && t.background_type === 'image')
-    ? '<div style="width:44px;height:44px;border-radius:8px;flex-shrink:0;background-image:url(\'' + esc(t.background_value||'') + '\');background-size:cover;background-position:center;border:1px solid var(--border2);"></div>'
-    : '<div style="width:44px;height:44px;border-radius:8px;flex-shrink:0;background:' + esc((t && t.background_value) || '#111') + ';border:1px solid var(--border2);"></div>';
-
-  el.innerHTML = '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
-      + bgPreview
-      + '<div style="flex:1;min-width:160px;">'
-        + '<div style="font-weight:700;font-size:14px;">' + esc(t ? (t.name || 'Untitled') : 'No template') + (usingDefault && t ? ' <span class="pill pill-applied" style="font-size:9px;">DEFAULT</span>' : '') + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Look: ' + esc(t ? tplLookLabel(t.look_id) : 'Original') + ' · Layout: ' + esc(t ? (t.layout_style || 'grid') : 'grid') + ' · Transition: ' + esc(t ? (t.transition_style || 'fade') : 'fade') + '</div>'
-      + '</div>'
-      + '<button class="btn btn-gold btn-sm" onclick="editEventTemplate(_mgEventId, \'' + linkedId + '\')"> Edit Design</button>'
+  el.innerHTML =
+      (usingDefault
+        ? '<div style="font-size:11px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;margin-bottom:16px;">Using the <strong>Studio Default</strong> — nothing customized for this gallery yet. Change anything below and hit Save to make it this gallery\'s own look.</div>'
+        : '')
+    + '<div class="field-group">'
+      + '<div class="field-label">Look</div>'
+      + '<input type="hidden" id="tpl-look" value=""/>'
+      + '<div class="tpl-picker tpl-look-picker" id="tpl-look-cards" data-tpl-input="tpl-look"></div>'
+      + '<div class="field-hint">A look sets the gallery\'s colours, typography and spacing. Picking one also fills in a matching background colour (an image background is left as is). &ldquo;Original&rdquo; keeps the event-type styling.</div>'
     + '</div>'
-    + '<div style="font-size:11px;color:var(--text3);margin-top:16px;">Layout, slideshow transition and background are controlled by the linked Template. Saving here updates this event only — edit the shared Template itself from <a href="#" onclick="return nav(\'templates\',null)">Templates</a> if you want the change to apply everywhere it\'s used.</div>';
-}
+    + '<div class="field-group">'
+      + '<div class="field-label">Photo Layout</div>'
+      + '<input type="hidden" id="tpl-layout" value="grid"/>'
+      + '<div class="tpl-picker" id="tpl-layout-cards" data-tpl-input="tpl-layout"></div>'
+    + '</div>'
+    + '<div class="field-group">'
+      + '<div class="field-label">Slideshow Transition</div>'
+      + '<input type="hidden" id="tpl-transition" value="fade"/>'
+      + '<div class="tpl-picker" id="tpl-transition-cards" data-tpl-input="tpl-transition"></div>'
+    + '</div>'
+    + '<div class="form-grid">'
+      + '<div class="field-group">'
+        + '<div class="field-label">Background Type</div>'
+        + '<select id="tpl-bg-type" style="width:100%;" onchange="tplBgTypeChanged()">'
+          + '<option value="color">Color</option>'
+          + '<option value="image">Image</option>'
+        + '</select>'
+      + '</div>'
+      + '<div class="field-group">'
+        + '<div class="field-label">Background Value</div>'
+        + '<input type="color" id="tpl-bg-value" value="#0f1020" style="width:100%;height:40px;" oninput="updateTplBgPreview();if(window.mgPushLiveDraft)mgPushLiveDraft();"/>'
+      + '</div>'
+    + '</div>'
+    + '<div class="field-group" id="tpl-bg-upload-row" style="display:none;">'
+      + '<div class="field-label">Background Image</div>'
+      + '<div style="display:flex;align-items:center;gap:10px;">'
+        + '<button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById(\'tpl-bg-file\').click()">Upload Image</button>'
+        + '<input type="file" id="tpl-bg-file" accept="image/*" style="display:none;" onchange="handleTplBgUpload(this)"/>'
+        + '<span id="tpl-bg-upload-status" style="font-size:11px;"></span>'
+      + '</div>'
+      + '<div id="tpl-bg-preview" style="display:none;margin-top:10px;width:100%;height:100px;border-radius:var(--r);border:1px solid var(--border2);background-size:cover;background-position:center;"></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">'
+      + '<button class="btn btn-ghost btn-sm" onclick="mgSetDesignAsStudioDefault()">Set as Studio Default</button>'
+      + '<button class="btn btn-gold" id="mgDesignSaveBtn" onclick="mgSaveDesign()">Save Design</button>'
+    + '</div>';
 
-/* Called by saveTemplate() when the template it just saved is linked to
-   the event currently open in this hub, so Design/Overview don't go stale
-   after an edit made through this tab. */
-function mgOnTemplateLinked(){
-  if(!_mgEventId) return;
-  var wasTab = _mgActiveTab;
-  loadManageGallery().then(function(){ mgSwitchTab(wasTab); });
+  mgFillDesignFields(current);
 }
 window.mgLoadDesign = mgLoadDesign;
+
+/* ── LIVE PREVIEW DRAFT ─────────────────────────────────────────────
+   Collects whatever's currently in the Design / Branding / Client
+   Experience fields (whether or not it's been saved yet) and posts it
+   into the preview iframe so changes show up instantly. event.html's
+   message listener applies this in-memory, without touching Firestore. */
+function mgCollectDraft(){
+  var draft = {};
+  if(document.getElementById('tpl-layout')) draft.design = mgReadDesignFields();
+  if(_mgBrandingDraft) draft.branding = _mgBrandingDraft;
+  if(_mgClientExpDraft) draft.clientExperience = _mgClientExpDraft;
+  if(_mgEventData) draft.cover_photo_id = _mgEventData.cover_photo_id || null;
+  return draft;
+}
+function mgPushLiveDraft(){
+  var frame = document.getElementById('mgPreviewFrame');
+  if(!frame || !frame.contentWindow) return;
+  try{ frame.contentWindow.postMessage({ type:'ig-mg-draft', draft: mgCollectDraft() }, '*'); }
+  catch(e){ /* cross-origin or not loaded yet — harmless, Save still persists normally */ }
+}
+window.mgPushLiveDraft = mgPushLiveDraft;
+
+/* ── BRANDING TAB ─────────────────────────────────────────────────
+   Per-event overrides of logo, accent colour and a short welcome message
+   shown on the gallery. Stored directly on the event doc (event.branding). */
+var _mgBrandingDraft = null;
+
+async function mgLoadBranding(){
+  if(!_mgEventId) return;
+  var el = document.getElementById('mgBrandingBody');
+  if(el) el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>';
+  try{
+    if(!_mgEventData){
+      var evSnap = await getDoc(doc(db, 'events', _mgEventId));
+      if(evSnap.exists) _mgEventData = Object.assign({ id: _mgEventId }, evSnap.data());
+    }
+    _mgBrandingDraft = Object.assign({ logo_url:'', accent_color:'', welcome_message:'' }, _mgEventData.branding || {});
+    mgRenderBranding();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgRenderBranding(){
+  var el = document.getElementById('mgBrandingBody');
+  if(!el) return;
+  var b = _mgBrandingDraft;
+  el.innerHTML =
+      '<div class="field-group">'
+        + '<div class="field-label">Gallery Logo <span style="font-weight:400;color:var(--text3);">(optional)</span></div>'
+        + '<div style="display:flex;align-items:center;gap:10px;">'
+          + '<button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById(\'mg-brand-logo-file\').click()">Upload Logo</button>'
+          + '<input type="file" id="mg-brand-logo-file" accept="image/*" style="display:none;" onchange="mgHandleBrandingLogoUpload(this)"/>'
+          + '<input type="text" id="mg-brand-logo-url" placeholder="Or paste an image URL" value="' + esc(b.logo_url) + '" oninput="mgOnBrandingChange()" style="flex:1;"/>'
+        + '</div>'
+        + (b.logo_url ? '<img src="' + esc(b.logo_url) + '" style="height:40px;margin-top:10px;border-radius:6px;"/>' : '')
+        + '<div class="field-hint">Replaces the studio logo on this gallery only. Leave blank to use the default.</div>'
+      + '</div>'
+      + '<div class="field-group">'
+        + '<div class="field-label">Accent Colour <span style="font-weight:400;color:var(--text3);">(optional)</span></div>'
+        + '<input type="color" id="mg-brand-accent" value="' + esc(b.accent_color || '#c9a35c') + '" style="width:100%;height:40px;" oninput="mgOnBrandingChange()"/>'
+        + '<div class="field-hint">Used for buttons and highlights on this gallery. Leave the Look\'s own accent by clearing this.</div>'
+      + '</div>'
+      + '<div class="field-group">'
+        + '<div class="field-label">Welcome Message <span style="font-weight:400;color:var(--text3);">(optional)</span></div>'
+        + '<textarea id="mg-brand-welcome" rows="3" placeholder="e.g. Thank you for celebrating with us — enjoy your photos!" oninput="mgOnBrandingChange()">' + esc(b.welcome_message) + '</textarea>'
+        + '<div class="field-hint">Shown near the top of the gallery, above the photos.</div>'
+      + '</div>'
+      + '<div style="display:flex;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">'
+        + '<button class="btn btn-gold" id="mgBrandingSaveBtn" onclick="mgSaveBranding()">Save Branding</button>'
+      + '</div>';
+}
+
+function mgOnBrandingChange(){
+  _mgBrandingDraft = {
+    logo_url        : (document.getElementById('mg-brand-logo-url')||{}).value || '',
+    accent_color    : (document.getElementById('mg-brand-accent')||{}).value || '',
+    welcome_message : (document.getElementById('mg-brand-welcome')||{}).value || '',
+  };
+  mgPushLiveDraft();
+}
+window.mgOnBrandingChange = mgOnBrandingChange;
+
+async function mgHandleBrandingLogoUpload(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  try{
+    var result = await uploadToCloudinary(file, 'gallery-branding');
+    document.getElementById('mg-brand-logo-url').value = result.secure_url;
+    mgOnBrandingChange();
+    mgRenderBranding();
+  }catch(e){
+    toast(' ', 'Logo upload failed', e.message);
+  }
+  input.value = '';
+}
+window.mgHandleBrandingLogoUpload = mgHandleBrandingLogoUpload;
+
+async function mgSaveBranding(){
+  if(!_mgEventId) return;
+  mgOnBrandingChange();
+  var btn = document.getElementById('mgBrandingSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+  try{
+    await updateDoc(doc(db, 'events', _mgEventId), { branding: _mgBrandingDraft });
+    if(_mgEventData) _mgEventData.branding = _mgBrandingDraft;
+    toast(' ', 'Branding saved', '');
+    mgRefreshPreview();
+  }catch(e){
+    toast(' ', 'Save failed', e.message);
+  }
+  if(btn){ btn.disabled = false; btn.textContent = 'Save Branding'; }
+}
+window.mgSaveBranding = mgSaveBranding;
+
+/* ── CLIENT EXPERIENCE TAB ───────────────────────────────────────
+   These live on the event_settings doc (one per event, auto-id) — the
+   same doc that already holds require_code / watermark_enabled from
+   event creation, so nothing new to migrate. */
+var _mgClientExpDraft = null;
+var _mgEventSettingsId = null; /* doc id of this event's event_settings row, once found/created */
+
+async function mgGetEventSettingsDoc(eventId){
+  var snap = await getDocs(query(collection(db, 'event_settings'), where('event_id','==',eventId)));
+  if(!snap.empty) return { id: snap.docs[0].id, data: snap.docs[0].data() };
+  var ref = await addDoc(collection(db, 'event_settings'), { event_id: eventId, require_code: true, watermark_enabled: true, allow_download: true, created_at: serverTimestamp() });
+  return { id: ref.id, data: { event_id: eventId, require_code: true, watermark_enabled: true, allow_download: true } };
+}
+
+async function mgLoadClientExp(){
+  if(!_mgEventId) return;
+  var el = document.getElementById('mgClientExpBody');
+  if(el) el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>';
+  try{
+    var s = await mgGetEventSettingsDoc(_mgEventId);
+    _mgEventSettingsId = s.id;
+    _mgClientExpDraft = Object.assign({ require_code:true, allow_download:true, watermark_enabled:true }, s.data);
+    mgRenderClientExp();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgToggleRow(label, hint, id, checked){
+  return '<div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;">'
+    + '<div class="toggle' + (checked ? ' on' : '') + '" id="' + id + '" onclick="mgFlipClientExpToggle(\'' + id + '\')"></div>'
+    + '<div><div style="font-size:13px;font-weight:600;">' + esc(label) + '</div><div style="font-size:11px;color:var(--text3);">' + esc(hint) + '</div></div>'
+  + '</div>';
+}
+
+function mgRenderClientExp(){
+  var el = document.getElementById('mgClientExpBody');
+  if(!el) return;
+  var d = _mgClientExpDraft;
+  el.innerHTML =
+      mgToggleRow('Require Access Code', 'Guests must enter the code to view the gallery', 'mg-ce-code', d.require_code !== false)
+    + mgToggleRow('Allow Downloads', 'Guests can download individual or all photos', 'mg-ce-download', d.allow_download !== false)
+    + mgToggleRow('Watermark on Downloads', 'Adds your studio watermark to downloaded files', 'mg-ce-watermark', d.watermark_enabled !== false)
+    + '<div style="display:flex;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">'
+      + '<button class="btn btn-gold" id="mgClientExpSaveBtn" onclick="mgSaveClientExp()">Save</button>'
+    + '</div>';
+}
+
+function mgFlipClientExpToggle(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  var on = !el.classList.contains('on');
+  el.classList.toggle('on', on);
+  var key = id === 'mg-ce-code' ? 'require_code' : (id === 'mg-ce-download' ? 'allow_download' : 'watermark_enabled');
+  _mgClientExpDraft[key] = on;
+  mgPushLiveDraft();
+}
+window.mgFlipClientExpToggle = mgFlipClientExpToggle;
+
+async function mgSaveClientExp(){
+  if(!_mgEventId || !_mgEventSettingsId) return;
+  var btn = document.getElementById('mgClientExpSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+  try{
+    await updateDoc(doc(db, 'event_settings', _mgEventSettingsId), _mgClientExpDraft);
+    toast(' ', 'Client Experience saved', '');
+    mgRefreshPreview();
+  }catch(e){
+    toast(' ', 'Save failed', e.message);
+  }
+  if(btn){ btn.disabled = false; btn.textContent = 'Save'; }
+}
+window.mgSaveClientExp = mgSaveClientExp;
+
+/* ── SETTINGS TAB — URL / access code / expiry / delete ── */
+async function mgLoadSettings(){
+  if(!_mgEventId) return;
+  var el = document.getElementById('mgSettingsBody');
+  if(el) el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>';
+  try{
+    if(!_mgEventData){
+      var evSnap = await getDoc(doc(db, 'events', _mgEventId));
+      if(evSnap.exists) _mgEventData = Object.assign({ id: _mgEventId }, evSnap.data());
+    }
+    mgRenderSettings();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgRenderSettings(){
+  var el = document.getElementById('mgSettingsBody');
+  if(!el || !_mgEventData) return;
+  var ev = _mgEventData;
+  var url = window.location.origin + '/event.html?event=' + ev.event_slug + '&code=' + ev.event_code;
+  var expiry = ev.expiry_date ? new Date(ev.expiry_date).toISOString().slice(0,10) : '';
+  el.innerHTML =
+      '<div class="field-group">'
+        + '<div class="field-label">Gallery URL</div>'
+        + '<div style="display:flex;gap:8px;"><input type="text" readonly value="' + esc(url) + '" style="flex:1;font-size:12px;"/><button class="btn btn-ghost btn-sm" onclick="copyEventLink(\'' + esc(ev.event_slug) + '\',\'' + esc(ev.event_code) + '\')">Copy</button></div>'
+      + '</div>'
+      + '<div class="field-group">'
+        + '<div class="field-label">Access Code</div>'
+        + '<div style="display:flex;gap:8px;"><input type="text" id="mg-set-code" value="' + esc(ev.event_code||'') + '" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/></div>'
+      + '</div>'
+      + '<div class="field-group">'
+        + '<div class="field-label">Expiry Date</div>'
+        + '<input type="date" id="mg-set-expiry" value="' + expiry + '"/>'
+      + '</div>'
+      + '<div style="display:flex;justify-content:flex-end;gap:10px;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">'
+        + '<button class="btn btn-red btn-sm" onclick="deleteEvent(\'' + ev.id + '\')">Delete Gallery</button>'
+        + '<button class="btn btn-gold" id="mgSettingsSaveBtn" onclick="mgSaveSettings()">Save Settings</button>'
+      + '</div>';
+}
+
+async function mgSaveSettings(){
+  if(!_mgEventId) return;
+  var code = (document.getElementById('mg-set-code').value||'').trim().toUpperCase();
+  var expiryVal = document.getElementById('mg-set-expiry').value;
+  if(!code){ toast(' ', 'Access code is required', ''); return; }
+  var btn = document.getElementById('mgSettingsSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+  try{
+    var payload = { event_code: code };
+    if(expiryVal) payload.expiry_date = new Date(expiryVal).toISOString();
+    await updateDoc(doc(db, 'events', _mgEventId), payload);
+    Object.assign(_mgEventData, payload);
+    toast(' ', 'Settings saved', '');
+    mgRenderSettings();
+  }catch(e){
+    toast(' ', 'Save failed', e.message);
+  }
+  if(btn){ btn.disabled = false; btn.textContent = 'Save Settings'; }
+}
+window.mgSaveSettings = mgSaveSettings;
 
 function goUploadForEvent(eventId){
   selectedEventId = eventId;
