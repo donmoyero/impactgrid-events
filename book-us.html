@@ -50,6 +50,29 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   letter-spacing: -.03em;
   line-height: 1.05;
 }
+.bk-page-sub {
+  font-size: 15px; color: var(--text2); line-height: 1.7;
+  max-width: 560px; margin-top: 14px;
+}
+
+/* Step progress */
+.bk-steps { display: flex; align-items: center; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+.bk-step {
+  display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 700;
+  color: var(--text3); letter-spacing: .01em; transition: color .2s;
+}
+.bk-step-num {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--bg3);
+  border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: var(--text3); transition: all .25s;
+}
+.bk-step--active, .bk-step--done { color: var(--text); }
+.bk-step--active .bk-step-num, .bk-step--done .bk-step-num {
+  background: linear-gradient(135deg,var(--gold),var(--gold2));
+  border-color: transparent; color: #07090f;
+}
+.bk-step-line { width: 36px; height: 1px; background: var(--border2); }
+@media(max-width:560px) { .bk-step-line { width: 18px; } }
 
 /* Booking layout */
 .bk-section { max-width: 1000px; margin: 0 auto; padding: 60px 24px; }
@@ -284,7 +307,16 @@ textarea { resize: vertical; min-height: 80px; }
 
 <!-- PAGE TITLE -->
 <div class="bk-page-title">
-  <h1>Book a Session</h1>
+  <div class="section-label">Booking</div>
+  <h1 class="anim-fade-up">Book a Session</h1>
+  <p class="bk-page-sub anim-fade-up">Pick an available date, tell us a bit about your event, and we'll confirm within 24 hours — no payment needed to hold your spot.</p>
+  <div class="bk-steps anim-fade-up">
+    <div class="bk-step bk-step--active" id="bkStep1"><span class="bk-step-num">1</span>Pick a date</div>
+    <div class="bk-step-line"></div>
+    <div class="bk-step" id="bkStep2"><span class="bk-step-num">2</span>Your details</div>
+    <div class="bk-step-line"></div>
+    <div class="bk-step" id="bkStep3"><span class="bk-step-num">3</span>Confirmed</div>
+  </div>
 </div>
 
 <!-- BOOKING SECTION -->
@@ -324,7 +356,7 @@ textarea { resize: vertical; min-height: 80px; }
       <!-- Form -->
       <div class="form-card">
         <div class="form-head">
-          <span class="form-head-icon">📋</span>
+          <span class="form-head-icon">✦</span>
           <span class="form-head-title">Your Details</span>
           <span class="form-head-date" id="formDateBadge" style="display:none;"></span>
         </div>
@@ -333,7 +365,7 @@ textarea { resize: vertical; min-height: 80px; }
 
           <!-- Date prompt shown before date is picked -->
           <div id="datePrompt" class="date-prompt">
-            <div class="date-prompt-ico">📅</div>
+            <div class="date-prompt-ico">✦</div>
             <div class="date-prompt-txt">Pick an available date on the calendar<br>to unlock the booking form.</div>
           </div>
 
@@ -669,9 +701,20 @@ function changeMonth(dir) {
   renderCalendar();
 }
 
+function setBkStep(stage) {
+  var s1 = document.getElementById('bkStep1');
+  var s2 = document.getElementById('bkStep2');
+  var s3 = document.getElementById('bkStep3');
+  if (!s1 || !s2 || !s3) return;
+  s1.className = 'bk-step' + (stage >= 2 ? ' bk-step--done' : ' bk-step--active');
+  s2.className = 'bk-step' + (stage === 2 ? ' bk-step--active' : (stage >= 3 ? ' bk-step--done' : ''));
+  s3.className = 'bk-step' + (stage === 3 ? ' bk-step--active' : '');
+}
+
 function selectDate(dateStr) {
   selectedDate = dateStr;
   renderCalendar();
+  setBkStep(2);
   document.getElementById('datePrompt').style.display  = 'none';
   document.getElementById('bookingForm').style.display = 'block';
   var badge = document.getElementById('formDateBadge');
@@ -726,6 +769,7 @@ async function submitBooking() {
     document.getElementById('successDetail').innerHTML =
       row('Name', name) + row('Email', email) + row('Date', readableDate) + (guests ? row('Guest Count', guests) : '');
     document.getElementById('successUI').style.display = 'block';
+    setBkStep(3);
     window.scrollTo({ top: document.getElementById('booking').offsetTop - 80, behavior:'smooth' });
 
   } catch(err) {
@@ -741,6 +785,7 @@ function row(label, val) {
 
 function resetBooking() {
   selectedDate = null;
+  setBkStep(1);
   document.getElementById('bookingUI').style.display  = 'block';
   document.getElementById('successUI').style.display  = 'none';
   document.getElementById('bookingForm').style.display = 'none';
