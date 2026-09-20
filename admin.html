@@ -136,6 +136,8 @@ tr:hover td{background:var(--bg2);}
 .empty-txt{font-size:14px;}
 .ws-layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
 .ws-sticky{position:sticky;top:0;}
+.mg-tab{background:none;border:1px solid var(--border);color:var(--text2);}
+.mg-tab.active{background:var(--gold);color:#07090f;border-color:var(--gold);}
 .field-group{margin-bottom:14px;}
 .field-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700;}
 .field-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;}
@@ -635,6 +637,63 @@ tr:hover td{background:var(--bg2);}
     <div class="page" id="page-events">
       <div class="page-header"><div class="page-title">Events</div><div class="page-sub">All ImpactGrid photo events.</div></div>
       <div class="card"><div class="card-head"><h2> All Events</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadEvents()"> Refresh</button><button class="btn btn-gold" onclick="nav('createevent',null)"> Create Event</button></div></div><div class="card-body table-wrap" id="eventsList"><div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div></div></div>
+    </div>
+    <!-- MANAGE GALLERY -->
+    <div class="page" id="page-managegallery">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <a href="#" onclick="return nav('events',null)" style="font-size:12px;color:var(--text3);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:8px;">&larr; All Events</a>
+          <div class="page-title" id="mgEventName">Gallery</div>
+          <div class="page-sub" id="mgEventSub">&nbsp;</div>
+        </div>
+        <a class="btn btn-ghost btn-sm" id="mgPreviewLink" href="#" target="_blank"> Preview Gallery</a>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:14px;" id="mgTabBar">
+        <button class="btn btn-sm mg-tab" id="mg-tab-overview" onclick="mgSwitchTab('overview')">Overview</button>
+        <button class="btn btn-sm mg-tab" id="mg-tab-photos" onclick="mgSwitchTab('photos')">Photos</button>
+        <button class="btn btn-sm mg-tab" id="mg-tab-cover" onclick="mgSwitchTab('cover')">Cover</button>
+        <button class="btn btn-sm mg-tab" id="mg-tab-design" onclick="mgSwitchTab('design')">Design</button>
+        <button class="btn btn-sm mg-tab" id="mg-tab-branding" onclick="mgSwitchTab('branding')">Branding</button>
+        <button class="btn btn-sm mg-tab" id="mg-tab-clientexp" onclick="mgSwitchTab('clientexp')">Client Experience</button>
+        <button class="btn btn-sm mg-tab" id="mg-tab-settings" onclick="mgSwitchTab('settings')">Settings</button>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="mg-panel" id="mg-panel-overview">
+        <div class="card"><div class="card-body" id="mgOverviewBody" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;">
+          <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:50%;"></div></div>
+        </div></div>
+      </div>
+
+      <!-- PHOTOS (built in a later phase) -->
+      <div class="mg-panel" id="mg-panel-photos" style="display:none;">
+        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Photo manager (featured / hide / reorder) is coming in the next phase. Use <a href="#" onclick="return nav('uploadphotos',null)">Upload Photos</a> for now.</div></div></div></div>
+      </div>
+
+      <!-- COVER (built in a later phase) -->
+      <div class="mg-panel" id="mg-panel-cover" style="display:none;">
+        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Cover photo picker is coming in the next phase.</div></div></div></div>
+      </div>
+
+      <!-- DESIGN (built in a later phase) -->
+      <div class="mg-panel" id="mg-panel-design" style="display:none;">
+        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">This gallery's layout is currently set via <a href="#" onclick="return nav('templates',null)">Templates</a>. A live-preview Design tab is coming in a later phase.</div></div></div></div>
+      </div>
+
+      <!-- BRANDING (future phase) -->
+      <div class="mg-panel" id="mg-panel-branding" style="display:none;">
+        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Branding controls are coming in a later phase.</div></div></div></div>
+      </div>
+
+      <!-- CLIENT EXPERIENCE (future phase) -->
+      <div class="mg-panel" id="mg-panel-clientexp" style="display:none;">
+        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Client experience toggles are coming in a later phase.</div></div></div></div>
+      </div>
+
+      <!-- SETTINGS (future phase) -->
+      <div class="mg-panel" id="mg-panel-settings" style="display:none;">
+        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Gallery settings (URL, access code, expiry, delete) are coming in a later phase — use <a href="#" onclick="return nav('events',null)">All Events</a> for these for now.</div></div></div></div>
+      </div>
     </div>
     <!-- CREATE EVENT -->
     <div class="page" id="page-createevent">
@@ -2143,6 +2202,7 @@ function nav(id,el){
   var loaders={
     eventactivity:'loadEventActivity',
     events:'loadEvents',createevent:'initCreateEventPage',
+    managegallery:'loadManageGallery',
     uploadphotos:'loadUploadPhotos',
     downloadrequests:'loadDownloadRequests',
     reviews:'loadReviewsPage',
