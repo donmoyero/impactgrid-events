@@ -2239,7 +2239,10 @@ async function loadStats(){
 /*  RECEPTIONIST HANDOVER  */
 var rcpSessions=[], rcpShowAll=false, rcpPreviewHistory=[], rcpPreviewCollected={};
 
-async function _rcpAuthHeader(){
+/* Shared admin-auth header — used by every fetch() to an endpoint the
+   backend gates with requireAdmin (receptionist handover, date locks,
+   bookings, booking-confirm/reject, block/unblock-date). */
+async function _adminAuthHeader(){
   var c=getSupabase();
   var { data }=await c.auth.getSession();
   var token=data && data.session ? data.session.access_token : null;
@@ -2249,7 +2252,7 @@ async function _rcpAuthHeader(){
 async function loadReceptionist(){
   var list=document.getElementById('rcp-list');
   try{
-    var headers=await _rcpAuthHeader();
+    var headers=await _adminAuthHeader();
     var res=await fetch(EVENTS_API+'/api/receptionist-handover',{headers:headers});
     var data=await res.json();
     if(!res.ok) throw new Error(data.error||'Failed to load');
@@ -2349,7 +2352,7 @@ function rcpToggleT(btn){
 
 async function rcpResolve(codename){
   try{
-    var headers=await _rcpAuthHeader();
+    var headers=await _adminAuthHeader();
     headers['Content-Type']='application/json';
     var res=await fetch(EVENTS_API+'/api/receptionist-handover/resolve',{
       method:'POST', headers:headers, body:JSON.stringify({codename:codename})
@@ -5773,7 +5776,7 @@ async function loadBookings() {
   el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>';
   try {
     var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
-    var res  = await fetch(API + '/api/bookings');
+    var res  = await fetch(API + '/api/bookings', { headers: await _adminAuthHeader() });
     var data = await res.json();
     _allBookings = data.bookings || [];
 
@@ -5840,7 +5843,7 @@ async function bkBulkUnbook(){
   var ok=0, fail=0;
   for(var i=0;i<ids.length;i++){
     try {
-      var res  = await fetch(API+'/api/booking-reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:ids[i]})});
+      var res  = await fetch(API+'/api/booking-reject',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({bookingId:ids[i]})});
       var data = await res.json();
       if(data.success) ok++; else fail++;
     } catch(e){ fail++; }
@@ -5905,7 +5908,7 @@ async function rejectBooking(id) {
   if(!confirm('Reject this booking and notify the client?')) return;
   var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
   try {
-    var res  = await fetch(API+'/api/booking-reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
+    var res  = await fetch(API+'/api/booking-reject',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({bookingId:id})});
     var data = await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
     toast('','Booking rejected','Client notified by email');
@@ -5923,7 +5926,7 @@ async function loadDateLocks(){
   if(!listEl) return;
   var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
   try {
-    var headers = await _rcpAuthHeader();
+    var headers = await _adminAuthHeader();
     var res  = await fetch(API + '/api/date-locks', { headers: headers });
     var data = await res.json();
     if(!res.ok || !data.success) throw new Error(data.error || 'Could not load date locks');
@@ -6000,7 +6003,7 @@ async function runDateLockRepair(){
   var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
   if(btn){ btn.disabled = true; btn.textContent = 'Checking…'; }
   try {
-    var headers = await _rcpAuthHeader();
+    var headers = await _adminAuthHeader();
     headers['Content-Type'] = 'application/json';
     var res  = await fetch(API + '/api/date-locks/sync', { method:'POST', headers: headers });
     var data = await res.json();
@@ -6134,7 +6137,7 @@ async function confirmBooking(){
   try {
     // Step 1 — confirm booking + create event server-side
     var res=await fetch(API+'/api/booking-confirm',{
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),
       body:JSON.stringify({bookingId:b.id, packageNotes:packageNotes, invoice:invoice, skipConfirmEmail:true})
     });
     var data=await res.json();
@@ -6521,7 +6524,7 @@ async function blockDate(){
   if(!dateVal){ toast('','Select a date first',''); return; }
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try {
-    var res=await fetch(API+'/api/block-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateVal,reason:reasonVal})});
+    var res=await fetch(API+'/api/block-date',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({date:dateVal,reason:reasonVal})});
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
     toast('','Date blocked',dateVal);
@@ -6535,7 +6538,7 @@ async function unblockDate(dateStr){
   if(!confirm('Unblock '+dateStr+'?')) return;
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try {
-    var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateStr})});
+    var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({date:dateStr})});
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
     toast('','Date unblocked',dateStr);
@@ -6704,7 +6707,7 @@ async function bkCalMultiBlock(){
   var ok=0, fail=0;
   for(var i=0;i<toBlock.length;i++){
     try {
-      var res=await fetch(API+'/api/block-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:toBlock[i],reason:reason})});
+      var res=await fetch(API+'/api/block-date',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({date:toBlock[i],reason:reason})});
       var data=await res.json();
       if(data.success) ok++; else fail++;
     } catch(e){ fail++; }
@@ -6725,7 +6728,7 @@ async function bkCalMultiUnblock(){
   var ok=0, fail=0;
   for(var i=0;i<toUnblock.length;i++){
     try {
-      var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:toUnblock[i]})});
+      var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({date:toUnblock[i]})});
       var data=await res.json();
       if(data.success) ok++; else fail++;
     } catch(e){ fail++; }
@@ -6785,7 +6788,7 @@ async function blockDateFromCalendar(dateStr){
   var reason=reasonInput?reasonInput.value.trim():'';
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try {
-    var res=await fetch(API+'/api/block-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateStr,reason:reason})});
+    var res=await fetch(API+'/api/block-date',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({date:dateStr,reason:reason})});
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
     toast('','Date marked unavailable',dateStr);
@@ -6798,7 +6801,7 @@ async function unblockDateFromCalendar(dateStr){
   if(!confirm('Unblock '+dateStr+'? It will become available again on the Book Us page.')) return;
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try {
-    var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:dateStr})});
+    var res=await fetch(API+'/api/unblock-date',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({date:dateStr})});
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
     toast('','Date unblocked',dateStr);
@@ -6820,7 +6823,7 @@ async function cancelConfirmedBooking(id){
   if(!confirm('Cancel this confirmed booking for '+b.name+' on '+(b.event_date||'')+'?\n\nThis frees up the date on the calendar. The client will be notified by email.')) return;
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try {
-    var res=await fetch(API+'/api/booking-reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
+    var res=await fetch(API+'/api/booking-reject',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({bookingId:id})});
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Failed');
     var freedDate=b.event_date;
