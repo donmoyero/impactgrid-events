@@ -634,7 +634,7 @@ renderFooter();
 
       if (res.status === 409 || (!res.ok && /book|unavailable|not available|taken/i.test(data.error || ''))) {
         await loadAvailability();
-        rejectDate(MSG_BOOKED);
+        rejectDate(data.error || MSG_BOOKED);
         btn.disabled = false; btn.textContent = 'Send booking request'; return;
       }
       if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed');
