@@ -446,6 +446,80 @@ function populateTemplateSelects(){
   });
 }
 
+/* ── VISUAL CARD PICKER (layout + transition) ─────────────────────
+   Cards are built from LAYOUT_STYLES / TRANSITION_STYLES above and write
+   into the hidden #tpl-layout / #tpl-transition inputs, so
+   openTemplateModal() and saveTemplate() keep reading/writing .value
+   exactly as before. Mini layouts mirror the real .layout-* CSS in
+   event.html (grid / masonry / justified / collage / filmstrip). */
+function tplTiles(n){ var h=''; for(var i=0;i<n;i++) h += '<div class="tpl-t"></div>'; return h; }
+
+function tplMiniLayout(v){
+  switch(v){
+    case 'masonry':
+      return '<div class="tpl-ml tpl-ml-masonry">'
+        + '<div class="tpl-col"><div class="tpl-t" style="flex:3"></div><div class="tpl-t" style="flex:2"></div></div>'
+        + '<div class="tpl-col"><div class="tpl-t" style="flex:2"></div><div class="tpl-t" style="flex:3"></div></div>'
+        + '<div class="tpl-col"><div class="tpl-t" style="flex:3"></div><div class="tpl-t" style="flex:2"></div></div>'
+      + '</div>';
+    case 'justified':
+      return '<div class="tpl-ml tpl-ml-justified">'
+        + '<div class="tpl-row"><div class="tpl-t" style="flex:2"></div><div class="tpl-t" style="flex:1"></div><div class="tpl-t" style="flex:2"></div></div>'
+        + '<div class="tpl-row"><div class="tpl-t" style="flex:1"></div><div class="tpl-t" style="flex:2"></div></div>'
+      + '</div>';
+    case 'collage':
+      return '<div class="tpl-ml tpl-ml-collage">' + tplTiles(6) + '</div>';
+    case 'filmstrip':
+      return '<div class="tpl-ml tpl-ml-filmstrip">' + tplTiles(3) + '</div>';
+    case 'grid':
+    default:
+      return '<div class="tpl-ml tpl-ml-grid">' + tplTiles(6) + '</div>';
+  }
+}
+
+function tplMiniTransition(v){
+  return '<div class="tpl-tr tpl-tr-' + v + '"><div class="tpl-tr-a"></div><div class="tpl-tr-b"></div></div>';
+}
+
+function tplRenderCards(containerId, inputId, styles, miniFn){
+  var wrap = document.getElementById(containerId);
+  var inp  = document.getElementById(inputId);
+  if(!wrap || !inp) return;
+  var cur = inp.value;
+  wrap.innerHTML = styles.map(function(s){
+    var on = s.value === cur;
+    return '<button type="button" class="tpl-card' + (on ? ' sel' : '') + '" data-value="' + s.value + '" aria-pressed="' + on + '">'
+      + '<div class="tpl-card-thumb">' + miniFn(s.value) + '</div>'
+      + '<div class="tpl-card-label">' + esc(s.label) + '</div>'
+    + '</button>';
+  }).join('');
+}
+
+/* Re-reads #tpl-layout / #tpl-transition and redraws both card grids —
+   call after those hidden inputs have been set (openTemplateModal does). */
+function tplRenderPickers(){
+  tplRenderCards('tpl-layout-cards',     'tpl-layout',     LAYOUT_STYLES,     tplMiniLayout);
+  tplRenderCards('tpl-transition-cards', 'tpl-transition', TRANSITION_STYLES, tplMiniTransition);
+}
+
+/* One delegated click handler for every card in either grid. */
+document.addEventListener('click', function(e){
+  var card = e.target.closest ? e.target.closest('.tpl-card') : null;
+  if(!card) return;
+  var grid = card.parentNode;
+  var inputId = grid && grid.getAttribute('data-tpl-input');
+  if(!inputId) return;
+  var inp = document.getElementById(inputId);
+  if(!inp) return;
+  inp.value = card.getAttribute('data-value');
+  Array.prototype.forEach.call(grid.querySelectorAll('.tpl-card'), function(c){
+    var on = c === card;
+    c.classList.toggle('sel', on);
+    c.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+});
+window.tplRenderPickers = tplRenderPickers;
+
 function openTemplateModal(prefill){
   var m = document.getElementById('templateModal');
   if(!m) return;
@@ -459,6 +533,7 @@ function openTemplateModal(prefill){
   var statusEl = document.getElementById('tpl-bg-upload-status');
   if(statusEl) statusEl.textContent = '';
   updateTplBgPreview();
+  tplRenderPickers(); /* hidden #tpl-layout / #tpl-transition are set above — draw the cards + highlight the current pick */
   document.getElementById('tpl-default').checked = !!(prefill && prefill.is_default);
   document.getElementById('templateModalTitle').textContent = prefill ? 'Edit Template' : 'New Template';
   m.style.display = 'flex';
