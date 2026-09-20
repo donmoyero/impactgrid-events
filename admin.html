@@ -138,6 +138,45 @@ tr:hover td{background:var(--bg2);}
 .ws-sticky{position:sticky;top:0;}
 .mg-tab{background:none;border:1px solid var(--border);color:var(--text2);}
 .mg-tab.active{background:var(--gold);color:#07090f;border-color:var(--gold);}
+
+/* ── Template editor: visual card picker (layout + transition) ── */
+.tpl-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;}
+.tpl-card{display:flex;flex-direction:column;justify-content:flex-start;background:var(--bg2);border:2px solid var(--border);border-radius:var(--r);padding:7px;cursor:pointer;text-align:center;font-family:var(--fb);color:var(--text2);transition:border-color .15s,box-shadow .15s,transform .15s;}
+.tpl-card:hover{border-color:var(--gold-glo);transform:translateY(-1px);}
+.tpl-card.sel{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);color:var(--text);}
+.tpl-card-thumb{height:56px;border-radius:5px;overflow:hidden;background:var(--bg3);margin-bottom:7px;position:relative;padding:4px;box-sizing:border-box;}
+.tpl-card-label{font-size:11px;font-weight:600;line-height:1.2;}
+.tpl-t{background:var(--gold);opacity:.55;border-radius:2px;min-width:0;min-height:0;}
+.tpl-t:nth-child(3n+2){opacity:.8;}
+.tpl-t:nth-child(3n){opacity:.38;}
+.tpl-ml{width:100%;height:100%;display:flex;}
+.tpl-ml-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:3px;}
+.tpl-ml-masonry{gap:3px;}
+.tpl-ml-masonry .tpl-col{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
+.tpl-ml-justified{flex-direction:column;gap:3px;}
+.tpl-ml-justified .tpl-row{flex:1;display:flex;gap:3px;min-height:0;}
+.tpl-ml-collage{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(3,1fr);gap:3px;}
+.tpl-ml-collage .tpl-t:nth-child(1){grid-column:span 4;grid-row:span 2;}
+.tpl-ml-collage .tpl-t:nth-child(2),.tpl-ml-collage .tpl-t:nth-child(3),.tpl-ml-collage .tpl-t:nth-child(4),.tpl-ml-collage .tpl-t:nth-child(5),.tpl-ml-collage .tpl-t:nth-child(6){grid-column:span 2;}
+.tpl-ml-filmstrip{gap:3px;align-items:center;overflow:hidden;}
+.tpl-ml-filmstrip .tpl-t{flex:0 0 44%;height:72%;}
+/* transition thumbs: idle shows a still of the effect; hover / selected plays it */
+.tpl-tr{position:absolute;inset:4px;border-radius:3px;overflow:hidden;background:var(--bg2);}
+.tpl-tr-a,.tpl-tr-b{position:absolute;inset:0;border-radius:3px;}
+.tpl-tr-a{background:var(--gold);opacity:.4;}
+.tpl-tr-b{background:var(--gold);opacity:.9;}
+.tpl-tr-fade .tpl-tr-b{opacity:.55;}
+.tpl-tr-slide .tpl-tr-b{transform:translateX(45%);}
+.tpl-tr-zoom .tpl-tr-b{transform:scale(.65);}
+.tpl-tr-none .tpl-tr-b{clip-path:inset(0 50% 0 0);}
+.tpl-card:hover .tpl-tr-fade .tpl-tr-b,.tpl-card.sel .tpl-tr-fade .tpl-tr-b{animation:tplTrFade 2.4s ease-in-out infinite;}
+.tpl-card:hover .tpl-tr-slide .tpl-tr-b,.tpl-card.sel .tpl-tr-slide .tpl-tr-b{animation:tplTrSlide 2.4s ease-in-out infinite;}
+.tpl-card:hover .tpl-tr-zoom .tpl-tr-b,.tpl-card.sel .tpl-tr-zoom .tpl-tr-b{animation:tplTrZoom 2.4s ease-in-out infinite;}
+.tpl-card:hover .tpl-tr-none .tpl-tr-b,.tpl-card.sel .tpl-tr-none .tpl-tr-b{animation:tplTrNone 2.4s step-end infinite;}
+@keyframes tplTrFade{0%,15%{opacity:0;}45%,75%{opacity:.9;}100%{opacity:0;}}
+@keyframes tplTrSlide{0%,15%{transform:translateX(100%);}45%,75%{transform:translateX(0);}100%{transform:translateX(100%);}}
+@keyframes tplTrZoom{0%,15%{opacity:0;transform:scale(1.3);}45%,75%{opacity:.9;transform:scale(1);}100%{opacity:0;transform:scale(1.3);}}
+@keyframes tplTrNone{0%{opacity:0;}45%{opacity:.9;}90%{opacity:0;}}
 .field-group{margin-bottom:14px;}
 .field-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700;}
 .field-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;}
@@ -1214,22 +1253,13 @@ If you have any questions, just reply to this email.
           </div>
           <div class="field-group">
             <div class="field-label">Photo Layout</div>
-            <select id="tpl-layout" style="width:100%;">
-              <option value="grid">Grid</option>
-              <option value="masonry">Masonry</option>
-              <option value="justified">Justified Rows</option>
-              <option value="collage">Collage</option>
-              <option value="filmstrip">Filmstrip</option>
-            </select>
+            <input type="hidden" id="tpl-layout" value="grid"/>
+            <div class="tpl-picker" id="tpl-layout-cards" data-tpl-input="tpl-layout"></div>
           </div>
           <div class="field-group">
             <div class="field-label">Slideshow Transition</div>
-            <select id="tpl-transition" style="width:100%;">
-              <option value="fade">Fade</option>
-              <option value="slide">Slide</option>
-              <option value="zoom">Zoom</option>
-              <option value="none">Instant / None</option>
-            </select>
+            <input type="hidden" id="tpl-transition" value="fade"/>
+            <div class="tpl-picker" id="tpl-transition-cards" data-tpl-input="tpl-transition"></div>
           </div>
           <div class="form-grid">
             <div class="field-group">
