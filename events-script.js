@@ -808,6 +808,30 @@ function openManageGallery(eventId){
   nav('managegallery', null);
 }
 
+/* ── LIVE PREVIEW — the real event.html in an iframe, next to the editor ──
+   Not a mocked-up preview: same URL as "Preview Gallery", so it reflects
+   whatever's actually saved (hidden/order/template etc). Reloaded on tab
+   open and after any save that changes what the client sees; a manual
+   Refresh button covers anything this doesn't catch automatically. */
+function mgBuildPreviewUrl(){
+  if(!_mgEventData || !_mgEventData.event_slug) return null;
+  return 'event.html?event=' + _mgEventData.event_slug + '&code=' + _mgEventData.event_code + '&_pv=' + Date.now();
+}
+function mgRefreshPreview(){
+  var url = mgBuildPreviewUrl();
+  var frame = document.getElementById('mgPreviewFrame');
+  var loading = document.getElementById('mgPreviewLoading');
+  if(!frame || !url) return;
+  if(loading) loading.style.display = 'flex';
+  frame.src = url;
+}
+function mgPreviewLoaded(){
+  var loading = document.getElementById('mgPreviewLoading');
+  if(loading) loading.style.display = 'none';
+}
+window.mgRefreshPreview = mgRefreshPreview;
+window.mgPreviewLoaded  = mgPreviewLoaded;
+
 async function loadManageGallery(){
   if(!_mgEventId) { nav('events', null); return; }
   var id = _mgEventId;
@@ -830,6 +854,7 @@ async function loadManageGallery(){
     if(nameEl) nameEl.textContent = ev.name || 'Gallery';
     if(subEl)  subEl.textContent  = 'Client Gallery';
     if(prevEl) prevEl.href = 'event.html?event=' + ev.event_slug + '&code=' + ev.event_code;
+    mgRefreshPreview();
 
     var photoCountP = getDocs(query(collection(db, 'photos'), where('event_id','==',id)));
     var templateNameP = ev.template_id
@@ -995,6 +1020,7 @@ async function mgSavePhotoOrder(){
     }));
     _mgPhotos.forEach(function(p, i){ p.order = i * 10; });
     toast(' ', 'Order saved', '');
+    mgRefreshPreview();
   }catch(e){
     toast(' ', 'Failed to save order', e.message);
     mgLoadPhotos();
@@ -1017,7 +1043,7 @@ async function mgToggleHidden(id){
   var next = !p.hidden;
   p.hidden = next;
   mgRenderPhotos();
-  try{ await updateDoc(doc(db, 'photos', id), { hidden: next }); }
+  try{ await updateDoc(doc(db, 'photos', id), { hidden: next }); mgRefreshPreview(); }
   catch(e){ p.hidden = !next; mgRenderPhotos(); toast(' ', 'Failed to update', e.message); }
 }
 
@@ -1028,6 +1054,7 @@ async function mgDeletePhoto(id){
     _mgPhotos = _mgPhotos.filter(function(p){ return p.id !== id; });
     delete _mgPhotoMeta[id];
     mgRenderPhotos();
+    mgRefreshPreview();
     if(result.cloudinaryOk) toast(' ', 'Photo deleted', '');
     else toast(' ', 'Removed from gallery', 'Cloudinary file cleanup failed — Cloudinary Cleanup will catch it later');
   }catch(e){ toast(' ', 'Error', e.message); }
