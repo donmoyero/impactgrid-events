@@ -1926,6 +1926,26 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
+    <div class="card" id="dateAvailCard">
+      <div class="card-head">
+        <h2>Date Availability</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="loadDateLocks()">Refresh</button>
+          <button class="btn btn-gold btn-sm" id="dateLockRepairBtn" onclick="runDateLockRepair()">Check &amp; repair</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 14px;max-width:70ch;">
+          <strong style="color:var(--text);">One booking per date.</strong>
+          Pending and confirmed bookings hold their date; rejecting or cancelling a booking frees it.
+          This is enforced by the server for the website form and the chat assistant, so two people can't book the same date even if they submit at the same moment.
+        </p>
+        <div id="dateLockSummary" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
+        <div id="dateLockConflicts"></div>
+        <div id="dateLockList"><div class="empty"><div class="empty-txt">Loading…</div></div></div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-head">
         <h2> Block Dates</h2>
@@ -5771,6 +5791,7 @@ async function loadBookings() {
     el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
   }
   await loadBlockedDatesList();
+  loadDateLocks();
 }
 
 function filterBookings(status, btn) {
@@ -5890,6 +5911,107 @@ async function rejectBooking(id) {
     toast('','Booking rejected','Client notified by email');
     loadBookings();
   } catch(e){ toast('','Error',e.message); }
+}
+
+
+/* ── DATE AVAILABILITY — server-enforced "one booking per date" ──
+   GET  /api/date-locks        → held dates + conflicts / missing / stale
+   POST /api/date-locks/sync   → "Check & repair" (never rejects a booking)
+   Both are admin-only and need the Supabase session token. */
+async function loadDateLocks(){
+  var listEl = document.getElementById('dateLockList');
+  if(!listEl) return;
+  var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+  try {
+    var headers = await _rcpAuthHeader();
+    var res  = await fetch(API + '/api/date-locks', { headers: headers });
+    var data = await res.json();
+    if(!res.ok || !data.success) throw new Error(data.error || 'Could not load date locks');
+    renderDateLocks(data);
+  } catch(e){
+    listEl.innerHTML = '<div class="empty"><div class="empty-txt">Could not load date availability: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function _dlChip(label, n, bad){
+  var col = bad && n ? 'var(--red)' : 'var(--text2)';
+  var bg  = bad && n ? 'var(--red-dim)' : 'var(--bg3)';
+  var bd  = bad && n ? 'var(--red-glo)' : 'var(--border2)';
+  return '<span style="display:inline-flex;gap:6px;align-items:center;padding:5px 12px;border-radius:100px;font-size:12px;background:'+bg+';border:1px solid '+bd+';color:'+col+';"><strong>'+n+'</strong> '+label+'</span>';
+}
+
+function renderDateLocks(d){
+  var held=d.held||[], conflicts=d.conflicts||[], missing=d.missing||[], stale=d.stale||[];
+
+  document.getElementById('dateLockSummary').innerHTML =
+    _dlChip('dates held', held.length, false) +
+    _dlChip('double-booked', conflicts.length, true) +
+    _dlChip('not yet protected', missing.length, true) +
+    _dlChip('stale', stale.length, true);
+
+  var cEl = document.getElementById('dateLockConflicts');
+  if(conflicts.length){
+    cEl.innerHTML = '<div style="background:var(--red-dim);border:1px solid var(--red-glo);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;">'
+      + '<div style="font-weight:700;color:var(--red);margin-bottom:4px;">Two active bookings on the same date</div>'
+      + '<div style="font-size:12px;color:var(--text2);margin-bottom:10px;">These came in before date protection was switched on. Reject one for each date below.</div>'
+      + conflicts.map(function(c){
+          return '<div style="padding:10px 0;border-top:1px solid var(--red-glo);">'
+            + '<div style="font-family:var(--fm);font-size:12px;margin-bottom:6px;">'+esc(c.date)+'</div>'
+            + c.bookings.map(function(b){
+                var canReject = b.status !== 'rejected';
+                return '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;padding:3px 0;">'
+                  + '<span style="min-width:140px;font-weight:600;">'+esc(b.name||'—')+'</span>'
+                  + '<span style="color:var(--text3);">'+esc(b.event_type||'')+'</span>'
+                  + '<span style="text-transform:capitalize;color:'+(b.status==='confirmed'?'var(--green)':'var(--gold)')+';">'+esc(b.status)+'</span>'
+                  + (canReject ? '<button class="btn btn-ghost btn-sm" style="margin-left:auto;color:var(--red);" onclick="rejectBooking(\''+esc(b.id)+'\')">Reject</button>' : '')
+                  + '</div>';
+              }).join('')
+            + '</div>';
+        }).join('')
+      + '</div>';
+  } else { cEl.innerHTML = ''; }
+
+  var note = '';
+  if(missing.length || stale.length){
+    note = '<div style="font-size:12px;color:var(--gold);margin-bottom:12px;">'
+      + (missing.length ? missing.length+' booked date'+(missing.length!==1?'s are':' is')+' not yet protected against double-booking. ' : '')
+      + (stale.length ? stale.length+' lock'+(stale.length!==1?'s':'')+' point'+(stale.length===1?'s':'')+' at a rejected or missing booking. ' : '')
+      + 'Press <strong>Check &amp; repair</strong> to fix.</div>';
+  }
+
+  var listEl = document.getElementById('dateLockList');
+  if(!held.length){
+    listEl.innerHTML = note + '<div class="empty"><div class="empty-txt">No dates are currently held by a booking.</div></div>';
+    return;
+  }
+  listEl.innerHTML = note + '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Held by</th><th>Event</th><th>Status</th></tr></thead><tbody>'
+    + held.map(function(h){
+        var b = h.booking || {};
+        return '<tr><td style="font-family:var(--fm);white-space:nowrap;">'+esc(h.date)+'</td>'
+          + '<td>'+esc(b.name||'—')+'<div style="font-size:11px;color:var(--text3);">'+esc(b.email||'')+'</div></td>'
+          + '<td>'+esc(b.event_type||'—')+'</td>'
+          + '<td style="text-transform:capitalize;">'+esc(b.status||'—')+'</td></tr>';
+      }).join('')
+    + '</tbody></table></div>';
+}
+
+async function runDateLockRepair(){
+  var btn = document.getElementById('dateLockRepairBtn');
+  var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+  if(btn){ btn.disabled = true; btn.textContent = 'Checking…'; }
+  try {
+    var headers = await _rcpAuthHeader();
+    headers['Content-Type'] = 'application/json';
+    var res  = await fetch(API + '/api/date-locks/sync', { method:'POST', headers: headers });
+    var data = await res.json();
+    if(!res.ok || !data.success) throw new Error(data.error || 'Repair failed');
+    var fixed = (data.created||[]).length + (data.repointed||[]).length + (data.removed||[]).length;
+    var conflicts = (data.conflicts||[]).length;
+    toast('', fixed ? fixed + ' date lock' + (fixed!==1?'s':'') + ' repaired' : 'Nothing to repair',
+      conflicts ? conflicts + ' double-booked date' + (conflicts!==1?'s need':' needs') + ' your attention' : 'No double-bookings found');
+    await loadDateLocks();
+  } catch(e){ toast('', 'Error', e.message); }
+  finally { if(btn){ btn.disabled = false; btn.textContent = 'Check & repair'; } }
 }
 
 function openConfirmModal(id) {
@@ -6017,6 +6139,9 @@ async function confirmBooking(){
     });
     var data=await res.json();
     if(!data.success) throw new Error(data.error||'Backend error');
+    if(data.otherActiveOnDate && data.otherActiveOnDate.length){
+      toast('','Heads up','Another request is still open for this date — see Date Availability below to reject it.');
+    }
 
     // Step 2 — save invoice to Supabase
     var sb = getSupabase();
