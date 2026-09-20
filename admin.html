@@ -377,7 +377,6 @@ tr:hover td{background:var(--bg2);}
       <nav class="sb-nav">
         <a href="#" onclick="return nav('events',this)"><span class="sb-ico"></span>All Events</a>
         <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico"></span>Create Event</a>
-        <a href="#" onclick="return nav('templates',this)"><span class="sb-ico"></span>Templates</a>
         <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico"></span>Upload Photos</a>
         <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico"></span>Reviews</a>
         <a href="#" onclick="return nav('brandpartners',this)"><span class="sb-ico"></span>Brand Partners</a>
@@ -760,19 +759,34 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
 
-      <!-- BRANDING (future phase) -->
+      <!-- BRANDING -->
       <div class="mg-panel" id="mg-panel-branding" style="display:none;">
-        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Branding controls are coming in a later phase.</div></div></div></div>
+        <div class="card">
+          <div class="card-head"><h2>Branding</h2></div>
+          <div class="card-body" id="mgBrandingBody">
+            <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>
+          </div>
+        </div>
       </div>
 
-      <!-- CLIENT EXPERIENCE (future phase) -->
+      <!-- CLIENT EXPERIENCE -->
       <div class="mg-panel" id="mg-panel-clientexp" style="display:none;">
-        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Client experience toggles are coming in a later phase.</div></div></div></div>
+        <div class="card">
+          <div class="card-head"><h2>Client Experience</h2></div>
+          <div class="card-body" id="mgClientExpBody">
+            <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>
+          </div>
+        </div>
       </div>
 
-      <!-- SETTINGS (future phase) -->
+      <!-- SETTINGS -->
       <div class="mg-panel" id="mg-panel-settings" style="display:none;">
-        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Gallery settings (URL, access code, expiry, delete) are coming in a later phase — use <a href="#" onclick="return nav('events',null)">All Events</a> for these for now.</div></div></div></div>
+        <div class="card">
+          <div class="card-head"><h2>Settings</h2></div>
+          <div class="card-body" id="mgSettingsBody">
+            <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>
+          </div>
+        </div>
       </div>
       </div><!-- /mg-main -->
 
@@ -816,16 +830,11 @@ tr:hover td{background:var(--bg2);}
                   <select id="ev-service" onchange="onEventServiceSelect()" style="width:100%;">
                     <option value="">— No linked service —</option>
                   </select>
-                  <div class="field-hint">Auto-fills the template below from the service's default — still overridable</div>
+                  <div class="field-hint">Just for your own reference — the gallery's look is set afterwards from Manage Gallery → Design</div>
                 </div>
               </div>
               <div class="form-grid" style="margin-bottom:16px;">
                 <div class="field-group"><div class="field-label">Access Code</div><div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/><button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;"></button></div></div>
-                <div class="field-group"><div class="field-label">Template</div>
-                  <select id="ev-template" data-template-select onchange="updateTemplatePreview()" style="width:100%;">
-                    <option value="">— No template (use defaults) —</option>
-                  </select>
-                </div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
                 <div class="toggle on" id="ev-code-toggle" onclick="toggleRequireCode()"></div>
@@ -936,8 +945,9 @@ If you have any questions, just reply to this email.
         </div>
         <div class="ws-sticky">
           <div id="templatePreviewCard" style="border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2);box-shadow:var(--sh);transition:all .3s;">
-            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);"> Template Preview</div>
+            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);"> Gallery Preview</div>
             <div id="templatePreviewInner"></div>
+            <div style="padding:8px 14px;font-size:10px;color:var(--text3);border-top:1px solid var(--border);">Uses your Studio Default design. Customize this event's own look afterwards in Manage Gallery → Design.</div>
           </div>
         </div>
       </div>
@@ -1197,31 +1207,6 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
-    <!-- TEMPLATES -->
-    <div class="page" id="page-templates">
-      <div class="page-header">
-        <div class="page-title">Templates</div>
-        <div class="page-sub">Each template controls a gallery's photo layout, slideshow transition and background. Assign one to a service so bookings pick it up automatically, or set it manually per event.</div>
-      </div>
-      <div class="ws-layout">
-        <div>
-          <div class="card">
-            <div class="card-head">
-              <h2> Your Templates</h2>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-ghost btn-sm" onclick="loadTemplates()"> Refresh</button>
-                <button class="btn btn-gold" onclick="openTemplateModal()">+ New Template</button>
-              </div>
-            </div>
-            <div class="card-body table-wrap" id="templatesList">
-              <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div></div>
-            </div>
-          </div>
-        </div>
-        <div class="ws-sticky"></div>
-      </div>
-    </div>
-
     <!-- CLOUDINARY CLEANUP -->
     <div class="page" id="page-cloudinarycleanup">
       <div class="page-header">
@@ -1250,68 +1235,6 @@ If you have any questions, just reply to this email.
       </div>
     </div>
 
-    <!-- TEMPLATE MODAL (add / edit) -->
-    <div id="templateModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
-      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);">
-        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-          <h2 style="font-size:16px;font-weight:900;" id="templateModalTitle">New Template</h2>
-          <button onclick="closeTemplateModal()" style="font-size:18px;color:var(--text3);background:none;border:none;cursor:pointer;line-height:1;">&times;</button>
-        </div>
-        <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
-          <input type="hidden" id="tpl-id"/>
-          <div class="field-group">
-            <div class="field-label">Template Name *</div>
-            <input type="text" id="tpl-name" placeholder="e.g. Wedding — Elegant"/>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Look</div>
-            <input type="hidden" id="tpl-look" value=""/>
-            <div class="tpl-picker tpl-look-picker" id="tpl-look-cards" data-tpl-input="tpl-look"></div>
-            <div class="field-hint">A look sets the gallery's colours, typography and spacing. Picking one also fills in a matching background colour (an image background is left as is). Layout and transition below stay yours to choose. &ldquo;Original&rdquo; keeps the event-type styling.</div>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Photo Layout</div>
-            <input type="hidden" id="tpl-layout" value="grid"/>
-            <div class="tpl-picker" id="tpl-layout-cards" data-tpl-input="tpl-layout"></div>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Slideshow Transition</div>
-            <input type="hidden" id="tpl-transition" value="fade"/>
-            <div class="tpl-picker" id="tpl-transition-cards" data-tpl-input="tpl-transition"></div>
-          </div>
-          <div class="form-grid">
-            <div class="field-group">
-              <div class="field-label">Background Type</div>
-              <select id="tpl-bg-type" style="width:100%;" onchange="tplBgTypeChanged()">
-                <option value="color">Color</option>
-                <option value="image">Image</option>
-              </select>
-            </div>
-            <div class="field-group">
-              <div class="field-label">Background Value</div>
-              <input type="color" id="tpl-bg-value" value="#0f1020" style="width:100%;height:40px;" oninput="updateTplBgPreview()"/>
-            </div>
-          </div>
-          <div class="field-group" id="tpl-bg-upload-row" style="display:none;">
-            <div class="field-label">Background Image</div>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('tpl-bg-file').click()">Upload Image</button>
-              <input type="file" id="tpl-bg-file" accept="image/*" style="display:none;" onchange="handleTplBgUpload(this)"/>
-              <span id="tpl-bg-upload-status" style="font-size:11px;"></span>
-            </div>
-            <div id="tpl-bg-preview" style="display:none;margin-top:10px;width:100%;height:100px;border-radius:var(--r);border:1px solid var(--border2);background-size:cover;background-position:center;"></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
-            <input type="checkbox" id="tpl-default" style="width:18px;height:18px;"/>
-            <div><div style="font-size:13px;font-weight:600;">Default Template</div><div style="font-size:11px;color:var(--text3);">Used when an event has no template linked</div></div>
-          </div>
-          <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:4px;">
-            <button class="btn btn-ghost" onclick="closeTemplateModal()">Cancel</button>
-            <button class="btn btn-gold" onclick="saveTemplate()">Save Template</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- ABOUT PAGE EDITOR -->
     <div class="page" id="page-about">
@@ -1449,14 +1372,6 @@ If you have any questions, just reply to this email.
             <div id="svcImgPreviewWrap" style="display:none;margin-top:10px;">
               <img id="svcImgPreview" style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--r);border:1px solid var(--border2);" src="" alt="Preview"/>
             </div>
-          </div>
-
-          <div class="field-group">
-            <div class="field-label">Default Gallery Template <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
-            <select id="svc-template" data-template-select style="width:100%;">
-              <option value="">— No template (use defaults) —</option>
-            </select>
-            <div class="field-hint">When someone books this service, their event gallery uses this template's layout, transition and background automatically. Manage templates on the Templates page.</div>
           </div>
 
           <div class="field-group">
@@ -2311,7 +2226,6 @@ function nav(id,el){
     blog:'loadBlogPosts',
     social:'loadSocialPage',
     receptionist:'loadReceptionist',
-    templates:'loadTemplates',
     services:'loadServicesPage'
   };
   if(loaders[id]&&window[loaders[id]]) window[loaders[id]]();
@@ -2341,7 +2255,7 @@ window.createEvent = function(){ if(window.igCreateEvent) window.igCreateEvent()
 window.initCreateEventPage = function(){
   if(window.setDefaultExpiry)    window.setDefaultExpiry();
   if(window.initInvoiceDefaults) window.initInvoiceDefaults();
-  if(window.loadTemplates)       window.loadTemplates();
+  if(window.loadStudioDefaultDesign) window.loadStudioDefaultDesign();
   if(window.loadServicesForEventForm) window.loadServicesForEventForm();
   if(window.checkExpiryWarning)  window.checkExpiryWarning();
 };
@@ -2905,21 +2819,20 @@ async function saveTicker(){
   }catch(e){toast('','Save failed',e.message);}
 }
 
-/*  TEMPLATE PREVIEW — reads the live templates collection (window._templatesCache
-    from events-script.js), not a hardcoded category list  */
+/*  GALLERY PREVIEW (create-event form) — every new event starts on the
+    Studio Default design (window._studioDefaultDesign, loaded from
+    studio_settings/design_defaults by events-script.js). Its own look is
+    only set afterwards, per-event, from Manage Gallery → Design.  */
 function updateTemplatePreview(){
-  var sel = document.getElementById('ev-template');
   var evName = document.getElementById('ev-name').value.trim()||'Your Event Name';
   var inner = document.getElementById('templatePreviewInner'); if(!inner) return;
-  var cache = window._templatesCache || [];
-  var t = sel && sel.value ? cache.filter(function(x){return x.id===sel.value;})[0] : null;
-  if(!t) t = cache.filter(function(x){return x.is_default;})[0];
+  var t = window._studioDefaultDesign || null;
 
   var bg = t ? (t.background_type==='image' ? '#0d1020' : (t.background_value||'#0d1020')) : '#f8f9fc';
   var bgImg = t && t.background_type==='image' ? t.background_value : '';
   var text = t ? '#fff' : '#0d1020';
   var text2 = t ? 'rgba(255,255,255,.7)' : '#505878';
-  var label = t ? (t.name + ' · ' + (t.layout_style||'grid') + ' layout · ' + (t.transition_style||'fade') + ' transition') : 'No template selected — using default grid & fade';
+  var label = t ? ('Studio Default · ' + (t.layout_style||'grid') + ' layout · ' + (t.transition_style||'fade') + ' transition') : 'Default grid & fade';
 
   inner.innerHTML=
     '<div style="background:'+bg+';'+(bgImg?'background-image:url(\''+bgImg.replace(/'/g,"")+'\');background-size:cover;background-position:center;':'')+'padding:20px 14px;text-align:center;border-bottom:1px solid rgba(0,0,0,0.08);">'+
@@ -4350,7 +4263,6 @@ function loadServices(){
 
 function loadServicesPage(){
   loadServices();
-  if(window.loadTemplates) window.loadTemplates(); /* populates the Default Gallery Template select */
 }
 
 function renderServicesAdmin(){
@@ -4442,9 +4354,6 @@ function openServiceModal(prefill){
   document.getElementById('svc-price').value     = prefill ? (prefill.icon||'') : '';
   document.getElementById('svc-image').value     = prefill ? (prefill.image_url||'') : '';
   document.getElementById('svc-order').value     = prefill ? (prefill.sort_order||0) : 0;
-  if(window.populateTemplateSelects) window.populateTemplateSelects();
-  var svcTplEl = document.getElementById('svc-template');
-  if(svcTplEl) svcTplEl.value = prefill ? (prefill.default_template_id||'') : '';
   var toggle = document.getElementById('svc-active-toggle');
   if(prefill){ prefill.is_active ? toggle.classList.add('on') : toggle.classList.remove('on'); }
   else { toggle.classList.add('on'); }
@@ -4493,8 +4402,7 @@ async function saveService(){
   var sort_order= parseInt(document.getElementById('svc-order').value)||0;
   var is_active = document.getElementById('svc-active-toggle').classList.contains('on');
 
-  var defaultTemplateId = document.getElementById('svc-template') ? (document.getElementById('svc-template').value||null) : null;
-  var payload = { title, description: desc, icon: price||null, image_url: image_url||null, sort_order, is_active, default_template_id: defaultTemplateId };
+  var payload = { title, description: desc, icon: price||null, image_url: image_url||null, sort_order, is_active };
 
   try {
     var sb = getSupabase();
