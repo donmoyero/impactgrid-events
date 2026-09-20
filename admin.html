@@ -686,14 +686,25 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
 
-      <!-- COVER (built in a later phase) -->
+      <!-- COVER -->
       <div class="mg-panel" id="mg-panel-cover" style="display:none;">
-        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">Cover photo picker is coming in the next phase.</div></div></div></div>
+        <div class="card">
+          <div class="card-head"><h2>Cover Photo</h2></div>
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:12px;">Pick which photo represents this gallery. Videos can't be used as a cover.</div>
+            <div id="mgCoverGrid"><div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div></div>
+          </div>
+        </div>
       </div>
 
-      <!-- DESIGN (built in a later phase) -->
+      <!-- DESIGN -->
       <div class="mg-panel" id="mg-panel-design" style="display:none;">
-        <div class="card"><div class="card-body"><div class="empty"><div class="empty-txt">This gallery's layout is currently set via <a href="#" onclick="return nav('templates',null)">Templates</a>. A live-preview Design tab is coming in a later phase.</div></div></div></div>
+        <div class="card">
+          <div class="card-head"><h2>Design</h2></div>
+          <div class="card-body" id="mgDesignBody">
+            <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>
+          </div>
+        </div>
       </div>
 
       <!-- BRANDING (future phase) -->
