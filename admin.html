@@ -389,7 +389,6 @@ tr:hover td{background:var(--bg2);}
           <div class="card"><div class="card-head"><h2> Section Text</h2><button class="btn btn-gold" onclick="saveHomepageContent()"> Save All</button></div><div class="card-body"><div class="content-sections" id="contentSections"><div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div></div></div></div>
         </div>
         <div class="ws-sticky">
-          <div class="hint-box"><strong>How content updates work</strong><br><br>Changes here update the <code>site_content</code> table. The homepage reads this on load — visitors see updates within seconds. For the trust badge labels, use a line break where you want the text to wrap onto a second line.</div>
           <a href="index.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Homepage</a>
         </div>
       </div>
@@ -527,11 +526,8 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
 
-      <div class="hint-box" style="margin-bottom:18px;">
-        <strong>How it works</strong><br><br>
-        Uploading a file sends it to Supabase storage and saves the URL automatically. You can also paste any URL directly. Changes go live immediately — no redeploy needed.
-        <br><br>
-        <a href="index.html" target="_blank" class="btn btn-green btn-sm" style="margin-top:6px;display:inline-flex;"> Preview Homepage</a>
+      <div style="margin-bottom:18px;">
+        <a href="index.html" target="_blank" class="btn btn-green btn-sm" style="display:inline-flex;"> Preview Homepage</a>
       </div>
     </div>
     <!-- UPDATES -->
@@ -656,7 +652,7 @@ tr:hover td{background:var(--bg2);}
               </div>
               <div class="form-grid" style="margin-bottom:12px;">
                 <div class="field-group"><div class="field-label">Event Date *</div><input type="date" id="ev-date"/><div class="field-hint">The actual date of the event — used in the client's reminder email</div></div>
-                <div class="field-group"><div class="field-label">Expiry Date</div><input type="date" id="ev-expiry"/><div class="field-hint">Default: 30 days from today</div></div>
+                <div class="field-group"><div class="field-label">Expiry Date</div><input type="date" id="ev-expiry" oninput="checkExpiryWarning()"/><div class="field-hint">Default: 30 days from today</div><div id="ev-expiry-warn" class="hint-box hint-warn" style="display:none;margin-top:6px;padding:8px 10px;"></div></div>
               </div>
               <div class="form-grid" style="margin-bottom:12px;">
                 <div class="field-group"><div class="field-label">Linked Service <span style="font-weight:400;color:var(--text3);">(optional)</span></div>
@@ -786,8 +782,6 @@ If you have any questions, just reply to this email.
             <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);"> Template Preview</div>
             <div id="templatePreviewInner"></div>
           </div>
-          <div class="hint-box" style="margin-top:12px;"><strong>How events work</strong><br><br>After creating, upload photos from <strong>Upload Photos</strong>. Guests scan their face to find their photos instantly.</div>
-          <div class="hint-box hint-warn" style="margin-top:10px;"><strong>30-day expiry</strong><br>Events and photos auto-delete after the expiry date.</div>
         </div>
       </div>
     </div>
@@ -800,7 +794,7 @@ If you have any questions, just reply to this email.
           <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2> Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico"></div><div class="upload-zone-title">Drop photos or videos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · MP4 · MOV · WebM (videos over 100MB are auto-compressed) · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
           <div class="card" id="upload-photos-list-card" style="display:none;"><div class="card-head"><h2> Event Photos</h2><div style="display:flex;gap:10px;align-items:center;"><label style="font-size:12px;display:flex;gap:5px;align-items:center;cursor:pointer;color:var(--text2);"><input type="checkbox" id="epSelectAllCb" onchange="epToggleSelectAll(this)" style="margin:0;cursor:pointer;"/> Select all</label><button class="btn btn-ghost btn-sm" id="epBulkDeleteBtn" onclick="epBulkDeleteSelected()" style="display:none;color:var(--red);"> Delete Selected (<span id="epSelectedCount">0</span>)</button><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()"> Refresh</button></div></div><div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet.</div></div></div></div>
         </div>
-        <div class="ws-sticky"><div class="hint-box"><strong>Upload tips</strong><br><br>You can upload multiple photos at once.<br><br>Photos are stored in the event bucket and are available immediately in the gallery after upload.</div></div>
+        <div class="ws-sticky"></div>
       </div>
     </div>
 
@@ -883,12 +877,6 @@ If you have any questions, just reply to this email.
             </div>
           </div>
           <div class="ws-sticky">
-            <div class="hint-box">
-              <strong>How this works</strong><br><br>
-              The name you give a portfolio becomes its own SEO page — so name it after what you want to rank for, e.g. "Event Photography Manchester" or "Fashion Photography Manchester".<br><br>
-              Every photo needs alt text — a plain description of what's in the shot. This is what actually gets your images found in Google Images.<br><br>
-              Drag a photo by its ⠿⠿ handle to reorder it.
-            </div>
             <button class="btn btn-gold" onclick="portfolioSaveCategory()" style="display:flex;justify-content:center;margin-top:12px;padding:10px;width:100%;"> Save Portfolio</button>
             <a href="portfolio.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:10px;padding:10px;"> Preview Portfolio</a>
           </div>
@@ -971,11 +959,6 @@ If you have any questions, just reply to this email.
             </div>
           </div>
           <div class="ws-sticky">
-            <div class="hint-box">
-              <strong>How the book works</strong><br><br>
-              Drag a page by its ⠿⠿ handle to reorder it (or use / ). Text and image pages can sit side-by-side as a spread on the public blog page.<br><br>
-              YouTube pages take the video ID or you can just paste the full YouTube link — it shows a thumbnail and only loads the video when clicked.
-            </div>
             <button class="btn btn-gold" onclick="blogSavePost()" style="display:flex;justify-content:center;margin-top:12px;padding:10px;width:100%;"> Save Post</button>
             <a href="blog.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:10px;padding:10px;"> Preview Blog</a>
           </div>
@@ -1025,11 +1008,6 @@ If you have any questions, just reply to this email.
           </div>
         </div>
         <div class="ws-sticky">
-          <div class="hint-box">
-            <strong>How this works</strong><br><br>
-            Upload a cover image (a still/thumbnail of the video), paste the actual Instagram or TikTok post link, then Save. On the public page, tapping a card opens that link in a new tab — it doesn't try to play the video on your own site.<br><br>
-            Drag a card by its ⠿⠿ handle to reorder — that's the order it shows in the grid.
-          </div>
           <a href="social.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Social Grid</a>
         </div>
       </div>
@@ -1057,12 +1035,6 @@ If you have any questions, just reply to this email.
           </div>
         </div>
         <div class="ws-sticky">
-          <div class="hint-box">
-            <strong>How services work</strong><br><br>
-            Each service has a <strong>title</strong>, <strong>description</strong>, an optional <strong>price</strong>, an optional <strong>image</strong>.<br><br>
-            Drag any row by its ⠿⠿ handle to reorder — it saves automatically. Services are shown on <code>services.html</code> in that order, and on the live page clicking a service opens its details with a Book button.<br><br>
-            Toggle <strong>Active</strong> to hide/show a service without deleting it.
-          </div>
           <a href="services.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview Services Page</a>
         </div>
       </div>
@@ -1089,13 +1061,7 @@ If you have any questions, just reply to this email.
             </div>
           </div>
         </div>
-        <div class="ws-sticky">
-          <div class="hint-box">
-            <strong>How templates work</strong><br><br>
-            Set a <strong>Default Gallery Template</strong> on any service (Services page) — bookings made against that service will use it automatically. You can still override the template on any individual event when you create it.<br><br>
-            Mark one template <strong>Default</strong> to use as the fallback when an event has no template linked.
-          </div>
-        </div>
+        <div class="ws-sticky"></div>
       </div>
     </div>
 
@@ -1278,11 +1244,6 @@ If you have any questions, just reply to this email.
 
         </div>
         <div class="ws-sticky">
-          <div class="hint-box">
-            <strong>How the About page works</strong><br><br>
-            All content reads from the <code>about_page</code> Supabase table (single row). The team members and Mission &amp; Vision pillars are stored as JSON arrays in that row.<br><br>
-            Changes go live immediately — no redeploy needed.
-          </div>
           <a href="about.html" target="_blank" class="btn btn-green" style="display:flex;justify-content:center;margin-top:12px;padding:10px;"> Preview About Page</a>
         </div>
       </div>
@@ -1402,7 +1363,6 @@ If you have any questions, just reply to this email.
               </div>
             </div>
           </div>
-          <div class="hint-box" style="margin-top:12px;"><strong>How this works</strong><br><br>This preview knows it's you, not a customer — Dijo won't try to run you through the booking flow here. Ask it to simulate a customer conversation if you want to see that side.<br><br>On the live site, when Dijo can't answer something, it asks for the visitor's email, flags the chat, and this page shows it here in red until you mark it resolved.</div>
         </div>
       </div>
     </div>
@@ -1457,8 +1417,6 @@ If you have any questions, just reply to this email.
 
         </div>
         <div class="ws-sticky">
-          <div class="hint-box"><strong>Sending</strong><br><br>Emails are sent from <strong>events@impactgridgroup.com</strong> via Resend. Guests see your brand, not a random address.</div>
-
         </div>
       </div>
     </div>
@@ -1633,7 +1591,6 @@ If you have any questions, just reply to this email.
             </div>
         </div>
         <div class="ws-sticky">
-          <div class="hint-box"><strong>Impactgrid Form</strong><br><br>Create a campaign to generate a public registration page. Guests fill in their details and receive a voucher code.</div>
         </div>
       </div>
     </div>
@@ -1687,10 +1644,7 @@ If you have any questions, just reply to this email.
               <button id="adhoc-sendBtn" class="btn btn-gold" onclick="sendAdhocReviewRequest()"> Send Review Request</button>
             </div>
           </div>
-          <div class="hint-box" style="margin-top:10px;">
-            <strong>How this works</strong><br><br>
-            The AI writes a short, warm ask — "enjoyed working with us? mind dropping a quick review?" — and emails it to the guest with a link to leave a review on the site. Every send is logged on the left — click any row to preview the exact message and resend it.
-          </div>
+
         </div>
       </div>
     </div>
@@ -2213,6 +2167,27 @@ window.initCreateEventPage = function(){
   if(window.initInvoiceDefaults) window.initInvoiceDefaults();
   if(window.loadTemplates)       window.loadTemplates();
   if(window.loadServicesForEventForm) window.loadServicesForEventForm();
+  if(window.checkExpiryWarning)  window.checkExpiryWarning();
+};
+
+/*  Only surface the expiry warning when it's actually relevant —
+    i.e. the chosen date is soon — instead of a permanent sidebar notice. */
+window.checkExpiryWarning = function(){
+  var input = document.getElementById('ev-expiry');
+  var box   = document.getElementById('ev-expiry-warn');
+  if(!input || !box) return;
+  if(!input.value){ box.style.display='none'; return; }
+  var today = new Date(); today.setHours(0,0,0,0);
+  var picked = new Date(input.value + 'T00:00:00');
+  var daysLeft = Math.round((picked - today) / 86400000);
+  if(daysLeft <= 7){
+    box.innerHTML = '<strong>Heads up —</strong> this expiry is only ' +
+      (daysLeft <= 0 ? 'today or in the past' : daysLeft + ' day' + (daysLeft===1?'':'s') + ' away') +
+      '. Events and photos auto-delete once the expiry date passes.';
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
 };
 
 /* Populates the "Linked Service" dropdown on the Create Event form from
