@@ -571,8 +571,10 @@ async function saveTemplate(){
       }catch(e){
         console.error('[saveTemplate] failed to link template to event:', e);
       }
+      var linkedEventId = _templateEditEventId;
       _templateEditEventId = null;
       if(typeof loadEvents === 'function') loadEvents();
+      if(linkedEventId === _mgEventId && typeof mgOnTemplateLinked === 'function') mgOnTemplateLinked();
     }
 
     closeTemplateModal();
@@ -797,7 +799,9 @@ async function deleteEvent(id){
    Photos / Cover / Design / Branding / Client Experience /
    Settings tabs are placeholders until their own phases)
 ════════════════════════════════════════════════════ */
-var _mgEventId = null;
+var _mgEventId   = null;
+var _mgEventData = null; /* full event doc, cached on hub load + kept in sync by Cover/Design actions */
+var _mgActiveTab = 'overview';
 
 function openManageGallery(eventId){
   _mgEventId = eventId;
@@ -821,6 +825,7 @@ async function loadManageGallery(){
     var evSnap = await getDoc(doc(db, 'events', id));
     if(!evSnap.exists){ if(body) body.innerHTML = '<div class="empty"><div class="empty-txt">Event not found.</div></div>'; return; }
     var ev = evSnap.data();
+    _mgEventData = Object.assign({ id: id }, ev);
 
     if(nameEl) nameEl.textContent = ev.name || 'Gallery';
     if(subEl)  subEl.textContent  = 'Client Gallery';
@@ -870,7 +875,10 @@ function mgSwitchTab(tab){
   var panel = document.getElementById('mg-panel-' + tab);
   if(btn)   btn.classList.add('active');
   if(panel) panel.style.display = 'block';
+  _mgActiveTab = tab;
   if(tab === 'photos') mgLoadPhotos();
+  if(tab === 'cover')  mgLoadCover();
+  if(tab === 'design') mgLoadDesign();
 }
 
 /* ── PHOTOS TAB — featured / hide / drag-reorder ──
@@ -1037,6 +1045,135 @@ window.mgPhotoDragEnd    = mgPhotoDragEnd;
 window.mgToggleFeatured  = mgToggleFeatured;
 window.mgToggleHidden    = mgToggleHidden;
 window.mgDeletePhoto     = mgDeletePhoto;
+
+/* ── COVER TAB — pick which photo represents the gallery ──
+   Reuses the same photo fetch as the Photos tab (_mgPhotos) rather than
+   querying again; images only, since a video can't be a cover photo. */
+async function mgLoadCover(){
+  if(!_mgEventId) return;
+  var el = document.getElementById('mgCoverGrid');
+  if(el) el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>';
+  try{
+    if(!_mgEventData){
+      var evSnap = await getDoc(doc(db, 'events', _mgEventId));
+      if(evSnap.exists) _mgEventData = Object.assign({ id: _mgEventId }, evSnap.data());
+    }
+    await mgLoadPhotos(); /* populates _mgPhotos; also refreshes the (hidden) Photos tab grid, which is harmless */
+    mgRenderCover();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgRenderCover(){
+  var el = document.getElementById('mgCoverGrid');
+  if(!el) return;
+  var imgs = _mgPhotos.filter(function(p){ return p.media_type !== 'video'; });
+  if(!imgs.length){
+    el.innerHTML = '<div class="empty"><div class="empty-txt">No photos yet — upload some first, then pick a cover.</div></div>';
+    return;
+  }
+  var currentCover = _mgEventData ? _mgEventData.cover_photo_id : null;
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">'
+    + imgs.map(function(p){
+        var isCover = p.id === currentCover;
+        return '<div style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid ' + (isCover ? 'var(--gold)' : 'var(--border)') + ';">'
+          + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:100px;object-fit:cover;display:block;"/>'
+          + (isCover ? '<div style="position:absolute;top:4px;right:4px;background:var(--gold);color:#07090f;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;">Cover</div>' : '')
+          + '<div style="padding:6px;background:var(--bg2);">'
+          + '<button class="btn ' + (isCover ? 'btn-red' : 'btn-gold') + ' btn-sm" style="width:100%;font-size:10px;padding:4px 6px;" onclick="' + (isCover ? 'mgClearCover()' : ("mgSetCover('" + p.id + "')")) + '">' + (isCover ? 'Remove Cover' : 'Set as Cover') + '</button>'
+          + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+
+async function mgSetCover(id){
+  if(!_mgEventId || !_mgEventData) return;
+  var prev = _mgEventData.cover_photo_id || null;
+  _mgEventData.cover_photo_id = id;
+  mgRenderCover();
+  try{
+    await updateDoc(doc(db, 'events', _mgEventId), { cover_photo_id: id });
+    toast(' ', 'Cover updated', '');
+  }catch(e){
+    _mgEventData.cover_photo_id = prev;
+    mgRenderCover();
+    toast(' ', 'Failed to set cover', e.message);
+  }
+}
+
+async function mgClearCover(){
+  if(!_mgEventId || !_mgEventData) return;
+  var prev = _mgEventData.cover_photo_id || null;
+  _mgEventData.cover_photo_id = null;
+  mgRenderCover();
+  try{
+    await updateDoc(doc(db, 'events', _mgEventId), { cover_photo_id: null });
+    toast(' ', 'Cover removed', '');
+  }catch(e){
+    _mgEventData.cover_photo_id = prev;
+    mgRenderCover();
+    toast(' ', 'Failed to remove cover', e.message);
+  }
+}
+
+window.mgLoadCover  = mgLoadCover;
+window.mgSetCover   = mgSetCover;
+window.mgClearCover = mgClearCover;
+
+/* ── DESIGN TAB — wires the existing Templates picker into the hub ──
+   Doesn't rebuild the template editor: it summarizes the linked template
+   and reuses editEventTemplate()/the existing templateModal + saveTemplate()
+   flow that already links a template back onto an event. */
+async function mgLoadDesign(){
+  if(!_mgEventId) return;
+  var el = document.getElementById('mgDesignBody');
+  if(el) el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>';
+  try{
+    if(!_mgEventData){
+      var evSnap = await getDoc(doc(db, 'events', _mgEventId));
+      if(evSnap.exists) _mgEventData = Object.assign({ id: _mgEventId }, evSnap.data());
+    }
+    if(!_templatesCache.length) await loadTemplates();
+    mgRenderDesign();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgRenderDesign(){
+  var el = document.getElementById('mgDesignBody');
+  if(!el || !_mgEventData) return;
+  var linkedId  = _mgEventData.template_id || '';
+  var t         = linkedId ? _templatesCache.find(function(x){ return x.id === linkedId; }) : null;
+  var usingDefault = !t;
+  if(!t) t = _templatesCache.find(function(x){ return x.is_default; }) || null;
+
+  var bgPreview = (t && t.background_type === 'image')
+    ? '<div style="width:44px;height:44px;border-radius:8px;flex-shrink:0;background-image:url(\'' + esc(t.background_value||'') + '\');background-size:cover;background-position:center;border:1px solid var(--border2);"></div>'
+    : '<div style="width:44px;height:44px;border-radius:8px;flex-shrink:0;background:' + esc((t && t.background_value) || '#111') + ';border:1px solid var(--border2);"></div>';
+
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
+      + bgPreview
+      + '<div style="flex:1;min-width:160px;">'
+        + '<div style="font-weight:700;font-size:14px;">' + esc(t ? (t.name || 'Untitled') : 'No template') + (usingDefault && t ? ' <span class="pill pill-applied" style="font-size:9px;">DEFAULT</span>' : '') + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Layout: ' + esc(t ? (t.layout_style || 'grid') : 'grid') + ' · Transition: ' + esc(t ? (t.transition_style || 'fade') : 'fade') + '</div>'
+      + '</div>'
+      + '<button class="btn btn-gold btn-sm" onclick="editEventTemplate(_mgEventId, \'' + linkedId + '\')"> Edit Design</button>'
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--text3);margin-top:16px;">Layout, slideshow transition and background are controlled by the linked Template. Saving here updates this event only — edit the shared Template itself from <a href="#" onclick="return nav(\'templates\',null)">Templates</a> if you want the change to apply everywhere it\'s used.</div>';
+}
+
+/* Called by saveTemplate() when the template it just saved is linked to
+   the event currently open in this hub, so Design/Overview don't go stale
+   after an edit made through this tab. */
+function mgOnTemplateLinked(){
+  if(!_mgEventId) return;
+  var wasTab = _mgActiveTab;
+  loadManageGallery().then(function(){ mgSwitchTab(wasTab); });
+}
+window.mgLoadDesign = mgLoadDesign;
 
 function goUploadForEvent(eventId){
   selectedEventId = eventId;
