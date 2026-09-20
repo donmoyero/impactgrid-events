@@ -926,10 +926,10 @@ input,textarea,select{font-family:inherit;}
 }
 
 /* ══════════════════════════════════════
-   TEMPLATE-DRIVEN LAYOUT & TRANSITIONS
-   Applied per event from its linked Template (Templates page in
-   admin). These rules come last so they override the legacy
-   .tpl-* grid/card rules above for any event using a template.
+   DESIGN-DRIVEN LAYOUT & TRANSITIONS
+   Applied per event from its own `design` field (Manage Gallery → Design
+   in admin), falling back to the Studio Default. These rules come last
+   so they override the legacy .tpl-* grid/card rules above.
 ══════════════════════════════════════ */
 
 /* — Photo layouts — */
@@ -1236,22 +1236,23 @@ var currentSlide = 0;
 ══════════════════════════════════════ */
 var DEFAULT_TEMPLATE = { layout_style:'grid', transition_style:'fade', background_type:'color', background_value:'#0d1020' };
 var activeTemplate = DEFAULT_TEMPLATE;
+var activeBranding = { logo_url:'', accent_color:'', welcome_message:'' };
+var activeClientExp = { require_code:true, allow_download:true, watermark_enabled:true };
 
-async function applyEventTemplate(ev, db){
-  var tpl = null;
-  try{
-    var templateId = ev.template_id || (ev.event_settings && ev.event_settings.template_id) || null;
-    if(templateId){
-      var tSnap = await db.collection('templates').doc(templateId).get();
-      if(tSnap.exists) tpl = Object.assign({id:tSnap.id}, tSnap.data());
-    }
-    if(!tpl){
-      var defSnap = await db.collection('templates').where('is_default','==',true).limit(1).get();
-      if(!defSnap.empty) tpl = Object.assign({id:defSnap.docs[0].id}, defSnap.docs[0].data());
-    }
-  }catch(e){ console.warn('[applyEventTemplate] could not load template, using defaults:', e.message); }
+/* Design now lives directly on the event (ev.design). There is no more
+   shared "templates" collection — an event with no design of its own
+   falls back to the single studio-wide default at studio_settings/design_defaults,
+   and only then to the built-in DEFAULT_TEMPLATE above. */
+async function applyEventDesign(ev, db){
+  var design = ev.design || null;
+  if(!design){
+    try{
+      var defSnap = await db.collection('studio_settings').doc('design_defaults').get();
+      if(defSnap.exists) design = defSnap.data();
+    }catch(e){ console.warn('[applyEventDesign] could not load studio default, using built-in defaults:', e.message); }
+  }
 
-  activeTemplate = Object.assign({}, DEFAULT_TEMPLATE, tpl || {});
+  activeTemplate = Object.assign({}, DEFAULT_TEMPLATE, design || {});
 
   /* Layout — applied to the photo grid container */
   var pg = document.getElementById('photoGrid');
@@ -1280,7 +1281,89 @@ async function applyEventTemplate(ev, db){
   } else {
     document.body.style.background = activeTemplate.background_value || DEFAULT_TEMPLATE.background_value;
   }
+
+  applyEventBranding(ev.branding || {});
+  applyClientExperience(ev.event_settings || {});
 }
+
+/* Branding — per-event overrides of logo / accent colour / welcome message.
+   All optional; an empty value leaves the current Look's own styling alone. */
+function applyEventBranding(branding){
+  activeBranding = Object.assign({ logo_url:'', accent_color:'', welcome_message:'' }, branding || {});
+
+  if(activeBranding.accent_color){
+    document.documentElement.style.setProperty('--accent', activeBranding.accent_color);
+  }
+
+  var hl = document.getElementById('heroTextLayer');
+  if(!hl) return;
+
+  var logoEl = document.getElementById('ig-brand-logo');
+  if(activeBranding.logo_url){
+    if(!logoEl){
+      logoEl = document.createElement('img');
+      logoEl.id = 'ig-brand-logo';
+      logoEl.style.cssText = 'max-height:56px;max-width:70%;margin:0 auto 14px;display:block;';
+      hl.insertBefore(logoEl, hl.firstChild);
+    }
+    logoEl.src = activeBranding.logo_url;
+  } else if(logoEl){
+    logoEl.remove();
+  }
+
+  var welcomeEl = document.getElementById('ig-brand-welcome');
+  if(activeBranding.welcome_message){
+    if(!welcomeEl){
+      welcomeEl = document.createElement('p');
+      welcomeEl.id = 'ig-brand-welcome';
+      welcomeEl.className = 'hero-sub';
+      hl.appendChild(welcomeEl);
+    }
+    welcomeEl.textContent = activeBranding.welcome_message;
+  } else if(welcomeEl){
+    welcomeEl.remove();
+  }
+}
+
+/* Client Experience — Require Access Code is already handled at boot
+   (settings.require_code, further down). This wires the other two:
+   hiding download controls entirely, and a body class the watermark
+   step (wherever it runs, download or server-side) can key off of. */
+function applyClientExperience(settings){
+  activeClientExp = Object.assign({ require_code:true, allow_download:true, watermark_enabled:true }, settings || {});
+  document.body.classList.toggle('ig-no-download', activeClientExp.allow_download === false);
+  document.body.classList.toggle('ig-watermarked', activeClientExp.watermark_enabled !== false);
+  var dlSelected = document.getElementById('downloadSelectedBtn');
+  var dlAll      = document.getElementById('downloadAllBtn');
+  if(activeClientExp.allow_download === false){
+    if(dlSelected) dlSelected.style.display = 'none';
+    if(dlAll) dlAll.style.display = 'none';
+  }
+}
+
+/* ── LIVE PREVIEW DRAFT (Manage Gallery hub) ──────────────────────
+   When this page is running inside the admin's Manage Gallery preview
+   iframe, apply draft changes in-memory the instant they're made in the
+   Design / Branding / Client Experience tabs — no save, no reload. */
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'ig-mg-draft' || window === window.top) return;
+  var draft = e.data.draft || {};
+  if(draft.design){
+    activeTemplate = Object.assign({}, DEFAULT_TEMPLATE, draft.design);
+    var pg = document.getElementById('photoGrid');
+    if(pg) pg.className = 'photo-grid layout-' + (activeTemplate.layout_style || 'grid');
+    if(window.applyGalleryLook) applyGalleryLook(activeTemplate.look_id || '');
+    var slideWrap = document.getElementById('slideshowWrap');
+    if(slideWrap) slideWrap.setAttribute('data-transition', activeTemplate.transition_style || 'fade');
+    if(activeTemplate.background_type === 'image' && activeTemplate.background_value){
+      document.body.style.background = 'center / cover no-repeat fixed url("' + activeTemplate.background_value.replace(/"/g,'') + '")';
+    } else {
+      document.body.style.background = activeTemplate.background_value || DEFAULT_TEMPLATE.background_value;
+    }
+  }
+  if(draft.branding) applyEventBranding(draft.branding);
+  if(draft.clientExperience) applyClientExperience(draft.clientExperience);
+});
 
 /* Inserts Cloudinary delivery transformations (auto format, auto quality,
    capped width) into a Cloudinary URL, so a background image uploaded at
@@ -1296,7 +1379,7 @@ function cloudinaryOptimizedUrl(url){
 /* Loads an image-type template background at LOW fetch priority, after
    photos/slideshow have already begun loading — so on a slow connection
    the real event photos always win the bandwidth race. No-op for color
-   backgrounds (those are applied instantly in applyEventTemplate above). */
+   backgrounds (those are applied instantly in applyEventDesign above). */
 function applyTemplateBackgroundDeferred(){
   if(activeTemplate.background_type !== 'image' || !activeTemplate.background_value) return;
   var url = cloudinaryOptimizedUrl(activeTemplate.background_value);
@@ -1391,13 +1474,13 @@ document.addEventListener('DOMContentLoaded', async function(){
     trackVisit(ev.id, ev.name);
 
     /* Base skin stays constant — layout, slideshow transition and
-       background are now driven per-event by applyEventTemplate(),
-       sourced from the event's linked Template (set on the service
-       at booking time, or overridden per event in admin). */
+       background are now driven per-event by applyEventDesign(), sourced
+       straight from the event's own `design` field, falling back to the
+       Studio Default when this gallery hasn't been customized yet. */
     var type = ev.type || ev.template || 'professional';
     var tpl  = TPL_MAP[type] || TPL_MAP.professional;
     document.body.className = tpl.cls;
-    await applyEventTemplate(ev, db);
+    await applyEventDesign(ev, db);
 
     document.getElementById('navEventName').textContent = ev.name;
     document.getElementById('navCodeBadge').textContent = ev.event_code;
