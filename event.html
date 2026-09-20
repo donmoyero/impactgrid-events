@@ -1478,14 +1478,30 @@ async function loadPhotos(){
       .get();
     var data = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
 
-    /* Photos first, videos last — stable sort keeps upload order within each group. */
-    data = data.map(function(p, i){ return { p: p, i: i }; })
-      .sort(function(a, b){
-        var av = a.p.media_type === 'video' ? 1 : 0;
-        var bv = b.p.media_type === 'video' ? 1 : 0;
-        return av - bv || (a.i - b.i);
-      })
-      .map(function(x){ return x.p; });
+    /* Hidden photos (admin-side Photos manager) never reach the client. */
+    data = data.filter(function(p){ return p.hidden !== true; });
+
+    var hasOrder = data.some(function(p){ return typeof p.order === 'number'; });
+    if(hasOrder){
+      /* Admin has explicitly reordered this gallery — that order wins.
+         Anything without a value yet sorts after the ordered ones. */
+      data = data.map(function(p, i){ return { p: p, i: i }; })
+        .sort(function(a, b){
+          var ao = typeof a.p.order === 'number' ? a.p.order : Infinity;
+          var bo = typeof b.p.order === 'number' ? b.p.order : Infinity;
+          return ao - bo || (a.i - b.i);
+        })
+        .map(function(x){ return x.p; });
+    } else {
+      /* Photos first, videos last — stable sort keeps upload order within each group. */
+      data = data.map(function(p, i){ return { p: p, i: i }; })
+        .sort(function(a, b){
+          var av = a.p.media_type === 'video' ? 1 : 0;
+          var bv = b.p.media_type === 'video' ? 1 : 0;
+          return av - bv || (a.i - b.i);
+        })
+        .map(function(x){ return x.p; });
+    }
 
     allPhotos = data || [];
 
