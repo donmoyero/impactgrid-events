@@ -870,11 +870,173 @@ function mgSwitchTab(tab){
   var panel = document.getElementById('mg-panel-' + tab);
   if(btn)   btn.classList.add('active');
   if(panel) panel.style.display = 'block';
+  if(tab === 'photos') mgLoadPhotos();
+}
+
+/* ── PHOTOS TAB — featured / hide / drag-reorder ──
+   Order is persisted as an `order` int (index * 10, same spacing
+   convention as saveServiceOrder) so event.html can sort by it once
+   it's set; events that haven't been reordered yet fall back to their
+   old created_at-based sort there. */
+var _mgPhotos        = [];
+var _mgPhotoMeta     = {}; /* id -> {cloudinary_id, web_public_id, thumb_public_id, media_type}, for delete */
+var _mgPhotoDragIdx  = null;
+
+async function mgLoadPhotos(){
+  if(!_mgEventId) return;
+  var el = document.getElementById('mgPhotosGrid');
+  if(el) el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>';
+  try{
+    var snap = await getDocs(query(collection(db, 'photos'), where('event_id','==',_mgEventId)));
+    var data = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    data.sort(function(a, b){
+      var ao = typeof a.order === 'number' ? a.order : null;
+      var bo = typeof b.order === 'number' ? b.order : null;
+      if(ao !== null && bo !== null) return ao - bo;
+      if(ao !== null) return -1;
+      if(bo !== null) return 1;
+      var ta = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
+      var tb = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
+      return ta - tb;
+    });
+    _mgPhotos = data;
+    _mgPhotoMeta = {};
+    data.forEach(function(p){
+      _mgPhotoMeta[p.id] = {
+        cloudinary_id  : p.cloudinary_id   || '',
+        web_public_id  : p.web_public_id   || '',
+        thumb_public_id: p.thumb_public_id || '',
+        media_type     : p.media_type      || 'photo'
+      };
+    });
+    mgRenderPhotos();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgRenderPhotos(){
+  var el      = document.getElementById('mgPhotosGrid');
+  var countEl = document.getElementById('mgPhotosCount');
+  if(countEl) countEl.textContent = _mgPhotos.length ? (_mgPhotos.length + ' photo' + (_mgPhotos.length > 1 ? 's' : '')) : '';
+  if(!el) return;
+  if(!_mgPhotos.length){
+    el.innerHTML = '<div class="empty"><div class="empty-txt">No photos yet. Use Upload Photos to add some.</div></div>';
+    return;
+  }
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">'
+    + _mgPhotos.map(function(p, idx){
+        var isVid = p.media_type === 'video';
+        return '<div class="mg-photo-card" draggable="true" '
+          + 'ondragstart="mgPhotoDragStart(event,' + idx + ')" '
+          + 'ondragover="mgPhotoDragOver(event)" '
+          + 'ondragleave="mgPhotoDragLeave(event)" '
+          + 'ondrop="mgPhotoDrop(event,' + idx + ')" '
+          + 'ondragend="mgPhotoDragEnd(event)" '
+          + 'style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid ' + (p.featured ? 'var(--gold)' : 'var(--border)') + ';' + (p.hidden ? 'opacity:.45;' : '') + '">'
+          + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:100px;object-fit:cover;display:block;pointer-events:none;" onerror="this.style.background=\'var(--bg3)\'"/>'
+          + (isVid ? '<div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;">Video</div>' : '')
+          + (p.featured ? '<div style="position:absolute;top:4px;right:4px;background:var(--gold);color:#07090f;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;">Featured</div>' : '')
+          + (p.hidden ? '<div style="position:absolute;bottom:26px;left:0;right:0;text-align:center;background:rgba(0,0,0,.65);color:#fff;font-size:9px;padding:2px 0;">Hidden from client</div>' : '')
+          + '<div style="display:flex;gap:4px;padding:6px;background:var(--bg2);">'
+          + '<button class="btn btn-ghost btn-sm" style="flex:1;font-size:10px;padding:4px 6px;" onclick="mgToggleFeatured(\'' + p.id + '\')">' + (p.featured ? 'Unfeature' : 'Feature') + '</button>'
+          + '<button class="btn btn-ghost btn-sm" style="flex:1;font-size:10px;padding:4px 6px;" onclick="mgToggleHidden(\'' + p.id + '\')">' + (p.hidden ? 'Show' : 'Hide') + '</button>'
+          + '<button class="btn btn-red btn-icon btn-sm" style="font-size:10px;padding:4px 6px;" onclick="mgDeletePhoto(\'' + p.id + '\')">&times;</button>'
+          + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+
+/* Drag-and-drop reordering (mirrors the Services tab pattern) */
+function mgPhotoDragStart(e, idx){
+  _mgPhotoDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', String(idx)); } catch(err) {}
+  e.currentTarget.classList.add('mg-photo-dragging');
+}
+function mgPhotoDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('mg-photo-dragover');
+}
+function mgPhotoDragLeave(e){
+  e.currentTarget.classList.remove('mg-photo-dragover');
+}
+function mgPhotoDrop(e, idx){
+  e.preventDefault();
+  e.currentTarget.classList.remove('mg-photo-dragover');
+  if(_mgPhotoDragIdx === null || _mgPhotoDragIdx === idx) return;
+  var moved = _mgPhotos.splice(_mgPhotoDragIdx, 1)[0];
+  _mgPhotos.splice(idx, 0, moved);
+  _mgPhotoDragIdx = null;
+  mgRenderPhotos();
+  mgSavePhotoOrder();
+}
+function mgPhotoDragEnd(e){
+  e.currentTarget.classList.remove('mg-photo-dragging');
+  document.querySelectorAll('.mg-photo-card.mg-photo-dragover').forEach(function(el){ el.classList.remove('mg-photo-dragover'); });
+  _mgPhotoDragIdx = null;
+}
+
+async function mgSavePhotoOrder(){
+  try{
+    var updates = _mgPhotos.map(function(p, i){ return { id: p.id, order: i * 10 }; });
+    await Promise.all(updates.map(function(u){
+      return updateDoc(doc(db, 'photos', u.id), { order: u.order });
+    }));
+    _mgPhotos.forEach(function(p, i){ p.order = i * 10; });
+    toast(' ', 'Order saved', '');
+  }catch(e){
+    toast(' ', 'Failed to save order', e.message);
+    mgLoadPhotos();
+  }
+}
+
+async function mgToggleFeatured(id){
+  var p = _mgPhotos.find(function(x){ return x.id === id; });
+  if(!p) return;
+  var next = !p.featured;
+  p.featured = next;
+  mgRenderPhotos();
+  try{ await updateDoc(doc(db, 'photos', id), { featured: next }); }
+  catch(e){ p.featured = !next; mgRenderPhotos(); toast(' ', 'Failed to update', e.message); }
+}
+
+async function mgToggleHidden(id){
+  var p = _mgPhotos.find(function(x){ return x.id === id; });
+  if(!p) return;
+  var next = !p.hidden;
+  p.hidden = next;
+  mgRenderPhotos();
+  try{ await updateDoc(doc(db, 'photos', id), { hidden: next }); }
+  catch(e){ p.hidden = !next; mgRenderPhotos(); toast(' ', 'Failed to update', e.message); }
+}
+
+async function mgDeletePhoto(id){
+  if(!confirm('Delete this photo?')) return;
+  try{
+    var result = await deletePhotoCore(id, _mgPhotoMeta[id]);
+    _mgPhotos = _mgPhotos.filter(function(p){ return p.id !== id; });
+    delete _mgPhotoMeta[id];
+    mgRenderPhotos();
+    if(result.cloudinaryOk) toast(' ', 'Photo deleted', '');
+    else toast(' ', 'Removed from gallery', 'Cloudinary file cleanup failed — Cloudinary Cleanup will catch it later');
+  }catch(e){ toast(' ', 'Error', e.message); }
 }
 
 window.openManageGallery = openManageGallery;
 window.loadManageGallery = loadManageGallery;
 window.mgSwitchTab       = mgSwitchTab;
+window.mgLoadPhotos      = mgLoadPhotos;
+window.mgPhotoDragStart  = mgPhotoDragStart;
+window.mgPhotoDragOver   = mgPhotoDragOver;
+window.mgPhotoDragLeave  = mgPhotoDragLeave;
+window.mgPhotoDrop       = mgPhotoDrop;
+window.mgPhotoDragEnd    = mgPhotoDragEnd;
+window.mgToggleFeatured  = mgToggleFeatured;
+window.mgToggleHidden    = mgToggleHidden;
+window.mgDeletePhoto     = mgDeletePhoto;
 
 function goUploadForEvent(eventId){
   selectedEventId = eventId;
@@ -1483,7 +1645,7 @@ async function loadDownloadRequests(){
       if(r.event_id){
         try{
           var evDoc = await getDoc(doc(db, 'events', r.event_id));
-          r.event_name = evDoc.exists() ? evDoc.data().name : '—';
+          r.event_name = evDoc.exists ? evDoc.data().name : '—';
         }catch(e){ r.event_name = '—'; }
       }
       allRequests.push(r);
