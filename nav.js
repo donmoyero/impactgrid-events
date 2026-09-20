@@ -3,7 +3,9 @@
    Version: 5.2  (audit fix: removed hardcoded credentials,
                   removed getContentClient() auth fallback)
 
-   NAV:  Home | Services | Portfolio | About | Book Us
+   NAV:  Home | Services | Portfolio | About  (Book Us hidden from public nav —
+         only shown once logged in as admin. Visitors reach book-us.html via
+         the homepage "Book Us for Your Event" button or via Services page.)
    Mobile sidebar mirrors same links.
 
    REQUIRED LOAD ORDER on every page:
@@ -81,7 +83,9 @@
       var cls  = l.href === activePage ? ' class="active"' : '';
       var id   = l.id ? ' id="' + l.id + '"' : '';
       var icon = NAV_ICONS[l.href] || '•';
-      return '<li><a href="' + l.href + '"' + cls + id + '>' +
+      var hideStyle = (l.href === 'book-us.html') ? ' style="display:none;"' : '';
+      var liId = (l.href === 'book-us.html') ? ' id="navBookUsItem"' : '';
+      return '<li' + liId + hideStyle + '><a href="' + l.href + '"' + cls + id + '>' +
                '<span class="nav-icon" aria-hidden="true">' + icon + '</span>' +
                '<span class="nav-label">' + l.label + '</span>' +
              '</a></li>';
@@ -93,11 +97,12 @@
       { href:'portfolio.html',   label:'Portfolio' },
       { href:'blog.html',        label:'Blog' },
       { href:'about.html',       label:'About' },
-      { href:'book-us.html',     label:'Book Us' },
+      { href:'book-us.html',     label:'Book Us', id:'mobNavBookUs', adminOnly:true },
     ].map(function(l) {
-      var cls = l.href === activePage ? ' class="active"' : '';
-      var id  = l.id ? ' id="' + l.id + '"' : '';
-      return '<a href="' + l.href + '"' + cls + id + ' onclick="closeSidebar()">' + l.label + '</a>';
+      var cls  = l.href === activePage ? ' class="active"' : '';
+      var id   = l.id ? ' id="' + l.id + '"' : '';
+      var hide = l.adminOnly ? ' style="display:none;"' : '';
+      return '<a href="' + l.href + '"' + cls + id + hide + ' onclick="closeSidebar()">' + l.label + '</a>';
     }).join('');
 
     /* ── Social links: same icon+label markup as the main nav items,
@@ -346,7 +351,7 @@
                 }).join('') +
               '</div>' +
             '</div>' +
-            '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="book-us.html">Book Us</a><a href="leave-review.html">Leave a Review</a></div>' +
+            '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="book-us.html" id="footerBookUsLink" style="display:none;">Book Us</a><a href="leave-review.html">Leave a Review</a></div>' +
             '<div class="fc"><h4>Contact</h4><a href="mailto:events@impactgridgroup.com">events@impactgridgroup.com</a><a href="tel:07469016509">07469 016509</a></div>' +
             '<div class="fc"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>' +
           '</div>' +
@@ -544,6 +549,15 @@
     var footerAdmin = document.getElementById('footerAdminLink');
     if (footerAdmin) footerAdmin.style.display = 'none';
 
+    /* Book Us — public visitors only reach it via the homepage CTA or
+       Services page; admin gets it back in the nav for convenience. */
+    var navBookUs    = document.getElementById('navBookUsItem');
+    var mobNavBookUs = document.getElementById('mobNavBookUs');
+    var footerBookUs = document.getElementById('footerBookUsLink');
+    if (navBookUs)    navBookUs.style.display    = 'block';
+    if (mobNavBookUs) mobNavBookUs.style.display = 'block';
+    if (footerBookUs) footerBookUs.style.display = 'inline';
+
     /* Avatar — real photo takes priority over initial */
     var avEl = document.getElementById('userAv');
     if (avEl) {
@@ -588,6 +602,15 @@
     var user  = document.getElementById('navUser');
     if (guest) guest.style.display = 'none'; /* keep hidden — admin uses footer link */
     if (user)  user.style.display  = 'none';
+
+    /* Book Us — public visitors only reach it via the homepage CTA or
+       Services page, never from the nav. */
+    var navBookUs    = document.getElementById('navBookUsItem');
+    var mobNavBookUs = document.getElementById('mobNavBookUs');
+    var footerBookUs = document.getElementById('footerBookUsLink');
+    if (navBookUs)    navBookUs.style.display    = 'none';
+    if (mobNavBookUs) mobNavBookUs.style.display = 'none';
+    if (footerBookUs) footerBookUs.style.display = 'none';
 
     var mobOut  = document.getElementById('mobOut');
     var mobIn   = document.getElementById('mobIn');
