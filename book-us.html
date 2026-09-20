@@ -36,257 +36,167 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 <meta name="twitter:image" content="https://impactgridgroup.com/logo.png"/>
 <link rel="stylesheet" href="shared.css"/>
 <style>
-/* ── PAGE-SPECIFIC: booking page only ── */
+/* ── PAGE-SPECIFIC: booking flow only (layout + calendar). Tokens come from shared.css ── */
 
-/* Page heading */
-.bk-page-title {
-  padding: 60px 24px 0;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-.bk-page-title h1 {
-  font-size: clamp(36px, 6vw, 64px);
-  font-weight: 900;
-  letter-spacing: -.03em;
-  line-height: 1.05;
-}
-.bk-page-sub {
-  font-size: 15px; color: var(--text2); line-height: 1.7;
-  max-width: 560px; margin-top: 14px;
+.bk-split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  min-height: 100vh;
 }
 
-/* Step progress */
-.bk-steps { display: flex; align-items: center; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
-.bk-step {
-  display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 700;
-  color: var(--text3); letter-spacing: .01em; transition: color .2s;
+/* ── Photo panel ── */
+.bk-photo {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(200,179,4,.28), transparent 60%),
+    #080808;
+  color: #fff;
 }
-.bk-step-num {
-  width: 24px; height: 24px; border-radius: 50%; background: var(--bg3);
-  border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800; color: var(--text3); transition: all .25s;
+.bk-photo picture, .bk-photo img.bk-photo-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
 }
-.bk-step--active, .bk-step--done { color: var(--text); }
-.bk-step--active .bk-step-num, .bk-step--done .bk-step-num {
-  background: linear-gradient(135deg,var(--gold),var(--gold2));
-  border-color: transparent; color: #07090f;
+.bk-photo img.bk-photo-img { object-fit: cover; object-position: center top; }
+.bk-photo::after {          /* legibility gradient behind logo + caption */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,.45), transparent 28%, transparent 55%, rgba(0,0,0,.72));
 }
-.bk-step-line { width: 36px; height: 1px; background: var(--border2); }
-@media(max-width:560px) { .bk-step-line { width: 18px; } }
-
-/* Booking layout */
-.bk-section { max-width: 1000px; margin: 0 auto; padding: 60px 24px; }
-.section-label {
-  font-family: var(--fm); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 12px;
+.bk-photo-logo {
+  position: absolute; top: 28px; left: 28px; z-index: 2;
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--fd); font-weight: 800; font-size: 16px; color: #fff;
 }
-.section-title  { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
-.section-sub    { font-size: 14px; color: var(--text2); margin-bottom: 36px; }
-
-.booking-wrap {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start;
-}
-@media(max-width:760px) { .booking-wrap { grid-template-columns: 1fr; } }
-
-/* Calendar */
-.cal-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--r2); overflow: hidden; box-shadow: var(--sh);
-}
-.cal-head {
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.cal-month { font-family: var(--fd); font-size: 16px; font-weight: 900; }
-.cal-nav   { display: flex; gap: 6px; }
-.cal-btn {
-  width: 32px; height: 32px; border-radius: var(--r); border: 1px solid var(--border2);
-  background: var(--bg2); color: var(--text2); font-size: 14px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; transition: all .15s;
-}
-.cal-btn:hover { border-color: var(--gold); color: var(--gold); }
-.cal-body    { padding: 16px 20px 20px; }
-.cal-dow     { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 8px; }
-.cal-dow-cell {
-  text-align: center; font-family: var(--fm); font-size: 9px;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--text3); padding: 4px 0;
-}
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
-.cal-day {
-  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-  border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer;
-  border: 1px solid transparent; transition: all .15s; position: relative;
-}
-.cal-day:hover:not(.cal-day--other):not(.cal-day--past):not(.cal-day--blocked) {
-  background: var(--bg3); border-color: var(--border2);
-}
-.cal-day--other   { color: var(--text3); pointer-events: none; }
-.cal-day--past    { color: var(--text3); pointer-events: none; opacity: .4; }
-.cal-day--blocked { pointer-events: none; }
-.cal-day--blocked::after {
-  content: ''; position: absolute; inset: 3px; border-radius: 7px;
-  background: repeating-linear-gradient(-45deg,var(--red-dim),var(--red-dim) 2px,transparent 2px,transparent 7px);
-  border: 1px solid var(--red-glo);
-}
-.cal-day--blocked span { opacity: .35; }
-.cal-day--today::before {
-  content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-  width: 4px; height: 4px; border-radius: 50%; background: var(--gold);
-}
-.cal-day--selected {
-  background: linear-gradient(135deg,var(--gold),var(--gold2)) !important;
-  color: #07090f !important; font-weight: 700; border-color: transparent !important;
-  box-shadow: var(--sh-gold);
-}
-.cal-legend {
-  display: flex; gap: 16px; margin-top: 14px; padding-top: 14px;
-  border-top: 1px solid var(--border); flex-wrap: wrap;
-}
-.cal-legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text3); }
-.cal-legend-dot  { width: 12px; height: 12px; border-radius: 4px; }
-.legend-avail    { background: var(--bg3); border: 1px solid var(--border2); }
-.legend-sel      { background: linear-gradient(135deg,var(--gold),var(--gold2)); }
-.legend-blocked  { background: repeating-linear-gradient(-45deg,var(--red-dim),var(--red-dim) 2px,transparent 2px,transparent 6px); border: 1px solid var(--red-glo); }
-.legend-today    { background: var(--bg3); border: 1px solid var(--border2); position: relative; }
-.legend-today::after { content: ''; position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--gold); }
-.cal-day--booked { pointer-events: none; }
-.cal-day--booked::after {
-  content: ''; position: absolute; inset: 3px; border-radius: 7px;
-  background: rgba(240,180,41,0.18);
-  border: 1px solid rgba(240,180,41,0.45);
-}
-.cal-day--booked span { opacity: .55; }
-.legend-booked { background: rgba(240,180,41,0.18); border: 1px solid rgba(240,180,41,0.45); }
-
-/* ── Calendar: black & white override ──
-   Scoped to .cal-card only — rest of the site keeps its normal colors. ── */
-.cal-btn:hover { border-color: #07090f; color: #07090f; }
-[data-theme="dark"] .cal-btn:hover { border-color: #fff; color: #fff; }
-
-.cal-day--today::before { background: #07090f; }
-[data-theme="dark"] .cal-day--today::before { background: #fff; }
-
-.cal-day--selected {
-  background: #07090f !important;
-  color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
-}
-[data-theme="dark"] .cal-day--selected {
-  background: #fff !important;
-  color: #07090f !important;
-  box-shadow: 0 4px 16px rgba(255,255,255,0.25) !important;
+.bk-photo-logo img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; }
+.bk-photo-cap {
+  position: absolute; left: 28px; right: 28px; bottom: 32px; z-index: 2;
+  font-family: var(--fd); font-size: clamp(22px, 2.4vw, 32px); font-weight: 800;
+  letter-spacing: -.02em; line-height: 1.15; max-width: 16ch;
 }
 
-.cal-day--blocked::after {
-  background: repeating-linear-gradient(-45deg, rgba(7,9,15,0.14), rgba(7,9,15,0.14) 2px, transparent 2px, transparent 7px);
-  border: 1px solid rgba(7,9,15,0.4);
-}
-[data-theme="dark"] .cal-day--blocked::after {
-  background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.16), rgba(255,255,255,0.16) 2px, transparent 2px, transparent 7px);
-  border: 1px solid rgba(255,255,255,0.4);
-}
+/* ── Form panel ── */
+.bk-panel { display: flex; justify-content: center; padding: 56px 40px 72px; }
+.bk-panel-in { width: 100%; max-width: 520px; }
 
-.cal-day--booked::after {
-  background: rgba(7,9,15,0.08);
-  border: 1px solid rgba(7,9,15,0.3);
-}
-[data-theme="dark"] .cal-day--booked::after {
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.3);
-}
+.bk-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; font-size: 13px; color: var(--text3); font-weight: 600; }
+.bk-progress-bars { display: flex; gap: 6px; }
+.bk-progress-bars i { display: block; width: 36px; height: 4px; border-radius: 4px; background: var(--border2); transition: background .25s; }
+.bk-progress-bars i.on { background: var(--text); }
 
-.legend-sel      { background: #07090f; }
-[data-theme="dark"] .legend-sel { background: #fff; }
+.bk-h1 { font-size: clamp(30px, 4vw, 44px); font-weight: 900; letter-spacing: -.03em; line-height: 1.08; margin-bottom: 12px; outline: none; }
+.bk-lede { font-size: 15px; color: var(--text2); line-height: 1.65; margin-bottom: 32px; max-width: 46ch; }
 
-.legend-blocked  {
-  background: repeating-linear-gradient(-45deg, rgba(7,9,15,0.14), rgba(7,9,15,0.14) 2px, transparent 2px, transparent 6px);
-  border: 1px solid rgba(7,9,15,0.4);
-}
-[data-theme="dark"] .legend-blocked {
-  background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.16), rgba(255,255,255,0.16) 2px, transparent 2px, transparent 6px);
-  border: 1px solid rgba(255,255,255,0.4);
-}
+.bk-step[hidden] { display: none; }
+.bk-step { animation: bkIn .28s ease both; }
+@keyframes bkIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bk-step { animation: none; } }
 
-.legend-booked   { background: rgba(7,9,15,0.08); border: 1px solid rgba(7,9,15,0.3); }
-[data-theme="dark"] .legend-booked { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); }
+.f-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.f-full  { margin-bottom: 16px; }
+@media (max-width: 500px) { .f-row { grid-template-columns: 1fr; } }
+.f-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.f-opt   { color: var(--text3); font-weight: 500; }
+.f-hint  { font-size: 12px; color: var(--text3); margin-top: 6px; line-height: 1.5; }
 
-.legend-today::after { background: #07090f; }
-[data-theme="dark"] .legend-today::after { background: #fff; }
-
-
-/* Form card */
-.form-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--r2); overflow: hidden; box-shadow: var(--sh);
-}
-.form-head {
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-}
-.form-head-icon  { font-size: 16px; }
-.form-head-title { font-family: var(--fd); font-size: 15px; font-weight: 900; }
-.form-head-date  {
-  margin-left: auto; font-family: var(--fm); font-size: 10px;
-  color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold-glo);
-  padding: 3px 10px; border-radius: 100px; letter-spacing: .04em;
-}
-.form-body       { padding: 20px; }
-.field-row       { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-@media(max-width:500px) { .field-row { grid-template-columns: 1fr; } }
-.field-group     { margin-bottom: 0; }
-.field-group-full{ margin-bottom: 12px; }
-.field-label     { font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; display: block; }
-input, textarea, select {
-  font-family: var(--fb); font-size: 13px; color: var(--text);
+.bk-panel input, .bk-panel textarea, .bk-panel select {
+  font-family: var(--fb); font-size: 14px; color: var(--text);
   background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: var(--r); padding: 11px 14px; width: 100%; outline: none;
+  border-radius: var(--r); padding: 12px 14px; width: 100%;
   transition: border-color .2s, box-shadow .2s;
 }
-input:focus, textarea:focus, select:focus {
-  border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim);
+.bk-panel input:focus, .bk-panel textarea:focus, .bk-panel select:focus {
+  outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--gold-dim);
 }
-select option { background: var(--bg2); }
-textarea { resize: vertical; min-height: 80px; }
+.bk-panel select option { background: var(--bg2); }
+.bk-panel textarea { resize: vertical; min-height: 88px; }
+.bk-panel .is-invalid { border-color: var(--red); }
 
-/* Date prompt */
-.date-prompt     { text-align: center; padding: 32px 20px; color: var(--text3); }
-.date-prompt-ico { font-size: 32px; margin-bottom: 10px; }
-.date-prompt-txt { font-size: 13px; line-height: 1.6; }
-
-/* Submit button */
-.btn-submit {
-  width: 100%; padding: 14px; border-radius: var(--r); border: none; cursor: pointer;
-  background: linear-gradient(135deg,var(--gold),var(--gold2));
-  color: #07090f; font-family: var(--fd); font-size: 15px; font-weight: 900;
-  letter-spacing: -.01em; margin-top: 16px; transition: all .2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+.bk-actions { display: flex; gap: 12px; margin-top: 24px; }
+.bk-btn {
+  flex: 1; padding: 14px 20px; border-radius: var(--r); border: 1px solid transparent;
+  font-family: var(--fd); font-size: 15px; font-weight: 800; letter-spacing: -.01em;
+  cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s;
 }
-.btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--sh-gold); }
-.btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.bk-btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #07090f; }
+.bk-btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--sh-gold); }
+.bk-btn-ghost { flex: 0 0 auto; background: var(--bg3); border-color: var(--border2); color: var(--text2); font-family: var(--fb); font-weight: 600; font-size: 14px; }
+.bk-btn-ghost:hover { border-color: var(--text); color: var(--text); }
+.bk-btn:disabled { opacity: .55; cursor: not-allowed; }
+.bk-btn:focus-visible, .cal-day:focus-visible, .cal-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.bk-fine { font-size: 12px; color: var(--text3); margin-top: 14px; line-height: 1.5; }
 
-/* Alerts */
-.alert     { padding: 12px 16px; border-radius: var(--r); font-size: 13px; margin-bottom: 14px; display: none; }
-.alert-err { background: var(--red-dim); border: 1px solid var(--red-glo); color: var(--red); }
-.alert-ok  { background: var(--green-dim); border: 1px solid rgba(45,212,160,.25); color: var(--green); }
+.bk-alert { display: none; padding: 12px 14px; border-radius: var(--r); font-size: 13px; line-height: 1.5; margin-bottom: 16px;
+  background: var(--red-dim); border: 1px solid var(--red-glo, rgba(217,79,59,.28)); color: var(--red); }
+.bk-alert.show { display: block; }
 
-/* Success state */
-.success-wrap  { max-width: 520px; margin: 80px auto; padding: 24px; text-align: center; animation: fadeUp .5s ease; }
-.success-icon  { width: 72px; height: 72px; border-radius: 50%; background: var(--green-dim); border: 2px solid rgba(45,212,160,.3); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
-.success-title { font-size: 28px; margin-bottom: 10px; }
-.success-sub   { color: var(--text2); font-size: 15px; line-height: 1.7; margin-bottom: 24px; }
-.success-detail{ background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; text-align: left; margin-bottom: 24px; }
-.success-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-.success-detail-row:last-child { border-bottom: none; }
-.success-detail-label { color: var(--text3); }
-.success-detail-val   { font-weight: 600; color: var(--text); }
-.btn-back {
-  display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
-  border-radius: var(--r); background: var(--bg3); border: 1px solid var(--border2);
-  color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+/* ── Calendar ── */
+.cal-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; }
+.cal-head { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.cal-month { font-family: var(--fd); font-size: 16px; font-weight: 800; }
+.cal-nav { display: flex; gap: 6px; }
+.cal-btn { width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--border2); background: var(--bg2); color: var(--text2); font-size: 16px; display: flex; align-items: center; justify-content: center; transition: border-color .15s, color .15s; }
+.cal-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
+.cal-btn:disabled { opacity: .3; cursor: default; }
+.cal-body { padding: 12px 14px 14px; position: relative; }
+.cal-dow, .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-dow { margin-bottom: 4px; }
+.cal-dow div { text-align: center; font-size: 11px; font-weight: 600; color: var(--text3); padding: 4px 0; }
+.cal-grid { gap: 3px; }
+.cal-day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center; position: relative;
+  border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--text);
+  border: 1px solid transparent; background: none; padding: 0; transition: background .15s, border-color .15s;
 }
-.btn-back:hover { color: var(--text); border-color: var(--gold); }
+.cal-day--empty { visibility: hidden; }
+.cal-day:not(.cal-day--past):not(.cal-day--taken):hover { background: var(--bg3); border-color: var(--border2); }
+.cal-day--past { color: var(--text3); opacity: .4; cursor: default; }
+.cal-day--taken { color: var(--text3); cursor: not-allowed; }
+.cal-day--taken span { text-decoration: line-through; text-decoration-thickness: 1px; }
+.cal-day--taken::after {
+  content: ''; position: absolute; inset: 3px; border-radius: 7px; pointer-events: none;
+  background: repeating-linear-gradient(-45deg, rgba(7,9,15,.13), rgba(7,9,15,.13) 2px, transparent 2px, transparent 7px);
+  border: 1px solid rgba(7,9,15,.35);
+}
+[data-theme="dark"] .cal-day--taken::after {
+  background: repeating-linear-gradient(-45deg, rgba(255,255,255,.16), rgba(255,255,255,.16) 2px, transparent 2px, transparent 7px);
+  border-color: rgba(255,255,255,.35);
+}
+.cal-day--today::before { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #07090f; }
+[data-theme="dark"] .cal-day--today::before { background: #fff; }
+.cal-day--selected { background: #07090f !important; color: #fff !important; font-weight: 700; border-color: transparent !important; }
+[data-theme="dark"] .cal-day--selected { background: #fff !important; color: #07090f !important; }
+.cal-day--selected::before { background: #fff; }
+[data-theme="dark"] .cal-day--selected::before { background: #07090f; }
+.cal-loading .cal-day { opacity: .45; pointer-events: none; }
+.cal-status { font-size: 12px; color: var(--text3); min-height: 18px; margin-top: 10px; }
+.cal-legend { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.cal-legend span { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text3); }
+.cal-legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.lg-avail { background: var(--bg3); border: 1px solid var(--border2); }
+.lg-sel   { background: #07090f; }
+[data-theme="dark"] .lg-sel { background: #fff; }
+.lg-taken { background: repeating-linear-gradient(-45deg, rgba(7,9,15,.16), rgba(7,9,15,.16) 2px, transparent 2px, transparent 6px); border: 1px solid rgba(7,9,15,.4); }
+[data-theme="dark"] .lg-taken { background: repeating-linear-gradient(-45deg, rgba(255,255,255,.18), rgba(255,255,255,.18) 2px, transparent 2px, transparent 6px); border-color: rgba(255,255,255,.4); }
 
+.date-msg { font-size: 13px; font-weight: 600; margin-top: 10px; min-height: 20px; }
+.date-msg.err { color: var(--red); }
+.date-msg.ok  { color: var(--text); }
 
+/* ── Success ── */
+.bk-done-ico { width: 64px; height: 64px; border-radius: 50%; background: var(--green-dim); border: 2px solid rgba(45,212,160,.3); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 20px; }
+.bk-summary { background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); padding: 6px 20px; margin: 24px 0; }
+.bk-summary div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.bk-summary div:last-child { border-bottom: none; }
+.bk-summary dt { color: var(--text3); }
+.bk-summary dd { font-weight: 600; text-align: right; margin: 0; }
+
+/* ── Mobile: photo becomes a banner above the form ── */
+@media (max-width: 860px) {
+  .bk-split { grid-template-columns: 1fr; padding-top: 56px; }   /* 56px = fixed mobile top bar */
+  .bk-photo { position: relative; height: 200px; }
+  .bk-photo-logo { top: 16px; left: 16px; }
+  .bk-photo-logo img { width: 40px; height: 40px; }
+  .bk-photo-cap { display: none; }
+  .bk-panel { padding: 32px 20px 56px; }
+}
 </style>
 
   <!-- Google Analytics -->
@@ -305,131 +215,141 @@ textarea { resize: vertical; min-height: 80px; }
 <!-- nav.js injects the left-rail nav here -->
 <div id="ig-nav"></div>
 
-<!-- PAGE TITLE -->
-<div class="bk-page-title">
-  <div class="section-label">Booking</div>
-  <h1 class="anim-fade-up">Book a Session</h1>
-  <p class="bk-page-sub anim-fade-up">Pick an available date, tell us a bit about your event, and we'll confirm within 24 hours — no payment needed to hold your spot.</p>
-  <div class="bk-steps anim-fade-up">
-    <div class="bk-step bk-step--active" id="bkStep1"><span class="bk-step-num">1</span>Pick a date</div>
-    <div class="bk-step-line"></div>
-    <div class="bk-step" id="bkStep2"><span class="bk-step-num">2</span>Your details</div>
-    <div class="bk-step-line"></div>
-    <div class="bk-step" id="bkStep3"><span class="bk-step-num">3</span>Confirmed</div>
-  </div>
-</div>
+<main class="bk-split">
 
-<!-- BOOKING SECTION -->
-<section class="bk-section" id="booking">
+  <!-- ═════ PHOTO PANEL ═════
+       Drop your photo in the site root as booking-model.webp (preferred) or booking-model.jpg.
+       If neither exists, the panel falls back to the dark branded background. -->
+  <aside class="bk-photo" aria-hidden="true">
+    <picture>
+      <source srcset="booking-model.webp" type="image/webp"/>
+      <img class="bk-photo-img" src="booking-model.jpg" alt="" onerror="this.closest('picture').style.display='none'"/>
+    </picture>
+    <div class="bk-photo-logo">
+      <img src="logo.png" alt=""/>
+      <span>ImpactGrid Events</span>
+    </div>
+    <div class="bk-photo-cap">Your event, captured properly.</div>
+  </aside>
 
-  <!-- Main booking UI -->
-  <div id="bookingUI">
-    <div class="booking-wrap">
+  <!-- ═════ FORM PANEL ═════ -->
+  <section class="bk-panel">
+    <div class="bk-panel-in">
 
-      <!-- Calendar -->
-      <div class="cal-card">
-        <div class="cal-head">
-          <div class="cal-month" id="calMonth">Loading…</div>
-          <div class="cal-nav">
-            <button class="cal-btn" id="calPrev" onclick="changeMonth(-1)" title="Previous month">‹</button>
-            <button class="cal-btn" id="calNext" onclick="changeMonth(1)"  title="Next month">›</button>
-          </div>
-        </div>
-        <div class="cal-body">
-          <div class="cal-dow">
-            <div class="cal-dow-cell">Su</div><div class="cal-dow-cell">Mo</div>
-            <div class="cal-dow-cell">Tu</div><div class="cal-dow-cell">We</div>
-            <div class="cal-dow-cell">Th</div><div class="cal-dow-cell">Fr</div>
-            <div class="cal-dow-cell">Sa</div>
-          </div>
-          <div class="cal-grid" id="calGrid"></div>
-          <div class="cal-legend">
-            <div class="cal-legend-item"><div class="cal-legend-dot legend-avail"></div>Available</div>
-            <div class="cal-legend-item"><div class="cal-legend-dot legend-sel"></div>Selected</div>
-            <div class="cal-legend-item"><div class="cal-legend-dot legend-blocked"></div>Unavailable</div>
-            <div class="cal-legend-item"><div class="cal-legend-dot legend-today"></div>Today</div>
-            <div class="cal-legend-item"><div class="cal-legend-dot legend-booked"></div>Booked</div>
-          </div>
-        </div>
+      <div class="bk-progress" id="bkProgress" aria-live="polite">
+        <div class="bk-progress-bars"><i class="on" id="pb1"></i><i id="pb2"></i></div>
+        <span id="bkProgressText">Step 1 of 2</span>
       </div>
 
-      <!-- Form -->
-      <div class="form-card">
-        <div class="form-head">
-          <span class="form-head-icon">✦</span>
-          <span class="form-head-title">Your Details</span>
-          <span class="form-head-date" id="formDateBadge" style="display:none;"></span>
-        </div>
-        <div class="form-body">
-          <div id="formAlert" class="alert"></div>
+      <!-- ── PAGE 1: who you are ── -->
+      <form class="bk-step" id="step1" novalidate autocomplete="on">
+        <h1 class="bk-h1" id="h1-step1" tabindex="-1">Welcome to ImpactGrid Events</h1>
+        <p class="bk-lede">Start with your contact details. Next you'll choose a date and service.</p>
 
-          <!-- Date prompt shown before date is picked -->
-          <div id="datePrompt" class="date-prompt">
-            <div class="date-prompt-ico">✦</div>
-            <div class="date-prompt-txt">Pick an available date on the calendar<br>to unlock the booking form.</div>
+        <div class="bk-alert" id="alert1" role="alert"></div>
+
+        <div class="f-row">
+          <div>
+            <label class="f-label" for="bk-first">First name</label>
+            <input type="text" id="bk-first" autocomplete="given-name" required/>
           </div>
-
-          <!-- Actual form (hidden until date selected) -->
-          <div id="bookingForm" style="display:none;">
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Full Name *</label>
-                <input type="text" id="bk-name" placeholder="Your name"/>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Email *</label>
-                <input type="email" id="bk-email" placeholder="you@email.com"/>
-              </div>
-            </div>
-            <div class="field-group-full">
-              <label class="field-label">Phone *</label>
-              <input type="tel" id="bk-phone" placeholder="+44 7000 000000"/>
-            </div>
-            <input type="hidden" id="bk-type" value="Other"/>
-            <input type="hidden" id="bk-service-id" value=""/>
-            <div class="field-group-full" id="bk-service-row">
-              <label class="field-label">Service</label>
-              <select id="bk-service">
-                <option value="">— Select a service (optional) —</option>
-              </select>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Guest Count</label>
-                <input type="number" id="bk-guests" placeholder="e.g. 80" min="1"/>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Location / Venue</label>
-                <input type="text" id="bk-location" placeholder="e.g. Manchester City Centre"/>
-              </div>
-            </div>
-            <div class="field-group-full">
-              <label class="field-label">Additional Notes</label>
-              <textarea id="bk-notes" placeholder="Tell us more about your event, any special requirements…" rows="3"></textarea>
-            </div>
-
-            <button class="btn-submit" id="submitBtn" onclick="submitBooking()">
-              <span id="submitLabel">✦ Send Booking Request</span>
-            </button>
-            <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px;">We'll confirm within 24 hours. No payment taken at this stage.</p>
+          <div>
+            <label class="f-label" for="bk-last">Surname</label>
+            <input type="text" id="bk-last" autocomplete="family-name" required/>
           </div>
         </div>
+        <div class="f-full">
+          <label class="f-label" for="bk-phone">Phone</label>
+          <input type="tel" id="bk-phone" autocomplete="tel" inputmode="tel" placeholder="07000 000000" required/>
+        </div>
+        <div class="f-full">
+          <label class="f-label" for="bk-email">Email</label>
+          <input type="email" id="bk-email" autocomplete="email" placeholder="you@email.com" required/>
+        </div>
+
+        <div class="bk-actions">
+          <button type="submit" class="bk-btn bk-btn-primary">Continue</button>
+        </div>
+        <p class="bk-fine">No payment is taken. We confirm your request within 24 hours.</p>
+      </form>
+
+      <!-- ── PAGE 2: the event ── -->
+      <form class="bk-step" id="step2" novalidate hidden>
+        <h1 class="bk-h1" id="h1-step2" tabindex="-1">Tell us about your event</h1>
+        <p class="bk-lede" id="step2Lede">Pick a date, choose a service, and add any details that help us prepare.</p>
+
+        <div class="bk-alert" id="alert2" role="alert"></div>
+
+        <!-- Date -->
+        <div class="f-full">
+          <span class="f-label" id="dateLabel">Pick a date</span>
+          <div class="cal-card" role="group" aria-labelledby="dateLabel">
+            <div class="cal-head">
+              <div class="cal-month" id="calMonth" aria-live="polite">Loading…</div>
+              <div class="cal-nav">
+                <button type="button" class="cal-btn" id="calPrev" aria-label="Previous month">‹</button>
+                <button type="button" class="cal-btn" id="calNext" aria-label="Next month">›</button>
+              </div>
+            </div>
+            <div class="cal-body" id="calBody">
+              <div class="cal-dow" aria-hidden="true">
+                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+              </div>
+              <div class="cal-grid" id="calGrid"></div>
+              <div class="cal-status" id="calStatus" aria-live="polite"></div>
+              <div class="cal-legend">
+                <span><i class="lg-avail"></i>Available</span>
+                <span><i class="lg-sel"></i>Selected</span>
+                <span><i class="lg-taken"></i>Booked</span>
+              </div>
+            </div>
+          </div>
+          <div class="date-msg" id="dateMsg" role="status" aria-live="polite"></div>
+        </div>
+
+        <!-- Service -->
+        <div class="f-full">
+          <label class="f-label" for="bk-service">Pick your service</label>
+          <select id="bk-service" required>
+            <option value="">Choose a service</option>
+          </select>
+          <div class="f-hint" id="svcHint" hidden></div>
+        </div>
+
+        <div class="f-row">
+          <div>
+            <label class="f-label" for="bk-guests">Guest count <span class="f-opt">(optional)</span></label>
+            <input type="number" id="bk-guests" min="1" inputmode="numeric" placeholder="e.g. 80"/>
+          </div>
+          <div>
+            <label class="f-label" for="bk-location">Location</label>
+            <input type="text" id="bk-location" autocomplete="off" placeholder="Venue or area"/>
+          </div>
+        </div>
+        <div class="f-full">
+          <label class="f-label" for="bk-notes">Additional notes <span class="f-opt">(optional)</span></label>
+          <textarea id="bk-notes" rows="3" placeholder="Timings, special requests, anything we should know"></textarea>
+        </div>
+
+        <div class="bk-actions">
+          <button type="button" class="bk-btn bk-btn-ghost" id="backBtn">Back</button>
+          <button type="submit" class="bk-btn bk-btn-primary" id="submitBtn">Send booking request</button>
+        </div>
+        <p class="bk-fine">No payment is taken. We confirm your request within 24 hours.</p>
+      </form>
+
+      <!-- ── Success ── -->
+      <div class="bk-step" id="stepDone" hidden>
+        <div class="bk-done-ico" aria-hidden="true">✓</div>
+        <h1 class="bk-h1" id="h1-done" tabindex="-1">Request sent</h1>
+        <p class="bk-lede" style="margin-bottom:0;">We've received your booking request and will confirm within 24 hours. Check your inbox for a confirmation email.</p>
+        <dl class="bk-summary" id="doneSummary"></dl>
+        <button type="button" class="bk-btn bk-btn-ghost" id="againBtn">Make another booking</button>
       </div>
 
     </div>
-  </div>
-
-  <!-- Success state -->
-  <div id="successUI" style="display:none;">
-    <div class="success-wrap">
-      <div class="success-icon">✓</div>
-      <h2 class="success-title">Request Sent!</h2>
-      <p class="success-sub">Thanks — we've received your booking request and will confirm within 24 hours. Check your inbox for a confirmation email.</p>
-      <div class="success-detail" id="successDetail"></div>
-      <button class="btn-back" onclick="resetBooking()">← Make another booking</button>
-    </div>
-  </div>
-</section>
+  </section>
+</main>
 
 <!-- nav.js injects the footer here -->
 <div id="ig-footer"></div>
@@ -442,367 +362,312 @@ textarea { resize: vertical; min-height: 80px; }
 <script src="nav.js"></script>
 
 <script>
-/* ── Boot nav ── */
 renderNav('book-us.html');
 renderFooter();
 
-/* ── Page-specific JS ── */
-const EVENTS_API = 'https://impactgrid-events-api.onrender.com';
+(function () {
+  'use strict';
 
-var today        = new Date(); today.setHours(0,0,0,0);
-var calYear      = today.getFullYear();
-var calMonth     = today.getMonth();
-var selectedDate = null;
+  var EVENTS_API = 'https://impactgrid-events-api.onrender.com';
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var MSG_BOOKED  = 'Date already booked. Please select another date.';
+  var MSG_BLOCKED = "We aren't taking bookings on that date. Please select another date.";
 
-/* ── Live Service dropdown (always reflects the current services table —
-   add/remove a service in admin and it shows up here automatically) ── */
-var _bookServices = {}; // id -> {id,title,icon}
-
-async function loadServicesForBooking() {
-  var sel = document.getElementById('bk-service');
-  if (!sel) return;
-  try {
-    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-    if (!sb) return;
-    var res = await sb
-      .from('services')
-      .select('id,title,icon')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
-    if (res.error || !res.data) return;
-
-    _bookServices = {};
-    res.data.forEach(function(s) { _bookServices[s.id] = s; });
-
-    var options = ['<option value="">— Select a service (optional) —</option>'];
-    res.data.forEach(function(s) {
-      var label = s.title + (s.icon ? ' — ' + s.icon : '');
-      options.push('<option value="' + s.id + '">' + label.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</option>');
-    });
-    sel.innerHTML = options.join('');
-
-    /* If we arrived via a services.html card link, try to match that title
-       to a live service so the dropdown reflects the same selection —
-       purely cosmetic since the banner already carries the real prefill. */
-    if (window._pendingServiceTitleMatch) {
-      var wanted = window._pendingServiceTitleMatch.toLowerCase();
-      var match = res.data.find(function(s) { return s.title.toLowerCase() === wanted; });
-      if (match) sel.value = match.id;
-    }
-  } catch (e) {
-    console.warn('[book-us] Failed to load services for dropdown:', e);
+  function $(id) { return document.getElementById(id); }
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function pretty(ds) {
+    var p = ds.split('-'); var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
-}
+  function el(tag, text) { var e = document.createElement(tag); if (text != null) e.textContent = text; return e; }
 
-function onServiceSelect() {
-  var sel = document.getElementById('bk-service');
-  var s = sel && _bookServices[sel.value];
-  if (!s) return;
-
-  /* Pre-fill notes with the chosen service, replacing any previous
-     "Service:" line so re-selecting doesn't stack duplicates. */
-  var notes = document.getElementById('bk-notes');
-  if (notes) {
-    var lines = notes.value.split('\n').filter(function(l) { return l.indexOf('Service:') !== 0; });
-    var serviceLine = 'Service: ' + s.title + (s.icon ? ' (' + s.icon + ')' : '');
-    notes.value = [serviceLine].concat(lines).join('\n').replace(/^\n+/, '');
-  }
-
-  /* Event Type is now just the real service title/id — no more bucketed
-     Wedding/Corporate/Portrait/Social/Other categories that never matched
-     what was actually booked. */
-  var typeSel = document.getElementById('bk-type');
-  if (typeSel) typeSel.value = s.title;
-  var svcIdEl = document.getElementById('bk-service-id');
-  if (svcIdEl) svcIdEl.value = s.id;
-}
-
-(function() {
-  var sel = document.getElementById('bk-service');
-  if (sel) sel.addEventListener('change', onServiceSelect);
-})();
-
-loadServicesForBooking();
-
-/* ── Pre-fill from service page (?service=...&id=...&price=...&desc=...) ── */
-(function() {
-  var p        = new URLSearchParams(window.location.search);
-  var svcTitle = (p.get('service') || '').replace(/[\r\n]+/g, ' ').trim();
-  var svcId    = (p.get('id')      || '').trim();
-  var svcPrice = (p.get('price')   || '').replace(/[\r\n]+/g, ' ').trim();
-  var svcDesc  = (p.get('desc')    || '').replace(/[\r\n]+/g, ' ').trim();
-  if (!svcTitle) return;
-
-  window._pendingServiceTitleMatch = svcTitle;
-
-  function applyService() {
-    /* 1 — inject service summary card above the two-col layout */
-    var layout = document.querySelector('.bk-layout') || document.querySelector('.page-wrap > section') || document.querySelector('.page-wrap');
-    var card = document.createElement('div');
-    card.id = 'svc-banner';
-    card.style.cssText = [
-      'background:var(--gold-dim)',
-      'border:1px solid var(--gold-glo)',
-      'border-radius:14px',
-      'padding:18px 24px',
-      'margin:0 0 24px',
-      'display:flex',
-      'align-items:center',
-      'justify-content:space-between',
-      'flex-wrap:wrap',
-      'gap:12px'
-    ].join(';');
-    card.innerHTML =
-      '<div style="display:flex;align-items:center;gap:14px;">' +
-        '<div style="font-size:22px;line-height:1;">✦</div>' +
-        '<div>' +
-          '<div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;">Selected Service</div>' +
-          '<div style="font-size:16px;font-weight:800;color:var(--text);line-height:1.2;">' + svcTitle + '</div>' +
-          (svcDesc ? '<div style="font-size:12px;color:var(--text2);margin-top:4px;max-width:480px;line-height:1.5;">' + svcDesc + '</div>' : '') +
-        '</div>' +
-      '</div>' +
-      (svcPrice
-        ? '<div style="font-size:18px;font-weight:900;color:var(--gold);white-space:nowrap;">' + svcPrice + '</div>'
-        : '') +
-      '<button id="svc-banner-close" ' +
-        'style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;">✕ Change</button>';
-
-    /* Insert before the booking layout */
-    var bkSection = document.querySelector('.bk-section') || document.querySelector('section');
-    if (bkSection) bkSection.insertBefore(card, bkSection.firstChild);
-
-    /* Safe close button — no inline JS */
-    var closeBtn = document.getElementById('svc-banner-close');
-    if (closeBtn) closeBtn.addEventListener('click', function() {
-      var banner = document.getElementById('svc-banner');
-      if (banner) banner.remove();
-      clearServicePrefill();
-    });
-
-    /* 2 — Event Type is just the real service title now; also carry the
-       real id through if we have one so the backend can look up the
-       service directly (e.g. for its linked gallery template). */
-    var sel = document.getElementById('bk-type');
-    if (sel) sel.value = svcTitle;
-    var svcIdEl = document.getElementById('bk-service-id');
-    if (svcIdEl && svcId) svcIdEl.value = svcId;
-
-    /* 3 — pre-fill Notes with package info */
-    var notes = document.getElementById('bk-notes');
-    if (notes && !notes.value) {
-      notes.value = 'Service: ' + svcTitle + (svcPrice ? ' (' + svcPrice + ')' : '') + '\n';
-    }
-
-    /* 4 — update form card header title */
-    var formTitle = document.querySelector('.form-head-title');
-    if (formTitle) formTitle.textContent = 'Your Details — ' + svcTitle;
-
-    /* 5 — hide the manual Service dropdown; the banner above already
-       carries the selection, no need to show both. */
-    var svcRow = document.getElementById('bk-service-row');
-    if (svcRow) svcRow.style.display = 'none';
-  }
-
-  window.clearServicePrefill = function() {
-    var sel = document.getElementById('bk-type');
-    if (sel) { sel.value = 'Other'; }
-    var svcIdEl = document.getElementById('bk-service-id');
-    if (svcIdEl) svcIdEl.value = '';
-    var notes = document.getElementById('bk-notes');
-    if (notes && notes.value.indexOf('Service:') === 0) notes.value = '';
-    var formTitle = document.querySelector('.form-head-title');
-    if (formTitle) formTitle.textContent = 'Your Details';
-    var svcRow = document.getElementById('bk-service-row');
-    if (svcRow) svcRow.style.display = '';
-    /* strip param from URL without reload */
-    window.history.replaceState({}, '', window.location.pathname);
+  /* ═══════════ Incoming service (from services.html → ?service=…&id=…&price=…) ═══════════ */
+  var qs = new URLSearchParams(window.location.search);
+  var incoming = {
+    title: (qs.get('service') || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120),
+    id:    (qs.get('id')      || '').trim().slice(0, 80),
+    price: (qs.get('price')   || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 40)
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyService);
-  } else {
-    applyService();
+  /* ═══════════ State ═══════════ */
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var calYear = today.getFullYear(), calMonth = today.getMonth();
+  var selectedDate = null;
+  var blocked = [], booked = [];
+  var availState = 'loading';           // loading | ready | failed
+  var availPromise = null;
+  var services = {};                    // id -> {id,title,icon}
+  var customer = {};
+
+  /* ═══════════ Step navigation ═══════════ */
+  function showStep(name) {
+    ['step1', 'step2', 'stepDone'].forEach(function (id) { $(id).hidden = (id !== name); });
+    var on = name === 'step2' ? 2 : 1;
+    $('pb1').className = 'on'; $('pb2').className = on === 2 ? 'on' : '';
+    $('bkProgressText').textContent = 'Step ' + on + ' of 2';
+    $('bkProgress').style.display = name === 'stepDone' ? 'none' : '';
+    var h = $(name === 'step1' ? 'h1-step1' : name === 'step2' ? 'h1-step2' : 'h1-done');
+    h.focus({ preventScroll: true });
+    window.scrollTo({ top: 0 });
   }
-})();
-var blockedDates = [];
-var bookedDates  = [];
-
-var MONTH_NAMES = ['January','February','March','April','May','June',
-  'July','August','September','October','November','December'];
-
-async function loadBlockedDates() {
-  try {
-    const [blockedRes, bookedRes] = await Promise.all([
-      fetch(EVENTS_API + '/api/blocked-dates'),
-      fetch(EVENTS_API + '/api/booked-dates')
-    ]);
-    const blockedData = await blockedRes.json();
-    const bookedData  = await bookedRes.json();
-    blockedDates = blockedData.dates || [];
-    bookedDates  = bookedData.dates  || [];
-  } catch(e) { blockedDates = []; bookedDates = []; }
-  renderCalendar();
-}
-
-function renderCalendar() {
-  var firstDay    = new Date(calYear, calMonth, 1).getDay();
-  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  document.getElementById('calMonth').textContent = MONTH_NAMES[calMonth] + ' ' + calYear;
-
-  var prevBtn = document.getElementById('calPrev');
-  prevBtn.disabled = (calYear === today.getFullYear() && calMonth === today.getMonth());
-  prevBtn.style.opacity = prevBtn.disabled ? '.3' : '1';
-
-  var grid = document.getElementById('calGrid');
-  grid.innerHTML = '';
-
-  for (var i = 0; i < firstDay; i++) {
-    var blank = document.createElement('div');
-    blank.className = 'cal-day cal-day--other';
-    grid.appendChild(blank);
+  function alertBox(id, msg) {
+    var a = $(id); a.textContent = msg || ''; a.classList.toggle('show', !!msg);
   }
+  function flag(input, bad) { input.classList.toggle('is-invalid', !!bad); input.setAttribute('aria-invalid', bad ? 'true' : 'false'); }
 
-  for (var d = 1; d <= daysInMonth; d++) {
-    var cell    = document.createElement('div');
-    var dateObj = new Date(calYear, calMonth, d);
-    var dateStr = isoDate(dateObj);
-    var isPast  = dateObj < today;
-    var isToday = dateObj.getTime() === today.getTime();
-    var isBlock  = blockedDates.includes(dateStr);
-    var isBooked = bookedDates.includes(dateStr);
-    var isSel    = (dateStr === selectedDate);
+  /* ═══════════ PAGE 1 ═══════════ */
+  $('step1').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = $('bk-first'), l = $('bk-last'), p = $('bk-phone'), m = $('bk-email');
+    var first = f.value.trim(), last = l.value.trim(), phone = p.value.trim(), email = m.value.trim();
+    var okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    var okPhone = phone.replace(/[^0-9]/g, '').length >= 7;
 
-    var cls = 'cal-day';
-    if (isPast)         cls += ' cal-day--past';
-    else if (isBlock)   cls += ' cal-day--blocked';
-    else if (isBooked)  cls += ' cal-day--booked';
-    if (isToday)        cls += ' cal-day--today';
-    if (isSel)          cls += ' cal-day--selected';
-
-    cell.className = cls;
-    cell.innerHTML = '<span>' + d + '</span>';
-    if (!isPast && !isBlock && !isBooked) {
-      cell.onclick = (function(ds){ return function(){ selectDate(ds); }; })(dateStr);
+    flag(f, !first); flag(l, !last); flag(p, !okPhone); flag(m, !okEmail);
+    var bad = !first ? f : !last ? l : !okPhone ? p : !okEmail ? m : null;
+    if (bad) {
+      alertBox('alert1', !first ? 'Enter your first name.' : !last ? 'Enter your surname.' :
+        !okPhone ? 'Enter a phone number we can reach you on.' : 'Enter a valid email address.');
+      bad.focus(); return;
     }
-    grid.appendChild(cell);
-  }
-}
-
-function isoDate(d) {
-  return d.getFullYear() + '-' +
-    String(d.getMonth()+1).padStart(2,'0') + '-' +
-    String(d.getDate()).padStart(2,'0');
-}
-
-function changeMonth(dir) {
-  calMonth += dir;
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  if (calMonth > 11) { calMonth = 0;  calYear++; }
-  renderCalendar();
-}
-
-function setBkStep(stage) {
-  var s1 = document.getElementById('bkStep1');
-  var s2 = document.getElementById('bkStep2');
-  var s3 = document.getElementById('bkStep3');
-  if (!s1 || !s2 || !s3) return;
-  s1.className = 'bk-step' + (stage >= 2 ? ' bk-step--done' : ' bk-step--active');
-  s2.className = 'bk-step' + (stage === 2 ? ' bk-step--active' : (stage >= 3 ? ' bk-step--done' : ''));
-  s3.className = 'bk-step' + (stage === 3 ? ' bk-step--active' : '');
-}
-
-function selectDate(dateStr) {
-  selectedDate = dateStr;
-  renderCalendar();
-  setBkStep(2);
-  document.getElementById('datePrompt').style.display  = 'none';
-  document.getElementById('bookingForm').style.display = 'block';
-  var badge = document.getElementById('formDateBadge');
-  var parts = dateStr.split('-');
-  badge.textContent = MONTH_NAMES[parseInt(parts[1])-1].slice(0,3) + ' ' + parseInt(parts[2]) + ', ' + parts[0];
-  badge.style.display = 'inline-flex';
-  if (window.innerWidth < 760) {
-    document.querySelector('.form-card').scrollIntoView({behavior:'smooth', block:'start'});
-  }
-}
-
-async function submitBooking() {
-  var alertEl = document.getElementById('formAlert');
-  function showAlert(msg, ok) {
-    alertEl.textContent = msg;
-    alertEl.className = 'alert ' + (ok ? 'alert-ok' : 'alert-err');
-    alertEl.style.display = 'block';
-  }
-  alertEl.style.display = 'none';
-
-  var name      = document.getElementById('bk-name').value.trim();
-  var email     = document.getElementById('bk-email').value.trim();
-  var phone     = document.getElementById('bk-phone').value.trim();
-  var type      = document.getElementById('bk-type').value;
-  var serviceId = document.getElementById('bk-service-id') ? document.getElementById('bk-service-id').value.trim() : '';
-  var guests    = document.getElementById('bk-guests').value.trim();
-  var location  = document.getElementById('bk-location').value.trim();
-  var notes     = document.getElementById('bk-notes').value.trim();
-
-  if (!selectedDate) { showAlert('Please select a date on the calendar first.', false); return; }
-  if (!name)         { showAlert('Please enter your full name.', false); return; }
-  if (!email || !email.includes('@')) { showAlert('Please enter a valid email address.', false); return; }
-  if (!phone)        { showAlert('Please enter a phone number.', false); return; }
-
-  var btn = document.getElementById('submitBtn');
-  var lbl = document.getElementById('submitLabel');
-  btn.disabled = true;
-  lbl.textContent = '⏳ Sending…';
-
-  try {
-    const res  = await fetch(EVENTS_API + '/api/booking-request', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, event_type: type, service_id: serviceId||null, event_date: selectedDate, guest_count: guests||null, location: location||null, notes: notes||null })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed');
-
-    document.getElementById('bookingUI').style.display = 'none';
-    var parts = selectedDate.split('-');
-    var readableDate = MONTH_NAMES[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
-    document.getElementById('successDetail').innerHTML =
-      row('Name', name) + row('Email', email) + row('Date', readableDate) + (guests ? row('Guest Count', guests) : '');
-    document.getElementById('successUI').style.display = 'block';
-    setBkStep(3);
-    window.scrollTo({ top: document.getElementById('booking').offsetTop - 80, behavior:'smooth' });
-
-  } catch(err) {
-    showAlert('Something went wrong: ' + err.message, false);
-    btn.disabled = false;
-    lbl.textContent = '✦ Send Booking Request';
-  }
-}
-
-function row(label, val) {
-  return '<div class="success-detail-row"><span class="success-detail-label">' + label + '</span><span class="success-detail-val">' + val + '</span></div>';
-}
-
-function resetBooking() {
-  selectedDate = null;
-  setBkStep(1);
-  document.getElementById('bookingUI').style.display  = 'block';
-  document.getElementById('successUI').style.display  = 'none';
-  document.getElementById('bookingForm').style.display = 'none';
-  document.getElementById('datePrompt').style.display  = 'block';
-  document.getElementById('formDateBadge').style.display = 'none';
-  ['bk-name','bk-email','bk-phone','bk-guests','bk-location','bk-notes'].forEach(function(id){
-    var el = document.getElementById(id); if(el) el.value = '';
+    alertBox('alert1', '');
+    customer = { first: first, last: last, phone: phone, email: email };
+    showStep('step2');
   });
-  document.getElementById('bk-type').value = 'Other';
-  var svcIdEl = document.getElementById('bk-service-id'); if(svcIdEl) svcIdEl.value = '';
-  document.getElementById('submitBtn').disabled = false;
-  document.getElementById('submitLabel').textContent = '✦ Send Booking Request';
-  document.getElementById('formAlert').style.display = 'none';
-  renderCalendar();
-}
+  ['bk-first', 'bk-last', 'bk-phone', 'bk-email'].forEach(function (id) {
+    $(id).addEventListener('input', function () { flag(this, false); });
+  });
+  $('backBtn').addEventListener('click', function () { showStep('step1'); });
 
-loadBlockedDates();
+  /* ═══════════ Availability ═══════════
+     Loaded on page open (during step 1) so it's ready by step 2.
+     "booked" = confirmed bookings, "blocked" = dates the admin has switched off. */
+  function loadAvailability() {
+    availState = 'loading';
+    renderCalendar();
+    availPromise = Promise.all([
+      fetch(EVENTS_API + '/api/blocked-dates', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw 0; return r.json(); }),
+      fetch(EVENTS_API + '/api/booked-dates',  { cache: 'no-store' }).then(function (r) { if (!r.ok) throw 0; return r.json(); })
+    ]).then(function (res) {
+      blocked = res[0].dates || []; booked = res[1].dates || [];
+      availState = 'ready';
+    }).catch(function () {
+      availState = 'failed';
+    }).then(function () {
+      renderCalendar();
+      return availState;
+    });
+    return availPromise;
+  }
+
+  /* ═══════════ Calendar ═══════════ */
+  function renderCalendar() {
+    var first = new Date(calYear, calMonth, 1).getDay();
+    var days  = new Date(calYear, calMonth + 1, 0).getDate();
+    $('calMonth').textContent = MONTHS[calMonth] + ' ' + calYear;
+    $('calPrev').disabled = (calYear === today.getFullYear() && calMonth === today.getMonth());
+    $('calBody').classList.toggle('cal-loading', availState === 'loading');
+    $('calStatus').textContent =
+      availState === 'loading' ? 'Checking availability…' :
+      availState === 'failed'  ? "Couldn't load availability. You can still pick a date and we'll confirm it." : '';
+
+    var grid = $('calGrid'); grid.innerHTML = '';
+    for (var i = 0; i < first; i++) { var b = el('div'); b.className = 'cal-day cal-day--empty'; grid.appendChild(b); }
+
+    for (var d = 1; d <= days; d++) {
+      var dt = new Date(calYear, calMonth, d), ds = iso(dt);
+      var isPast = dt < today, isBooked = booked.indexOf(ds) > -1, isBlocked = blocked.indexOf(ds) > -1;
+      var cls = 'cal-day';
+      if (isPast) cls += ' cal-day--past';
+      else if (isBooked || isBlocked) cls += ' cal-day--taken';
+      if (dt.getTime() === today.getTime()) cls += ' cal-day--today';
+      if (ds === selectedDate) cls += ' cal-day--selected';
+
+      var btn = el('button'); btn.type = 'button'; btn.className = cls;
+      btn.appendChild(el('span', String(d)));
+      var label = pretty(ds);
+      if (isPast)                    { btn.disabled = true; label += ' (past)'; }
+      else if (isBooked || isBlocked){ btn.setAttribute('aria-disabled', 'true'); label += isBooked ? ', already booked' : ', unavailable'; }
+      else if (ds === selectedDate)  { btn.setAttribute('aria-pressed', 'true'); }
+      btn.setAttribute('aria-label', label);
+      btn.dataset.date = ds;
+      grid.appendChild(btn);
+    }
+  }
+
+  /* Taken dates stay focusable/clickable on purpose: clicking one explains why it can't be chosen,
+     but never selects it. */
+  $('calGrid').addEventListener('click', function (e) {
+    var btn = e.target.closest('.cal-day'); if (!btn || !btn.dataset.date || btn.disabled) return;
+    var ds = btn.dataset.date;
+    if (booked.indexOf(ds) > -1)  { setDateMsg(MSG_BOOKED, true);  return; }
+    if (blocked.indexOf(ds) > -1) { setDateMsg(MSG_BLOCKED, true); return; }
+    selectedDate = ds;
+    setDateMsg(pretty(ds), false, true);
+    alertBox('alert2', '');
+    renderCalendar();
+  });
+  function setDateMsg(msg, isErr, isOk) {
+    var m = $('dateMsg'); m.textContent = msg || '';
+    m.className = 'date-msg' + (isErr ? ' err' : isOk ? ' ok' : '');
+  }
+  function changeMonth(dir) {
+    calMonth += dir;
+    if (calMonth < 0)  { calMonth = 11; calYear--; }
+    if (calMonth > 11) { calMonth = 0;  calYear++; }
+    renderCalendar();
+  }
+  $('calPrev').addEventListener('click', function () { changeMonth(-1); });
+  $('calNext').addEventListener('click', function () { changeMonth(1); });
+
+  /* ═══════════ Services ═══════════
+     Live from the services table so admin changes show up here automatically. */
+  var OTHER_VALUE = '__other__', INCOMING_VALUE = '__incoming__';
+
+  function serviceLabel(s) { return s.title + (s.icon ? ' — ' + s.icon : ''); }
+
+  function buildServiceOptions(list) {
+    var sel = $('bk-service'); sel.innerHTML = '';
+    var ph = el('option', 'Choose a service'); ph.value = ''; sel.appendChild(ph);
+
+    services = {};
+    (list || []).forEach(function (s) {
+      services[s.id] = s;
+      var o = el('option', serviceLabel(s)); o.value = s.id; sel.appendChild(o);
+    });
+
+    var o2 = el('option', "Not sure yet — I'd like advice"); o2.value = OTHER_VALUE; sel.appendChild(o2);
+    applyIncomingService();
+  }
+
+  /* Preselect the service the visitor picked on services.html. Match by id, then by title.
+     If the live list doesn't contain it (or failed to load), still offer it so nothing is lost. */
+  function applyIncomingService() {
+    if (!incoming.title) return;
+    var sel = $('bk-service'), match = null;
+    Object.keys(services).forEach(function (id) {
+      var s = services[id];
+      if (incoming.id && String(s.id) === incoming.id) match = s;
+      else if (!match && s.title.toLowerCase() === incoming.title.toLowerCase()) match = s;
+    });
+    if (match) { sel.value = match.id; }
+    else {
+      var old = sel.querySelector('option[value="' + INCOMING_VALUE + '"]'); if (old) old.remove();
+      var o = el('option', incoming.title + (incoming.price ? ' — ' + incoming.price : '')); o.value = INCOMING_VALUE;
+      sel.insertBefore(o, sel.children[1]); sel.value = INCOMING_VALUE;
+    }
+    var hint = $('svcHint');
+    hint.textContent = 'Selected from our Services page. You can change it above.';
+    hint.hidden = false;
+  }
+
+  function loadServices() {
+    buildServiceOptions([]);    // usable immediately (incoming service + "Not sure yet")
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if (!sb) return;
+      sb.from('services').select('id,title,icon').eq('is_active', true).order('sort_order', { ascending: true })
+        .then(function (res) {
+          if (res.error || !res.data) return;
+          var keep = $('bk-service').value;
+          buildServiceOptions(res.data);
+          if (keep && !incoming.title && $('bk-service').querySelector('option[value="' + keep + '"]')) $('bk-service').value = keep;
+        });
+    } catch (e) { console.warn('[book-us] services load failed', e); }
+  }
+
+  function currentService() {
+    var v = $('bk-service').value;
+    if (!v) return null;
+    if (v === OTHER_VALUE)    return { id: null, title: 'Other' };
+    if (v === INCOMING_VALUE) return { id: incoming.id || null, title: incoming.title };
+    var s = services[v]; return s ? { id: s.id, title: s.title, price: s.icon } : null;
+  }
+
+  /* ═══════════ Submit ═══════════ */
+  function takenMessage(ds) {
+    return booked.indexOf(ds) > -1 ? MSG_BOOKED : blocked.indexOf(ds) > -1 ? MSG_BLOCKED : null;
+  }
+  function rejectDate(msg) {
+    selectedDate = null;
+    setDateMsg(msg, true);
+    alertBox('alert2', msg);
+    renderCalendar();
+    $('dateLabel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  $('step2').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    alertBox('alert2', '');
+
+    if (!selectedDate) { alertBox('alert2', 'Pick a date on the calendar.'); $('dateLabel').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    var svc = currentService();
+    if (!svc) { flag($('bk-service'), true); alertBox('alert2', 'Pick a service.'); $('bk-service').focus(); return; }
+
+    var btn = $('submitBtn'); btn.disabled = true; btn.textContent = 'Checking date…';
+
+    /* 1) Re-check availability right now — someone else may have booked this date
+          while this page was open. */
+    if (availPromise) await availPromise;
+    await loadAvailability();
+    var taken = takenMessage(selectedDate);
+    if (taken) { rejectDate(taken); btn.disabled = false; btn.textContent = 'Send booking request'; return; }
+
+    /* 2) Send. The server is the source of truth and must reject a taken date (see docs/server-availability-check.md). */
+    btn.textContent = 'Sending…';
+    var notes = $('bk-notes').value.trim();
+    var notesOut = 'Service: ' + svc.title + (svc.price ? ' (' + svc.price + ')' : '') + (notes ? '\n' + notes : '');
+    var guests = $('bk-guests').value.trim(), loc = $('bk-location').value.trim();
+
+    try {
+      var res  = await fetch(EVENTS_API + '/api/booking-request', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: customer.first + ' ' + customer.last,
+          email: customer.email, phone: customer.phone,
+          event_type: svc.title, service_id: svc.id || null,
+          event_date: selectedDate, guest_count: guests || null,
+          location: loc || null, notes: notesOut
+        })
+      });
+      var data = {}; try { data = await res.json(); } catch (_) {}
+
+      if (res.status === 409 || (!res.ok && /book|unavailable|not available|taken/i.test(data.error || ''))) {
+        await loadAvailability();
+        rejectDate(MSG_BOOKED);
+        btn.disabled = false; btn.textContent = 'Send booking request'; return;
+      }
+      if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed');
+
+      var s = $('doneSummary'); s.innerHTML = '';
+      [['Name', customer.first + ' ' + customer.last], ['Email', customer.email], ['Date', pretty(selectedDate)],
+       ['Service', svc.title]].concat(guests ? [['Guests', guests]] : []).forEach(function (r) {
+        var row = el('div'); row.appendChild(el('dt', r[0])); row.appendChild(el('dd', r[1])); s.appendChild(row);
+      });
+      showStep('stepDone');
+    } catch (err) {
+      alertBox('alert2', "Your request didn't send: " + err.message + '. Check your connection and try again.');
+      btn.disabled = false; btn.textContent = 'Send booking request';
+    }
+  });
+
+  $('bk-service').addEventListener('change', function () { flag(this, false); });
+
+  $('againBtn').addEventListener('click', function () {
+    selectedDate = null; customer = {};
+    ['bk-first', 'bk-last', 'bk-phone', 'bk-email', 'bk-guests', 'bk-location', 'bk-notes'].forEach(function (id) { $(id).value = ''; });
+    setDateMsg('');
+    $('submitBtn').disabled = false; $('submitBtn').textContent = 'Send booking request';
+    buildServiceOptions(Object.keys(services).map(function (k) { return services[k]; }));
+    if (!incoming.title) $('bk-service').value = '';
+    loadAvailability();
+    showStep('step1');
+  });
+
+  /* ═══════════ Boot ═══════════ */
+  loadServices();
+  loadAvailability();
+})();
 </script>
 </body>
 </html>
