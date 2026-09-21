@@ -1303,7 +1303,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       if(error || !data || !data.length) return;
 
       grid.innerHTML = data.map(function(c, i){
-        return '<a class="bento-card ' + (i === 0 ? 'wide' : '') + '" href="portfolio.html?category=' + encodeURIComponent(c.slug || '') + '">' +
+        return '<a class="bento-card" href="portfolio.html?category=' + encodeURIComponent(c.slug || '') + '">' +
           (c.cover_image ? '<img class="bento-img" src="' + escHtml(c.cover_image) + '" alt="' + escHtml(c.title || '') + '" loading="lazy"/>' : '') +
           '<div class="bento-title">' + escHtml(c.title || 'Featured Work') + '</div>' +
           (c.meta_description ? '<div class="bento-desc">' + escHtml(c.meta_description) + '</div>' : '') +
