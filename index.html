@@ -838,6 +838,49 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     }
     .quote-role { font-size: 12px; color: var(--ix-mid); }
 
+    /* ── Portfolio Highlights (2-card bento) & Trending Services (4-card who-grid) ── */
+    .bento-card { text-decoration: none; display: block; }
+    .portfolio-bento {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 1fr;
+    }
+    .portfolio-bento .bento-card { min-height: 360px; display: flex; flex-direction: column; justify-content: flex-end; }
+    .portfolio-bento .bento-img {
+      position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; margin: 0; opacity: 0.55;
+    }
+    .portfolio-bento .bento-card { position: relative; overflow: hidden; }
+    .portfolio-bento .bento-title, .portfolio-bento .bento-desc { position: relative; z-index: 1; }
+    .portfolio-bento .bento-title { color: var(--ix-white); }
+
+    .trending-grid { grid-template-columns: repeat(4, 1fr); }
+    .who-card { text-decoration: none; display: block; }
+
+    /* ── Testimonials carousel — one review at a time ── */
+    .quote-nav { display: flex; gap: 10px; flex-shrink: 0; }
+    .quote-arrow {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid var(--ix-border); background: transparent;
+      color: var(--ix-white); font-size: 15px; cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .quote-arrow:hover { border-color: var(--ix-accent); background: var(--ix-dim); }
+    .quote-carousel { max-width: 640px; margin: 0 auto; }
+    .quote-card.single { text-align: center; align-items: center; }
+    .quote-card.single .quote-text { font-size: 22px; }
+    .quote-card.single .quote-author { flex-direction: column; gap: 4px; }
+    .quote-dots { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
+    .quote-dot {
+      width: 7px; height: 7px; border-radius: 50%; border: none;
+      background: var(--ix-border); cursor: pointer; padding: 0;
+      transition: background .2s, transform .2s;
+    }
+    .quote-dot.active { background: var(--ix-accent); transform: scale(1.3); }
+
+    @media (max-width: 900px) {
+      .portfolio-bento { grid-template-columns: 1fr; }
+      .trending-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
     /* ── CTA ──────────────────────────────────────── */
     .cta-section {
       padding: 130px 40px;
@@ -1053,60 +1096,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     </div>
   </section>
 
-
-  <!-- GALLERY STRIP -->
-  <div class="gallery-strip full-bleed">
-    <div class="gallery-row" id="galleryRow1">
-      <!-- loaded dynamically from Supabase site_content -->
-    </div>
-  </div>
-
-
-
-
-  <!-- HOW WE WORK -->
-  <section class="how full-bleed" id="how">
-
-    <div class="how-photos how-photos-left">
-      <img id="howImg0" class="how-photo p1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png" alt="Event 1" loading="lazy"/>
-      <img id="howImg1" class="how-photo p2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png" alt="Event 2" loading="lazy"/>
-      <img id="howImg2" class="how-photo p3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 3" loading="lazy"/>
-      <img id="howImg3" class="how-photo p4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png" alt="Event 4" loading="lazy"/>
-      <img id="howImg4" class="how-photo p5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816514965-1.png" alt="Event 5" loading="lazy"/>
-    </div>
-
-    <div class="how-inner">
-      <div class="steps">
-        <div class="section-label">How We Work</div>
-        <div class="step"><div class="step-text"><h3>Book Your Event</h3></div></div>
-        <div class="step"><div class="step-text"><h3>We Show Up &amp; Shoot</h3></div></div>
-        <div class="step"><div class="step-text"><h3>We Build Your Gallery</h3></div></div>
-        <div class="step"><div class="step-text"><h3>You Keep the Memories</h3></div></div>
-      </div>
-    </div>
-
-    <div class="how-photos how-photos-right">
-      <img id="howImg5" class="how-photo p1" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg" alt="Event 6" loading="lazy"/>
-      <img id="howImg6" class="how-photo p2" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png" alt="Event 7" loading="lazy"/>
-      <img id="howImg7" class="how-photo p3" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png" alt="Event 8" loading="lazy"/>
-      <img id="howImg8" class="how-photo p4" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png" alt="Event 9" loading="lazy"/>
-      <img id="howImg9" class="how-photo p5" src="https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png" alt="Event 10" loading="lazy"/>
-    </div>
-
-  </section>
-
-
-
-  <!-- WHY US -->
-  <section class="testimonials" id="why" style="display:none;">
-    <div class="testimonials-inner">
-      <div class="quotes-grid" id="quotesGrid">
-        <!-- Populated from Supabase event_reviews by loadHomepageReviews() below, ordered by
-             admin-set position. Section stays hidden until at least one real review loads. -->
-      </div>
-    </div>
-  </section>
-
   <!-- TRUST BADGES -->
   <section class="trust-strip">
     <div class="trust-inner">
@@ -1145,30 +1134,82 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     </div>
   </section>
 
+  <!-- GALLERY STRIP -->
+  <div class="gallery-strip full-bleed">
+    <div class="gallery-row" id="galleryRow1">
+      <!-- loaded dynamically from Supabase site_content -->
+    </div>
+  </div>
+
+  <!-- PORTFOLIO HIGHLIGHTS — top 2 portfolio categories (admin order) -->
+  <section class="who" id="portfolioHighlights" style="display:none;">
+    <div class="who-header">
+      <div>
+        <div class="section-label">Featured Work</div>
+        <h2 class="section-title">From the <em>portfolio</em>.</h2>
+      </div>
+      <a href="portfolio.html" class="hero-btn-secondary"><span>View Full Portfolio</span></a>
+    </div>
+    <div class="bento portfolio-bento" id="portfolioBento">
+      <!-- populated by loadPortfolioHighlights() -->
+    </div>
+  </section>
+
+  <!-- TRENDING SERVICES — top 4 services (admin order for now, booking-count-driven later) -->
+  <section class="who" id="trendingServices" style="display:none;">
+    <div class="who-header">
+      <div>
+        <div class="section-label">Trending Now</div>
+        <h2 class="section-title">Our most <em>booked</em> services.</h2>
+      </div>
+      <a href="services.html" class="hero-btn-secondary"><span>Explore All Services</span></a>
+    </div>
+    <div class="who-grid trending-grid" id="trendingGrid">
+      <!-- populated by loadTrendingServices() -->
+    </div>
+  </section>
+
+  <!-- WHAT CLIENTS SAY — one review at a time, auto-rotating -->
+  <section class="testimonials" id="why" style="display:none;">
+    <div class="testimonials-inner">
+      <div class="testimonials-header">
+        <div>
+          <div class="section-label">Kind Words</div>
+          <h2 class="section-title">What clients <em>say</em>.</h2>
+        </div>
+        <div class="quote-nav">
+          <button class="quote-arrow" id="quotePrev" aria-label="Previous review">←</button>
+          <button class="quote-arrow" id="quoteNext" aria-label="Next review">→</button>
+        </div>
+      </div>
+      <div class="quote-carousel" id="quoteCarousel">
+        <!-- Populated from Supabase event_reviews by loadHomepageReviews() below, one card
+             shown at a time, ordered by admin-set position. Stays hidden until reviews load. -->
+      </div>
+      <div class="quote-dots" id="quoteDots"></div>
+    </div>
+  </section>
+
   <!-- BRAND PARTNERS (logos only, no heading — populated from admin) -->
   <section class="partners-strip" id="partnersStrip" style="display:none;">
     <div class="partners-inner" id="partnersInner"></div>
   </section>
 
-  <!-- CTA -->
-  <section class="cta-section full-bleed">
-    <div class="cta-bg"></div>
-    <div class="cta-inner">
-      <h2 class="cta-title">Newsletter</h2>
-      <div class="nl-form">
-        <input class="nl-input" type="email" id="nlEmail" placeholder="Enter your email address" autocomplete="email"/>
-        <button class="nl-btn" id="nlBtn" onclick="submitNewsletter()">Send It</button>
-      </div>
-      <div class="nl-msg" id="nlMsg"></div>
-    </div>
-  </section>
-
   <script>
-  /* ── Newsletter signup ── */
-  /* ── Live homepage reviews ── */
+  function escHtml(s){
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Live homepage reviews — one card at a time, auto-rotating ──
+     Always shows your latest reviews first; as new ones come in via
+     admin the carousel picks them up automatically on next page load. */
+  var quoteData = [];
+  var quoteIndex = 0;
+  var quoteTimer = null;
+
   async function loadHomepageReviews(){
-    var grid = document.getElementById('quotesGrid');
-    if(!grid) return;
+    var track = document.getElementById('quoteCarousel');
+    if(!track) return;
 
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
@@ -1183,26 +1224,25 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
       if(error || !data || !data.length) return; // no reviews yet — section stays hidden
 
-      function esc(s){
-        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      }
-      function stars(n){
-        n = Math.max(0, Math.min(5, n || 5));
-        return '★★★★★☆☆☆☆☆'.slice(5 - n, 10 - n);
+      quoteData = data;
+      renderQuote(0);
+
+      var dots = document.getElementById('quoteDots');
+      if (dots) {
+        dots.innerHTML = quoteData.map(function(_, i){
+          return '<button class="quote-dot' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" aria-label="Go to review ' + (i+1) + '"></button>';
+        }).join('');
+        dots.querySelectorAll('.quote-dot').forEach(function(btn){
+          btn.addEventListener('click', function(){ renderQuote(parseInt(btn.dataset.i, 10)); resetQuoteTimer(); });
+        });
       }
 
-      grid.innerHTML = data.map(function(r){
-        return '<div class="quote-card">' +
-          '<div class="quote-stars">' + stars(r.rating) + '</div>' +
-          (r.message ? '<p class="quote-text">"' + esc(r.message) + '"</p>' : '') +
-          '<div class="quote-author">' +
-            '<div>' +
-              '<div class="quote-name">' + esc(r.reviewer_name || 'Verified Guest') + '</div>' +
-              (r.event_name ? '<div class="quote-role">' + esc(r.event_name) + '</div>' : '') +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('');
+      var prevBtn = document.getElementById('quotePrev');
+      var nextBtn = document.getElementById('quoteNext');
+      if (prevBtn) prevBtn.addEventListener('click', function(){ renderQuote(quoteIndex - 1); resetQuoteTimer(); });
+      if (nextBtn) nextBtn.addEventListener('click', function(){ renderQuote(quoteIndex + 1); resetQuoteTimer(); });
+
+      resetQuoteTimer();
 
       var section = document.getElementById('why');
       if (section) section.style.display = '';
@@ -1211,7 +1251,108 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       // section stays hidden — no fake content to fall back to
     }
   }
+
+  function stars(n){
+    n = Math.max(0, Math.min(5, n || 5));
+    return '★★★★★☆☆☆☆☆'.slice(5 - n, 10 - n);
+  }
+
+  function renderQuote(i){
+    if(!quoteData.length) return;
+    quoteIndex = ((i % quoteData.length) + quoteData.length) % quoteData.length;
+    var r = quoteData[quoteIndex];
+    var track = document.getElementById('quoteCarousel');
+    track.innerHTML = '<div class="quote-card single">' +
+      '<div class="quote-stars">' + stars(r.rating) + '</div>' +
+      (r.message ? '<p class="quote-text">"' + escHtml(r.message) + '"</p>' : '') +
+      '<div class="quote-author">' +
+        '<div>' +
+          '<div class="quote-name">' + escHtml(r.reviewer_name || 'Verified Guest') + '</div>' +
+          (r.event_name ? '<div class="quote-role">' + escHtml(r.event_name) + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+    var dots = document.getElementById('quoteDots');
+    if (dots) dots.querySelectorAll('.quote-dot').forEach(function(d, di){ d.classList.toggle('active', di === quoteIndex); });
+  }
+
+  function resetQuoteTimer(){
+    if (quoteTimer) clearInterval(quoteTimer);
+    quoteTimer = setInterval(function(){ renderQuote(quoteIndex + 1); }, 6000);
+  }
+
   loadHomepageReviews();
+
+  /* ── Portfolio Highlights — top 2 categories, current admin order.
+     Swap the .order() below for a booking/view-count column later to
+     make this fully automatic without touching the markup. ── */
+  async function loadPortfolioHighlights(){
+    var section = document.getElementById('portfolioHighlights');
+    var grid = document.getElementById('portfolioBento');
+    if(!section || !grid) return;
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if(!sb) return;
+
+      var { data, error } = await sb
+        .from('portfolio_categories')
+        .select('title, slug, meta_description, cover_image')
+        .order('created_at', { ascending: false })
+        .limit(2);
+
+      if(error || !data || !data.length) return;
+
+      grid.innerHTML = data.map(function(c, i){
+        return '<a class="bento-card ' + (i === 0 ? 'wide' : '') + '" href="portfolio.html?category=' + encodeURIComponent(c.slug || '') + '">' +
+          (c.cover_image ? '<img class="bento-img" src="' + escHtml(c.cover_image) + '" alt="' + escHtml(c.title || '') + '" loading="lazy"/>' : '') +
+          '<div class="bento-title">' + escHtml(c.title || 'Featured Work') + '</div>' +
+          (c.meta_description ? '<div class="bento-desc">' + escHtml(c.meta_description) + '</div>' : '') +
+        '</a>';
+      }).join('');
+
+      section.style.display = '';
+    } catch(e) {
+      console.warn('[portfolio-highlights] Could not load:', e.message);
+    }
+  }
+  loadPortfolioHighlights();
+
+  /* ── Trending Services — top 4 services, current admin order.
+     Swap the .order() below for a real booking-count column later
+     (synced from the booking system) to make ranking automatic. ── */
+  async function loadTrendingServices(){
+    var section = document.getElementById('trendingServices');
+    var grid = document.getElementById('trendingGrid');
+    if(!section || !grid) return;
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if(!sb) return;
+
+      var { data, error } = await sb
+        .from('services')
+        .select('title, description, image_url, sort_order')
+        .order('sort_order', { ascending: true })
+        .limit(4);
+
+      if(error || !data || !data.length) return;
+
+      grid.innerHTML = data.map(function(s){
+        return '<a class="who-card" href="services.html">' +
+          (s.image_url ? '<img src="' + escHtml(s.image_url) + '" alt="' + escHtml(s.title || '') + '" loading="lazy"/>' : '') +
+          '<div class="who-overlay"></div>' +
+          '<div class="who-label">' +
+            '<div class="who-type">Trending</div>' +
+            '<div class="who-name">' + escHtml(s.title || 'Service') + '</div>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+
+      section.style.display = '';
+    } catch(e) {
+      console.warn('[trending-services] Could not load:', e.message);
+    }
+  }
+  loadTrendingServices();
 
   /* ── Brand partner logos (admin-uploaded, no heading) ──── */
   async function loadBrandPartners(){
@@ -1253,46 +1394,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     }
   }
   loadBrandPartners();
-
-  async function submitNewsletter(){
-    var input = document.getElementById('nlEmail');
-    var btn   = document.getElementById('nlBtn');
-    var msg   = document.getElementById('nlMsg');
-    var email = (input.value || '').trim().toLowerCase();
-
-    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-      msg.textContent = 'Please enter a valid email address.';
-      msg.className = 'nl-msg err';
-      input.focus();
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
-    msg.textContent = '';
-    msg.className = 'nl-msg';
-
-    try {
-      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if(!sb) throw new Error('Not connected');
-
-      var { error } = await sb.from('newsletter_subscribers').upsert(
-        { email: email, subscribed_at: new Date().toISOString() },
-        { onConflict: 'email' }
-      );
-      if(error) throw error;
-
-      msg.textContent = "✓ You're on the list! We'll be in touch.";
-      msg.className = 'nl-msg ok';
-      input.value = '';
-      btn.textContent = 'Subscribed ✓';
-    } catch(e) {
-      msg.textContent = 'Something went wrong — please try again.';
-      msg.className = 'nl-msg err';
-      btn.disabled = false;
-      btn.textContent = 'Notify Me';
-    }
-  }
 
   /* ── Dynamic homepage images from Supabase site_content ── */
   (function(){
