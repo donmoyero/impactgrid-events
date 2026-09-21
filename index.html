@@ -425,6 +425,19 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     .h-cta-sub { display: flex; align-items: center; justify-content: center; gap: clamp(14px, 1.6vw, 26px); margin-bottom: clamp(20px, 2vw, 34px); }
     .h-cta-sub::before, .h-cta-sub::after { content: ''; height: 1px; width: clamp(40px, 8vw, 130px); background: rgba(255,255,255,.4); }
     .h-cta-sub p { font: 400 clamp(15px, 1.25vw, 20px)/1.3 var(--h-sans); color: rgba(255,255,255,.92); }
+    .h-newsletter-form {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; flex-wrap: wrap; max-width: 520px; margin: 0 auto;
+    }
+    .h-newsletter-input {
+      flex: 1 1 260px; height: 52px; padding: 0 18px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08);
+      color: #fff; font: 400 15px/1 var(--h-sans);
+    }
+    .h-newsletter-input::placeholder { color: rgba(255,255,255,.55); }
+    .h-newsletter-input:focus { outline: 2px solid #fff; outline-offset: 2px; }
+    .h-newsletter-form .h-btn { flex: none; }
+    .h-newsletter-msg { margin-top: 14px; font: 400 13px/1.4 var(--h-sans); color: rgba(255,255,255,.85); min-height: 18px; }
     .h-corner {
       position: absolute; bottom: clamp(24px, 2.6vw, 44px);
       font: 500 clamp(9px, .68vw, 11px)/1.85 var(--h-sans); letter-spacing: .3em; text-transform: uppercase;
@@ -700,18 +713,20 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-in"><div class="h-partners-in" id="partnersInner"></div></div>
   </section>
 
-  <!-- ═════════ 7. CTA ═════════ -->
+  <!-- ═════════ 7. NEWSLETTER ═════════ -->
   <section class="h-cta">
     <div class="h-in">
-      <p class="h-eyebrow" style="color:rgba(255,255,255,.8)">Let’s make it happen</p>
-      <h2 class="h-serif-h" id="hCtaHeading">Planning an event?</h2>
-      <div class="h-cta-sub"><p id="hCtaSub">Let’s capture it the right way.</p></div>
-      <a href="book-us.html" class="h-btn h-btn--solid"><span id="hCtaBtn">Book Impact Grid</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      </a>
+      <p class="h-eyebrow" style="color:rgba(255,255,255,.8)">Stay Updated</p>
+      <h2 class="h-serif-h" id="hNewsletterHeading">Never Miss a Moment</h2>
+      <div class="h-cta-sub"><p id="hNewsletterSub">Event tips, portfolio drops and behind-the-scenes — straight to your inbox.</p></div>
+      <form id="newsletterForm" class="h-newsletter-form">
+        <input type="email" id="newsletterEmail" class="h-newsletter-input" placeholder="Your email address" required aria-label="Email address" />
+        <button type="submit" class="h-btn h-btn--solid"><span id="hNewsletterBtn">Subscribe</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+      </form>
+      <p id="newsletterMsg" class="h-newsletter-msg" aria-live="polite"></p>
     </div>
-    <div class="h-corner h-corner--l" aria-hidden="true"><span>Good</span><span>Events</span><span>Better</span><span>Memories</span></div>
-    <div class="h-corner h-corner--r" aria-hidden="true"><div>Manchester<br />UK Wide</div></div>
   </section>
 
   <script>
@@ -728,7 +743,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     'how_heading_line1','how_heading_line2',
     'step1_title','step1_desc','step2_title','step2_desc','step3_title','step3_desc','step4_title','step4_desc',
     'reviews_heading',
-    'cta_heading','cta_sub','cta_btn_text'
+    'newsletter_heading','newsletter_sub','newsletter_btn_text'
   ];
   var HOMEPAGE_TEXT_ID_MAP = {
     hero_h1_line1:'hHeroLine1', hero_h1_line2:'hHeroLine2', hero_sub:'hHeroSub',
@@ -739,7 +754,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     step1_title:'hStep1Title', step1_desc:'hStep1Desc', step2_title:'hStep2Title', step2_desc:'hStep2Desc',
     step3_title:'hStep3Title', step3_desc:'hStep3Desc', step4_title:'hStep4Title', step4_desc:'hStep4Desc',
     reviews_heading:'hReviewsHeading',
-    cta_heading:'hCtaHeading', cta_sub:'hCtaSub', cta_btn_text:'hCtaBtn'
+    newsletter_heading:'hNewsletterHeading', newsletter_sub:'hNewsletterSub', newsletter_btn_text:'hNewsletterBtn'
   };
   async function loadHomepageContentText(){
     try {
@@ -883,6 +898,36 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     }
   }
   loadBrandPartners();
+
+  /* ── Newsletter signup — writes to Supabase (newsletter_signups) ── */
+  (function(){
+    var form = document.getElementById('newsletterForm');
+    if (!form) return;
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      var input = document.getElementById('newsletterEmail');
+      var msg   = document.getElementById('newsletterMsg');
+      var btn   = form.querySelector('button[type="submit"]');
+      var email = input.value.trim();
+      if (!email) return;
+
+      btn.disabled = true;
+      msg.textContent = '';
+      try {
+        var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+        if (!sb) throw new Error('Signup is unavailable right now');
+        var { error } = await sb.from('newsletter_signups').insert([{ email: email }]);
+        if (error) throw error;
+        msg.textContent = 'Thanks — you’re on the list!';
+        input.value = '';
+      } catch (err) {
+        msg.textContent = 'Something went wrong — please try again.';
+        console.warn('[newsletter] signup failed:', err && err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  })();
   </script>
 
   </div><!-- /.page-wrap -->
