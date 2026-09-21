@@ -141,45 +141,41 @@
       '.nav-mega-label{font-size:13px;font-weight:600;color:var(--text);}' +
       '.nav-mega-desc{font-size:11px;color:var(--text3);margin-top:1px;}' +
       '.logo{cursor:pointer;}' +
-      /* ── LEFT-SIDE VERTICAL NAV OVERRIDES ── */
-      '.nav{position:fixed;top:0;left:0;right:auto;bottom:0;width:var(--nav-w-collapsed);height:100vh;flex-direction:column;align-items:stretch;padding:20px 0 24px;border-right:1px solid var(--border2);border-bottom:none;z-index:1100;overflow:hidden;transition:width 0.3s cubic-bezier(0.4,0,0.2,1);}' +
-      '.nav.expanded{width:var(--nav-w);box-shadow:4px 0 32px rgba(0,0,0,0.14);}' +
-      '[data-theme="dark"] .nav.expanded{box-shadow:4px 0 48px rgba(0,0,0,0.55);}' +
-      '.nav-backdrop{display:none;position:fixed;inset:0;z-index:1099;background:rgba(0,0,0,0.35);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);}' +
-      '.nav-backdrop.open{display:block;}' +
+      /* ── TOP HORIZONTAL NAV OVERRIDES ── */
+      '.nav{position:fixed;top:0;left:0;right:0;bottom:auto;width:100%;height:78px;flex-direction:row;align-items:center;padding:0 40px;background:var(--card);border-right:none;border-bottom:1px solid var(--border2);z-index:1100;overflow:visible;transition:background .3s;}' +
+      '.nav.expanded{width:100%;box-shadow:none;}' +
+      '[data-theme="dark"] .nav.expanded{box-shadow:none;}' +
+      '.nav-backdrop{display:none!important;}' +
       '.nav-handle{display:none!important;}' +
       '.nav-in{display:none;}' +
-      '.nav .logo{display:flex;align-items:center;gap:9px;padding:0 11px;margin-bottom:32px;cursor:pointer;white-space:nowrap;}' +
-      '.nav .logo .logo-text{opacity:0;transition:opacity 0.15s ease;pointer-events:none;}' +
-      '.nav.expanded .logo .logo-text{opacity:1;pointer-events:auto;}' +
-      '.nav .nav-links{display:flex;flex-direction:column;gap:2px;list-style:none;flex:1;padding:0 8px;}' +
-      '.nav .nav-links li{width:100%;}' +
-      '.nav .nav-links a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13.5px;overflow:hidden;white-space:nowrap;}' +
-      '.nav .nav-links a .nav-label{opacity:0;transition:opacity 0.15s ease;pointer-events:none;}' +
-      '.nav.expanded .nav-links a .nav-label{opacity:1;pointer-events:auto;}' +
-      '.nav .nav-icon{font-size:17px;flex-shrink:0;width:22px;text-align:center;}' +
-      '.nav .nav-divider{height:1px;background:var(--border);margin:8px 11px 6px;list-style:none;padding:0;flex-shrink:0;}' +
+      '.nav .logo{display:flex;align-items:center;gap:9px;padding:0;margin-bottom:0;margin-right:44px;cursor:pointer;white-space:nowrap;background:none;border:none;}' +
+      '.nav .logo .logo-text{opacity:1;pointer-events:auto;font-size:16px;font-weight:800;}' +
+      '.nav .nav-links{display:flex;flex-direction:row;gap:2px;list-style:none;flex:1;padding:0;align-items:center;}' +
+      '.nav .nav-links li{width:auto;}' +
+      '.nav .nav-links a{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:8px;font-size:13.5px;overflow:visible;white-space:nowrap;}' +
+      '.nav .nav-links a .nav-label{opacity:1;pointer-events:auto;}' +
+      '.nav .nav-icon{display:none;}' +
+      '.nav .nav-divider{display:none;}' +
       '.mob-social{display:flex;gap:10px;padding:14px 20px 6px;}' +
       '.mob-social-link{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:var(--bg2);color:var(--text2);transition:all .2s;flex-shrink:0;}' +
       '.mob-social-link:hover{background:var(--gold-dim);color:var(--gold);}' +
       '.f-social{display:flex;gap:8px;margin-top:14px;}' +
       '.f-social-link{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:var(--bg2);color:var(--text2);transition:all .2s;flex-shrink:0;}' +
       '.f-social-link:hover{background:var(--gold-dim);color:var(--gold);}' +
-      '.nav-bottom{display:flex;flex-direction:column;gap:8px;padding:16px 8px 0;margin-top:auto;border-top:1px solid var(--border);overflow:hidden;}' +
-      '.nav-bottom>*{opacity:0;pointer-events:none;transition:opacity 0.15s ease;}' +
-      '.nav.expanded .nav-bottom>*{opacity:1;pointer-events:auto;}' +
-      '.nav-guest{flex-direction:column!important;gap:7px!important;}' +
-      '.nav-guest .btn-ghost-sm,.nav-guest .btn-gold-sm{width:100%;text-align:center;}' +
-      '.nav .theme-btn{width:100%;text-align:left;padding:8px 12px;border-radius:8px;}' +
-      '.nav .hamburger{display:none!important;}' +
-      '.nav .u-drop{left:calc(100% + 6px);right:auto;top:0;bottom:auto;}' +
-      'body{padding-left:var(--nav-w-collapsed)!important;padding-right:0!important;padding-top:0!important;}' +
-      '.page-wrap{padding-left:var(--nav-w-collapsed)!important;padding-right:0!important;}' +
+      '.nav-bottom{display:flex;flex-direction:row;gap:10px;padding:0;margin-top:0;margin-left:auto;border-top:none;overflow:visible;align-items:center;}' +
+      '.nav-bottom>*{opacity:1;pointer-events:auto;}' +
+      '.nav-guest{flex-direction:row!important;gap:10px!important;}' +
+      '.nav-guest .btn-ghost-sm,.nav-guest .btn-gold-sm{width:auto;text-align:center;}' +
+      '.nav .theme-btn{width:auto;text-align:center;padding:9px 14px;border-radius:8px;font-size:12.5px;}' +
+      '.nav .hamburger{display:flex!important;}' +
+      '.nav .hamburger span{background:var(--text);}' +
+      '.nav .u-drop{left:auto;right:0;top:calc(100% + 10px);bottom:auto;}' +
+      '.nav-book-btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:999px;background:var(--text);color:var(--bg);font-size:13px;font-weight:600;white-space:nowrap;text-decoration:none;transition:opacity .2s;}' +
+      '.nav-book-btn:hover{opacity:.82;}' +
+      'body{padding-left:0!important;padding-right:0!important;padding-top:78px!important;}' +
+      '.page-wrap{padding-left:0!important;padding-right:0!important;}' +
       '@media(max-width:768px){' +
-        '.nav{width:0!important;padding:0!important;border-right:none!important;box-shadow:none!important;}' +
-        '.nav *{opacity:0!important;pointer-events:none!important;}' +
-        'body{padding-left:0!important;}' +
-        '.page-wrap{padding-left:0!important;}' +
+        '.nav{display:none!important;}' +
       '}' +
       '</style>' +
 
@@ -211,6 +207,7 @@
 
 
         '<div class="nav-bottom">' +
+          '<a href="book-us.html" class="nav-book-btn">Book an Event <span aria-hidden="true">→</span></a>' +
           '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">Dark mode</button>' +
 
           /* ── GUEST: hidden from public — admin accesses login via footer link ── */
