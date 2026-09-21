@@ -871,6 +871,19 @@ function mgPreviewLoaded(){
 window.mgRefreshPreview = mgRefreshPreview;
 window.mgPreviewLoaded  = mgPreviewLoaded;
 
+/* Desktop / mobile toggle for the live preview — just narrows the frame so
+   event.html's own responsive CSS kicks in; no reload needed. */
+function mgSetPreviewDevice(mode){
+  var stage = document.getElementById('mgPreviewStage');
+  if(!stage) return;
+  var mobile = (mode === 'mobile');
+  stage.classList.toggle('mg-dev-mobile', mobile);
+  var d = document.getElementById('mgDevDesktop'), m = document.getElementById('mgDevMobile');
+  if(d) d.classList.toggle('active', !mobile);
+  if(m) m.classList.toggle('active', mobile);
+}
+window.mgSetPreviewDevice = mgSetPreviewDevice;
+
 async function loadManageGallery(){
   if(!_mgEventId) { nav('events', null); return; }
   var id = _mgEventId;
