@@ -28,7 +28,7 @@ fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
     console.error('Failed to load Firebase config:', err);
     var alertEl = document.getElementById('createEventAlert');
     if(alertEl){
-      alertEl.textContent = '\u26a0\ufe0f Could not connect to database. Check your internet connection and refresh the page.';
+      alertEl.textContent = 'Could not connect to database. Check your internet connection and refresh the page.';
       alertEl.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);';
     }
   });
@@ -706,7 +706,7 @@ async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode
 async function loadEvents(){
   var el = document.getElementById('eventsList');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try{
     var q        = query(collection(db, 'events'), orderBy('created_at', 'desc'));
     var snap     = await getDocs(q);
@@ -756,7 +756,7 @@ async function loadEvents(){
             + '<button class="btn btn-ghost btn-sm" onclick="openManageGallery(\'' + ev.id + '\');mgSwitchTab(\'design\')">Edit Design</button>'
             + '<button class="btn btn-ghost btn-sm" onclick="goUploadForEvent(\'' + ev.id + '\')"> Upload</button>'
             + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="resendOwnerEmail(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')"> Resend Email</button>' : '')
-            + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="sendEventReminder(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">⏰ Send Reminder</button>' : '')
+            + (ev.owner_email ? '<button class="btn btn-ghost btn-sm" onclick="sendEventReminder(\'' + esc(ev.owner_email) + '\',\'' + esc(ev.name) + '\')">Send Reminder</button>' : '')
             + '<button class="btn ' + (ev.is_active ? 'btn-red' : 'btn-green') + ' btn-sm" onclick="toggleEvent(\'' + ev.id + '\',' + ev.is_active + ')">'
             + (ev.is_active ? 'Deactivate' : 'Activate') + '</button>'
             + '<button class="btn btn-red btn-icon btn-sm" onclick="deleteEvent(\'' + ev.id + '\')">&times;</button>'
@@ -785,7 +785,7 @@ async function resendOwnerEmail(ownerEmail, eventName){
 
 async function sendEventReminder(ownerEmail, eventName){
   if(!confirm('Send a gallery reminder to ' + ownerEmail + ' for "' + eventName + '"?')) return;
-  toast('⏰', 'Sending…', 'Sending reminder', true);
+  toast('', 'Sending…', 'Sending reminder', true);
   try{
     var res  = await fetch(EVENTS_API + '/api/send-reminder', {
       method : 'POST',
@@ -801,7 +801,7 @@ async function sendEventReminder(ownerEmail, eventName){
 async function toggleEvent(id, cur){
   await updateDoc(doc(db, 'events', id), { is_active: !cur });
   loadEvents(); loadStats();
-  toast(cur ? '⏸' : '▶ ', cur ? 'Event deactivated' : 'Event activated', '');
+  toast('', cur ? 'Event deactivated' : 'Event activated', '');
 }
 
 async function deleteEvent(id){
@@ -1021,7 +1021,7 @@ function mgRenderPhotos(){
           + 'style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid ' + (p.featured ? 'var(--gold)' : 'var(--border)') + ';' + (p.hidden ? 'opacity:.45;' : '') + '">'
           + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:100px;object-fit:cover;display:block;pointer-events:none;" onerror="this.style.background=\'var(--bg3)\'"/>'
           + (isVid ? '<div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;">Video</div>' : '')
-          + (p.featured ? '<div style="position:absolute;top:4px;right:4px;background:var(--gold);color:#07090f;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;">Featured</div>' : '')
+          + (p.featured ? '<div style="position:absolute;top:4px;right:4px;background:var(--gold);color:var(--on-gold);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;">Featured</div>' : '')
           + (p.hidden ? '<div style="position:absolute;bottom:26px;left:0;right:0;text-align:center;background:rgba(0,0,0,.65);color:#fff;font-size:9px;padding:2px 0;">Hidden from client</div>' : '')
           + '<div style="display:flex;gap:4px;padding:6px;background:var(--bg2);">'
           + '<button class="btn btn-ghost btn-sm" style="flex:1;font-size:10px;padding:4px 6px;" onclick="mgToggleFeatured(\'' + p.id + '\')">' + (p.featured ? 'Unfeature' : 'Feature') + '</button>'
@@ -1158,7 +1158,7 @@ function mgRenderCover(){
         var isCover = p.id === currentCover;
         return '<div style="position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg2);border:1px solid ' + (isCover ? 'var(--gold)' : 'var(--border)') + ';">'
           + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:100px;object-fit:cover;display:block;"/>'
-          + (isCover ? '<div style="position:absolute;top:4px;right:4px;background:var(--gold);color:#07090f;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;">Cover</div>' : '')
+          + (isCover ? '<div style="position:absolute;top:4px;right:4px;background:var(--gold);color:var(--on-gold);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;">Cover</div>' : '')
           + '<div style="padding:6px;background:var(--bg2);">'
           + '<button class="btn ' + (isCover ? 'btn-red' : 'btn-gold') + ' btn-sm" style="width:100%;font-size:10px;padding:4px 6px;" onclick="' + (isCover ? 'mgClearCover()' : ("mgSetCover('" + p.id + "')")) + '">' + (isCover ? 'Remove Cover' : 'Set as Cover') + '</button>'
           + '</div>'
@@ -1953,7 +1953,7 @@ var epPhotoMap = {}; /* id -> {cloudinary_id, web_public_id, thumb_public_id, me
 async function loadEventPhotos(){
   var el = document.getElementById('eventPhotosList');
   if(!el || !selectedEventId) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div></div>';
   epSelectedPhotoIds = new Set();
   epPhotoMap = {};
   try{
@@ -1991,7 +1991,7 @@ async function loadEventPhotos(){
             + '<input type="checkbox" class="ep-photo-cb" data-id="' + esc(p.id) + '" onchange="epTogglePhotoSelect(\'' + esc(p.id) + '\',this)" '
             + 'style="position:absolute;top:4px;left:4px;width:18px;height:18px;cursor:pointer;z-index:2;"/>'
             + '<img src="' + esc(p.preview_url) + '" style="width:100%;height:90px;object-fit:cover;" onerror="this.style.background=\'var(--bg3)\'"/>'
-            + (isVid ? '<div style="position:absolute;top:4px;right:28px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;">▶ Video</div>' : '')
+            + (isVid ? '<div style="position:absolute;top:4px;right:28px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;">Video</div>' : '')
             + '<a href="' + esc(viewUrl) + '" target="_blank" style="position:absolute;bottom:22px;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;"> View</a>'
             + '<a href="' + esc(dlUrl) + '" download target="_blank" style="position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 0;text-decoration:none;"> Download</a>'
             + '<button onclick="deletePhoto(\'' + esc(p.id) + '\')" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:11px;cursor:pointer;z-index:2;">&times;</button>'
@@ -2123,7 +2123,7 @@ var allRequests = [];
 async function loadDownloadRequests(){
   var el = document.getElementById('downloadRequestsList');
   if(!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">Loading…</div></div>';
   try{
     var q    = query(collection(db, 'download_requests'), orderBy('created_at', 'desc'));
     var snap = await getDocs(q);
@@ -2162,7 +2162,7 @@ function filterRequests(status, btn){
   document.querySelectorAll('[id^="req-filter-"]').forEach(function(b){
     b.classList.remove('active'); b.style.cssText = '';
   });
-  if(btn){ btn.classList.add('active'); btn.style.background = 'var(--gold)'; btn.style.color = '#fff'; }
+  if(btn){ btn.classList.add('active'); btn.style.background = 'var(--gold)'; btn.style.color = 'var(--on-gold)'; }
   renderRequestsTable(status === 'all' ? allRequests : allRequests.filter(function(r){ return r.status === status; }));
 }
 
@@ -2273,7 +2273,7 @@ function filterReviews(status, btn){
   document.querySelectorAll('[id^="rev-filter-"]').forEach(function(b){
     b.classList.remove('active'); b.style.cssText = '';
   });
-  if(btn){ btn.classList.add('active'); btn.style.background = 'var(--gold)'; btn.style.color = '#fff'; }
+  if(btn){ btn.classList.add('active'); btn.style.background = 'var(--gold)'; btn.style.color = 'var(--on-gold)'; }
   var filtered = status === 'all'
     ? _allReviews
     : _allReviews.filter(function(r){ return r.status === status; });
@@ -2372,7 +2372,7 @@ function ccRenderList(){
   el.innerHTML = _ccOrphans.map(function(o, i){
     var isVid = o.resourceType === 'video';
     var thumb = isVid
-      ? '<div style="width:100%;height:90px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);">▶ Video</div>'
+      ? '<div style="width:100%;height:90px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);">Video</div>'
       : '<img src="' + o.url + '" style="width:100%;height:90px;object-fit:cover;" onerror="this.style.background=\'var(--bg3)\'"/>';
     return '<label style="display:block;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);cursor:pointer;">'
       + '<div style="position:relative;">'
