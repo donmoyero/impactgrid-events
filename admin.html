@@ -140,6 +140,22 @@ tr:hover td{background:var(--bg2);}
 .ws-sticky{position:sticky;top:0;}
 .mg-tab{background:none;border:1px solid var(--border);color:var(--text2);}
 .mg-tab.active{background:var(--gold);color:#07090f;border-color:var(--gold);}
+/* ── Manage Gallery: Pic-Time-style split — narrow controls left, big live preview right ── */
+.mg-layout{display:flex;gap:24px;align-items:flex-start;}
+.mg-main{flex:0 0 clamp(340px,30%,420px);min-width:0;}
+.mg-main .form-grid{grid-template-columns:1fr;}
+.mg-preview{flex:1 1 0;min-width:0;position:sticky;top:20px;height:calc(100vh - var(--nav-h) - 40px);min-height:480px;}
+.mg-preview .card{height:100%;margin-bottom:0;display:flex;flex-direction:column;}
+.mg-pv-tools{display:flex;align-items:center;gap:6px;}
+.mg-dev-btn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:var(--r);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .2s;}
+.mg-dev-btn:hover{border-color:var(--gold-glo);color:var(--text);}
+.mg-dev-btn.active{background:var(--gold);color:#07090f;border-color:var(--gold);}
+.mg-pv-stage{flex:1;min-height:0;background:var(--bg3);display:flex;justify-content:center;align-items:stretch;position:relative;transition:padding .25s ease;}
+.mg-pv-device{position:relative;width:100%;height:100%;background:#fff;overflow:hidden;transition:width .25s ease,border-radius .25s ease;}
+.mg-pv-stage.mg-dev-mobile{padding:18px 0;}
+.mg-pv-stage.mg-dev-mobile .mg-pv-device{width:390px;max-width:100%;border-radius:28px;border:8px solid #15171f;box-shadow:var(--sh2);}
+.mg-pv-note{flex-shrink:0;padding:8px 14px;font-size:10px;color:var(--text3);line-height:1.5;border-top:1px solid var(--border);}
+@media(max-width:1100px){.mg-layout{flex-direction:column;}.mg-main{flex:1 1 auto;width:100%;}.mg-preview{position:static;width:100%;height:75vh;min-height:520px;}}
 
 /* ── Template editor: visual card picker (layout + transition) ── */
 .tpl-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;}
@@ -698,8 +714,8 @@ tr:hover td{background:var(--bg2);}
         </div>
         <a class="btn btn-ghost btn-sm" id="mgPreviewLink" href="#" target="_blank"> Preview Gallery</a>
       </div>
-      <div class="mg-layout" style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
-      <div class="mg-main" style="flex:1 1 480px;min-width:0;">
+      <div class="mg-layout">
+      <div class="mg-main">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:14px;" id="mgTabBar">
         <button class="btn btn-sm mg-tab" id="mg-tab-overview" onclick="mgSwitchTab('overview')">Overview</button>
         <button class="btn btn-sm mg-tab" id="mg-tab-photos" onclick="mgSwitchTab('photos')">Photos</button>
@@ -786,19 +802,23 @@ tr:hover td{background:var(--bg2);}
       </div>
       </div><!-- /mg-main -->
 
-      <div class="mg-preview" style="flex:0 0 340px;position:sticky;top:20px;">
+      <div class="mg-preview">
         <div class="card">
-          <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="card-head">
             <h2 style="font-size:12px;">Live Preview</h2>
-            <button class="btn btn-ghost btn-sm" onclick="mgRefreshPreview()" style="font-size:10px;padding:4px 8px;">&#8635; Refresh</button>
+            <div class="mg-pv-tools">
+              <button class="mg-dev-btn active" id="mgDevDesktop" onclick="mgSetPreviewDevice('desktop')" title="Desktop view">&#128421; Desktop</button>
+              <button class="mg-dev-btn" id="mgDevMobile" onclick="mgSetPreviewDevice('mobile')" title="Mobile view">&#128241; Mobile</button>
+              <button class="btn btn-ghost btn-sm" onclick="mgRefreshPreview()" style="font-size:10px;padding:4px 8px;">&#8635; Refresh</button>
+            </div>
           </div>
-          <div class="card-body" style="padding:0;">
-            <div style="width:100%;aspect-ratio:9/17;max-height:660px;overflow:hidden;border-radius:0 0 var(--r2) var(--r2);background:var(--bg3);position:relative;">
+          <div class="mg-pv-stage" id="mgPreviewStage">
+            <div class="mg-pv-device">
               <div id="mgPreviewLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);">Loading preview…</div>
               <iframe id="mgPreviewFrame" src="about:blank" onload="if(window.mgPreviewLoaded) mgPreviewLoaded()" style="width:100%;height:100%;border:0;position:relative;z-index:1;"></iframe>
             </div>
-            <div style="padding:10px 14px;font-size:10px;color:var(--text3);line-height:1.5;">This is the actual client gallery — it reflects saved changes (order, hidden photos, template) after each save.</div>
           </div>
+          <div class="mg-pv-note">This is the actual client gallery — it reflects saved changes (order, hidden photos, template) after each save.</div>
         </div>
       </div>
       </div><!-- /mg-layout -->
