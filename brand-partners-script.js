@@ -32,8 +32,8 @@
 
   window.uploadBrandLogo = async function (file) {
     var allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
-    if (!allowed.includes(file.type)) { toast('⚠️', 'Unsupported type', 'Use PNG, JPG, WebP or SVG'); return; }
-    if (file.size > 5 * 1024 * 1024) { toast('⚠️', 'File too large', 'Max 5MB'); return; }
+    if (!allowed.includes(file.type)) { toast('', 'Unsupported type', 'Use PNG, JPG, WebP or SVG'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast('', 'File too large', 'Max 5MB'); return; }
 
     var ext = file.name.split('.').pop();
     var fname = 'brand-logos/' + Date.now() + '-' + Math.random().toString(36).substring(2, 8) + '.' + ext;
@@ -63,11 +63,11 @@
 
       _setProgress(100);
       if (progEl) setTimeout(function () { progEl.style.display = 'none'; }, 400);
-      toast('✅', 'Logo uploaded!', '');
+      toast('', 'Logo uploaded!', '');
       loadBrandPartnersAdmin();
     } catch (e) {
       if (progEl) progEl.style.display = 'none';
-      toast('❌', 'Upload failed', e.message);
+      toast('', 'Upload failed', e.message);
     }
   };
 
@@ -88,7 +88,7 @@
       _partners = data || [];
       _render();
     } catch (e) {
-      if (el) el.innerHTML = '<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">' + _esc(e.message) + '</div></div>';
+      if (el) el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">' + _esc(e.message) + '</div></div>';
     } finally {
       _loading = false;
     }
@@ -99,7 +99,7 @@
     if (!el) return;
 
     if (!_partners.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico">🏷️</div><div class="empty-txt">No brand logos yet. Upload one above.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No brand logos yet. Upload one above.</div></div>';
       return;
     }
 
@@ -116,12 +116,12 @@
           '<label style="display:flex;align-items:center;gap:4px;">H <input type="number" min="1" placeholder="42" value="' + h + '" id="bp-h-' + p.id + '" style="width:60px;padding:4px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/></label>' +
           '<span style="opacity:.7;">px</span>' +
         '</div>' +
-        '<button class="btn btn-ghost btn-sm" onclick="saveBrandPartnerSize(\'' + p.id + '\')">💾 Save Size</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="saveBrandPartnerSize(\'' + p.id + '\')">Save Size</button>' +
         '<div style="display:flex;flex-direction:column;gap:2px;">' +
           '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;" ' + (i === 0 ? 'disabled' : '') + ' onclick="moveBrandPartner(\'' + p.id + '\',\'up\')">▲</button>' +
           '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;" ' + (i === _partners.length - 1 ? 'disabled' : '') + ' onclick="moveBrandPartner(\'' + p.id + '\',\'down\')">▼</button>' +
         '</div>' +
-        '<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteBrandPartner(\'' + p.id + '\',\'' + _esc(p.storage_path || '') + '\')">🗑 Delete</button>' +
+        '<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteBrandPartner(\'' + p.id + '\',\'' + _esc(p.storage_path || '') + '\')">Delete</button>' +
       '</div>';
     }).join('') + '</div>';
   }
@@ -133,7 +133,7 @@
     var w = wEl && wEl.value ? parseInt(wEl.value, 10) : null;
     var h = hEl && hEl.value ? parseInt(hEl.value, 10) : null;
     if ((wEl && wEl.value && (!w || w <= 0)) || (hEl && hEl.value && (!h || h <= 0))) {
-      toast('⚠️', 'Invalid size', 'Width and height must be positive numbers');
+      toast('', 'Invalid size', 'Width and height must be positive numbers');
       return;
     }
     try {
@@ -142,9 +142,9 @@
       if (error) throw error;
       var p = _partners.find(function (p) { return p.id === id; });
       if (p) { p.logo_width = w; p.logo_height = h; }
-      toast('✅', 'Size saved', w || h ? (w || 'auto') + ' × ' + (h || 'auto') + 'px' : 'Reset to default size');
+      toast('', 'Size saved', w || h ? (w || 'auto') + ' × ' + (h || 'auto') + 'px' : 'Reset to default size');
     } catch (e) {
-      toast('❌', 'Failed to save size', e.message);
+      toast('', 'Failed to save size', e.message);
     }
   }
 
@@ -168,7 +168,7 @@
         return c.from('brand_partners').update({ position: p.position }).eq('id', p.id);
       }));
     } catch (e) {
-      toast('❌', 'Failed to save order', e.message);
+      toast('', 'Failed to save order', e.message);
       loadBrandPartnersAdmin();
     }
   };
@@ -183,9 +183,9 @@
       if (error) throw error;
       _partners = _partners.filter(function (p) { return p.id !== id; });
       _render();
-      toast('🗑️', 'Logo deleted', '');
+      toast('', 'Logo deleted', '');
     } catch (e) {
-      toast('❌', 'Failed to delete', e.message);
+      toast('', 'Failed to delete', e.message);
     }
   };
 
