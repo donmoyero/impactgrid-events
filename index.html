@@ -75,974 +75,423 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   </script>
 
   <style>
-    /* ════════════════════════════════════════
-       INDEX — component styles only.
-       Resets, fonts, nav, footer, buttons and
-       grid utilities all come from shared.css.
-       The nav gets dark styling automatically via data-theme="dark" toggled by nav.js.
-    ════════════════════════════════════════ */
-
-    /* Page-local design tokens — mapped to shared.css variables */
+    /* ════════════════════════════════════════════════════
+       HOMEPAGE — layout + component styles only.
+       Fonts, resets, nav logic and footer markup still come
+       from shared.css / nav.js. Nothing here overrides a
+       shared.css token — colours below are page-local (--h-*).
+       Everything is scoped to body.home so no other page changes.
+    ════════════════════════════════════════════════════ */
     :root {
-      --ix-black:   var(--bg);
-      --ix-surface: var(--bg2);
-      --ix-border:  var(--border);
-      --ix-white:   var(--text);
-      --ix-accent:  var(--gold);
-      --ix-dim:     var(--gold-dim);
-      --ix-muted:   var(--text3);
-      --ix-mid:     var(--text2);
-      --ix-display: 'Fraunces', Georgia, serif;
+      --h-bg:      #0a0a0a;
+      --h-bg-2:    #0e0e0e;
+      --h-light:   #f6f4f0;
+      --h-ink:     #111111;
+      --h-ink-2:   #5f5c57;
+      --h-line:    rgba(255,255,255,.13);
+      --h-mute:    rgba(255,255,255,.66);
+      --h-gold:    #e9d8a6;
+      --h-serif:   'Fraunces', Georgia, 'Times New Roman', serif;
+      --h-sans:    'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --h-pad:     clamp(20px, 5.7vw, 110px);   /* text column inset  */
+      --h-pad-w:   clamp(14px, 3.1vw, 60px);    /* card grid inset    */
+      --h-r:       clamp(8px, .9vw, 14px);
     }
 
-    body {
+    html body.home {
+      background: var(--h-bg);
+      color: #fff;
+      padding-top: 0 !important;
+      padding-left: 0 !important;
       overflow-x: hidden;
     }
+    body.home .page-wrap { background: var(--h-bg); }
 
-    /* ── FULL-BLEED HELPER ─────────────────────────────
-       nav.js shifts the whole body/page-wrap right by
-       --nav-w-collapsed (the collapsed sidebar width).
-       Full-bleed sections (hero, ticker, gallery, cta)
-       must undo that offset so they span the full viewport.
-    ──────────────────────────────────────────────────── */
-    .full-bleed {
-      margin-left: calc(-1 * var(--nav-w-collapsed, 56px));
-      width: 100vw;
+    /* ── Shared bits ─────────────────────────────── */
+    .h-in      { max-width: 1680px; margin: 0 auto; padding-inline: var(--h-pad); }
+    .h-in--wide{ max-width: 1680px; margin: 0 auto; padding-inline: var(--h-pad-w); }
+
+    .h-eyebrow {
+      font: 500 clamp(9px, .72vw, 11px)/1 var(--h-sans);
+      letter-spacing: .34em;
+      text-transform: uppercase;
+      color: var(--h-mute);
+    }
+    .h-light .h-eyebrow { color: #7a766f; }
+
+    .h-serif-h {
+      font-family: var(--h-serif);
+      font-variation-settings: 'opsz' 72;
+      font-weight: 400;
+      letter-spacing: -.02em;
+      line-height: 1.02;
+    }
+
+    .h-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      height: clamp(44px, 3.4vw, 54px);
+      padding: 0 clamp(20px, 1.7vw, 30px);
+      border-radius: 8px;
+      font: 500 clamp(13.5px, 1vw, 15.5px)/1 var(--h-sans);
+      letter-spacing: 0;
+      white-space: nowrap;
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .h-btn svg { width: 15px; height: 15px; flex: none; }
+    .h-btn--solid { background: #fff; color: #111; }
+    .h-btn--solid:hover { background: #e9e6e0; }
+    .h-btn--line  { border: 1px solid rgba(255,255,255,.55); color: #fff; }
+    .h-btn--line:hover { background: rgba(255,255,255,.1); border-color: #fff; }
+
+    .h-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      font: 500 clamp(12px, .9vw, 14px)/1 var(--h-sans);
+      padding-bottom: 7px;
+      border-bottom: 1px solid currentColor;
+      white-space: nowrap;
+    }
+    .h-link svg { width: 14px; height: 14px; }
+    .h-link:hover { opacity: .7; }
+
+    body.home a:focus-visible,
+    body.home button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
+    body.home .h-light a:focus-visible,
+    body.home .h-light button:focus-visible { outline-color: #111; }
+
+    /* ── NAV — sits transparent on the hero, goes solid on scroll ── */
+    body.home #ig-nav,
+    body.home #ig-footer {
+      --bg:#0a0a0a; --bg2:#101010; --bg3:#161616; --card:#111; --card2:#181818;
+      --text:#fff; --text2:rgba(255,255,255,.74); --text3:rgba(255,255,255,.5);
+      --border:rgba(255,255,255,.08); --border2:rgba(255,255,255,.14);
+      --gold:#f2f2f2; --gold-dim:rgba(255,255,255,.08);
+    }
+    body.home #mainNav {
+      background: transparent !important;
+      border-bottom: 1px solid transparent !important;
+      padding: 0 var(--h-pad) !important;
+      height: 84px;
+      transition: background .3s, border-color .3s, backdrop-filter .3s;
+    }
+    body.home.h-scrolled #mainNav {
+      background: rgba(10,10,10,.86) !important;
+      border-bottom-color: rgba(255,255,255,.08) !important;
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    }
+    body.home #mainNav .logo { margin-right: 0; }
+    body.home #mainNav .logo .logo-img,
+    body.home #mainNav .logo .logo-mark { display: none !important; }
+    body.home #mainNav .logo .logo-text {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+      font-size: 0 !important; line-height: 1;
+    }
+    body.home #mainNav .logo .logo-text::before {
+      content: 'IMPACT GRID';
+      font: 800 clamp(22px, 1.9vw, 30px)/1 var(--h-sans);
+      letter-spacing: -.02em; color: #fff;
+    }
+    body.home #mainNav .logo .logo-text::after {
+      content: 'E V E N T S';
+      font: 500 clamp(8px, .62vw, 10px)/1 var(--h-sans);
+      letter-spacing: .42em; color: rgba(255,255,255,.75);
+      padding-left: 3px;
+    }
+    body.home #mainNav .nav-links { justify-content: center; gap: clamp(2px, 1vw, 20px); }
+    body.home #mainNav .nav-links a {
+      color: rgba(255,255,255,.9) !important; opacity: 1 !important;
+      background: transparent !important;
+      font-size: clamp(13px, .95vw, 15px); font-weight: 400;
+      padding: 9px clamp(10px, 1vw, 16px);
+    }
+    body.home #mainNav .nav-links a:hover,
+    body.home #mainNav .nav-links a.active { color: #fff !important; }
+       body.home #mainNav .nav-book-btn {
+      background: #fff; color: #111; border-radius: 8px;
+      padding: 0 22px; height: 46px; font-weight: 500; font-size: 14px;
+    }
+    body.home #themeBtn,
+    body.home .footer-tbtn { display: none !important; }
+
+    /* Mobile top bar */
+    @media (max-width: 768px) {
+      body.home #ig-mob-topbar {
+        background: transparent !important; border-bottom: 0 !important;
+        transition: background .3s;
+      }
+      body.home.h-scrolled #ig-mob-topbar {
+        background: rgba(10,10,10,.9) !important;
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      }
+      body.home #ig-mob-topbar .mob-topbar-logo { font-size: 0; }
+      body.home #ig-mob-topbar .mob-topbar-logo img { display: none; }
+      body.home #ig-mob-topbar .mob-topbar-logo::before {
+        content: 'IMPACT GRID'; font: 800 20px/1 var(--h-sans); letter-spacing: -.02em; color: #fff;
+      }
+      body.home #ig-mob-topbar .mob-topbar-ham span { background: #fff !important; }
+    }
+
+    /* ── 1. HERO ─────────────────────────────────── */
+    .h-hero {
+      position: relative; overflow: hidden;
+      min-height: clamp(640px, 46vw, 820px);
+      display: flex; align-items: center;
+      background: var(--h-bg);
+    }
+    .h-hero-photo { position: absolute; top: 0; bottom: 0; right: 0; left: 39%; }
+    .h-hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 28% 12%; }
+    .h-hero-shade {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(90deg, var(--h-bg) 0%, var(--h-bg) 33%, rgba(10,10,10,.82) 45%, rgba(10,10,10,.25) 62%, rgba(10,10,10,0) 76%),
+        linear-gradient(180deg, rgba(10,10,10,.85) 0, rgba(10,10,10,0) 24%),
+        linear-gradient(0deg, rgba(10,10,10,.75) 0, rgba(10,10,10,0) 22%);
+    }
+    .h-hero-inner { position: relative; z-index: 2; width: 100%; padding-top: 96px; padding-bottom: 44px; }
+    .h-hero .h-eyebrow { display: flex; gap: 1.9em; margin-bottom: clamp(14px, 1.4vw, 24px); }
+    .h-hero h1 {
+      font-family: var(--h-serif); font-weight: 400;
+      font-size: clamp(54px, 6.7vw, 124px);
+      line-height: .94; letter-spacing: -.035em;
+      color: #fff; margin-bottom: clamp(18px, 1.7vw, 30px);
+      font-variation-settings: 'opsz' 72;
+    }
+    .h-hero-sub {
+      font: 400 clamp(15.5px, 1.25vw, 20px)/1.5 var(--h-sans);
+      color: rgba(255,255,255,.88);
+      max-width: 27em; margin-bottom: clamp(22px, 2.2vw, 38px);
+    }
+    .h-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: clamp(26px, 2.8vw, 46px); }
+    .h-proof { display: flex; align-items: center; gap: 14px; }
+    .h-proof img { width: 96px; height: 40px; flex: none; }
+    .h-stars { color: var(--h-gold); font-size: 13px; letter-spacing: 3px; line-height: 1; margin-bottom: 6px; }
+    .h-proof p { font: 400 clamp(12px, .9vw, 14px)/1.3 var(--h-sans); color: rgba(255,255,255,.78); }
+
+    .h-side {
+      position: absolute; z-index: 2;
+      font: 500 clamp(9px, .7vw, 11px)/1.75 var(--h-sans);
+      letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.82);
+    }
+    .h-side--top { top: 120px; right: clamp(22px, 3.4vw, 60px); padding-left: 16px; }
+    .h-side--top::before {
+      content: ''; position: absolute; left: 0; top: 2px;
+      width: 1px; height: clamp(120px, 12vw, 190px); background: rgba(255,255,255,.4);
+    }
+    .h-side--top span { display: block; }
+    .h-side--bottom { bottom: 34px; right: clamp(22px, 3.4vw, 60px); display: flex; align-items: center; gap: 16px; }
+    .h-side--bottom::before { content: ''; width: 34px; height: 1px; background: rgba(255,255,255,.5); }
+
+    /* ── 2. STATS STRIP ──────────────────────────── */
+    .h-stats { background: var(--h-bg-2); border-top: 1px solid var(--h-line); border-bottom: 1px solid var(--h-line); }
+    .h-stats .h-in { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .h-stat {
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+      padding: clamp(18px, 1.9vw, 30px) 10px;
+    }
+    .h-stat + .h-stat { border-left: 1px solid var(--h-line); }
+    .h-stat svg { width: clamp(24px, 2.1vw, 32px); height: clamp(24px, 2.1vw, 32px); stroke: #fff; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; flex: none; opacity: .92; }
+    .h-stat b { display: block; font: 400 clamp(17px, 1.4vw, 23px)/1.15 var(--h-serif); letter-spacing: -.01em; }
+    .h-stat span { display: block; font: 400 clamp(11px, .82vw, 13px)/1.3 var(--h-sans); color: var(--h-mute); margin-top: 2px; }
+
+    /* ── 3. SERVICES (light) ─────────────────────── */
+    .h-services { background: var(--h-light); color: var(--h-ink); padding: clamp(38px, 3.6vw, 68px) 0 clamp(26px, 2.6vw, 48px); }
+    .h-services-head {
+      display: grid; grid-template-columns: 47fr 38fr 15fr; gap: 24px; align-items: start;
+      margin-bottom: clamp(20px, 2vw, 34px);
+    }
+    .h-services h2 { font-size: clamp(32px, 3.4vw, 58px); margin-top: clamp(10px, 1vw, 16px); }
+    .h-services-head p { font: 400 clamp(14px, 1.05vw, 17px)/1.55 var(--h-sans); color: #4a4743; max-width: 28em; padding-top: clamp(10px, 1vw, 16px); }
+    .h-services-head .h-link { justify-self: end; align-self: center; color: var(--h-ink); }
+
+    .h-svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, .8vw, 14px); }
+    .h-svc {
+      position: relative; overflow: hidden; isolation: isolate;
+      aspect-ratio: 315 / 225; min-height: 250px;
+      border-radius: var(--h-r); background: #0b0a09; color: #fff;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: clamp(16px, 1.8vw, 30px);
+    }
+    .h-svc > img {
+      position: absolute; inset: 0 0 auto 0; width: 100%; height: 72%;
+      object-fit: cover; z-index: -2; transition: transform .6s ease;
+      -webkit-mask-image: linear-gradient(180deg, #000 42%, transparent 100%);
+              mask-image: linear-gradient(180deg, #000 42%, transparent 100%);
+    }
+    .h-svc::after {
+      content: ''; position: absolute; inset: 0; z-index: -1;
+      background: linear-gradient(180deg, rgba(11,10,9,0) 30%, rgba(11,10,9,.6) 62%, rgba(11,10,9,.95) 86%);
+    }
+    .h-svc:hover > img { transform: scale(1.04); }
+    .h-svc-ico { width: clamp(24px, 2vw, 32px); height: clamp(24px, 2vw, 32px); stroke: #fff; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; margin-bottom: clamp(10px, 1vw, 16px); }
+    .h-svc-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+    .h-svc h3, .h-step h3 { word-spacing: .05em; }
+    .h-svc h3 { font: 400 clamp(19px, 1.7vw, 28px)/1.1 var(--h-serif); letter-spacing: -.01em; margin-bottom: 8px; }
+    .h-svc p { font: 400 clamp(12px, .9vw, 14.5px)/1.45 var(--h-sans); color: rgba(255,255,255,.76); max-width: 26em; }
+    .h-svc-go {
+      flex: none; width: clamp(32px, 2.6vw, 42px); height: clamp(32px, 2.6vw, 42px); border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.45); display: grid; place-items: center;
+      transition: background .2s, color .2s;
+    }
+    .h-svc-go svg { width: 14px; height: 14px; }
+    .h-svc:hover .h-svc-go { background: #fff; color: #111; }
+
+    /* ── 4. RECENT EVENTS ────────────────────────── */
+    .h-events { background: var(--h-bg); padding: clamp(22px, 2.4vw, 42px) 0 clamp(18px, 1.9vw, 34px); }
+    .h-events-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: clamp(14px, 1.4vw, 24px); flex-wrap: wrap; }
+    .h-events h2 { font-size: clamp(28px, 2.9vw, 50px); margin-top: clamp(8px, .8vw, 14px); }
+    .h-events-right { display: flex; align-items: center; gap: clamp(20px, 3vw, 50px); }
+    .h-events-right .h-eyebrow { letter-spacing: .28em; }
+    .h-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(5px, .5vw, 9px); }
+    .h-tile {
+      position: relative; overflow: hidden; isolation: isolate;
+      aspect-ratio: 237 / 127; border-radius: 5px; background: #0b0a09;
+      display: flex; align-items: flex-end; padding: clamp(10px, 1vw, 16px);
+    }
+    .h-tile img { position: absolute; inset: 0 0 auto 0; width: 100%; height: 84%; object-fit: cover; z-index: -2; transition: transform .6s ease;
+      -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%); mask-image: linear-gradient(180deg, #000 45%, transparent 100%); }
+    .h-tile::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(11,10,9,0) 30%, rgba(11,10,9,.7) 66%, #0b0a09 96%); }
+    .h-tile:hover img { transform: scale(1.05); }
+    .h-tile span { display: flex; align-items: center; gap: 12px; width: 100%; font: 400 clamp(11.5px, .95vw, 15px)/1 var(--h-sans); }
+    .h-tile span::after { content: ''; height: 1px; width: clamp(34px, 4.4vw, 74px); background: rgba(255,255,255,.4); }
+
+    /* ── 5. HOW IT WORKS (light) ─────────────────── */
+    .h-how { background: var(--h-light); color: var(--h-ink); padding: clamp(28px, 3vw, 54px) 0; }
+    .h-how .h-in { display: grid; grid-template-columns: 27fr 73fr; gap: 24px; align-items: start; }
+    .h-how h2 { font-size: clamp(32px, 3.4vw, 58px); margin-top: clamp(10px, 1vw, 16px); }
+    .h-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(16px, 2vw, 34px); padding-top: clamp(4px, .5vw, 8px); }
+    .h-step-top { display: flex; align-items: center; gap: 14px; margin-bottom: clamp(12px, 1.2vw, 20px); }
+    .h-step-num {
+      flex: none; width: clamp(30px, 2.5vw, 40px); height: clamp(30px, 2.5vw, 40px); border-radius: 50%;
+      border: 1px solid #1b1b1b; display: grid; place-items: center;
+      font: 400 clamp(11px, .85vw, 13px)/1 var(--h-sans);
+    }
+    .h-step-top::after { content: ''; flex: 1; height: 1px; background: rgba(0,0,0,.22); }
+    .h-step h3 { font: 400 clamp(17px, 1.4vw, 23px)/1.15 var(--h-serif); letter-spacing: -.01em; margin-bottom: 6px; }
+    .h-step p { font: 400 clamp(12.5px, .9vw, 14.5px)/1.5 var(--h-sans); color: var(--h-ink-2); max-width: 18em; }
+
+    /* ── 6. REVIEWS ──────────────────────────────── */
+    .h-reviews { background: var(--h-bg); padding: clamp(30px, 3.2vw, 58px) 0; }
+    .h-reviews .h-in { display: grid; grid-template-columns: 1fr minmax(0, 1.9fr) 1fr; gap: 24px; align-items: center; }
+    .h-reviews h2 { font-size: clamp(28px, 2.9vw, 50px); margin-top: clamp(8px, .8vw, 14px); white-space: nowrap; }
+    .h-quote-wrap { display: flex; align-items: center; gap: clamp(14px, 1.8vw, 30px); }
+    .h-arrow {
+      flex: none; width: clamp(34px, 2.8vw, 44px); height: clamp(34px, 2.8vw, 44px); border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.35); color: #fff; display: grid; place-items: center;
+      transition: background .2s, color .2s;
+    }
+    .h-arrow:hover { background: #fff; color: #111; }
+    .h-arrow svg { width: 15px; height: 15px; }
+    .h-quote { flex: 1; min-width: 0; transition: opacity .25s; }
+    .h-quote.is-swap { opacity: 0; }
+    .h-quote blockquote { font: 400 clamp(16px, 1.3vw, 22px)/1.45 var(--h-serif); color: #fff; margin-bottom: clamp(14px, 1.3vw, 22px); }
+    .h-quote-by { display: flex; align-items: center; gap: 12px; }
+    .h-av {
+      width: clamp(36px, 2.9vw, 46px); height: clamp(36px, 2.9vw, 46px); border-radius: 50%;
+      background: #2a2724; border: 1px solid rgba(255,255,255,.22);
+      display: grid; place-items: center; flex: none;
+      font: 500 clamp(13px, 1vw, 16px)/1 var(--h-sans); color: #fff;
+    }
+    .h-quote-by b { display: block; font: 500 clamp(12.5px, .95vw, 15px)/1.2 var(--h-sans); }
+    .h-quote-by span { display: block; font: 400 clamp(11px, .8vw, 13px)/1.3 var(--h-sans); color: var(--h-mute); }
+    .h-dots { display: flex; justify-content: center; gap: 8px; margin-top: clamp(14px, 1.4vw, 22px); }
+    .h-dots button { position: relative; width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.28); padding: 0; }
+    .h-dots button::after { content: ''; position: absolute; inset: -9px; }
+    .h-dots button.on { background: #fff; }
+    .h-rate { justify-self: end; text-align: left; }
+    .h-rate b { display: block; font: 400 clamp(38px, 3.6vw, 64px)/1 var(--h-serif); letter-spacing: -.02em; }
+    .h-rate .h-stars { margin: 10px 0 8px; font-size: clamp(14px, 1.1vw, 18px); }
+    .h-rate span { font: 400 clamp(12px, .9vw, 14px)/1.3 var(--h-sans); color: rgba(255,255,255,.8); }
+    .h-reviews.is-single .h-arrow,
+    .h-reviews.is-single .h-dots { display: none; }
+
+    /* ── 6b. Brand partners (only shows if logos exist in admin) ── */
+    .h-partners { background: var(--h-light); padding: clamp(22px, 2.4vw, 40px) 0; }
+    .h-partners-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 22px 48px; }
+    .h-partners .partner-logo { max-height: 42px; max-width: 140px; width: auto; height: auto; object-fit: contain; opacity: .85; }
+
+    /* ── 7. CTA ──────────────────────────────────── */
+    .h-cta {
+      position: relative; overflow: hidden; isolation: isolate; text-align: center;
+      background: #060606 url('assets/home/cta-crowd.jpg') center / cover no-repeat;
+      padding: clamp(44px, 4.4vw, 84px) 0 clamp(40px, 4vw, 76px);
+    }
+    .h-cta::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(6,6,6,.5), rgba(6,6,6,.15) 40%, rgba(6,6,6,.45)); }
+    .h-cta h2 { font-size: clamp(36px, 4.4vw, 76px); margin: clamp(12px, 1.2vw, 20px) 0 clamp(12px, 1.2vw, 20px); }
+    .h-cta-sub { display: flex; align-items: center; justify-content: center; gap: clamp(14px, 1.6vw, 26px); margin-bottom: clamp(20px, 2vw, 34px); }
+    .h-cta-sub::before, .h-cta-sub::after { content: ''; height: 1px; width: clamp(40px, 8vw, 130px); background: rgba(255,255,255,.4); }
+    .h-cta-sub p { font: 400 clamp(15px, 1.25vw, 20px)/1.3 var(--h-sans); color: rgba(255,255,255,.92); }
+    .h-corner {
+      position: absolute; bottom: clamp(24px, 2.6vw, 44px);
+      font: 500 clamp(9px, .68vw, 11px)/1.85 var(--h-sans); letter-spacing: .3em; text-transform: uppercase;
+      color: rgba(255,255,255,.8); text-align: left;
+    }
+    .h-corner--l { left: var(--h-pad); }
+    .h-corner--l span { display: block; }
+    .h-corner--r { right: var(--h-pad); display: flex; align-items: center; gap: 16px; }
+    .h-corner--r::before { content: ''; width: 36px; height: 1px; background: rgba(255,255,255,.5); }
+
+    /* ── Footer sits on the same near-black ── */
+    body.home .footer { background: #070707; border-top: 1px solid rgba(255,255,255,.08); }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 1100px) {
+      .h-side { display: none; }
+      .h-reviews h2 { white-space: normal; }
+      .h-services-head { grid-template-columns: 1fr 1fr; }
+      .h-services-head .h-link { grid-column: 1 / -1; justify-self: start; }
+      .h-how .h-in { grid-template-columns: 1fr; }
+      .h-reviews .h-in { grid-template-columns: 1fr; gap: 28px; }
+      .h-rate { justify-self: start; }
+    }
+    @media (max-width: 860px) {
+      .h-svc-grid { grid-template-columns: minmax(0, 1fr); }
+      .h-svc { aspect-ratio: auto; min-height: 300px; }
+      .h-tiles { grid-template-columns: repeat(2, 1fr); }
+      .h-stats .h-in { grid-template-columns: repeat(2, 1fr); }
+      .h-stat:nth-child(3) { border-left: 0; }
+      .h-stat:nth-child(n+3) { border-top: 1px solid var(--h-line); }
+      .h-steps { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
     }
     @media (max-width: 768px) {
-      .full-bleed {
-        margin-left: 0;
-        width: 100%;
+      .h-hero { display: block; min-height: 0; }
+      .h-hero-photo { position: relative; left: 0; height: 104vw; max-height: 620px; }
+      .h-hero-photo img { object-position: 34% 8%; }
+      .h-hero-shade {
+        background:
+          linear-gradient(180deg, rgba(10,10,10,.75) 0, rgba(10,10,10,0) 22%),
+          linear-gradient(0deg, var(--h-bg) 0, var(--h-bg) 4%, rgba(10,10,10,0) 46%);
+        height: min(104vw, 620px); bottom: auto;
       }
+      .h-hero-inner { margin-top: -16vw; padding-top: 0; padding-bottom: 40px; }
+      .h-hero h1 { font-size: clamp(50px, 15vw, 84px); }
+      .h-actions .h-btn { flex: 1 1 auto; }
+      .h-services-head { grid-template-columns: 1fr; }
+      .h-events-right { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .h-quote-wrap { gap: 10px; }
+      .h-corner { position: static; display: block; padding: 0 var(--h-pad); margin-top: 26px; text-align: center; }
+      .h-corner--l span { display: inline; }
+      .h-corner--l span + span::before { content: ' '; }
+      .h-corner--r { justify-content: center; margin-top: 10px; }
+      .h-corner--r::before { display: none; }
+    }
+    @media (max-width: 480px) {
+      .h-stat { flex-direction: column; text-align: center; gap: 8px; }
+      .h-steps { grid-template-columns: 1fr; }
+      .h-tile { aspect-ratio: 1 / .92; align-items: flex-end; }
+      .h-tile span::after { display: none; }
+      .h-quote-wrap { gap: 8px; }
+      .h-arrow { width: 32px; height: 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .h-svc > img, .h-tile img, .h-quote, .h-btn, .h-svc-go, .h-arrow { transition: none !important; }
+      .h-svc:hover > img, .h-tile:hover img { transform: none; }
     }
 
-    /* ── HERO ──────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      padding-top: 64px; /* matches nav.js --nav-h */
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-    }
-
-    /* Full-bleed cinematic image grid behind hero */
-    .hero-images {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 3px;
-      opacity: 0.35;
-    }
-    .hero-images img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: grayscale(30%);
-    }
-    .hero-images img:first-child { grid-row: 1 / 3; }
-
-    /* Dark gradient overlay */
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 60% at 50% 50%, rgba(8,8,8,0.2), transparent),
-        linear-gradient(to bottom, rgba(8,8,8,0.5) 0%, rgba(8,8,8,0.3) 40%, rgba(8,8,8,0.85) 100%);
-    }
-    /* In light mode hero still needs a dark overlay for readability over photos */
-    html:not([data-theme="dark"]) .hero-overlay {
-      background:
-        radial-gradient(ellipse 60% 60% at 50% 50%, rgba(20,12,4,0.25), transparent),
-        linear-gradient(to bottom, rgba(20,12,4,0.55) 0%, rgba(20,12,4,0.35) 40%, rgba(20,12,4,0.82) 100%);
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      max-width: 820px;
-      padding: 0 24px;
-      animation: heroFade 1.1s ease both;
-    }
-
-    @keyframes heroFade {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #F5F3EF;
-      margin-bottom: 28px;
-    }
-    .hero-eyebrow::before,
-    .hero-eyebrow::after {
-      content: '';
-      display: block;
-      width: 28px;
-      height: 1px;
-      background: #F5F3EF;
-      opacity: 0.5;
-    }
-
-    .hero-headline {
-      font-family: var(--ix-display);
-      font-size: clamp(46px, 7vw, 88px);
-      font-weight: 700;
-      line-height: 1.03;
-      letter-spacing: -0.03em;
-      color: #fff;
-      margin-bottom: 28px;
-    }
-    .hero-headline em {
-      font-style: normal;
-      color: #fff;
-    }
-
-    .hero-sub {
-      font-size: clamp(16px, 1.8vw, 19px);
-      font-weight: 300;
-      color: rgba(245,243,239,0.75);
-      max-width: 520px;
-      margin: 0 auto 44px;
-      line-height: 1.65;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    /* ── HERO BUTTONS ───────────────────────────── */
-    .hero-btn-primary {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
-      background: rgba(245,243,239,0.06);
-      color: rgba(245,243,239,0.92);
-      font-family: var(--fd, sans-serif);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      border-radius: 100px;
-      padding: 0;
-      border: 1px solid rgba(245,243,239,0.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset;
-      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-      overflow: hidden;
-    }
-    .hero-btn-primary::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 100px;
-      background: none;
-      pointer-events: none;
-    }
-    .hero-btn-primary:hover {
-      background: rgba(245,243,239,0.14);
-      border-color: rgba(245,243,239,0.5);
-      color: #fff;
-      transform: translateY(-2px);
-    }
-    .hero-btn-inner {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-    }
-    .hero-btn-text { line-height: 1; }
-    .hero-btn-arrow {
-      font-size: 15px;
-      transition: transform 0.25s ease;
-      display: inline-block;
-    }
-    .hero-btn-primary:hover .hero-btn-arrow { transform: translateX(4px); }
-
-    .hero-btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
-      color: rgba(245,243,239,0.92);
-      font-family: var(--fd, sans-serif);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      border-radius: 100px;
-      padding: 13px 26px;
-      border: 1px solid rgba(245,243,239,0.25);
-      background: rgba(245,243,239,0.06);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset;
-      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-    }
-    .hero-btn-secondary:hover {
-      background: rgba(245,243,239,0.14);
-      border-color: rgba(245,243,239,0.5);
-      color: #fff;
-      transform: translateY(-2px);
-    }
-
-    .hero-note {
-      margin-top: 20px;
-      font-size: 13px;
-      color: rgba(245,243,239,0.5);
-    }
-
-    /* ── TICKER ──────────────────────────────────── */
-    .ticker-wrap {
-      background: var(--ix-surface);
-      border-top: 1px solid var(--ix-border);
-      border-bottom: 1px solid var(--ix-border);
-      overflow: hidden;
-      padding: 0;
-    }
-    .ticker-inner {
-      display: flex;
-      width: max-content;
-      animation: ticker 28s linear infinite;
-    }
-    .ticker-inner:hover { animation-play-state: paused; }
-
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    .ticker-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 36px;
-      font-size: 13px;
-      font-weight: 400;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--ix-mid);
-      white-space: nowrap;
-      border-right: 1px solid var(--ix-border);
-    }
-    .ticker-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--ix-accent);
-      flex-shrink: 0;
-    }
-
-    /* ── SECTION COMMONS ──────────────────────────── */
-    section { padding: 110px 40px; }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ix-accent);
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      font-family: var(--ix-display);
-      font-size: clamp(32px, 4vw, 52px);
-      font-weight: 300;
-      line-height: 1.1;
-      letter-spacing: -0.025em;
-      color: var(--text);
-    }
-    .section-title em { font-style: italic; color: var(--ix-accent); }
-
-    .section-body {
-      font-size: 17px;
-      font-weight: 300;
-      color: var(--ix-mid);
-      line-height: 1.7;
-      max-width: 480px;
-    }
-
-    /* ── TRUST BADGES ──────────────────────────────── */
-    .trust-strip {
-      padding: 70px 40px;
-    }
-    .trust-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 28px;
-    }
-    .trust-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 14px;
-    }
-    .trust-icon {
-      width: 100%;
-      max-width: 150px;
-      height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
-    }
-    .trust-icon img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      mix-blend-mode: multiply;
-    }
-    @media (max-width: 700px) {
-      .trust-inner { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    /* ── BRAND PARTNERS STRIP ──────────────────────── */
-    .partners-strip {
-      padding: 0 40px 70px;
-    }
-    .partners-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 48px;
-    }
-    .partner-logo {
-      max-height: 42px;
-      max-width: 140px;
-      width: auto;
-      object-fit: contain;
-      opacity: 0.85;
-      transition: opacity .2s;
-    }
-    .partner-logo:hover {
-      opacity: 1;
-    }
-
-    /* ── GALLERY STRIP ─────────────────────────────── */
-    .gallery-strip {
-      padding: 0;
-      padding-bottom: 60px;
-      overflow: hidden;
-    }
-    .gallery-row {
-      display: flex;
-      gap: 4px;
-      height: 200px;
-      animation: drift 50s linear infinite;
-    }
-    @keyframes drift {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-    .gallery-img {
-      height: 100%;
-      width: auto;
-      min-width: 160px;
-      max-width: 260px;
-      flex-shrink: 0;
-      object-fit: cover;
-      border-radius: 4px;
-      filter: brightness(0.88);
-      transition: filter 0.3s;
-    }
-    .gallery-img:hover { filter: brightness(1); }
-
-    /* ── FEATURES BENTO ────────────────────────────── */
-    .features {
-      background: var(--ix-black);
-    }
-    .features-header {
-      max-width: 700px;
-      margin: 0 auto 72px;
-      text-align: center;
-    }
-    .features-header .section-body {
-      max-width: 100%;
-      margin: 20px auto 0;
-    }
-
-    .bento {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: auto auto;
-      gap: 3px;
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-
-    .bento-card {
-      background: var(--ix-surface);
-      border: 1px solid var(--ix-border);
-      border-radius: 12px;
-      padding: 40px 36px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.3s;
-    }
-    .bento-card:hover { border-color: var(--gold); }
-
-    .bento-card.wide { grid-column: span 2; }
-    .bento-card.tall { grid-row: span 2; }
-
-    .bento-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: var(--ix-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      font-size: 20px;
-    }
-
-    .bento-title {
-      font-family: var(--ix-display);
-      font-size: 22px;
-      font-weight: 400;
-      color: var(--text);
-      margin-bottom: 10px;
-      line-height: 1.2;
-    }
-
-    .bento-desc {
-      font-size: 14px;
-      color: var(--ix-mid);
-      line-height: 1.65;
-      font-weight: 300;
-    }
-
-    .bento-img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-top: 28px;
-      opacity: 0.75;
-    }
-    .bento-card.tall .bento-img { height: 280px; }
-
-    /* ── WHO IT'S FOR ──────────────────────────────── */
-    .who {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 110px 40px;
-    }
-    .who-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 56px;
-      gap: 40px;
-    }
-    .who-header .section-title { max-width: 460px; }
-
-    .who-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-    }
-
-    .who-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 10px;
-      aspect-ratio: 4/5;
-      cursor: default;
-    }
-    .who-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.6s ease, filter 0.4s ease;
-      filter: brightness(0.6) saturate(0.8);
-    }
-    .who-card:hover img { transform: scale(1.04); filter: brightness(0.5) saturate(0.7); }
-
-    .who-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(8,8,8,0.9) 0%, transparent 55%);
-    }
-    .who-label {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 28px 24px;
-    }
-    .who-type {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ix-accent);
-      margin-bottom: 6px;
-    }
-    .who-name {
-      font-family: var(--ix-display);
-      font-size: 22px;
-      font-weight: 400;
-      color: #F5F3EF;
-      line-height: 1.15;
-    }
-
-    /* ── HOW WE WORK — absolute mosaic ────────────── */
-    .how {
-      background: var(--ix-surface);
-      border-top: 1px solid var(--ix-border);
-      border-bottom: 1px solid var(--ix-border);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 520px;
-      overflow: hidden;
-      padding: 0;
-    }
-
-    /* Centre text */
-    .how-inner {
-      position: relative;
-      z-index: 3;
-      width: 320px;
-      flex-shrink: 0;
-      text-align: center;
-    }
-
-    .steps { display: flex; flex-direction: column; gap: 0; }
-
-    .step {
-      padding: 14px 0;
-      border-bottom: 1px solid var(--ix-border);
-      transition: opacity 0.2s;
-    }
-    .step:last-child { border-bottom: none; }
-    .step:hover { opacity: 0.65; }
-    .step-num { display: none; }
-    .step-text p { display: none; }
-
-    .step-text h3 {
-      font-family: var(--ix-display);
-      font-size: 17px;
-      font-weight: 400;
-      color: var(--ix-white);
-      letter-spacing: -0.01em;
-      line-height: 1.35;
-      margin: 0;
-      text-align: left;
-      white-space: normal;
-    }
-
-    .how .section-label {
-      display: block;
-      margin-bottom: 16px;
-      text-align: left;
-      color: var(--ix-mid);
-    }
-
-    /* ── Absolute photo panels ── */
-    .how-photos {
-      position: absolute;
-      top: 0; bottom: 0;
-    }
-    .how-photos-left  { left: 0; width: 340px; }
-    .how-photos-right { right: 0; width: 340px; }
-
-    /* Individual photos — absolutely placed to match reference */
-    .how-photo {
-      position: absolute;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-
-    /* ── LEFT side photos ──
-       Reference breakdown:
-       - top row: 2 small side-by-side, cut at top (~-30px)
-       - middle: 1 tall left, 1 tall right
-       - bottom: 1 photo alone, cut at bottom
-    */
-    .how-photos-left .p1 { width: 120px; height: 200px; top: -30px;  left: 170px; }
-    .how-photos-left .p2 { width: 150px; height: 180px; top: -30px;  left: 10px;  border-radius: 0 10px 10px 0; }
-    .how-photos-left .p3 { width: 120px; height: 230px; top: 145px;  left: 10px; }
-    .how-photos-left .p4 { width: 155px; height: 240px; top: 110px;  left: 145px; }
-    .how-photos-left .p5 { width: 120px; height: 195px; top: 340px;  left: 10px; }
-
-    /* ── RIGHT side photos ──
-       Reference breakdown:
-       - top right: 1 photo cut at top, far right edge
-       - middle: 2 large photos side by side
-       - bottom: 2 photos side by side, cut at bottom
-    */
-    .how-photos-right .p1 { width: 130px; height: 180px; top: -25px; right: 0;    border-radius: 10px 0 0 10px; }
-    .how-photos-right .p2 { width: 155px; height: 250px; top: 120px; right: 170px; }
-    .how-photos-right .p3 { width: 155px; height: 250px; top: 120px; right: 0; }
-    .how-photos-right .p4 { width: 155px; height: 185px; top: 345px; right: 170px; }
-    .how-photos-right .p5 { width: 155px; height: 185px; top: 345px; right: 0; }
-
-    /* ── COMPETITOR TABLE ─────────────────────────── */
-    .compare {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 110px 40px;
-    }
-    .compare-header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-    .compare-header .section-body {
-      margin: 16px auto 0;
-      max-width: 520px;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--ix-border);
-      border-radius: 14px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    thead th {
-      padding: 20px 24px;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ix-muted);
-      border-bottom: 1px solid var(--ix-border);
-      background: var(--bg2);
-    }
-    thead th:first-child { color: var(--ix-mid); }
-    thead th.highlight {
-      color: var(--ix-accent);
-      background: var(--gold-dim);
-    }
-
-    tbody tr {
-      border-bottom: 1px solid var(--ix-border);
-      transition: background 0.2s;
-    }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--bg2); }
-
-    td {
-      padding: 18px 24px;
-      vertical-align: middle;
-      color: var(--ix-mid);
-    }
-    td:first-child { color: var(--text); font-weight: 400; }
-    td.highlight { background: var(--gold-dim); }
-
-    .check { color: var(--ix-accent); font-size: 16px; }
-    .cross { color: var(--text3); font-size: 16px; }
-    .partial { color: var(--gold); font-size: 13px; font-weight: 300; opacity: 0.6; }
-
-    /* ── TESTIMONIALS ─────────────────────────────── */
-    .testimonials {
-      background: var(--ix-black);
-      border-top: 1px solid var(--ix-border);
-    }
-    .testimonials-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-    .testimonials-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 56px;
-      gap: 32px;
-    }
-    .testimonials-header .section-title { max-width: 420px; }
-
-    .quotes-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-    }
-    .quote-card {
-      background: var(--ix-surface);
-      border: 1px solid var(--ix-border);
-      border-radius: 12px;
-      padding: 36px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      transition: border-color 0.3s;
-    }
-    .quote-card:hover { border-color: var(--ix-accent); }
-
-    .quote-stars {
-      color: var(--ix-accent);
-      font-size: 16px;
-      letter-spacing: 3px;
-    }
-    .quote-text {
-      font-family: var(--ix-display);
-      font-size: 18px;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--ix-white);
-      line-height: 1.5;
-      flex: 1;
-    }
-    .quote-author {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .quote-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: var(--ix-dim);
-      border: 1px solid var(--ix-border);
-    }
-    .quote-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--ix-white);
-    }
-    .quote-role { font-size: 12px; color: var(--ix-mid); }
-
-    /* ── Portfolio Highlights (2-card bento) & Trending Services (4-card who-grid) ── */
-    .bento-card { text-decoration: none; display: block; }
-    .portfolio-bento {
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: 1fr;
-    }
-    .portfolio-bento .bento-card { min-height: 360px; display: flex; flex-direction: column; justify-content: flex-end; }
-    .portfolio-bento .bento-img {
-      position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; margin: 0; opacity: 0.55;
-    }
-    .portfolio-bento .bento-card { position: relative; overflow: hidden; }
-    .portfolio-bento .bento-title, .portfolio-bento .bento-desc { position: relative; z-index: 1; }
-    .portfolio-bento .bento-title { color: var(--ix-white); }
-
-    .trending-grid { grid-template-columns: repeat(4, 1fr); }
-    .who-card { text-decoration: none; display: block; }
-
-    /* ── Testimonials carousel — one review at a time ── */
-    .quote-nav { display: flex; gap: 10px; flex-shrink: 0; }
-    .quote-arrow {
-      width: 40px; height: 40px; border-radius: 50%;
-      border: 1px solid var(--ix-border); background: transparent;
-      color: var(--ix-white); font-size: 15px; cursor: pointer;
-      transition: border-color .2s, background .2s;
-    }
-    .quote-arrow:hover { border-color: var(--ix-accent); background: var(--ix-dim); }
-    .quote-carousel { max-width: 640px; margin: 0 auto; }
-    .quote-card.single { text-align: center; align-items: center; }
-    .quote-card.single .quote-text { font-size: 22px; }
-    .quote-card.single .quote-author { flex-direction: column; gap: 4px; }
-    .quote-dots { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
-    .quote-dot {
-      width: 7px; height: 7px; border-radius: 50%; border: none;
-      background: var(--ix-border); cursor: pointer; padding: 0;
-      transition: background .2s, transform .2s;
-    }
-    .quote-dot.active { background: var(--ix-accent); transform: scale(1.3); }
-
-    @media (max-width: 900px) {
-      .portfolio-bento { grid-template-columns: 1fr; }
-      .trending-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    /* ── CTA ──────────────────────────────────────── */
-    .cta-section {
-      padding: 130px 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-bg {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(200,169,126,0.08), transparent);
-    }
-    .cta-inner {
-      position: relative;
-      max-width: 560px;
-      margin: 0 auto;
-    }
-    .cta-title {
-      font-family: var(--ix-display);
-      font-size: clamp(36px, 5vw, 62px);
-      font-weight: 300;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-      color: var(--ix-white);
-      margin-bottom: 20px;
-    }
-    .cta-title em { font-style: italic; color: var(--ix-accent); }
-    .cta-sub {
-      font-size: 17px;
-      color: var(--text2);
-      font-weight: 300;
-      margin-bottom: 36px;
-      line-height: 1.6;
-    }
-    .cta-note {
-      margin-top: 16px;
-      font-size: 13px;
-      color: var(--ix-muted);
-    }
-    .nl-form {
-      display: flex;
-      gap: 0;
-      max-width: 460px;
-      margin: 0 auto 14px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(200,169,126,0.35);
-      background: var(--bg2);
-      backdrop-filter: blur(8px);
-      transition: border-color .2s, box-shadow .2s;
-    }
-    [data-theme="dark"] .nl-form {
-      background: rgba(255,255,255,0.04);
-    }
-    .nl-form:focus-within {
-      border-color: rgba(200,169,126,0.7);
-      box-shadow: 0 0 0 3px rgba(200,169,126,0.12);
-    }
-    .nl-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      padding: 15px 18px;
-      font-size: 14px;
-      color: var(--text);
-      font-family: var(--fb);
-      min-width: 0;
-    }
-    .nl-input::placeholder { color: var(--text3); }
-    .nl-btn {
-      flex-shrink: 0;
-      background: #000;
-      color: #fff;
-      border: none;
-      padding: 15px 22px;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: var(--fb);
-      cursor: pointer;
-      letter-spacing: .04em;
-      transition: background .2s, opacity .2s;
-      white-space: nowrap;
-    }
-    .nl-btn:hover { background: #222; }
-    .nl-btn:disabled { opacity: .55; cursor: not-allowed; }
-    .nl-msg {
-      font-size: 13px;
-      min-height: 18px;
-      transition: color .2s;
-    }
-    .nl-msg.ok  { color: #6ee7b7; }
-    .nl-msg.err { color: #fca5a5; }
-    .nl-note {
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--ix-mid);
-    }
-
-    /* ── RESPONSIVE ───────────────────────────────── */
-    @media (max-width: 900px) {
-      section { padding: 72px 20px; }
-      .bento { grid-template-columns: 1fr; }
-      .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
-      .who-grid { grid-template-columns: 1fr 1fr; }
-      .how {
-        flex-direction: column;
-        height: auto;
-        padding: 40px 0;
-        overflow: visible;
-        gap: 28px;
-      }
-      .how-inner { width: 100%; padding: 0 20px; order: 1; }
-
-      /* Compact 2-column mosaic grid, sized by its real content (no
-         fixed heights, so no blank gaps) — sits directly under the
-         text with normal spacing, order matches desktop's left/right
-         split just stacked instead of flanking. */
-      .how-photos {
-        position: static;
-        width: 100%;
-        height: auto;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        padding: 0 20px;
-      }
-      .how-photos-left  { order: 2; }
-      .how-photos-right { order: 3; }
-
-      .how-photo {
-        position: static !important;
-        width: 100% !important;
-        height: 160px !important;
-        top: auto !important; left: auto !important; right: auto !important;
-        object-fit: cover;
-        border-radius: 10px;
-      }
-      /* Slight stagger on alternating tiles for a mosaic feel instead
-         of a flat uniform grid */
-      .how-photos-left .p2, .how-photos-right .p2,
-      .how-photos-left .p4, .how-photos-right .p4 {
-        height: 210px !important;
-        margin-top: 24px;
-      }
-
-      .quotes-grid { grid-template-columns: 1fr; }
-      .who { padding: 72px 20px; }
-      .compare { padding: 72px 20px; }
-    }
-
-    @media (max-width: 600px) {
-      .who-grid { grid-template-columns: 1fr; }
-    }
     /* ── Image protection: block long-press-save (mobile) and
        right-click-save / drag-save (desktop) on every photo site-wide.
-       Not foolproof (nothing truly is — screenshots always work), but
-       stops the casual one-tap/one-click save that most visitors would
-       otherwise use. -webkit-touch-callout is the one that actually
-       matters for iPhone Safari's long-press "Save Image" popup. ── */
+       Not foolproof (screenshots always work), but stops the casual
+       one-tap/one-click save. ── */
     img {
-      -webkit-touch-callout: none;   /* kills iOS long-press "Save Image" menu */
+      -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
       -webkit-user-drag: none;
@@ -1052,7 +501,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
      crossorigin="anonymous"></script>
 </head>
-<body class="protect-page">
+<body class="protect-page home">
 
   <!-- ── Script load order required by nav.js ── -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1067,132 +516,222 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
   <div class="page-wrap">
 
-  <!-- HERO -->
-  <section class="hero full-bleed">
-    <div class="hero-images" id="heroImagesGrid">
-      <!-- loaded dynamically from Supabase site_content -->
+  <!-- ═════════ 1. HERO ═════════ -->
+  <section class="h-hero">
+    <div class="h-hero-photo">
+      <img src="assets/home/hero.jpg" alt="Guest in a black sequined dress at an evening event, photographed by Impact Grid" width="1216" height="880" fetchpriority="high" />
     </div>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <div class="hero-eyebrow">Impact Grid Events — Manchester</div>
-      <h1 class="hero-headline">
-        We capture your event.<br><em>Your guests keep it.</em>
-      </h1>
-      <p class="hero-sub">
-        Professional photography, high-quality content creation, and organised online galleries — delivered fast, so every guest walks away with their moment.
-      </p>
-      <div class="hero-actions">
-        <a href="book-us.html" class="hero-btn-primary">
-          <span class="hero-btn-inner">
-            <span class="hero-btn-text">Book Us for Your Event</span>
-            <span class="hero-btn-arrow">→</span>
-          </span>
+    <div class="h-hero-shade"></div>
+
+    <div class="h-in h-hero-inner">
+      <p class="h-eyebrow"><span>Events</span><span>People</span><span>Stories</span></p>
+      <h1>Moments<br />That Matter.</h1>
+      <p class="h-hero-sub">Professional event photography, content creation and online galleries — for people, brands and moments that deserve more.</p>
+      <div class="h-actions">
+        <a href="book-us.html" class="h-btn h-btn--solid">Book Your Event
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
-        <a href="services.html" class="hero-btn-secondary">
-          <span>See What We Offer</span>
-        </a>
+        <a href="portfolio.html" class="h-btn h-btn--line">View Portfolio</a>
       </div>
-      <p class="hero-note">Based in Manchester &nbsp;·&nbsp; Covering UK events &nbsp;·&nbsp; events@impactgridgroup.com</p>
-    </div>
-  </section>
-
-  <!-- TRUST BADGES -->
-  <section class="trust-strip">
-    <div class="trust-inner">
-      <div class="trust-item">
-        <span class="trust-icon">
-          <picture>
-            <source srcset="trust-guarantee.webp" type="image/webp"/>
-            <img src="trust-guarantee.png" alt="100% Satisfaction Guarantee" loading="lazy" width="340" height="301"/>
-          </picture>
-        </span>
-      </div>
-      <div class="trust-item">
-        <span class="trust-icon">
-          <picture>
-            <source srcset="trust-delivery.webp" type="image/webp"/>
-            <img src="trust-delivery.png" alt="Fast, Reliable Delivery" loading="lazy" width="340" height="293"/>
-          </picture>
-        </span>
-      </div>
-      <div class="trust-item">
-        <span class="trust-icon">
-          <picture>
-            <source srcset="trust-booking.webp" type="image/webp"/>
-            <img src="trust-booking.png" alt="Secure Online Booking" loading="lazy" width="340" height="226"/>
-          </picture>
-        </span>
-      </div>
-      <div class="trust-item">
-        <span class="trust-icon">
-          <picture>
-            <source srcset="trust-reviews.webp" type="image/webp"/>
-            <img src="trust-reviews.png" alt="Verified Client Reviews" loading="lazy" width="335" height="340"/>
-          </picture>
-        </span>
-      </div>
-    </div>
-  </section>
-
-  <!-- GALLERY STRIP -->
-  <div class="gallery-strip full-bleed">
-    <div class="gallery-row" id="galleryRow1">
-      <!-- loaded dynamically from Supabase site_content -->
-    </div>
-  </div>
-
-  <!-- PORTFOLIO HIGHLIGHTS — top 2 portfolio categories (admin order) -->
-  <section class="who" id="portfolioHighlights" style="display:none;">
-    <div class="who-header">
-      <div>
-        <div class="section-label">Featured Work</div>
-        <h2 class="section-title">From the <em>portfolio</em>.</h2>
-      </div>
-      <a href="portfolio.html" class="hero-btn-secondary"><span>View Full Portfolio</span></a>
-    </div>
-    <div class="bento portfolio-bento" id="portfolioBento">
-      <!-- populated by loadPortfolioHighlights() -->
-    </div>
-  </section>
-
-  <!-- TRENDING SERVICES — top 4 services (admin order for now, booking-count-driven later) -->
-  <section class="who" id="trendingServices" style="display:none;">
-    <div class="who-header">
-      <div>
-        <div class="section-label">Trending Now</div>
-        <h2 class="section-title">Our most <em>booked</em> services.</h2>
-      </div>
-      <a href="services.html" class="hero-btn-secondary"><span>Explore All Services</span></a>
-    </div>
-    <div class="who-grid trending-grid" id="trendingGrid">
-      <!-- populated by loadTrendingServices() -->
-    </div>
-  </section>
-
-  <!-- WHAT CLIENTS SAY — one review at a time, auto-rotating -->
-  <section class="testimonials" id="why" style="display:none;">
-    <div class="testimonials-inner">
-      <div class="testimonials-header">
+      <div class="h-proof">
+        <img src="assets/home/client-avatars.png" alt="" width="96" height="40" />
         <div>
-          <div class="section-label">Kind Words</div>
-          <h2 class="section-title">What clients <em>say</em>.</h2>
-        </div>
-        <div class="quote-nav">
-          <button class="quote-arrow" id="quotePrev" aria-label="Previous review">←</button>
-          <button class="quote-arrow" id="quoteNext" aria-label="Next review">→</button>
+          <div class="h-stars" aria-hidden="true">★★★★★</div>
+          <p>Trusted for 500+ events across the UK</p>
         </div>
       </div>
-      <div class="quote-carousel" id="quoteCarousel">
-        <!-- Populated from Supabase event_reviews by loadHomepageReviews() below, one card
-             shown at a time, ordered by admin-set position. Stays hidden until reviews load. -->
+    </div>
+
+    <div class="h-side h-side--top" aria-hidden="true"><span>More</span><span>Than</span><span>Photos</span></div>
+    <div class="h-side h-side--bottom" aria-hidden="true"><div>Manchester<br />and beyond</div></div>
+  </section>
+
+  <!-- ═════════ 2. STATS STRIP ═════════ -->
+  <section class="h-stats" aria-label="Impact Grid at a glance">
+    <div class="h-in">
+      <div class="h-stat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        <div><b>500+</b><span>Events Covered</span></div>
       </div>
-      <div class="quote-dots" id="quoteDots"></div>
+      <div class="h-stat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div><b>100%</b><span>Client Satisfaction</span></div>
+      </div>
+      <div class="h-stat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div><b>UK Wide</b><span>Coverage</span></div>
+      </div>
+      <div class="h-stat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div><b>Fast Delivery</b><span>Online Galleries</span></div>
+      </div>
     </div>
   </section>
 
-  <!-- BRAND PARTNERS (logos only, no heading — populated from admin) -->
-  <section class="partners-strip" id="partnersStrip" style="display:none;">
-    <div class="partners-inner" id="partnersInner"></div>
+  <!-- ═════════ 3. SERVICES ═════════ -->
+  <section class="h-services h-light" id="services">
+    <div class="h-in h-services-head">
+      <div>
+        <p class="h-eyebrow">Our Services</p>
+        <h2 class="h-serif-h">Capture.<br />Create. Deliver.</h2>
+      </div>
+      <p>From intimate celebrations to large-scale events, we provide photography and content solutions that bring your vision to life.</p>
+      <a href="services.html" class="h-link">Explore All Services
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="h-in--wide">
+      <div class="h-svc-grid">
+        <a href="services.html" class="h-svc">
+          <img src="assets/home/service-photography.jpg" alt="" loading="lazy" />
+          <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <div class="h-svc-row">
+            <div>
+              <h3>Event Photography</h3>
+              <p>Natural, high-quality photography that tells the real story of your event.</p>
+            </div>
+            <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </div>
+        </a>
+
+        <a href="services.html" class="h-svc">
+          <img src="assets/home/service-content.jpg" alt="" loading="lazy" />
+          <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4V8z"/></svg>
+          <div class="h-svc-row">
+            <div>
+              <h3>Content Creation</h3>
+              <p>Short-form video, reels and social content to keep the energy going beyond the event.</p>
+            </div>
+            <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </div>
+        </a>
+
+        <a href="services.html" class="h-svc">
+          <img src="assets/home/service-galleries.jpg" alt="" loading="lazy" />
+          <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <div class="h-svc-row">
+            <div>
+              <h3>Online Galleries</h3>
+              <p>A seamless, secure gallery for you and your guests to view, share and download.</p>
+            </div>
+            <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ 4. RECENT EVENTS ═════════ -->
+  <section class="h-events" id="recent-events">
+    <div class="h-in h-events-head">
+      <div>
+        <p class="h-eyebrow">Featured Work</p>
+        <h2 class="h-serif-h">Recent Events</h2>
+      </div>
+      <div class="h-events-right">
+        <p class="h-eyebrow">Real people. Real moments.</p>
+        <a href="portfolio.html" class="h-link">View Full Portfolio
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="h-in--wide">
+      <div class="h-tiles">
+        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-celebrations.jpg" alt="" loading="lazy" /><span>Celebrations</span></a>
+        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-corporate.jpg" alt="" loading="lazy" /><span>Corporate Events</span></a>
+        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-private.jpg" alt="" loading="lazy" /><span>Private Events</span></a>
+        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-sports.jpg" alt="" loading="lazy" /><span>Sports &amp; Community</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ 5. HOW IT WORKS ═════════ -->
+  <section class="h-how h-light" id="how-it-works">
+    <div class="h-in">
+      <div>
+        <p class="h-eyebrow">How It Works</p>
+        <h2 class="h-serif-h">Simple.<br />Seamless.</h2>
+      </div>
+      <ol class="h-steps" style="list-style:none;">
+        <li class="h-step">
+          <div class="h-step-top"><span class="h-step-num">01</span></div>
+          <h3>Book</h3>
+          <p>Tell us about your event and your needs.</p>
+        </li>
+        <li class="h-step">
+          <div class="h-step-top"><span class="h-step-num">02</span></div>
+          <h3>We Capture</h3>
+          <p>Our team gets to work on the big day.</p>
+        </li>
+        <li class="h-step">
+          <div class="h-step-top"><span class="h-step-num">03</span></div>
+          <h3>Your Gallery</h3>
+          <p>Receive your secure online gallery.</p>
+        </li>
+        <li class="h-step">
+          <div class="h-step-top"><span class="h-step-num">04</span></div>
+          <h3>Share &amp; Relive</h3>
+          <p>Download, share and keep the memories alive.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ═════════ 6. WHAT CLIENTS SAY ═════════ -->
+  <section class="h-reviews is-single" id="why" aria-label="Client reviews">
+    <div class="h-in">
+      <div>
+        <p class="h-eyebrow">Kind Words</p>
+        <h2 class="h-serif-h">What Clients Say</h2>
+      </div>
+
+      <div>
+        <div class="h-quote-wrap">
+          <button class="h-arrow" id="quotePrev" aria-label="Previous review">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          </button>
+          <div class="h-quote" id="quoteCarousel" aria-live="polite">
+            <!-- Placeholder shown until real reviews load from Supabase (event_reviews).
+                 As soon as live reviews arrive this is replaced automatically. -->
+            <blockquote>“Professional, creative and an amazing experience from start to finish. The photos were stunning!”</blockquote>
+            <div class="h-quote-by">
+              <div class="h-av" aria-hidden="true">T</div>
+              <div><b>Temi A.</b><span>Private Event</span></div>
+            </div>
+          </div>
+          <button class="h-arrow" id="quoteNext" aria-label="Next review">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div class="h-dots" id="quoteDots"></div>
+      </div>
+
+      <div class="h-rate">
+        <b id="rateNum">5.0</b>
+        <div class="h-stars" aria-hidden="true">★★★★★</div>
+        <span id="rateLabel">On Google Reviews</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRAND PARTNERS (logos only — populated from admin, hidden if none) -->
+  <section class="h-partners" id="partnersStrip" style="display:none;">
+    <div class="h-in"><div class="h-partners-in" id="partnersInner"></div></div>
+  </section>
+
+  <!-- ═════════ 7. CTA ═════════ -->
+  <section class="h-cta">
+    <div class="h-in">
+      <p class="h-eyebrow" style="color:rgba(255,255,255,.8)">Let’s make it happen</p>
+      <h2 class="h-serif-h">Planning an event?</h2>
+      <div class="h-cta-sub"><p>Let’s capture it the right way.</p></div>
+      <a href="book-us.html" class="h-btn h-btn--solid">Book Impact Grid
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="h-corner h-corner--l" aria-hidden="true"><span>Good</span><span>Events</span><span>Better</span><span>Memories</span></div>
+    <div class="h-corner h-corner--r" aria-hidden="true"><div>Manchester<br />UK Wide</div></div>
   </section>
 
   <script>
@@ -1200,330 +739,129 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  /* ── Live homepage reviews — one card at a time, auto-rotating ──
-     Always shows your latest reviews first; as new ones come in via
-     admin the carousel picks them up automatically on next page load. */
+  /* ── Nav goes solid once you scroll past the hero ── */
+  (function(){
+    function f(){ document.body.classList.toggle('h-scrolled', window.scrollY > 40); }
+    window.addEventListener('scroll', f, { passive: true });
+    f();
+  })();
+
+  /* ── Live homepage reviews — one at a time, auto-rotating ──
+     Pulls your latest reviews from Supabase (event_reviews). The section is
+     ALWAYS visible: if no reviews load, the placeholder quote in the HTML stays. */
   var quoteData = [];
   var quoteIndex = 0;
   var quoteTimer = null;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function initial(name){ return (String(name || 'V').trim().charAt(0) || 'V').toUpperCase(); }
+
+  function renderQuote(i, instant){
+    if (!quoteData.length) return;
+    quoteIndex = ((i % quoteData.length) + quoteData.length) % quoteData.length;
+    var r = quoteData[quoteIndex];
+    var box = document.getElementById('quoteCarousel');
+    function paint(){
+      box.innerHTML =
+        (r.message ? '<blockquote>“' + escHtml(r.message) + '”</blockquote>' : '') +
+        '<div class="h-quote-by">' +
+          '<div class="h-av" aria-hidden="true">' + escHtml(initial(r.reviewer_name)) + '</div>' +
+          '<div><b>' + escHtml(r.reviewer_name || 'Verified Guest') + '</b>' +
+          (r.event_name ? '<span>' + escHtml(r.event_name) + '</span>' : '') + '</div>' +
+        '</div>';
+      box.classList.remove('is-swap');
+    }
+    if (instant || reduceMotion) { paint(); }
+    else { box.classList.add('is-swap'); setTimeout(paint, 220); }
+    var dots = document.getElementById('quoteDots');
+    if (dots) dots.querySelectorAll('button').forEach(function(d, di){ d.classList.toggle('on', di === quoteIndex); });
+  }
+
+  function resetQuoteTimer(){
+    if (quoteTimer) clearInterval(quoteTimer);
+    if (reduceMotion || quoteData.length < 2) return;
+    quoteTimer = setInterval(function(){ renderQuote(quoteIndex + 1); }, 6500);
+  }
 
   async function loadHomepageReviews(){
-    var track = document.getElementById('quoteCarousel');
-    if(!track) return;
-
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if(!sb) return; // no client available — section stays hidden
+      if (!sb) return;
 
-      var { data, error } = await sb
+      var res = await sb
         .from('event_reviews')
         .select('reviewer_name, event_name, rating, message')
         .order('position', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false })
         .limit(9);
 
-      if(error || !data || !data.length) return; // no reviews yet — section stays hidden
+      var data = res && res.data;
+      if (res.error || !data || !data.length) return;   // keep the placeholder
 
       quoteData = data;
-      renderQuote(0);
+      var section = document.getElementById('why');
+      section.classList.toggle('is-single', data.length < 2);
 
-      var dots = document.getElementById('quoteDots');
-      if (dots) {
-        dots.innerHTML = quoteData.map(function(_, i){
-          return '<button class="quote-dot' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" aria-label="Go to review ' + (i+1) + '"></button>';
-        }).join('');
-        dots.querySelectorAll('.quote-dot').forEach(function(btn){
-          btn.addEventListener('click', function(){ renderQuote(parseInt(btn.dataset.i, 10)); resetQuoteTimer(); });
-        });
+      /* average rating from real reviews */
+      var rated = data.filter(function(r){ return typeof r.rating === 'number'; });
+      if (rated.length) {
+        var avg = rated.reduce(function(a, r){ return a + r.rating; }, 0) / rated.length;
+        document.getElementById('rateNum').textContent = avg.toFixed(1);
+        document.getElementById('rateLabel').textContent = 'From ' + data.length + ' client review' + (data.length > 1 ? 's' : '');
       }
 
-      var prevBtn = document.getElementById('quotePrev');
-      var nextBtn = document.getElementById('quoteNext');
-      if (prevBtn) prevBtn.addEventListener('click', function(){ renderQuote(quoteIndex - 1); resetQuoteTimer(); });
-      if (nextBtn) nextBtn.addEventListener('click', function(){ renderQuote(quoteIndex + 1); resetQuoteTimer(); });
+      var dots = document.getElementById('quoteDots');
+      dots.innerHTML = data.map(function(_, i){
+        return '<button type="button" class="' + (i === 0 ? 'on' : '') + '" data-i="' + i + '" aria-label="Go to review ' + (i + 1) + '"></button>';
+      }).join('');
+      dots.querySelectorAll('button').forEach(function(btn){
+        btn.addEventListener('click', function(){ renderQuote(parseInt(btn.dataset.i, 10)); resetQuoteTimer(); });
+      });
 
+      renderQuote(0, true);
       resetQuoteTimer();
-
-      var section = document.getElementById('why');
-      if (section) section.style.display = '';
-    } catch(e) {
-      console.warn('[reviews] Could not load reviews:', e.message);
-      // section stays hidden — no fake content to fall back to
+    } catch (e) {
+      console.warn('[reviews] Could not load reviews:', e && e.message);
     }
   }
 
-  function stars(n){
-    n = Math.max(0, Math.min(5, n || 5));
-    return '★★★★★☆☆☆☆☆'.slice(5 - n, 10 - n);
-  }
-
-  function renderQuote(i){
-    if(!quoteData.length) return;
-    quoteIndex = ((i % quoteData.length) + quoteData.length) % quoteData.length;
-    var r = quoteData[quoteIndex];
-    var track = document.getElementById('quoteCarousel');
-    track.innerHTML = '<div class="quote-card single">' +
-      '<div class="quote-stars">' + stars(r.rating) + '</div>' +
-      (r.message ? '<p class="quote-text">"' + escHtml(r.message) + '"</p>' : '') +
-      '<div class="quote-author">' +
-        '<div>' +
-          '<div class="quote-name">' + escHtml(r.reviewer_name || 'Verified Guest') + '</div>' +
-          (r.event_name ? '<div class="quote-role">' + escHtml(r.event_name) + '</div>' : '') +
-        '</div>' +
-      '</div>' +
-    '</div>';
-    var dots = document.getElementById('quoteDots');
-    if (dots) dots.querySelectorAll('.quote-dot').forEach(function(d, di){ d.classList.toggle('active', di === quoteIndex); });
-  }
-
-  function resetQuoteTimer(){
-    if (quoteTimer) clearInterval(quoteTimer);
-    quoteTimer = setInterval(function(){ renderQuote(quoteIndex + 1); }, 6000);
-  }
-
+  document.getElementById('quotePrev').addEventListener('click', function(){ renderQuote(quoteIndex - 1); resetQuoteTimer(); });
+  document.getElementById('quoteNext').addEventListener('click', function(){ renderQuote(quoteIndex + 1); resetQuoteTimer(); });
   loadHomepageReviews();
 
-  /* ── Portfolio Highlights — top 2 categories, current admin order.
-     Swap the .order() below for a booking/view-count column later to
-     make this fully automatic without touching the markup. ── */
-  async function loadPortfolioHighlights(){
-    var section = document.getElementById('portfolioHighlights');
-    var grid = document.getElementById('portfolioBento');
-    if(!section || !grid) return;
-    try {
-      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if(!sb) return;
-
-      var { data, error } = await sb
-        .from('portfolio_categories')
-        .select('title, slug, meta_description, cover_image')
-        .order('created_at', { ascending: false })
-        .limit(2);
-
-      if(error || !data || !data.length) return;
-
-      grid.innerHTML = data.map(function(c, i){
-        return '<a class="bento-card" href="portfolio.html?category=' + encodeURIComponent(c.slug || '') + '">' +
-          (c.cover_image ? '<img class="bento-img" src="' + escHtml(c.cover_image) + '" alt="' + escHtml(c.title || '') + '" loading="lazy"/>' : '') +
-          '<div class="bento-title">' + escHtml(c.title || 'Featured Work') + '</div>' +
-          (c.meta_description ? '<div class="bento-desc">' + escHtml(c.meta_description) + '</div>' : '') +
-        '</a>';
-      }).join('');
-
-      section.style.display = '';
-    } catch(e) {
-      console.warn('[portfolio-highlights] Could not load:', e.message);
-    }
-  }
-  loadPortfolioHighlights();
-
-  /* ── Trending Services — top 4 services, current admin order.
-     Swap the .order() below for a real booking-count column later
-     (synced from the booking system) to make ranking automatic. ── */
-  async function loadTrendingServices(){
-    var section = document.getElementById('trendingServices');
-    var grid = document.getElementById('trendingGrid');
-    if(!section || !grid) return;
-    try {
-      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if(!sb) return;
-
-      var { data, error } = await sb
-        .from('services')
-        .select('title, description, image_url, sort_order')
-        .order('sort_order', { ascending: true })
-        .limit(4);
-
-      if(error || !data || !data.length) return;
-
-      grid.innerHTML = data.map(function(s){
-        return '<a class="who-card" href="services.html">' +
-          (s.image_url ? '<img src="' + escHtml(s.image_url) + '" alt="' + escHtml(s.title || '') + '" loading="lazy"/>' : '') +
-          '<div class="who-overlay"></div>' +
-          '<div class="who-label">' +
-            '<div class="who-type">Trending</div>' +
-            '<div class="who-name">' + escHtml(s.title || 'Service') + '</div>' +
-          '</div>' +
-        '</a>';
-      }).join('');
-
-      section.style.display = '';
-    } catch(e) {
-      console.warn('[trending-services] Could not load:', e.message);
-    }
-  }
-  loadTrendingServices();
-
-  /* ── Brand partner logos (admin-uploaded, no heading) ──── */
+  /* ── Brand partner logos (admin-uploaded, no heading) ── */
   async function loadBrandPartners(){
     var strip = document.getElementById('partnersStrip');
     var inner = document.getElementById('partnersInner');
-    if(!strip || !inner) return;
+    if (!strip || !inner) return;
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-      if(!sb) return;
+      if (!sb) return;
 
-      var { data, error } = await sb
+      var res = await sb
         .from('brand_partners')
         .select('name, logo_url, logo_width, logo_height')
         .order('position', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: true });
 
-      if(error || !data || !data.length) return; // keep hidden
-
-      function esc(s){
-        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      }
+      var data = res && res.data;
+      if (res.error || !data || !data.length) return;
 
       inner.innerHTML = data.map(function(p){
-        /* Falls back to the default CSS sizing (max-height:42px; max-width:140px)
-           when no custom size was set in admin. object-fit:contain keeps the
-           logo's own aspect ratio regardless of the box size. */
         var sizeStyle = '';
         if (p.logo_width || p.logo_height) {
           sizeStyle = ' style="' +
             (p.logo_width  ? 'max-width:'  + p.logo_width  + 'px;' : '') +
-            (p.logo_height ? 'max-height:' + p.logo_height + 'px;' : '') +
-            '"';
+            (p.logo_height ? 'max-height:' + p.logo_height + 'px;' : '') + '"';
         }
-        return '<img class="partner-logo" src="' + esc(p.logo_url) + '" alt="' + esc(p.name || '') + '" loading="lazy"' + sizeStyle + '/>';
+        return '<img class="partner-logo" src="' + escHtml(p.logo_url) + '" alt="' + escHtml(p.name || '') + '" loading="lazy"' + sizeStyle + '/>';
       }).join('');
       strip.style.display = '';
-    } catch(e) {
-      console.warn('[brand-partners] Failed to load:', e.message);
+    } catch (e) {
+      console.warn('[brand-partners] Failed to load:', e && e.message);
     }
   }
   loadBrandPartners();
-
-  /* ── Dynamic homepage images from Supabase site_content ── */
-  (function(){
-    var DEFAULT_GALLERY = [
-      'https://images.unsplash.com/photo-1661956601349-f61c959a8fd4?w=600&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=560&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=500&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1519741497674-611481863552?w=560&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=500&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=540&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?w=500&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=560&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=500&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=560&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=540&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=500&q=85&fit=crop&crop=entropy',
-      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=540&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=500&q=85&fit=crop'
-    ];
-    var DEFAULT_HERO = [
-      'https://images.unsplash.com/photo-1622495896348-6e5b32fcb6e6?w=900&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=700&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=700&q=85&fit=crop',
-      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=700&q=85&fit=crop'
-    ];
-    var DEFAULT_WHO = [
-      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=75&fit=crop',
-      'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&q=75&fit=crop',
-      'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=600&q=75&fit=crop',
-      'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=600&q=75&fit=crop',
-      'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=75&fit=crop',
-      'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&q=75&fit=crop'
-    ];
-    var WHO_LABELS = [
-      {type:'Sport',   name:'Sports Days & Matches'},
-      {type:'Social',  name:'Nightlife & Parties'},
-      {type:'Corporate',name:'Brand Activations'},
-      {type:'Live Music',name:'Concerts & Festivals'},
-      {type:'Education',name:'Proms & Graduations'},
-      {type:'Creator', name:'Content Creators'}
-    ];
-    var DEFAULT_HOW = [
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779817339004-0.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779819085432-1.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779822889506-0.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816514965-1.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779824405409-2.jpg',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823792790-0.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779823794656-1.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/hero_grid-1779816517550-2.png',
-      'https://exeiojgldxqaakkybdij.supabase.co/storage/v1/object/public/site-media/site-images/gallery_strip-1779821154488-0.png'
-    ];
-
-    function renderHero(urls){
-      var el = document.getElementById('heroImagesGrid');
-      if(!el) return;
-      var list = (urls && urls.length) ? urls : DEFAULT_HERO;
-      el.innerHTML = list.slice(0,5).map(function(url,i){
-        return '<img src="'+url+'" alt="Impact Grid portfolio '+(i+1)+'" loading="'+(i===0?'eager':'lazy')+'"/>';
-      }).join('');
-    }
-
-    function renderGallery(urls){
-      var list = (urls && urls.length) ? urls : DEFAULT_GALLERY;
-      function makeImgs(arr){
-        return arr.map(function(url){
-          return '<img class="gallery-img" src="'+url+'" alt="Impact Grid portfolio" loading="lazy"/>';
-        }).join('');
-      }
-      var r1 = document.getElementById('galleryRow1');
-      if(r1) r1.innerHTML = makeImgs(list.concat(list));
-    }
-
-    function renderWhoCards(urls){
-      var el = document.getElementById('whoGrid');
-      if(!el) return;
-      var list = (urls && urls.length) ? urls : DEFAULT_WHO;
-      el.innerHTML = list.map(function(url, i){
-        var lbl = WHO_LABELS[i] || {type:'Event', name:'Event Photography'};
-        return '<div class="who-card">'
-          + '<img src="'+url+'" alt="'+lbl.type+'" loading="lazy"/>'
-          + '<div class="who-overlay"></div>'
-          + '<div class="who-label">'
-          + '<div class="who-type">'+lbl.type+'</div>'
-          + '<div class="who-name">'+lbl.name+'</div>'
-          + '</div></div>';
-      }).join('');
-    }
-
-    function renderHowImage(urls){
-      var list = (urls && urls.length) ? urls : DEFAULT_HOW;
-      for(var i = 0; i < 10; i++){
-        var img = document.getElementById('howImg' + i);
-        if(!img) continue;
-        img.src = list[i] || list[i % list.length] || DEFAULT_HOW[i % DEFAULT_HOW.length];
-      }
-    }
-
-    async function loadHomepageImages(){
-      try {
-        var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
-        if(!sb){
-          renderHero(null); renderGallery(null); renderWhoCards(null); renderHowImage(null);
-          return;
-        }
-        var res = await sb.from('site_content').select('key,value')
-          .in('key',['gallery_strip','hero_grid','who_cards','how_image']);
-        var rows = (res && res.data) ? res.data : [];
-        var kv = {};
-        rows.forEach(function(r){ try{ kv[r.key] = JSON.parse(r.value); }catch(e){ kv[r.key] = null; } });
-
-        renderHero(kv['hero_grid'] || null);
-        renderGallery(kv['gallery_strip'] || null);
-        renderWhoCards(kv['who_cards'] || null);
-        renderHowImage(kv['how_image'] || null);
-      } catch(e) {
-        renderHero(null); renderGallery(null); renderWhoCards(null); renderHowImage(null);
-      }
-    }
-
-    if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', loadHomepageImages);
-    } else {
-      loadHomepageImages();
-    }
-  })();
   </script>
 
   </div><!-- /.page-wrap -->
