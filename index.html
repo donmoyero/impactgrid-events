@@ -178,9 +178,12 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       border-bottom-color: rgba(255,255,255,.08) !important;
       -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     }
-    body.home #mainNav .logo { margin-right: 0; }
-    body.home #mainNav .logo .logo-img,
+    body.home #mainNav .logo { margin-right: 0; gap: 12px; }
     body.home #mainNav .logo .logo-mark { display: none !important; }
+    body.home #mainNav .logo .logo-img {
+      display: block !important; width: 42px; height: 42px;
+      object-fit: contain; border-radius: 9px; flex: none;
+    }
     body.home #mainNav .logo .logo-text {
       display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
       font-size: 0 !important; line-height: 1;
@@ -222,8 +225,13 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
         background: rgba(10,10,10,.9) !important;
         -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
       }
-      body.home #ig-mob-topbar .mob-topbar-logo { font-size: 0; }
-      body.home #ig-mob-topbar .mob-topbar-logo img { display: none; }
+      body.home #ig-mob-topbar .mob-topbar-logo {
+        font-size: 0; display: flex; align-items: center; gap: 10px;
+      }
+      body.home #ig-mob-topbar .mob-topbar-logo img {
+        display: block !important; width: 34px; height: 34px;
+        object-fit: contain; border-radius: 7px; order: -1;
+      }
       body.home #ig-mob-topbar .mob-topbar-logo::before {
         content: 'IMPACT GRID'; font: 800 20px/1 var(--h-sans); letter-spacing: -.02em; color: #fff;
       }
@@ -525,19 +533,19 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
     <div class="h-in h-hero-inner">
       <p class="h-eyebrow"><span>Events</span><span>People</span><span>Stories</span></p>
-      <h1>Moments<br />That Matter.</h1>
-      <p class="h-hero-sub">Professional event photography, content creation and online galleries — for people, brands and moments that deserve more.</p>
+      <h1><span id="hHeroLine1">Moments</span><br /><span id="hHeroLine2">That Matter.</span></h1>
+      <p class="h-hero-sub" id="hHeroSub">Professional event photography, content creation and online galleries — for people, brands and moments that deserve more.</p>
       <div class="h-actions">
-        <a href="book-us.html" class="h-btn h-btn--solid">Book Your Event
+        <a href="book-us.html" class="h-btn h-btn--solid"><span id="hHeroBtn1">Book Your Event</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
-        <a href="portfolio.html" class="h-btn h-btn--line">View Portfolio</a>
+        <a href="portfolio.html" class="h-btn h-btn--line" id="hHeroBtn2">View Portfolio</a>
       </div>
       <div class="h-proof">
         <img src="assets/home/client-avatars.png" alt="" width="96" height="40" />
         <div>
           <div class="h-stars" aria-hidden="true">★★★★★</div>
-          <p>Trusted for 500+ events across the UK</p>
+          <p id="hHeroProof">Trusted for 500+ events across the UK</p>
         </div>
       </div>
     </div>
@@ -551,19 +559,19 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-in">
       <div class="h-stat">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-        <div><b>500+</b><span>Events Covered</span></div>
+        <div><b id="hStat1Num">500+</b><span id="hStat1Label">Events Covered</span></div>
       </div>
       <div class="h-stat">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <div><b>100%</b><span>Client Satisfaction</span></div>
+        <div><b id="hStat2Num">100%</b><span id="hStat2Label">Client Satisfaction</span></div>
       </div>
       <div class="h-stat">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        <div><b>UK Wide</b><span>Coverage</span></div>
+        <div><b id="hStat3Num">UK Wide</b><span id="hStat3Label">Coverage</span></div>
       </div>
       <div class="h-stat">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        <div><b>Fast Delivery</b><span>Online Galleries</span></div>
+        <div><b id="hStat4Num">Fast Delivery</b><span id="hStat4Label">Online Galleries</span></div>
       </div>
     </div>
   </section>
@@ -573,9 +581,9 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-in h-services-head">
       <div>
         <p class="h-eyebrow">Our Services</p>
-        <h2 class="h-serif-h">Capture.<br />Create. Deliver.</h2>
+        <h2 class="h-serif-h"><span id="hSvcH1">Capture.</span><br /><span id="hSvcH2">Create. Deliver.</span></h2>
       </div>
-      <p>From intimate celebrations to large-scale events, we provide photography and content solutions that bring your vision to life.</p>
+      <p id="hSvcIntro">From intimate celebrations to large-scale events, we provide photography and content solutions that bring your vision to life.</p>
       <a href="services.html" class="h-link">Explore All Services
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
@@ -588,8 +596,8 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
           <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
           <div class="h-svc-row">
             <div>
-              <h3>Event Photography</h3>
-              <p>Natural, high-quality photography that tells the real story of your event.</p>
+              <h3 id="hSvc1Title">Event Photography</h3>
+              <p id="hSvc1Desc">Natural, high-quality photography that tells the real story of your event.</p>
             </div>
             <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
           </div>
@@ -600,8 +608,8 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
           <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4V8z"/></svg>
           <div class="h-svc-row">
             <div>
-              <h3>Content Creation</h3>
-              <p>Short-form video, reels and social content to keep the energy going beyond the event.</p>
+              <h3 id="hSvc2Title">Content Creation</h3>
+              <p id="hSvc2Desc">Short-form video, reels and social content to keep the energy going beyond the event.</p>
             </div>
             <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
           </div>
@@ -612,8 +620,8 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
           <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           <div class="h-svc-row">
             <div>
-              <h3>Online Galleries</h3>
-              <p>A seamless, secure gallery for you and your guests to view, share and download.</p>
+              <h3 id="hSvc3Title">Online Galleries</h3>
+              <p id="hSvc3Desc">A seamless, secure gallery for you and your guests to view, share and download.</p>
             </div>
             <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
           </div>
@@ -627,10 +635,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-in h-events-head">
       <div>
         <p class="h-eyebrow">Featured Work</p>
-        <h2 class="h-serif-h">Recent Events</h2>
+        <h2 class="h-serif-h" id="hEventsHeading">Recent Events</h2>
       </div>
       <div class="h-events-right">
-        <p class="h-eyebrow">Real people. Real moments.</p>
+        <p class="h-eyebrow" id="hEventsTag">Real people. Real moments.</p>
         <a href="portfolio.html" class="h-link">View Full Portfolio
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
@@ -651,28 +659,28 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-in">
       <div>
         <p class="h-eyebrow">How It Works</p>
-        <h2 class="h-serif-h">Simple.<br />Seamless.</h2>
+        <h2 class="h-serif-h"><span id="hHowH1">Simple.</span><br /><span id="hHowH2">Seamless.</span></h2>
       </div>
       <ol class="h-steps" style="list-style:none;">
         <li class="h-step">
           <div class="h-step-top"><span class="h-step-num">01</span></div>
-          <h3>Book</h3>
-          <p>Tell us about your event and your needs.</p>
+          <h3 id="hStep1Title">Book</h3>
+          <p id="hStep1Desc">Tell us about your event and your needs.</p>
         </li>
         <li class="h-step">
           <div class="h-step-top"><span class="h-step-num">02</span></div>
-          <h3>We Capture</h3>
-          <p>Our team gets to work on the big day.</p>
+          <h3 id="hStep2Title">We Capture</h3>
+          <p id="hStep2Desc">Our team gets to work on the big day.</p>
         </li>
         <li class="h-step">
           <div class="h-step-top"><span class="h-step-num">03</span></div>
-          <h3>Your Gallery</h3>
-          <p>Receive your secure online gallery.</p>
+          <h3 id="hStep3Title">Your Gallery</h3>
+          <p id="hStep3Desc">Receive your secure online gallery.</p>
         </li>
         <li class="h-step">
           <div class="h-step-top"><span class="h-step-num">04</span></div>
-          <h3>Share &amp; Relive</h3>
-          <p>Download, share and keep the memories alive.</p>
+          <h3 id="hStep4Title">Share &amp; Relive</h3>
+          <p id="hStep4Desc">Download, share and keep the memories alive.</p>
         </li>
       </ol>
     </div>
@@ -683,7 +691,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-in">
       <div>
         <p class="h-eyebrow">Kind Words</p>
-        <h2 class="h-serif-h">What Clients Say</h2>
+        <h2 class="h-serif-h" id="hReviewsHeading">What Clients Say</h2>
       </div>
 
       <div>
@@ -724,9 +732,9 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <section class="h-cta">
     <div class="h-in">
       <p class="h-eyebrow" style="color:rgba(255,255,255,.8)">Let’s make it happen</p>
-      <h2 class="h-serif-h">Planning an event?</h2>
-      <div class="h-cta-sub"><p>Let’s capture it the right way.</p></div>
-      <a href="book-us.html" class="h-btn h-btn--solid">Book Impact Grid
+      <h2 class="h-serif-h" id="hCtaHeading">Planning an event?</h2>
+      <div class="h-cta-sub"><p id="hCtaSub">Let’s capture it the right way.</p></div>
+      <a href="book-us.html" class="h-btn h-btn--solid"><span id="hCtaBtn">Book Impact Grid</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
     </div>
@@ -738,6 +746,54 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   function escHtml(s){
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
+  /* ── Editable homepage text — pulls saved copy from Supabase (site_content) ──
+     Admin > Homepage Text can override any of these. If a key has no saved
+     value, the hard-coded text already in the HTML stays exactly as-is. */
+  var HOMEPAGE_TEXT_KEYS = [
+    'hero_h1_line1','hero_h1_line2','hero_sub','hero_btn1_text','hero_btn2_text','hero_proof_text',
+    'stat1_num','stat1_label','stat2_num','stat2_label','stat3_num','stat3_label','stat4_num','stat4_label',
+    'services_heading_line1','services_heading_line2','services_intro',
+    'svc1_title','svc1_desc','svc2_title','svc2_desc','svc3_title','svc3_desc',
+    'events_heading','events_tag',
+    'how_heading_line1','how_heading_line2',
+    'step1_title','step1_desc','step2_title','step2_desc','step3_title','step3_desc','step4_title','step4_desc',
+    'reviews_heading',
+    'cta_heading','cta_sub','cta_btn_text'
+  ];
+  var HOMEPAGE_TEXT_ID_MAP = {
+    hero_h1_line1:'hHeroLine1', hero_h1_line2:'hHeroLine2', hero_sub:'hHeroSub',
+    hero_btn1_text:'hHeroBtn1', hero_btn2_text:'hHeroBtn2', hero_proof_text:'hHeroProof',
+    stat1_num:'hStat1Num', stat1_label:'hStat1Label', stat2_num:'hStat2Num', stat2_label:'hStat2Label',
+    stat3_num:'hStat3Num', stat3_label:'hStat3Label', stat4_num:'hStat4Num', stat4_label:'hStat4Label',
+    services_heading_line1:'hSvcH1', services_heading_line2:'hSvcH2', services_intro:'hSvcIntro',
+    svc1_title:'hSvc1Title', svc1_desc:'hSvc1Desc', svc2_title:'hSvc2Title', svc2_desc:'hSvc2Desc',
+    svc3_title:'hSvc3Title', svc3_desc:'hSvc3Desc',
+    events_heading:'hEventsHeading', events_tag:'hEventsTag',
+    how_heading_line1:'hHowH1', how_heading_line2:'hHowH2',
+    step1_title:'hStep1Title', step1_desc:'hStep1Desc', step2_title:'hStep2Title', step2_desc:'hStep2Desc',
+    step3_title:'hStep3Title', step3_desc:'hStep3Desc', step4_title:'hStep4Title', step4_desc:'hStep4Desc',
+    reviews_heading:'hReviewsHeading',
+    cta_heading:'hCtaHeading', cta_sub:'hCtaSub', cta_btn_text:'hCtaBtn'
+  };
+  async function loadHomepageContentText(){
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if (!sb) return;
+      var res = await sb.from('site_content').select('key, value').in('key', HOMEPAGE_TEXT_KEYS);
+      var data = res && res.data;
+      if (res.error || !data || !data.length) return;
+      data.forEach(function(row){
+        if (!row.value) return;
+        var id = HOMEPAGE_TEXT_ID_MAP[row.key];
+        var el = id && document.getElementById(id);
+        if (el) el.textContent = row.value;
+      });
+    } catch (e) {
+      console.warn('[homepage-text] Could not load saved copy:', e && e.message);
+    }
+  }
+  loadHomepageContentText();
 
   /* ── Nav goes solid once you scroll past the hero ── */
   (function(){
