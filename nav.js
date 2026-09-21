@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════
    ImpactGrid Group — nav.js
-   Version: 5.2  (audit fix: removed hardcoded credentials,
-                  removed getContentClient() auth fallback)
+   Version: 5.3  (unified header: homepage look on every page, light + dark;
+                  5.2: removed hardcoded credentials, removed getContentClient() auth fallback)
 
    NAV:  Home | Services | Portfolio | About  (Book Us hidden from public nav —
          only shown once logged in as admin. Visitors reach book-us.html via
@@ -171,7 +171,36 @@
       '.nav .u-drop{left:auto;right:0;top:calc(100% + 10px);bottom:auto;}' +
       '.nav-book-btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:999px;background:var(--text);color:var(--bg);font-size:13px;font-weight:600;white-space:nowrap;text-decoration:none;transition:opacity .2s;}' +
       '.nav-book-btn:hover{opacity:.82;}' +
-      'body{padding-left:0!important;padding-right:0!important;padding-top:78px!important;}' +
+      /* ── UNIFIED HEADER — one look on every page, identical in light + dark.
+         Fixed dark chrome (matches the homepage); page content below follows the theme toggle.
+         Selectors are #mainNav-scoped so they beat shared.css/.nav rules but stay below
+         any body.home overrides (homepage keeps its transparent-on-hero behaviour). ── */
+      '#mainNav{background:rgba(26,22,15,.94);border-bottom:1px solid rgba(255,255,255,.08);height:84px;padding:0 clamp(20px,4vw,72px);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}' +
+      '#mainNav .logo{margin-right:0;gap:12px;}' +
+      '#mainNav .logo .logo-mark{display:none!important;}' +
+      '#mainNav .logo .logo-img{display:block!important;width:42px;height:42px;object-fit:contain;border-radius:9px;flex:none;}' +
+      '#mainNav .logo .logo-text{display:flex;flex-direction:column;align-items:flex-start;gap:5px;font-size:0!important;line-height:1;}' +
+      '#mainNav .logo .logo-text::before{content:"IMPACT GRID";font:800 clamp(22px,1.9vw,30px)/1 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.02em;color:#fff;}' +
+      '#mainNav .logo .logo-text::after{content:"E V E N T S";font:500 clamp(8px,.62vw,10px)/1 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.42em;color:#fff;padding-left:3px;}' +
+      '#mainNav .nav-links{justify-content:center;gap:clamp(2px,1vw,20px);}' +
+      '#mainNav .nav-links a{color:#fff!important;opacity:1!important;background:transparent!important;font-size:clamp(13px,.95vw,15px);font-weight:400;padding:9px clamp(10px,1vw,16px);}' +
+      '#mainNav .nav-links a:hover{background:rgba(255,255,255,.08)!important;}' +
+      '#mainNav .nav-links a.active{background:rgba(255,255,255,.14)!important;}' +
+      '#mainNav .nav-book-btn{background:#fff;color:#111;border-radius:8px;padding:0 22px;height:46px;font-weight:500;font-size:14px;}' +
+      '#mainNav .theme-btn{color:#fff!important;opacity:1!important;border-color:rgba(255,255,255,.4)!important;background:rgba(255,255,255,.06)!important;}' +
+      '#mainNav .theme-btn:hover{border-color:#fff!important;background:rgba(255,255,255,.14)!important;}' +
+      '#mainNav .user-btn{background:#fff;border-color:transparent;}' +
+      '#mainNav .user-btn:hover{border-color:rgba(255,255,255,.6);}' +
+      '#mainNav .u-name{color:#111;}' +
+      '#mainNav .u-chev{color:#555;}' +
+      '@media(max-width:768px){' +
+        '#ig-mob-topbar{background:rgba(26,22,15,.94)!important;border-bottom:1px solid rgba(255,255,255,.08)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}' +
+        '#ig-mob-topbar .mob-topbar-logo{font-size:0;display:flex;align-items:center;gap:10px;}' +
+        '#ig-mob-topbar .mob-topbar-logo img{display:block!important;width:34px;height:34px;object-fit:contain;border-radius:7px;order:-1;}' +
+        '#ig-mob-topbar .mob-topbar-logo::before{content:"IMPACT GRID";font:800 20px/1 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.02em;color:#fff;}' +
+        '#ig-mob-topbar .mob-topbar-ham span{background:#fff!important;}' +
+      '}' +
+      'body{padding-left:0!important;padding-right:0!important;padding-top:84px!important;}' +
       '.page-wrap{padding-left:0!important;padding-right:0!important;}' +
       '@media(max-width:768px){' +
         '.nav{display:none!important;}' +
@@ -437,7 +466,10 @@
      INIT
   ───────────────────────────────────────── */
   function _initNavInteractions() {
-    /* Theme already restored at IIFE boot — nothing else needed here */
+    /* Theme is restored at IIFE boot (before the nav exists), so sync the
+       toggle labels now that the buttons are in the DOM. */
+    var tb = document.getElementById('themeBtn'); if (tb) tb.textContent = _isDark ? 'Light mode' : 'Dark mode';
+    var mb = document.getElementById('mobTBtn');  if (mb) mb.textContent = _isDark ? 'Light' : 'Dark';
   }
 
   /* ─────────────────────────────────────────
