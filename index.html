@@ -292,13 +292,11 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     .h-stats { background: var(--h-bg-2); border-top: 1px solid var(--h-line); border-bottom: 1px solid var(--h-line); }
     .h-stats .h-in { display: grid; grid-template-columns: repeat(4, 1fr); }
     .h-stat {
-      display: flex; align-items: center; justify-content: center; gap: 16px;
-      padding: clamp(18px, 1.9vw, 30px) 10px;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(14px, 1.6vw, 22px) 10px;
     }
     .h-stat + .h-stat { border-left: 1px solid var(--h-line); }
-    .h-stat svg { width: clamp(24px, 2.1vw, 32px); height: clamp(24px, 2.1vw, 32px); stroke: #fff; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; flex: none; opacity: .92; }
-    .h-stat b { display: block; font: 400 clamp(17px, 1.4vw, 23px)/1.15 var(--h-serif); letter-spacing: -.01em; }
-    .h-stat span { display: block; font: 400 clamp(11px, .82vw, 13px)/1.3 var(--h-sans); color: var(--h-mute); margin-top: 2px; }
+    .h-trust-badge { height: clamp(56px, 5.6vw, 84px); width: auto; flex: none; }
 
     /* ── 3. SERVICES (light) ─────────────────────── */
     .h-services { background: var(--h-light); color: var(--h-ink); padding: clamp(38px, 3.6vw, 68px) 0 clamp(26px, 2.6vw, 48px); }
@@ -554,25 +552,13 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-side h-side--bottom" aria-hidden="true"><div>Manchester<br />and beyond</div></div>
   </section>
 
-  <!-- ═════════ 2. STATS STRIP ═════════ -->
-  <section class="h-stats" aria-label="Impact Grid at a glance">
+  <!-- ═════════ 2. TRUST BADGES ═════════ -->
+  <section class="h-stats" aria-label="Why book with Impact Grid">
     <div class="h-in">
-      <div class="h-stat">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-        <div><b id="hStat1Num">500+</b><span id="hStat1Label">Events Covered</span></div>
-      </div>
-      <div class="h-stat">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <div><b id="hStat2Num">100%</b><span id="hStat2Label">Client Satisfaction</span></div>
-      </div>
-      <div class="h-stat">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        <div><b id="hStat3Num">UK Wide</b><span id="hStat3Label">Coverage</span></div>
-      </div>
-      <div class="h-stat">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        <div><b id="hStat4Num">Fast Delivery</b><span id="hStat4Label">Online Galleries</span></div>
-      </div>
+      <div class="h-stat"><img class="h-trust-badge" src="trust-reviews.webp" alt="Verified client reviews" /></div>
+      <div class="h-stat"><img class="h-trust-badge" src="trust-guarantee.webp" alt="100% satisfaction guarantee" /></div>
+      <div class="h-stat"><img class="h-trust-badge" src="trust-delivery.webp" alt="Secure online booking" /></div>
+      <div class="h-stat"><img class="h-trust-badge" src="trust-booking.webp" alt="Fast, reliable delivery" /></div>
     </div>
   </section>
 
@@ -752,7 +738,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
      value, the hard-coded text already in the HTML stays exactly as-is. */
   var HOMEPAGE_TEXT_KEYS = [
     'hero_h1_line1','hero_h1_line2','hero_sub','hero_btn1_text','hero_btn2_text','hero_proof_text',
-    'stat1_num','stat1_label','stat2_num','stat2_label','stat3_num','stat3_label','stat4_num','stat4_label',
     'services_heading_line1','services_heading_line2','services_intro',
     'svc1_title','svc1_desc','svc2_title','svc2_desc','svc3_title','svc3_desc',
     'events_heading','events_tag',
@@ -764,8 +749,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   var HOMEPAGE_TEXT_ID_MAP = {
     hero_h1_line1:'hHeroLine1', hero_h1_line2:'hHeroLine2', hero_sub:'hHeroSub',
     hero_btn1_text:'hHeroBtn1', hero_btn2_text:'hHeroBtn2', hero_proof_text:'hHeroProof',
-    stat1_num:'hStat1Num', stat1_label:'hStat1Label', stat2_num:'hStat2Num', stat2_label:'hStat2Label',
-    stat3_num:'hStat3Num', stat3_label:'hStat3Label', stat4_num:'hStat4Num', stat4_label:'hStat4Label',
     services_heading_line1:'hSvcH1', services_heading_line2:'hSvcH2', services_intro:'hSvcIntro',
     svc1_title:'hSvc1Title', svc1_desc:'hSvc1Desc', svc2_title:'hSvc2Title', svc2_desc:'hSvc2Desc',
     svc3_title:'hSvc3Title', svc3_desc:'hSvc3Desc',
