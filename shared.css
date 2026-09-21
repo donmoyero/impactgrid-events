@@ -30,15 +30,15 @@
   --border2: rgba(0,0,0,0.13);
 
   /* Text */
-  --text:  #0d1017;
-  --text2: #4a5068;
-  --text3: #9099b8;
+  --text:  #0d0d0d;
+  --text2: #555555;
+  --text3: #9a9a9a;
 
-  /* Dark yellow accent — matched to logo's exact hue, deepened for contrast */
-  --gold:     #aa9803;
-  --gold2:    #c8b304;
-  --gold-dim: rgba(170,152,3,0.10);
-  --gold-glo: rgba(170,152,3,0.28);
+  /* Accent — monochrome (was gold) */
+  --gold:     #161616;
+  --gold2:    #000000;
+  --gold-dim: rgba(0,0,0,0.06);
+  --gold-glo: rgba(0,0,0,0.18);
 
   /* Blue */
   --blue:     #2d6edb;
@@ -58,7 +58,7 @@
   --purple-dim: rgba(124,58,237,0.08);
 
   /* Brand */
-  --brand-primary: #aa9803;
+  --brand-primary: #161616;
   --brand-dark:    #080808;
 
   /* Typography */
@@ -86,8 +86,8 @@
 
   --sh:      0 4px 24px rgba(0,0,0,0.06);
   --sh2:     0 16px 48px rgba(0,0,0,0.10);
-  --sh-gold: 0 8px 28px rgba(170,152,3,0.22);
-  --sh-gold-sm: 0 4px 14px rgba(170,152,3,0.16);
+  --sh-gold: 0 8px 28px rgba(0,0,0,0.20);
+  --sh-gold-sm: 0 4px 14px rgba(0,0,0,0.14);
 
   /* Ink — raw RGB triplet for text/border rgba() overlays that need a
      theme-aware base colour (used on blog.html). Light mode: dark ink. */
@@ -109,13 +109,13 @@
   --border2: rgba(255,255,255,0.11);
 
   --text:  #ffffff;
-  --text2: #857f74;
-  --text3: #4a4640;
+  --text2: #a3a3a3;
+  --text3: #5c5c5c;
 
-  --gold:     #c8b304;
-  --gold2:    #dcc504;
-  --gold-dim: rgba(200,179,4,0.12);
-  --gold-glo: rgba(200,179,4,0.30);
+  --gold:     #f2f2f2;
+  --gold2:    #ffffff;
+  --gold-dim: rgba(255,255,255,0.08);
+  --gold-glo: rgba(255,255,255,0.20);
 
   --blue:     #4f8ef7;
   --blue2:    #7eb3ff;
@@ -134,8 +134,8 @@
 
   --sh:      0 4px 24px rgba(0,0,0,0.45);
   --sh2:     0 16px 64px rgba(0,0,0,0.65);
-  --sh-gold: 0 8px 28px rgba(200,179,4,0.28);
-  --sh-gold-sm: 0 4px 14px rgba(200,179,4,0.20);
+  --sh-gold: 0 8px 28px rgba(255,255,255,0.14);
+  --sh-gold-sm: 0 4px 14px rgba(255,255,255,0.10);
 
   /* Dark mode: flip ink to a light tone so blog.html text/borders
      built from rgba(var(--ink),alpha) stay legible. */
@@ -355,7 +355,7 @@ body::after {
 .btn-gold-sm {
   padding: 7px 16px; border-radius: 8px;
   font-size: 12px; font-weight: 700;
-  background: linear-gradient(135deg, #8c7e03 0%, var(--gold) 45%, var(--gold2) 100%);
+  background: linear-gradient(135deg, #000000 0%, var(--gold) 45%, var(--gold2) 100%);
   color: #fff; white-space: nowrap; transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
   box-shadow: var(--sh-gold-sm), inset 0 1px 0 rgba(255,255,255,0.2);
   position: relative; overflow: hidden;
@@ -622,7 +622,7 @@ body::after {
    backwards compat — refactor pages to .btn-primary over time. */
 .btn-primary, .btn-gold,
 .btn-hero-gold, .btn-cta-gold {
-  background: linear-gradient(135deg, #8c7e03 0%, #aa9803 45%, #c8b304 100%);
+  background: linear-gradient(135deg, #000000 0%, #161616 45%, #2b2b2b 100%);
   color: #ffffff; border: none;
   box-shadow: 0 2px 0 rgba(0,0,0,0.22), var(--sh-gold-sm), inset 0 1px 0 rgba(255,255,255,0.15);
 }
@@ -630,8 +630,8 @@ body::after {
 [data-theme="dark"] .btn-gold,
 [data-theme="dark"] .btn-hero-gold,
 [data-theme="dark"] .btn-cta-gold {
-  color: #ffffff;
-  background: linear-gradient(135deg, #c8b304 0%, #dcc504 50%, #c8b304 100%);
+  color: #0a0a0a;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%);
   box-shadow: 0 2px 0 rgba(0,0,0,0.40), var(--sh-gold-sm), inset 0 1px 0 rgba(255,255,255,0.12);
 }
 .btn-primary:hover, .btn-gold:hover,
