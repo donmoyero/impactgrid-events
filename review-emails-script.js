@@ -82,10 +82,10 @@
 
   function _sourceLabel(s) {
     return {
-      auto        : '⏱ Auto (after event ready)',
-      manual      : '👤 Manual (per request)',
-      manual_adhoc: '✍️ Manual (any email)',
-      cron        : '🔁 Cron safety-net'
+      auto        : 'Auto (after event ready)',
+      manual      : 'Manual (per request)',
+      manual_adhoc: 'Manual (any email)',
+      cron        : 'Cron safety-net'
     }[s] || s || '—';
   }
 
@@ -103,7 +103,7 @@
   function _renderError(msg) {
     var el = document.getElementById('review-emails-table-wrap');
     if (!el) return;
-    el.innerHTML = '<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">' + _esc(msg) + '</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">' + _esc(msg) + '</div></div>';
   }
 
   function _renderTable() {
@@ -111,7 +111,7 @@
     if (!el) return;
 
     if (!_log.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico">📧</div><div class="empty-txt">No review request emails sent yet.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No review request emails sent yet.</div></div>';
       return;
     }
 
@@ -125,12 +125,12 @@
           if ((r.ai_message || '').length > 60) preview += '…';
           return '<tr>'
             + '<td style="font-weight:600;">' + _esc(r.guest_email) + '</td>'
-            + '<td>' + _esc(r.event_name || (r.service_title ? '🛠 ' + r.service_title : '—')) + '</td>'
+            + '<td>' + _esc(r.event_name || (r.service_title ? '' + r.service_title : '—')) + '</td>'
             + '<td style="font-size:11px;color:var(--text3);max-width:220px;">' + _esc(preview) + '</td>'
             + '<td style="font-size:11px;color:var(--text3);">' + _sourceLabel(r.source) + '</td>'
             + '<td>' + statusPill + '</td>'
             + '<td style="color:var(--text3);font-size:12px;">' + sentDate + (r.resent_at ? '<br><span style="font-size:10px;">resent ' + new Date(r.resent_at).toLocaleDateString('en-GB') + '</span>' : '') + '</td>'
-            + '<td><button class="btn btn-ghost btn-sm" onclick="viewReviewEmail(\'' + r.id + '\')">👁 Preview / Resend</button></td>'
+            + '<td><button class="btn btn-ghost btn-sm" onclick="viewReviewEmail(\'' + r.id + '\')">Preview / Resend</button></td>'
             + '</tr>';
         }).join('')
       + '</tbody></table>';
@@ -173,13 +173,13 @@
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
 
-      toast('✅', 'Review request resent!', '');
+      toast('', 'Review request resent!', '');
       closeReviewEmailModal();
       loadReviewEmailLog();
     } catch (e) {
-      toast('❌', 'Failed to resend', e.message);
+      toast('', 'Failed to resend', e.message);
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '📤 Resend'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Resend'; }
     }
   };
 
@@ -193,7 +193,7 @@
     var btn    = document.getElementById('adhoc-sendBtn');
 
     if (!email) {
-      toast('⚠️', 'Missing info', 'Guest email is required');
+      toast('', 'Missing info', 'Guest email is required');
       return;
     }
 
@@ -208,14 +208,14 @@
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
 
-      toast('✅', 'Review request sent!', email + ' will get an email asking for a review');
+      toast('', 'Review request sent!', email + ' will get an email asking for a review');
       document.getElementById('adhoc-email').value = '';
       if (svcEl) svcEl.value = '';
       loadReviewEmailLog();
     } catch (e) {
-      toast('❌', 'Failed to send', e.message);
+      toast('', 'Failed to send', e.message);
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '⭐ Send Review Request'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Send Review Request'; }
     }
   };
 
