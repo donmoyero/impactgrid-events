@@ -163,6 +163,29 @@
     }).join('');
   }
 
+  /* ── Add (create mode) ──────────────────────────────────── */
+  window.openAddReviewModal = async function () {
+    document.getElementById('revEdit-id').value      = '';
+    document.getElementById('revEdit-reviewer').value = '';
+    document.getElementById('revEdit-event').value    = '';
+    document.getElementById('revEdit-message').value  = '';
+    _setEditStars(5);
+
+    if (!_services.length) { try { await _loadServicesForPicker(); } catch (e) {} }
+    _populateServicePicker('');
+
+    var hint = document.getElementById('revEdit-service-hint');
+    if (hint) hint.style.display = 'none';
+
+    var title = document.getElementById('revEdit-title');
+    if (title) title.textContent = 'Add Review';
+    var btn = document.getElementById('revEdit-saveBtn');
+    if (btn) btn.textContent = 'Add Review';
+
+    var modal = document.getElementById('reviewEditModal');
+    if (modal) modal.style.display = 'flex';
+  };
+
   /* ── Edit ───────────────────────────────────────────────── */
   window.editReview = async function (id) {
     var r = _reviews.find(function (x) { return x.id === id; });
@@ -179,6 +202,11 @@
 
     var hint = document.getElementById('revEdit-service-hint');
     if (hint) hint.style.display = r.service_id ? 'none' : 'block';
+
+    var title = document.getElementById('revEdit-title');
+    if (title) title.textContent = 'Edit Review';
+    var btn = document.getElementById('revEdit-saveBtn');
+    if (btn) btn.textContent = 'Save Changes';
 
     var modal = document.getElementById('reviewEditModal');
     if (modal) modal.style.display = 'flex';
@@ -217,6 +245,7 @@
 
   window.saveReviewEdit = async function () {
     var id       = document.getElementById('revEdit-id').value;
+    var isNew    = !id;
     var btn      = document.getElementById('revEdit-saveBtn');
     var reviewer  = document.getElementById('revEdit-reviewer').value.trim();
     var eventNm   = document.getElementById('revEdit-event').value.trim();
@@ -226,33 +255,63 @@
     var serviceId = svcSel ? svcSel.value : '';
     var svcObj    = serviceId ? _services.find(function (s) { return s.id === serviceId; }) : null;
 
-    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    if (btn) { btn.disabled = true; btn.textContent = isNew ? 'Adding…' : 'Saving…'; }
     try {
-      var { error } = await getSupabase()
-        .from('event_reviews')
-        .update({
-          reviewer_name: reviewer || null,
-          event_name   : eventNm || null,
-          message      : message || null,
-          rating       : rating,
-          service_id   : serviceId || null,
-          service_title: svcObj ? svcObj.title : null
-        })
-        .eq('id', id);
-      if (error) throw error;
+      if (isNew) {
+        /* New reviews are pinned to the front (position 0) so they show up
+           first in the homepage carousel; existing rows shift back by one. */
+        _reviews.forEach(function (r) { r.position = (r.position || 0) + 1; });
+        try {
+          await Promise.all(_reviews.map(function (r) {
+            return getSupabase().from('event_reviews').update({ position: r.position }).eq('id', r.id);
+          }));
+        } catch (e) { /* non-fatal — homepage still sorts by created_at as a fallback */ }
 
-      var r = _reviews.find(function (x) { return x.id === id; });
-      if (r) {
-        r.reviewer_name = reviewer; r.event_name = eventNm; r.message = message; r.rating = rating;
-        r.service_id = serviceId || null; r.service_title = svcObj ? svcObj.title : null;
+        var { data, error } = await getSupabase()
+          .from('event_reviews')
+          .insert([{
+            reviewer_name: reviewer || null,
+            event_name   : eventNm || null,
+            message      : message || null,
+            rating       : rating,
+            service_id   : serviceId || null,
+            service_title: svcObj ? svcObj.title : null,
+            position     : 0
+          }])
+          .select();
+        if (error) throw error;
+
+        if (data && data[0]) _reviews.unshift(data[0]);
+        _renderTable();
+        closeReviewEditModal();
+        toast('✅', 'Review added', 'Now live on the homepage');
+      } else {
+        var { error } = await getSupabase()
+          .from('event_reviews')
+          .update({
+            reviewer_name: reviewer || null,
+            event_name   : eventNm || null,
+            message      : message || null,
+            rating       : rating,
+            service_id   : serviceId || null,
+            service_title: svcObj ? svcObj.title : null
+          })
+          .eq('id', id);
+        if (error) throw error;
+
+        var r = _reviews.find(function (x) { return x.id === id; });
+        if (r) {
+          r.reviewer_name = reviewer; r.event_name = eventNm; r.message = message; r.rating = rating;
+          r.service_id = serviceId || null; r.service_title = svcObj ? svcObj.title : null;
+        }
+        _renderTable();
+        closeReviewEditModal();
+        toast('✅', 'Review updated', '');
       }
-      _renderTable();
-      closeReviewEditModal();
-      toast('✅', 'Review updated', '');
     } catch (e) {
-      toast('❌', 'Failed to save', e.message);
+      toast('❌', isNew ? 'Failed to add' : 'Failed to save', e.message);
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+      if (btn) { btn.disabled = false; btn.textContent = isNew ? 'Add Review' : 'Save Changes'; }
     }
   };
 
