@@ -538,7 +538,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <!-- ═════════ 1. HERO ═════════ -->
   <section class="h-hero">
     <div class="h-hero-photo">
-      <img src="assets/home/hero.jpg" alt="Guest in a black sequined dress at an evening event, photographed by Impact Grid" width="1216" height="880" fetchpriority="high" />
+      <img id="hHeroImg" src="assets/home/hero.jpg" alt="Guest in a black sequined dress at an evening event, photographed by Impact Grid" width="1216" height="880" fetchpriority="high" />
     </div>
     <div class="h-hero-shade"></div>
 
@@ -579,7 +579,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     <div class="h-in--wide">
       <div class="h-svc-grid">
         <a href="services.html" class="h-svc">
-          <img src="assets/home/service-photography.jpg" alt="" loading="lazy" />
+          <img id="hSvc1Img" src="assets/home/service-photography.jpg" alt="" loading="lazy" />
           <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
           <div class="h-svc-row">
             <div>
@@ -591,7 +591,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
         </a>
 
         <a href="services.html" class="h-svc">
-          <img src="assets/home/service-content.jpg" alt="" loading="lazy" />
+          <img id="hSvc2Img" src="assets/home/service-content.jpg" alt="" loading="lazy" />
           <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4V8z"/></svg>
           <div class="h-svc-row">
             <div>
@@ -603,7 +603,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
         </a>
 
         <a href="services.html" class="h-svc">
-          <img src="assets/home/service-galleries.jpg" alt="" loading="lazy" />
+          <img id="hSvc3Img" src="assets/home/service-galleries.jpg" alt="" loading="lazy" />
           <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           <div class="h-svc-row">
             <div>
@@ -631,10 +631,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     </div>
     <div class="h-in--wide">
       <div class="h-tiles">
-        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-celebrations.jpg" alt="" loading="lazy" /><span>Celebrations</span></a>
-        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-corporate.jpg" alt="" loading="lazy" /><span>Corporate Events</span></a>
-        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-private.jpg" alt="" loading="lazy" /><span>Private Events</span></a>
-        <a href="portfolio.html" class="h-tile"><img src="assets/home/event-sports.jpg" alt="" loading="lazy" /><span>Sports &amp; Community</span></a>
+        <a href="portfolio.html" class="h-tile"><img id="hEvt1Img" src="assets/home/event-celebrations.jpg" alt="" loading="lazy" /><span>Celebrations</span></a>
+        <a href="portfolio.html" class="h-tile"><img id="hEvt2Img" src="assets/home/event-corporate.jpg" alt="" loading="lazy" /><span>Corporate Events</span></a>
+        <a href="portfolio.html" class="h-tile"><img id="hEvt3Img" src="assets/home/event-private.jpg" alt="" loading="lazy" /><span>Private Events</span></a>
+        <a href="portfolio.html" class="h-tile"><img id="hEvt4Img" src="assets/home/event-sports.jpg" alt="" loading="lazy" /><span>Sports &amp; Community</span></a>
       </div>
     </div>
   </section>
@@ -714,7 +714,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   </section>
 
   <!-- ═════════ 7. NEWSLETTER ═════════ -->
-  <section class="h-cta">
+  <section class="h-cta" id="hCtaSection">
     <div class="h-in">
       <p class="h-eyebrow" style="color:rgba(255,255,255,.8)">Stay Updated</p>
       <h2 class="h-serif-h" id="hNewsletterHeading">Never Miss a Moment</h2>
@@ -774,6 +774,43 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     }
   }
   loadHomepageContentText();
+
+  /* ── Editable homepage images — pulls saved image URLs from Supabase (site_content) ──
+     Admin > Homepage Images can override any of these. If a key has no saved
+     value (or the row is empty), the hard-coded image already in the HTML stays as-is. */
+  async function loadHomepageImages(){
+    try {
+      var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if (!sb) return;
+      var keys = ['home_hero_photo','home_service_images','home_event_tiles','home_cta_bg'];
+      var res = await sb.from('site_content').select('key, value').in('key', keys);
+      var data = res && res.data;
+      if (res.error || !data || !data.length) return;
+      var kv = {};
+      data.forEach(function(row){
+        try { kv[row.key] = JSON.parse(row.value); } catch(e) {}
+      });
+      function setImg(id, url){
+        if (!url) return;
+        var el = document.getElementById(id);
+        if (el) el.src = url;
+      }
+      if (kv.home_hero_photo) setImg('hHeroImg', kv.home_hero_photo[0]);
+      if (kv.home_service_images) {
+        ['hSvc1Img','hSvc2Img','hSvc3Img'].forEach(function(id, i){ setImg(id, kv.home_service_images[i]); });
+      }
+      if (kv.home_event_tiles) {
+        ['hEvt1Img','hEvt2Img','hEvt3Img','hEvt4Img'].forEach(function(id, i){ setImg(id, kv.home_event_tiles[i]); });
+      }
+      if (kv.home_cta_bg && kv.home_cta_bg[0]) {
+        var cta = document.getElementById('hCtaSection');
+        if (cta) cta.style.backgroundImage = "url('" + kv.home_cta_bg[0].replace(/'/g,"\\'") + "')";
+      }
+    } catch (e) {
+      console.warn('[homepage-images] Could not load saved images:', e && e.message);
+    }
+  }
+  loadHomepageImages();
 
   /* ── Nav goes solid once you scroll past the hero ── */
   (function(){
