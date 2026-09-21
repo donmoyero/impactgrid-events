@@ -167,8 +167,7 @@
       '.nav-guest{flex-direction:row!important;gap:10px!important;}' +
       '.nav-guest .btn-ghost-sm,.nav-guest .btn-gold-sm{width:auto;text-align:center;}' +
       '.nav .theme-btn{width:auto;text-align:center;padding:9px 14px;border-radius:8px;font-size:12.5px;}' +
-      '.nav .hamburger{display:flex!important;}' +
-      '.nav .hamburger span{background:var(--text);}' +
+      '.nav .hamburger{display:none!important;}' +
       '.nav .u-drop{left:auto;right:0;top:calc(100% + 10px);bottom:auto;}' +
       '.nav-book-btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:999px;background:var(--text);color:var(--bg);font-size:13px;font-weight:600;white-space:nowrap;text-decoration:none;transition:opacity .2s;}' +
       '.nav-book-btn:hover{opacity:.82;}' +
@@ -230,10 +229,6 @@
               '<button onclick="igSignOut()">Sign out</button>' +
             '</div>' +
           '</div>' +
-
-          '<button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobSidebar" onclick="openSidebar()">' +
-            '<span></span><span></span><span></span>' +
-          '</button>' +
         '</div>' +
       '</nav>' +
 
