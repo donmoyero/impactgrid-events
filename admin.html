@@ -29,8 +29,8 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;500&family=Italiana&family=Syne:wght@800&family=Nunito:wght@900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="shared.css"/>
 <style>
-:root{--red-glo:rgba(217,79,59,0.18);--sidebar-w:252px;}
-[data-theme="dark"]{--red-glo:rgba(247,95,79,0.22);}
+:root{--red-glo:rgba(217,79,59,0.18);--sidebar-w:252px;--nav-h:72px;--on-gold:#ffffff;}
+[data-theme="dark"]{--red-glo:rgba(247,95,79,0.22);--on-gold:#07090f;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;transition:background .3s,color .3s;}
@@ -40,25 +40,29 @@ h1,h2,h3,h4{font-family:var(--fd);font-weight:900;line-height:1.08;letter-spacin
 input,textarea,select{font-family:var(--fb);font-size:13px;color:var(--text);background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:9px 12px;width:100%;outline:none;transition:border-color .2s,background .2s;resize:vertical;}
 input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);}
 img{display:block;max-width:100%;}
-.topbar{flex-shrink:0;height:var(--nav-h);background:rgba(242,244,251,.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;z-index:100;transition:background .3s;}
-[data-theme="dark"] .topbar{background:rgba(7,9,15,.92);}
-.topbar-logo{display:flex;align-items:center;gap:8px;font-family:var(--fd);font-weight:900;font-size:14px;letter-spacing:-.03em;}
-.topbar-logo-mark{width:28px;height:28px;border-radius:7px;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;}
-[data-theme="dark"] .topbar-logo-mark{color:#07090f;}
-.topbar-logo-img{width:28px;height:28px;object-fit:contain;border-radius:5px;}
+.topbar{flex-shrink:0;height:var(--nav-h);background:rgba(26,22,15,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08);color:#fff;display:flex;align-items:center;padding:0 clamp(16px,2.4vw,32px);gap:14px;z-index:100;transition:background .3s,border-color .3s;}
+[data-theme="dark"] .topbar{background:rgba(26,22,15,.88);}
+.topbar-logo{display:flex;align-items:center;gap:12px;font-family:var(--fb);}
+.topbar-wordmark{display:flex;flex-direction:column;align-items:flex-start;gap:5px;line-height:1;text-align:left;}
+.topbar-wordmark b{font:800 20px/1 var(--fb);letter-spacing:-.02em;color:#fff;}
+.topbar-wordmark i{font:500 8px/1 var(--fb);letter-spacing:.42em;color:#fff;padding-left:2px;font-style:normal;}
+.topbar-logo-mark{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#111;}
+.topbar-logo-img{width:38px;height:38px;object-fit:contain;border-radius:9px;flex:none;}
 .topbar-logo{background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer;}
 .topbar-logo:hover{opacity:.8;}
 .sidebar{transition:background .3s,border-color .3s,width .25s ease;}
 .sidebar.collapsed{width:0;border-right:none;}
-.toast-icon:empty{display:none;}
-.topbar-div{width:1px;height:22px;background:var(--border2);}
-.admin-badge{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--gold-glo);font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);}
+.toast-icon:empty,.sb-ico:empty,.quick-ico:empty,.empty-ico:empty{display:none;}
+.topbar-div{width:1px;height:26px;background:rgba(255,255,255,.18);}
+.admin-badge{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#fff;}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.topbar-user{font-family:var(--fm);font-size:10px;color:var(--text2);}
-.topbar-btn{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:500;color:var(--text2);border:1px solid var(--border2);transition:all .2s;}
-.topbar-btn:hover{color:var(--text);border-color:var(--gold);}
-.topbar-btn-red{color:var(--red);border-color:var(--red-glo);}
-.topbar-btn-red:hover{background:var(--red-dim);}
+.topbar-user{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.75);}
+.topbar-btn{padding:8px 14px;border-radius:8px;font-size:12.5px;font-weight:500;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.4);transition:all .2s;}
+.topbar-btn:hover{border-color:#fff;background:rgba(255,255,255,.14);}
+.topbar-btn-site{background:#fff;color:#111;border-color:#fff;font-weight:600;}
+.topbar-btn-site:hover{background:#fff;opacity:.85;}
+.topbar-btn-red{color:#ff8f80;border-color:rgba(255,143,128,.45);background:transparent;}
+.topbar-btn-red:hover{background:rgba(255,143,128,.14);border-color:#ff8f80;}
 .shell{display:flex;flex:1;overflow:hidden;}
 .sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;transition:background .3s,border-color .3s;}
 .sidebar::-webkit-scrollbar{width:4px;}
@@ -101,7 +105,7 @@ img{display:block;max-width:100%;}
 .quick-title{font-size:13px;font-weight:700;margin-bottom:3px;}
 .quick-desc{font-size:11px;color:var(--text2);line-height:1.55;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .2s cubic-bezier(0.4,0,0.2,1);font-family:var(--fb);}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--on-gold);}
 [data-theme="dark"] .btn-gold{color:#07090f;}
 .btn-gold:hover{transform:translateY(-1px);box-shadow:var(--sh-gold);}
 .btn-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(15,168,118,.2);}
@@ -139,7 +143,7 @@ tr:hover td{background:var(--bg2);}
 .ws-layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
 .ws-sticky{position:sticky;top:0;}
 .mg-tab{background:none;border:1px solid var(--border);color:var(--text2);}
-.mg-tab.active{background:var(--gold);color:#07090f;border-color:var(--gold);}
+.mg-tab.active{background:var(--gold);color:var(--on-gold);border-color:var(--gold);}
 /* ── Manage Gallery: Pic-Time-style split — narrow controls left, big live preview right ── */
 .mg-layout{display:flex;gap:24px;align-items:flex-start;}
 .mg-main{flex:0 0 clamp(340px,30%,420px);min-width:0;}
@@ -149,7 +153,7 @@ tr:hover td{background:var(--bg2);}
 .mg-pv-tools{display:flex;align-items:center;gap:6px;}
 .mg-dev-btn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:var(--r);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .2s;}
 .mg-dev-btn:hover{border-color:var(--gold-glo);color:var(--text);}
-.mg-dev-btn.active{background:var(--gold);color:#07090f;border-color:var(--gold);}
+.mg-dev-btn.active{background:var(--gold);color:var(--on-gold);border-color:var(--gold);}
 .mg-pv-stage{flex:1;min-height:0;background:var(--bg3);display:flex;justify-content:center;align-items:stretch;position:relative;transition:padding .25s ease;}
 .mg-pv-device{position:relative;width:100%;height:100%;background:#fff;overflow:hidden;transition:width .25s ease,border-radius .25s ease;}
 .mg-pv-stage.mg-dev-mobile{padding:18px 0;}
@@ -311,6 +315,7 @@ tr:hover td{background:var(--bg2);}
 @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}.quick-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
 @media(max-width:700px){.sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);transition:transform .3s ease;}.sidebar.open{transform:translateX(0);}.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:499;backdrop-filter:blur(2px);}.sidebar-overlay.open{display:block;}.shell{position:relative;}.page{padding:18px 16px;}.stats-row{grid-template-columns:repeat(2,1fr)!important;}.quick-grid{grid-template-columns:repeat(2,1fr)!important;}}
 @media(min-width:701px){.sidebar-overlay{display:none!important;}}
+@media(max-width:700px){.topbar{gap:10px;}.topbar-user,.topbar-div,.admin-badge{display:none;}.topbar-btn{padding:7px 10px;}}
 
 /* ── Booking Calendar (Bookings page) ── */
 .cal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--sh);}
@@ -367,14 +372,14 @@ tr:hover td{background:var(--bg2);}
   <button type="button" class="topbar-logo" onclick="toggleSidebar()" aria-label="Toggle menu" title="Toggle menu">
     <img src="logo.png" class="topbar-logo-img" alt="ImpactGrid" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
     <div class="topbar-logo-mark" style="display:none;">IG</div>
-    ImpactGrid
+    <span class="topbar-wordmark"><b>IMPACT GRID</b><i>E V E N T S</i></span>
   </button>
   <div class="topbar-div"></div>
   <div class="admin-badge">Admin Workstation</div>
   <div class="topbar-right">
     <span class="topbar-user" id="topbarUser"></span>
     <button class="topbar-btn" id="themeToggleBtn" onclick="toggleAdminTheme()" title="Toggle light/dark"></button>
-    <a href="index.html" target="_blank" class="topbar-btn">View Site</a>
+    <a href="index.html" target="_blank" class="topbar-btn topbar-btn-site">View Site</a>
     <button class="topbar-btn topbar-btn-red" onclick="igLogout()">Sign Out</button>
   </div>
 </div>
@@ -807,8 +812,8 @@ tr:hover td{background:var(--bg2);}
           <div class="card-head">
             <h2 style="font-size:12px;">Live Preview</h2>
             <div class="mg-pv-tools">
-              <button class="mg-dev-btn active" id="mgDevDesktop" onclick="mgSetPreviewDevice('desktop')" title="Desktop view">&#128421; Desktop</button>
-              <button class="mg-dev-btn" id="mgDevMobile" onclick="mgSetPreviewDevice('mobile')" title="Mobile view">&#128241; Mobile</button>
+              <button class="mg-dev-btn active" id="mgDevDesktop" onclick="mgSetPreviewDevice('desktop')" title="Desktop view">Desktop</button>
+              <button class="mg-dev-btn" id="mgDevMobile" onclick="mgSetPreviewDevice('mobile')" title="Mobile view">Mobile</button>
               <button class="btn btn-ghost btn-sm" onclick="mgRefreshPreview()" style="font-size:10px;padding:4px 8px;">&#8635; Refresh</button>
             </div>
           </div>
@@ -1048,7 +1053,7 @@ If you have any questions, just reply to this email.
               <div class="card-head">
                 <h2> Photos</h2>
                 <div style="display:flex;gap:6px;">
-                  <button class="btn btn-ghost btn-sm" onclick="portfolioShuffleImages()" title="Randomize photo order">&#128256; Shuffle</button>
+                  <button class="btn btn-ghost btn-sm" onclick="portfolioShuffleImages()" title="Randomize photo order">Shuffle</button>
                   <label class="btn btn-ghost btn-sm" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
                     <input type="file" id="portfolioAddImageIn" accept="image/*" multiple style="display:none;" onchange="portfolioAddImageFiles(event)">
                   </label>
@@ -1992,8 +1997,8 @@ If you have any questions, just reply to this email.
         <h2>All Bookings</h2>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <div style="display:flex;gap:8px;flex-wrap:wrap;" id="bkFilterBar">
-            <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:#07090f;">All</button>
-            <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)">⏳ Pending</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-all"       onclick="filterBookings('all',this)"       style="background:var(--gold);color:var(--on-gold);">All</button>
+            <button class="btn btn-ghost btn-sm" id="bk-filter-pending"   onclick="filterBookings('pending',this)">Pending</button>
             <button class="btn btn-ghost btn-sm" id="bk-filter-confirmed" onclick="filterBookings('confirmed',this)"> Confirmed</button>
             <button class="btn btn-ghost btn-sm" id="bk-filter-rejected"  onclick="filterBookings('rejected',this)"> Rejected</button>
             <button class="btn btn-ghost btn-sm" onclick="bkToggleSelectMode()">Select</button>
@@ -5867,7 +5872,7 @@ async function loadBookings() {
 
 function filterBookings(status, btn) {
   document.querySelectorAll('[id^="bk-filter-"]').forEach(function(b){ b.style.background=''; b.style.color=''; });
-  if(btn){ btn.style.background='var(--gold)'; btn.style.color='#07090f'; }
+  if(btn){ btn.style.background='var(--gold)'; btn.style.color='var(--on-gold)'; }
   var filtered = status==='all' ? _allBookings : _allBookings.filter(function(b){ return b.status===status; });
   renderBookingsTable(filtered);
 }
@@ -6721,7 +6726,7 @@ function toggleBkCalMultiSelect(){
   if(btn){
     btn.textContent = bkCalMultiMode ? 'Exit Multi-Select' : 'Select Multiple';
     btn.style.background = bkCalMultiMode ? 'var(--gold)' : '';
-    btn.style.color = bkCalMultiMode ? '#07090f' : '';
+    btn.style.color = bkCalMultiMode ? 'var(--on-gold)' : '';
   }
   renderBookingCalendar();
   if(bkCalMultiMode) renderBkCalMultiPanel();
