@@ -59,9 +59,9 @@
       if (error) throw error;
       _reviews = _reviews.filter(function(r){ return r.id !== id; });
       _renderTable();
-      toast('🗑️', 'Review deleted', '');
+      toast('', 'Review deleted', '');
     } catch (e) {
-      toast('❌', 'Failed to delete', e.message);
+      toast('', 'Failed to delete', e.message);
     }
   };
 
@@ -90,7 +90,7 @@
         return c.from('event_reviews').update({ position: r.position }).eq('id', r.id);
       }));
     } catch (e) {
-      toast('❌', 'Failed to save order', e.message);
+      toast('', 'Failed to save order', e.message);
       loadEventReviews();
     }
   };
@@ -120,7 +120,7 @@
   function _renderError(msg) {
     var el = document.getElementById('reviews-table-wrap');
     if (!el) return;
-    el.innerHTML = '<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">' + _esc(msg) + '</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">' + _esc(msg) + '</div></div>';
   }
 
   function _renderTable() {
@@ -131,7 +131,7 @@
     if (countEl) countEl.textContent = _reviews.length;
 
     if (!_reviews.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico">⭐</div><div class="empty-txt">No reviews yet.</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-txt">No reviews yet.</div></div>';
       return;
     }
 
@@ -146,17 +146,17 @@
           '<div style="min-width:0;flex:1;">' +
             '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
               '<span style="font-size:14px;font-weight:700;">' + _esc(r.reviewer_name || 'Anonymous') + '</span>' +
-              (r.event_name ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">📸 ' + _esc(r.event_name) + '</span>' : '') +
-              (r.service_title ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">🛠 ' + _esc(r.service_title) + '</span>' : '') +
-              (!r.service_id ? '<span title="Not linked to a service — hidden from the Services page" style="font-size:10px;font-weight:700;color:var(--red,#e5484d);background:var(--red-dim,rgba(217,79,59,0.12));border:1px solid var(--red-glo,rgba(217,79,59,0.3));padding:1px 7px;border-radius:100px;font-family:var(--fm);">⚠ no service — hidden</span>' : '') +
+              (r.event_name ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">' + _esc(r.event_name) + '</span>' : '') +
+              (r.service_title ? '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">' + _esc(r.service_title) + '</span>' : '') +
+              (!r.service_id ? '<span title="Not linked to a service — hidden from the Services page" style="font-size:10px;font-weight:700;color:var(--red,#e5484d);background:var(--red-dim,rgba(217,79,59,0.12));border:1px solid var(--red-glo,rgba(217,79,59,0.3));padding:1px 7px;border-radius:100px;font-family:var(--fm);">No service — hidden</span>' : '') +
               '<span style="font-size:11px;color:var(--text3);font-family:var(--fm);">' + date + '</span>' +
             '</div>' +
             '<div style="color:var(--gold);font-size:14px;margin-bottom:6px;">' + _stars(r.rating) + '</div>' +
             (r.message ? '<div style="font-size:13px;color:var(--text2);line-height:1.6;">' + _esc(r.message) + '</div>' : '') +
           '</div>' +
           '<div style="display:flex;gap:6px;flex-shrink:0;">' +
-            '<button class="btn btn-ghost btn-sm" onclick="editReview(\'' + r.id + '\')">✏ Edit</button>' +
-            '<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteReview(\'' + r.id + '\')">🗑 Delete</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="editReview(\'' + r.id + '\')">Edit</button>' +
+            '<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteReview(\'' + r.id + '\')">Delete</button>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -284,7 +284,7 @@
         if (data && data[0]) _reviews.unshift(data[0]);
         _renderTable();
         closeReviewEditModal();
-        toast('✅', 'Review added', 'Now live on the homepage');
+        toast('', 'Review added', 'Now live on the homepage');
       } else {
         var { error } = await getSupabase()
           .from('event_reviews')
@@ -306,10 +306,10 @@
         }
         _renderTable();
         closeReviewEditModal();
-        toast('✅', 'Review updated', '');
+        toast('', 'Review updated', '');
       }
     } catch (e) {
-      toast('❌', isNew ? 'Failed to add' : 'Failed to save', e.message);
+      toast('', isNew ? 'Failed to add' : 'Failed to save', e.message);
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = isNew ? 'Add Review' : 'Save Changes'; }
     }
