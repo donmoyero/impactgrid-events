@@ -87,10 +87,11 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
          the site-wide toggle (data-theme="dark" on <html>). */
       --h-bg:      #f6f4f0;
       --h-bg-2:    #efece5;
-      --h-ink:     #14120f;
-      --h-ink-2:   #5f5c57;
+      --h-ink:     #0d0d0d;                /* light mode: solid dark text   */
+      --h-ink-2:   #1f1d1a;                /* secondary text — still dark   */
       --h-line:    rgba(20,18,15,.12);
-      --h-mute:    rgba(20,18,15,.6);
+      --h-line-2:  rgba(20,18,15,.28);     /* stronger dividers / outlines  */
+      --h-mute:    #2e2b27;                /* eyebrows / captions — dark    */
 
       /* Permanent "photo hero" scrim — used only behind the hero and the
          closing CTA banner, where a dark backdrop keeps text legible over a
@@ -99,7 +100,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       --h-scrim:    #1a160f;
       --h-scrim-2:  #221c12;
 
-      --h-light:   #f6f4f0;
+      --h-light:   #f6f4f0;   /* theme-aware: see dark override below */
       --h-gold:    #d9c187;
       --h-serif:   'Fraunces', Georgia, 'Times New Roman', serif;
       --h-sans:    'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -111,10 +112,12 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     html[data-theme="dark"] {
       --h-bg:      var(--h-scrim, #1a160f);
       --h-bg-2:    var(--h-scrim-2, #221c12);
-      --h-ink:     #f7f4ee;
-      --h-ink-2:   rgba(247,244,238,.68);
-      --h-line:    rgba(247,244,238,.13);
-      --h-mute:    rgba(247,244,238,.66);
+      --h-light:   var(--h-scrim, #1a160f);   /* services / how-it-works / partners follow dark mode */
+      --h-ink:     #ffffff;                /* dark mode: pure white text    */
+      --h-ink-2:   #ffffff;
+      --h-line:    rgba(255,255,255,.18);
+      --h-line-2:  rgba(255,255,255,.35);
+      --h-mute:    #ffffff;
     }
 
     html body.home {
@@ -137,7 +140,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       text-transform: uppercase;
       color: var(--h-mute);
     }
-    .h-light .h-eyebrow { color: #7a766f; }
 
     .h-serif-h {
       font-family: var(--h-serif);
@@ -174,9 +176,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     .h-link:hover { opacity: .7; }
 
     body.home a:focus-visible,
-    body.home button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
-    body.home .h-light a:focus-visible,
-    body.home .h-light button:focus-visible { outline-color: #111; }
+    body.home button:focus-visible { outline: 2px solid var(--h-ink); outline-offset: 3px; border-radius: 4px; }
+    body.home #mainNav a:focus-visible, body.home #mainNav button:focus-visible,
+    body.home .h-hero a:focus-visible, body.home .h-hero button:focus-visible,
+    body.home .h-cta a:focus-visible,  body.home .h-cta button:focus-visible { outline-color: #fff; }
 
     /* ── NAV — sits transparent on the hero, goes solid on scroll ──
        The nav bar itself stays a fixed premium dark chrome (like the hero
@@ -212,12 +215,12 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     body.home #mainNav .logo .logo-text::after {
       content: 'E V E N T S';
       font: 500 clamp(8px, .62vw, 10px)/1 var(--h-sans);
-      letter-spacing: .42em; color: rgba(255,255,255,.75);
+      letter-spacing: .42em; color: #fff;
       padding-left: 3px;
     }
     body.home #mainNav .nav-links { justify-content: center; gap: clamp(2px, 1vw, 20px); }
     body.home #mainNav .nav-links a {
-      color: rgba(255,255,255,.9) !important; opacity: 1 !important;
+      color: #fff !important; opacity: 1 !important;
       background: transparent !important;
       font-size: clamp(13px, .95vw, 15px); font-weight: 400;
       padding: 9px clamp(10px, 1vw, 16px);
@@ -228,8 +231,14 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       background: #fff; color: #111; border-radius: 8px;
       padding: 0 22px; height: 46px; font-weight: 500; font-size: 14px;
     }
-    /* Theme toggle is enabled on the homepage too (light is the default,
-       dark uses the warm premium palette defined above). */
+    /* Theme toggle sits on the always-dark nav, so it must be white in BOTH
+       modes (shared.css makes it dark grey in light mode = invisible). */
+    body.home #mainNav .theme-btn {
+      color: #fff !important; opacity: 1 !important;
+      border-color: rgba(255,255,255,.4) !important;
+      background: rgba(255,255,255,.06) !important;
+    }
+    body.home #mainNav .theme-btn:hover { border-color: #fff !important; background: rgba(255,255,255,.14) !important; }
 
     /* Mobile top bar */
     @media (max-width: 768px) {
@@ -256,6 +265,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
     /* ── 1. HERO ─────────────────────────────────── */
     .h-hero {
+      color: #fff;
       position: relative; overflow: hidden;
       min-height: clamp(640px, 46vw, 820px);
       display: flex; align-items: center;
@@ -275,7 +285,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
         linear-gradient(0deg, rgba(26,22,15,.6) 0, rgba(26,22,15,0) 22%);
     }
     .h-hero-inner { position: relative; z-index: 2; width: 100%; padding-top: 96px; padding-bottom: 44px; }
-    .h-hero .h-eyebrow { display: flex; gap: 1.9em; margin-bottom: clamp(14px, 1.4vw, 24px); color: rgba(255,255,255,.82); }
+    .h-hero .h-eyebrow { display: flex; gap: 1.9em; margin-bottom: clamp(14px, 1.4vw, 24px); color: #fff; }
     .h-hero h1 {
       font-family: var(--h-serif); font-weight: 400;
       font-size: clamp(54px, 6.7vw, 124px);
@@ -285,19 +295,19 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     }
     .h-hero-sub {
       font: 400 clamp(15.5px, 1.25vw, 20px)/1.5 var(--h-sans);
-      color: rgba(255,255,255,.88);
+      color: #fff;
       max-width: 27em; margin-bottom: clamp(22px, 2.2vw, 38px);
     }
     .h-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: clamp(26px, 2.8vw, 46px); }
     .h-proof { display: flex; align-items: center; gap: 14px; }
     .h-proof img { width: 96px; height: 40px; flex: none; }
     .h-stars { color: var(--h-gold); font-size: 13px; letter-spacing: 3px; line-height: 1; margin-bottom: 6px; }
-    .h-proof p { font: 400 clamp(12px, .9vw, 14px)/1.3 var(--h-sans); color: rgba(255,255,255,.78); }
+    .h-proof p { font: 400 clamp(12px, .9vw, 14px)/1.3 var(--h-sans); color: #fff; }
 
     .h-side {
       position: absolute; z-index: 2;
       font: 500 clamp(9px, .7vw, 11px)/1.75 var(--h-sans);
-      letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.82);
+      letter-spacing: .3em; text-transform: uppercase; color: #fff;
     }
     .h-side--top { top: 120px; right: clamp(22px, 3.4vw, 60px); padding-left: 16px; }
     .h-side--top::before {
@@ -325,7 +335,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       margin-bottom: clamp(20px, 2vw, 34px);
     }
     .h-services h2 { font-size: clamp(32px, 3.4vw, 58px); margin-top: clamp(10px, 1vw, 16px); }
-    .h-services-head p { font: 400 clamp(14px, 1.05vw, 17px)/1.55 var(--h-sans); color: #4a4743; max-width: 28em; padding-top: clamp(10px, 1vw, 16px); }
+    .h-services-head p { font: 400 clamp(14px, 1.05vw, 17px)/1.55 var(--h-sans); color: var(--h-ink-2); max-width: 28em; padding-top: clamp(10px, 1vw, 16px); }
     .h-services-head .h-link { justify-self: end; align-self: center; color: var(--h-ink); }
 
     .h-svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, .8vw, 14px); }
@@ -351,7 +361,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     .h-svc-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
     .h-svc h3, .h-step h3 { word-spacing: .05em; }
     .h-svc h3 { font: 400 clamp(19px, 1.7vw, 28px)/1.1 var(--h-serif); letter-spacing: -.01em; margin-bottom: 8px; }
-    .h-svc p { font: 400 clamp(12px, .9vw, 14.5px)/1.45 var(--h-sans); color: rgba(255,255,255,.76); max-width: 26em; }
+    .h-svc p { font: 400 clamp(12px, .9vw, 14.5px)/1.45 var(--h-sans); color: #fff; max-width: 26em; }
     .h-svc-go {
       flex: none; width: clamp(32px, 2.6vw, 42px); height: clamp(32px, 2.6vw, 42px); border-radius: 50%;
       border: 1px solid rgba(255,255,255,.45); display: grid; place-items: center;
@@ -369,7 +379,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     .h-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(5px, .5vw, 9px); }
     .h-tile {
       position: relative; overflow: hidden; isolation: isolate;
-      aspect-ratio: 237 / 127; border-radius: 5px; background: #1a160f;
+      aspect-ratio: 237 / 127; border-radius: 5px; background: #1a160f; color: #fff;
       display: flex; align-items: flex-end; padding: clamp(10px, 1vw, 16px);
     }
     .h-tile img { position: absolute; inset: 0 0 auto 0; width: 100%; height: 84%; object-fit: cover; z-index: -2; transition: transform .6s ease;
@@ -387,10 +397,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     .h-step-top { display: flex; align-items: center; gap: 14px; margin-bottom: clamp(12px, 1.2vw, 20px); }
     .h-step-num {
       flex: none; width: clamp(30px, 2.5vw, 40px); height: clamp(30px, 2.5vw, 40px); border-radius: 50%;
-      border: 1px solid #1b1b1b; display: grid; place-items: center;
+      border: 1px solid var(--h-ink); display: grid; place-items: center;
       font: 400 clamp(11px, .85vw, 13px)/1 var(--h-sans);
     }
-    .h-step-top::after { content: ''; flex: 1; height: 1px; background: rgba(0,0,0,.22); }
+    .h-step-top::after { content: ''; flex: 1; height: 1px; background: var(--h-line-2); }
     .h-step h3 { font: 400 clamp(17px, 1.4vw, 23px)/1.15 var(--h-serif); letter-spacing: -.01em; margin-bottom: 6px; }
     .h-step p { font: 400 clamp(12.5px, .9vw, 14.5px)/1.5 var(--h-sans); color: var(--h-ink-2); max-width: 18em; }
 
@@ -426,6 +436,8 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     .h-rate b { display: block; font: 400 clamp(38px, 3.6vw, 64px)/1 var(--h-serif); letter-spacing: -.02em; }
     .h-rate .h-stars { margin: 10px 0 8px; font-size: clamp(14px, 1.1vw, 18px); }
     .h-rate span { font: 400 clamp(12px, .9vw, 14px)/1.3 var(--h-sans); color: var(--h-ink-2); }
+    /* Gold stars are too faint on the light background — deepen them in light mode only */
+    html:not([data-theme="dark"]) .h-reviews .h-stars { color: #9a7414; }
     .h-reviews.is-single .h-arrow,
     .h-reviews.is-single .h-dots { display: none; }
 
@@ -436,15 +448,16 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
     /* ── 7. CTA ──────────────────────────────────── */
     .h-cta {
+      color: #fff;
       position: relative; overflow: hidden; isolation: isolate; text-align: center;
       background: var(--h-scrim) url('assets/home/cta-crowd.jpg') center / cover no-repeat;
       padding: clamp(44px, 4.4vw, 84px) 0 clamp(40px, 4vw, 76px);
     }
     .h-cta::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(26,22,15,.55), rgba(26,22,15,.18) 40%, rgba(26,22,15,.5)); }
-    .h-cta h2 { font-size: clamp(36px, 4.4vw, 76px); margin: clamp(12px, 1.2vw, 20px) 0 clamp(12px, 1.2vw, 20px); }
+    .h-cta h2 { color: #fff; font-size: clamp(36px, 4.4vw, 76px); margin: clamp(12px, 1.2vw, 20px) 0 clamp(12px, 1.2vw, 20px); }
     .h-cta-sub { display: flex; align-items: center; justify-content: center; gap: clamp(14px, 1.6vw, 26px); margin-bottom: clamp(20px, 2vw, 34px); }
     .h-cta-sub::before, .h-cta-sub::after { content: ''; height: 1px; width: clamp(40px, 8vw, 130px); background: rgba(255,255,255,.4); }
-    .h-cta-sub p { font: 400 clamp(15px, 1.25vw, 20px)/1.3 var(--h-sans); color: rgba(255,255,255,.92); }
+    .h-cta-sub p { font: 400 clamp(15px, 1.25vw, 20px)/1.3 var(--h-sans); color: #fff; }
     .h-newsletter-form {
       display: flex; align-items: center; justify-content: center;
       gap: 10px; flex-wrap: wrap; max-width: 520px; margin: 0 auto;
@@ -454,14 +467,14 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08);
       color: #fff; font: 400 15px/1 var(--h-sans);
     }
-    .h-newsletter-input::placeholder { color: rgba(255,255,255,.55); }
+    .h-newsletter-input::placeholder { color: #fff; opacity: .7; }
     .h-newsletter-input:focus { outline: 2px solid #fff; outline-offset: 2px; }
     .h-newsletter-form .h-btn { flex: none; }
-    .h-newsletter-msg { margin-top: 14px; font: 400 13px/1.4 var(--h-sans); color: rgba(255,255,255,.85); min-height: 18px; }
+    .h-newsletter-msg { margin-top: 14px; font: 400 13px/1.4 var(--h-sans); color: #fff; min-height: 18px; }
     .h-corner {
       position: absolute; bottom: clamp(24px, 2.6vw, 44px);
       font: 500 clamp(9px, .68vw, 11px)/1.85 var(--h-sans); letter-spacing: .3em; text-transform: uppercase;
-      color: rgba(255,255,255,.8); text-align: left;
+      color: #fff; text-align: left;
     }
     .h-corner--l { left: var(--h-pad); }
     .h-corner--l span { display: block; }
@@ -739,7 +752,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <!-- ═════════ 7. NEWSLETTER ═════════ -->
   <section class="h-cta" id="hCtaSection">
     <div class="h-in">
-      <p class="h-eyebrow" style="color:rgba(255,255,255,.8)">Stay Updated</p>
+      <p class="h-eyebrow" style="color:#fff">Stay Updated</p>
       <h2 class="h-serif-h" id="hNewsletterHeading">Never Miss a Moment</h2>
       <div class="h-cta-sub"><p id="hNewsletterSub">Event tips, portfolio drops and behind-the-scenes — straight to your inbox.</p></div>
       <form id="newsletterForm" class="h-newsletter-form">
