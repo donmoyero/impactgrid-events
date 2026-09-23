@@ -42,7 +42,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   min-height: 100vh;
-  padding-left: var(--nav-w-collapsed);   /* room for the shared left-rail nav so it doesn't sit on top of the photo panel */
 }
 
 /* ── Photo panel ── */
@@ -57,16 +56,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   position: absolute; inset: 0; width: 100%; height: 100%;
 }
 .bk-photo img.bk-photo-img { object-fit: cover; object-position: center; }
-.bk-photo::after {          /* legibility gradient behind logo + caption */
+.bk-photo::after {          /* legibility gradient behind the caption */
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to bottom, rgba(0,0,0,.45), transparent 28%, transparent 55%, rgba(0,0,0,.72));
 }
-.bk-photo-logo {
-  position: absolute; top: 28px; left: 28px; z-index: 2;
-  display: flex; align-items: center; gap: 12px;
-  font-family: var(--fd); font-weight: 800; font-size: 16px; color: #fff;
-}
-.bk-photo-logo img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; }
 .bk-photo-cap {
   position: absolute; left: 28px; right: 28px; bottom: 32px; z-index: 2;
   font-family: var(--fd); font-size: clamp(22px, 2.4vw, 32px); font-weight: 800;
@@ -116,7 +109,8 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   font-family: var(--fd); font-size: 15px; font-weight: 800; letter-spacing: -.01em;
   cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s;
 }
-.bk-btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #07090f; }
+.bk-btn-primary { background: linear-gradient(135deg, #000000 0%, #161616 45%, #2b2b2b 100%); color: #ffffff; }
+[data-theme="dark"] .bk-btn-primary { background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%); color: #0a0a0a; }
 .bk-btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--sh-gold); }
 .bk-btn-ghost { flex: 0 0 auto; background: var(--bg3); border-color: var(--border2); color: var(--text2); font-family: var(--fb); font-weight: 600; font-size: 14px; }
 .bk-btn-ghost:hover { border-color: var(--text); color: var(--text); }
@@ -193,10 +187,8 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
    Breakpoint matches shared.css (768px) — that's where the left-rail nav
    collapses into the fixed top bar, so the two layouts must switch together. */
 @media (max-width: 768px) {
-  .bk-split { grid-template-columns: 1fr; padding-top: 56px; padding-left: 0; }   /* 56px = fixed mobile top bar */
+  .bk-split { grid-template-columns: 1fr; padding-top: 56px; }   /* 56px = fixed mobile top bar */
   .bk-photo { position: relative; height: 200px; }
-  .bk-photo-logo { top: 16px; left: 16px; }
-  .bk-photo-logo img { width: 40px; height: 40px; }
   .bk-photo-cap { display: none; }
   .bk-panel { padding: 32px 20px 56px; }
 }
@@ -223,16 +215,14 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <!-- ═════ PHOTO PANEL ═════
        Managed from Admin → Homepage Images → "Book Us Splash Photo" (site_content key: book_us_photo).
        Falls back to booking-model.webp/.jpg in the site root if nothing has been uploaded yet,
-       and to the dark branded background if neither exists. -->
+       and to the dark branded background if neither exists.
+       No logo/wordmark here — the shared top nav already carries the brand, so the photo runs
+       full-bleed with just the caption over it. -->
   <aside class="bk-photo" aria-hidden="true">
     <picture id="bkPhotoPicture">
       <source id="bkPhotoSource" srcset="booking-model.webp" type="image/webp"/>
       <img class="bk-photo-img" id="bkPhotoImg" src="booking-model.jpg" alt="" onerror="this.closest('picture').style.display='none'"/>
     </picture>
-    <div class="bk-photo-logo">
-      <img src="logo.png" alt=""/>
-      <span>ImpactGrid Events</span>
-    </div>
     <div class="bk-photo-cap">Your event, captured properly.</div>
   </aside>
 
