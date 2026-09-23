@@ -507,37 +507,6 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
 
-      <!--  SECTION 2: SERVICE CARD IMAGES  -->
-      <div class="card" style="margin-bottom:18px;">
-        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-serviceimgs')">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;"></span>
-            <div>
-              <div style="font-size:14px;font-weight:800;">Service Card Images</div>
-              <div style="font-size:11px;color:var(--text3);margin-top:1px;">The 3 images on the "Our Services" cards</div>
-            </div>
-          </div>
-          <span id="chev-serviceimgs" style="font-size:11px;color:var(--text3);transition:transform .2s;"></span>
-        </div>
-        <div id="sec-serviceimgs" style="display:none;border-top:1px solid var(--border);">
-          <div style="padding:20px;">
-            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Exactly 3 images, in this order: <strong>1) Event Photography  2) Content Creation  3) Online Galleries</strong>. Drag to reorder.</p>
-            <div class="upload-zone" id="svcDropZone" style="margin-bottom:14px;" onclick="document.getElementById('svcFileIn').click()" ondragover="onDragOver(event,'svcDropZone')" ondragleave="onDragLeave(event,'svcDropZone')" ondrop="onDropSection(event,'svcDropZone','serviceImgList','home_service_images',3)">
-              <div class="upload-zone-ico"></div>
-              <div class="upload-zone-title">Drop images here or click to upload</div>
-              <div class="upload-zone-sub">JPG · PNG · WebP · up to 3 images</div>
-              <input type="file" id="svcFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handleSectionFiles(event,'serviceImgList','home_service_images',3)"/>
-            </div>
-            <div id="svcUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
-            <div id="serviceImgList" style="display:flex;flex-direction:column;gap:8px;"></div>
-            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-              <button class="btn btn-ghost btn-sm" onclick="addSectionRow('serviceImgList','home_service_images',3)">+ Add URL</button>
-              <button class="btn btn-gold" onclick="saveSectionList('serviceImgList','home_service_images','Service images')"> Save Service Images</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!--  SECTION 3: FEATURED WORK / EVENT TILES  -->
       <div class="card" style="margin-bottom:18px;">
         <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-eventtiles')">
@@ -2534,11 +2503,6 @@ var CONTENT_DEFS=[
     {key:'hero_btn1_text',label:'Primary button text',type:'text'},
     {key:'hero_btn2_text',label:'Secondary button text',type:'text'}
   ]},
-  {section:' Services Section',fields:[
-    {key:'svc1_title',label:'Card 1 — title',type:'text'},{key:'svc1_desc',label:'Card 1 — description',type:'textarea'},
-    {key:'svc2_title',label:'Card 2 — title',type:'text'},{key:'svc2_desc',label:'Card 2 — description',type:'textarea'},
-    {key:'svc3_title',label:'Card 3 — title',type:'text'},{key:'svc3_desc',label:'Card 3 — description',type:'textarea'}
-  ]},
   {section:' How It Works Section',fields:[
     {key:'how_heading_line1',label:'Heading — Line 1',type:'text'},
     {key:'how_heading_line2',label:'Heading — Line 2',type:'text'},
@@ -4067,11 +4031,6 @@ var VT = (function(){
    into index.html. Shown until a section is saved with a real upload, so the
    admin preview always matches what's live. */
 var DEFAULT_HERO_PHOTO = ['assets/home/hero.jpg'];
-var DEFAULT_SERVICE_IMAGES = [
-  'assets/home/service-photography.jpg',
-  'assets/home/service-content.jpg',
-  'assets/home/service-galleries.jpg'
-];
 var DEFAULT_EVENT_TILES = [
   'assets/home/event-celebrations.jpg',
   'assets/home/event-corporate.jpg',
@@ -4093,10 +4052,10 @@ function toggleSection(id){
 
 /* Load ALL homepage sections when the hero page opens */
 async function loadAllHomepageSections(){
-  var keys = ['home_hero_photo','home_service_images','home_event_tiles','home_cta_bg','book_us_photo'];
-  var defaults = { home_hero_photo: DEFAULT_HERO_PHOTO, home_service_images: DEFAULT_SERVICE_IMAGES, home_event_tiles: DEFAULT_EVENT_TILES, home_cta_bg: DEFAULT_CTA_BG, book_us_photo: DEFAULT_BOOK_US_PHOTO };
-  var listIds  = { home_hero_photo: 'heroPhotoList', home_service_images: 'serviceImgList', home_event_tiles: 'eventTilesList', home_cta_bg: 'ctaBgList', book_us_photo: 'bookUsPhotoList' };
-  var maxes    = { home_hero_photo: 1, home_service_images: 3, home_event_tiles: 4, home_cta_bg: 1, book_us_photo: 1 };
+  var keys = ['home_hero_photo','home_event_tiles','home_cta_bg','book_us_photo'];
+  var defaults = { home_hero_photo: DEFAULT_HERO_PHOTO, home_event_tiles: DEFAULT_EVENT_TILES, home_cta_bg: DEFAULT_CTA_BG, book_us_photo: DEFAULT_BOOK_US_PHOTO };
+  var listIds  = { home_hero_photo: 'heroPhotoList', home_event_tiles: 'eventTilesList', home_cta_bg: 'ctaBgList', book_us_photo: 'bookUsPhotoList' };
+  var maxes    = { home_hero_photo: 1, home_event_tiles: 4, home_cta_bg: 1, book_us_photo: 1 };
 
   /* Show cached/defaults immediately */
   keys.forEach(function(k){
@@ -4238,7 +4197,7 @@ function handleSectionFiles(e, listId, key, max){
 
 async function uploadSectionFiles(files, listId, key, max){
   var el = document.getElementById(listId);
-  var progId = { heroPhotoList:'hpUploadProg', serviceImgList:'svcUploadProg', eventTilesList:'evtUploadProg', ctaBgList:'ctaUploadProg', bookUsPhotoList:'buUploadProg' }[listId];
+  var progId = { heroPhotoList:'hpUploadProg', eventTilesList:'evtUploadProg', ctaBgList:'ctaUploadProg', bookUsPhotoList:'buUploadProg' }[listId];
   var prog = progId ? document.getElementById(progId) : null;
 
   /* Check limit */
