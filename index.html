@@ -554,43 +554,9 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     </div>
 
     <div class="h-in--wide">
-      <div class="h-svc-grid">
-        <a href="services.html" class="h-svc">
-          <img id="hSvc1Img" src="assets/home/service-photography.jpg" alt="" loading="lazy" />
-          <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-          <div class="h-svc-row">
-            <div>
-              <h3 id="hSvc1Title">Event Photography</h3>
-              <p id="hSvc1Desc">Natural, high-quality photography that tells the real story of your event.</p>
-            </div>
-            <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-          </div>
-        </a>
-
-        <a href="services.html" class="h-svc">
-          <img id="hSvc2Img" src="assets/home/service-content.jpg" alt="" loading="lazy" />
-          <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4V8z"/></svg>
-          <div class="h-svc-row">
-            <div>
-              <h3 id="hSvc2Title">Content Creation</h3>
-              <p id="hSvc2Desc">Short-form video, reels and social content to keep the energy going beyond the event.</p>
-            </div>
-            <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-          </div>
-        </a>
-
-        <a href="services.html" class="h-svc">
-          <img id="hSvc3Img" src="assets/home/service-galleries.jpg" alt="" loading="lazy" />
-          <svg class="h-svc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-          <div class="h-svc-row">
-            <div>
-              <h3 id="hSvc3Title">Online Galleries</h3>
-              <p id="hSvc3Desc">A seamless, secure gallery for you and your guests to view, share and download.</p>
-            </div>
-            <span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-          </div>
-        </a>
-      </div>
+      <!-- Populated live by loadTopServices() below with the top 3 most-booked
+           services — no manual editing needed, this always reflects reality. -->
+      <div class="h-svc-grid" id="hSvcGrid"></div>
     </div>
   </section>
 
@@ -716,7 +682,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
      value, the hard-coded text already in the HTML stays exactly as-is. */
   var HOMEPAGE_TEXT_KEYS = [
     'hero_h1_line1','hero_h1_line2','hero_sub','hero_btn1_text','hero_btn2_text',
-    'svc1_title','svc1_desc','svc2_title','svc2_desc','svc3_title','svc3_desc',
     'how_heading_line1','how_heading_line2',
     'step1_title','step1_desc','step2_title','step2_desc','step3_title','step3_desc','step4_title','step4_desc',
     'reviews_heading',
@@ -725,8 +690,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   var HOMEPAGE_TEXT_ID_MAP = {
     hero_h1_line1:'hHeroLine1', hero_h1_line2:'hHeroLine2', hero_sub:'hHeroSub',
     hero_btn1_text:'hHeroBtn1', hero_btn2_text:'hHeroBtn2',
-    svc1_title:'hSvc1Title', svc1_desc:'hSvc1Desc', svc2_title:'hSvc2Title', svc2_desc:'hSvc2Desc',
-    svc3_title:'hSvc3Title', svc3_desc:'hSvc3Desc',
     how_heading_line1:'hHowH1', how_heading_line2:'hHowH2',
     step1_title:'hStep1Title', step1_desc:'hStep1Desc', step2_title:'hStep2Title', step2_desc:'hStep2Desc',
     step3_title:'hStep3Title', step3_desc:'hStep3Desc', step4_title:'hStep4Title', step4_desc:'hStep4Desc',
@@ -759,7 +722,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
       if (!sb) return;
-      var keys = ['home_hero_photo','home_service_images','home_event_tiles','home_cta_bg'];
+      var keys = ['home_hero_photo','home_event_tiles','home_cta_bg'];
       var res = await sb.from('site_content').select('key, value').in('key', keys);
       var data = res && res.data;
       if (res.error || !data || !data.length) return;
@@ -773,9 +736,6 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
         if (el) el.src = url;
       }
       if (kv.home_hero_photo) setImg('hHeroImg', kv.home_hero_photo[0]);
-      if (kv.home_service_images) {
-        ['hSvc1Img','hSvc2Img','hSvc3Img'].forEach(function(id, i){ setImg(id, kv.home_service_images[i]); });
-      }
       if (kv.home_event_tiles) {
         ['hEvt1Img','hEvt2Img','hEvt3Img','hEvt4Img'].forEach(function(id, i){ setImg(id, kv.home_event_tiles[i]); });
       }
@@ -788,6 +748,51 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     }
   }
   loadHomepageImages();
+
+  /* ── "Our Services" section — always the real top 3 most-booked services ──
+     Pulled live from /api/top-services (ranked by CONFIRMED bookings) on every
+     page load, so this updates itself automatically as patronage changes —
+     no admin upkeep required. */
+  var EVENTS_API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+  var SVC_GO_ARROW = '<span class="h-svc-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>';
+
+  function renderTopServices(services){
+    var grid = document.getElementById('hSvcGrid');
+    if (!grid || !services || !services.length) return;
+
+    grid.innerHTML = services.map(function(s){
+      var img = s.image_url
+        ? '<img src="' + escHtml(s.image_url) + '" alt="" loading="lazy" />'
+        : '';
+      var priceBadge = s.icon
+        ? '<span class="h-svc-ico" style="width:auto;height:auto;stroke:none;fill:none;font:600 13px var(--h-sans, sans-serif);color:#f0b429;display:inline-block;margin-bottom:clamp(10px,1vw,16px);">' + escHtml(s.icon) + '</span>'
+        : '';
+      var params = 'service=' + encodeURIComponent(s.title || '')
+        + '&id=' + encodeURIComponent(s.id || '')
+        + (s.icon ? '&price=' + encodeURIComponent(s.icon) : '');
+      return '<a href="book-us.html?' + params + '" class="h-svc">' +
+        img + priceBadge +
+        '<div class="h-svc-row">' +
+          '<div>' +
+            '<h3>' + escHtml(s.title) + '</h3>' +
+            '<p>' + escHtml(s.description) + '</p>' +
+          '</div>' +
+          SVC_GO_ARROW +
+        '</div>' +
+      '</a>';
+    }).join('');
+  }
+
+  async function loadTopServices(){
+    try {
+      var res = await fetch(EVENTS_API + '/api/top-services');
+      var data = await res.json();
+      if (data && data.services && data.services.length) renderTopServices(data.services);
+    } catch (e) {
+      console.warn('[top-services] Could not load top services:', e && e.message);
+    }
+  }
+  loadTopServices();
 
   /* ── Nav goes solid once you scroll past the hero ── */
   (function(){
