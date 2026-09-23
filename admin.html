@@ -599,8 +599,39 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
 
+      <!--  SECTION 5: BOOK US SPLASH PHOTO  -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head" style="cursor:pointer;" onclick="toggleSection('sec-bookusphoto')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;"></span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">Book Us Splash Photo</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px;">The big photo down the side of the Book Us page</div>
+            </div>
+          </div>
+          <span id="chev-bookusphoto" style="font-size:11px;color:var(--text3);transition:transform .2s;"></span>
+        </div>
+        <div id="sec-bookusphoto" style="display:none;border-top:1px solid var(--border);">
+          <div style="padding:20px;">
+            <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">1 image. This fills the entire side panel top-to-bottom, so use a tall, high-res photo — a full-length or portrait shot works best. It's shown behind a dark gradient with your logo, so avoid busy detail near the top-left corner.</p>
+            <div class="upload-zone" id="buDropZone" style="margin-bottom:14px;" onclick="document.getElementById('buFileIn').click()" ondragover="onDragOver(event,'buDropZone')" ondragleave="onDragLeave(event,'buDropZone')" ondrop="onDropSection(event,'buDropZone','bookUsPhotoList','book_us_photo',1)">
+              <div class="upload-zone-ico"></div>
+              <div class="upload-zone-title">Drop image here or click to upload</div>
+              <div class="upload-zone-sub">JPG · PNG · WebP · 1 image</div>
+              <input type="file" id="buFileIn" accept="image/jpeg,image/png,image/webp" onchange="handleSectionFiles(event,'bookUsPhotoList','book_us_photo',1)"/>
+            </div>
+            <div id="buUploadProg" style="display:none;background:var(--gold-dim);border:1px solid var(--gold-glo);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);"></div>
+            <div id="bookUsPhotoList" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="btn btn-gold" onclick="saveSectionList('bookUsPhotoList','book_us_photo','Book Us photo')"> Save Photo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div style="margin-bottom:18px;">
         <a href="index.html" target="_blank" class="btn btn-green btn-sm" style="display:inline-flex;"> Preview Homepage</a>
+        <a href="book-us.html" target="_blank" class="btn btn-ghost btn-sm" style="display:inline-flex;"> Preview Book Us</a>
       </div>
     </div>
     <!-- UPDATES -->
@@ -4048,6 +4079,7 @@ var DEFAULT_EVENT_TILES = [
   'assets/home/event-sports.jpg'
 ];
 var DEFAULT_CTA_BG = ['assets/home/cta-crowd.jpg'];
+var DEFAULT_BOOK_US_PHOTO = [];   /* empty until an admin uploads one — book-us.html falls back to booking-model.jpg/webp in the site root */
 
 /* Section collapse toggle */
 function toggleSection(id){
@@ -4061,10 +4093,10 @@ function toggleSection(id){
 
 /* Load ALL homepage sections when the hero page opens */
 async function loadAllHomepageSections(){
-  var keys = ['home_hero_photo','home_service_images','home_event_tiles','home_cta_bg'];
-  var defaults = { home_hero_photo: DEFAULT_HERO_PHOTO, home_service_images: DEFAULT_SERVICE_IMAGES, home_event_tiles: DEFAULT_EVENT_TILES, home_cta_bg: DEFAULT_CTA_BG };
-  var listIds  = { home_hero_photo: 'heroPhotoList', home_service_images: 'serviceImgList', home_event_tiles: 'eventTilesList', home_cta_bg: 'ctaBgList' };
-  var maxes    = { home_hero_photo: 1, home_service_images: 3, home_event_tiles: 4, home_cta_bg: 1 };
+  var keys = ['home_hero_photo','home_service_images','home_event_tiles','home_cta_bg','book_us_photo'];
+  var defaults = { home_hero_photo: DEFAULT_HERO_PHOTO, home_service_images: DEFAULT_SERVICE_IMAGES, home_event_tiles: DEFAULT_EVENT_TILES, home_cta_bg: DEFAULT_CTA_BG, book_us_photo: DEFAULT_BOOK_US_PHOTO };
+  var listIds  = { home_hero_photo: 'heroPhotoList', home_service_images: 'serviceImgList', home_event_tiles: 'eventTilesList', home_cta_bg: 'ctaBgList', book_us_photo: 'bookUsPhotoList' };
+  var maxes    = { home_hero_photo: 1, home_service_images: 3, home_event_tiles: 4, home_cta_bg: 1, book_us_photo: 1 };
 
   /* Show cached/defaults immediately */
   keys.forEach(function(k){
@@ -4206,7 +4238,7 @@ function handleSectionFiles(e, listId, key, max){
 
 async function uploadSectionFiles(files, listId, key, max){
   var el = document.getElementById(listId);
-  var progId = { heroPhotoList:'hpUploadProg', serviceImgList:'svcUploadProg', eventTilesList:'evtUploadProg', ctaBgList:'ctaUploadProg' }[listId];
+  var progId = { heroPhotoList:'hpUploadProg', serviceImgList:'svcUploadProg', eventTilesList:'evtUploadProg', ctaBgList:'ctaUploadProg', bookUsPhotoList:'buUploadProg' }[listId];
   var prog = progId ? document.getElementById(progId) : null;
 
   /* Check limit */
