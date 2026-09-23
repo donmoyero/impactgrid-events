@@ -42,6 +42,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   min-height: 100vh;
+  padding-left: var(--nav-w-collapsed);   /* room for the shared left-rail nav so it doesn't sit on top of the photo panel */
 }
 
 /* ── Photo panel ── */
@@ -55,7 +56,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 .bk-photo picture, .bk-photo img.bk-photo-img {
   position: absolute; inset: 0; width: 100%; height: 100%;
 }
-.bk-photo img.bk-photo-img { object-fit: cover; object-position: center top; }
+.bk-photo img.bk-photo-img { object-fit: cover; object-position: center; }
 .bk-photo::after {          /* legibility gradient behind logo + caption */
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to bottom, rgba(0,0,0,.45), transparent 28%, transparent 55%, rgba(0,0,0,.72));
@@ -188,9 +189,11 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 .bk-summary dt { color: var(--text3); }
 .bk-summary dd { font-weight: 600; text-align: right; margin: 0; }
 
-/* ── Mobile: photo becomes a banner above the form ── */
-@media (max-width: 860px) {
-  .bk-split { grid-template-columns: 1fr; padding-top: 56px; }   /* 56px = fixed mobile top bar */
+/* ── Mobile: photo becomes a banner above the form ──
+   Breakpoint matches shared.css (768px) — that's where the left-rail nav
+   collapses into the fixed top bar, so the two layouts must switch together. */
+@media (max-width: 768px) {
+  .bk-split { grid-template-columns: 1fr; padding-top: 56px; padding-left: 0; }   /* 56px = fixed mobile top bar */
   .bk-photo { position: relative; height: 200px; }
   .bk-photo-logo { top: 16px; left: 16px; }
   .bk-photo-logo img { width: 40px; height: 40px; }
@@ -218,12 +221,13 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 <main class="bk-split">
 
   <!-- ═════ PHOTO PANEL ═════
-       Drop your photo in the site root as booking-model.webp (preferred) or booking-model.jpg.
-       If neither exists, the panel falls back to the dark branded background. -->
+       Managed from Admin → Homepage Images → "Book Us Splash Photo" (site_content key: book_us_photo).
+       Falls back to booking-model.webp/.jpg in the site root if nothing has been uploaded yet,
+       and to the dark branded background if neither exists. -->
   <aside class="bk-photo" aria-hidden="true">
-    <picture>
-      <source srcset="booking-model.webp" type="image/webp"/>
-      <img class="bk-photo-img" src="booking-model.jpg" alt="" onerror="this.closest('picture').style.display='none'"/>
+    <picture id="bkPhotoPicture">
+      <source id="bkPhotoSource" srcset="booking-model.webp" type="image/webp"/>
+      <img class="bk-photo-img" id="bkPhotoImg" src="booking-model.jpg" alt="" onerror="this.closest('picture').style.display='none'"/>
     </picture>
     <div class="bk-photo-logo">
       <img src="logo.png" alt=""/>
@@ -364,6 +368,32 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 <script>
 renderNav('book-us.html');
 renderFooter();
+
+/* ── Splash photo — pulls the admin-uploaded image from Supabase (site_content).
+   If nothing has been uploaded yet, the booking-model.webp/.jpg fallback already
+   in the HTML stays as-is. ── */
+(function loadBookUsPhoto() {
+  try {
+    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if (!sb) return;
+    sb.from('site_content').select('key, value').eq('key', 'book_us_photo').then(function (res) {
+      var data = res && res.data;
+      if (res.error || !data || !data.length) return;
+      var urls;
+      try { urls = JSON.parse(data[0].value); } catch (e) { return; }
+      var url = urls && urls[0];
+      if (!url) return;
+      var img = document.getElementById('bkPhotoImg');
+      var src = document.getElementById('bkPhotoSource');
+      var picture = document.getElementById('bkPhotoPicture');
+      if (picture) picture.style.display = '';
+      if (src) src.removeAttribute('srcset');   /* uploaded URL is the source of truth, not the local webp fallback */
+      if (img) img.src = url;
+    });
+  } catch (e) {
+    console.warn('[book-us-photo] Could not load saved photo:', e && e.message);
+  }
+})();
 
 (function () {
   'use strict';
