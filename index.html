@@ -811,6 +811,13 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 
   function initial(name){ return (String(name || 'V').trim().charAt(0) || 'V').toUpperCase(); }
 
+  function starsFor(rating){
+    var full = Math.round(rating || 0);
+    var s = '';
+    for (var i = 1; i <= 5; i++) s += (i <= full ? '★' : '☆');
+    return s;
+  }
+
   function renderQuote(i, instant){
     if (!quoteData.length) return;
     quoteIndex = ((i % quoteData.length) + quoteData.length) % quoteData.length;
@@ -818,6 +825,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
     var box = document.getElementById('quoteCarousel');
     function paint(){
       box.innerHTML =
+        (typeof r.rating === 'number' ? '<div class="h-stars" aria-hidden="true">' + starsFor(r.rating) + '</div>' : '') +
         (r.message ? '<blockquote>“' + escHtml(r.message) + '”</blockquote>' : '') +
         '<div class="h-quote-by">' +
           '<div class="h-av" aria-hidden="true">' + escHtml(initial(r.reviewer_name)) + '</div>' +
