@@ -139,7 +139,8 @@
       background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
       box-shadow: 0 4px 20px rgba(17,24,39,0.45), 0 0 0 0 rgba(17,24,39,0.4);
       border: none;
-      cursor: pointer;
+      cursor: grab;
+      touch-action: none;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -147,6 +148,8 @@
       transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
       animation: ig-pulse 3s ease-in-out infinite;
     }
+    #ig-chat-bubble:active { cursor: grabbing; }
+    #ig-chat-bubble.dragging { transition: none !important; animation: none !important; }
     #ig-chat-bubble:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 28px rgba(17,24,39,0.6), 0 0 0 6px rgba(17,24,39,0.15);
@@ -652,6 +655,7 @@
   /* ── Toggle chat ── */
   function toggleChat() {
     isOpen = !isOpen;
+    if (isOpen) positionChatWindow();
     chatWindow.classList.toggle('open', isOpen);
     bubbleBtn.classList.toggle('open', isOpen);
     unreadDot.style.display = 'none';
@@ -669,8 +673,140 @@
     }
   }, isReturning ? 5000 : 9000);
 
+  /* ── Draggable bubble ──
+     The launcher can be dragged anywhere on screen (mouse or touch). A small
+     movement threshold tells a genuine drag apart from a tap/click, and the
+     chosen spot is remembered (as a fraction of the viewport, so it still
+     makes sense after a resize or on a different device). The chat window
+     always re-anchors itself to wherever the bubble currently is, flipping
+     above/below and left/right so it never runs off-screen. ── */
+  const BUBBLE_POS_KEY = 'ig_chat_bubble_pos';
+  const DRAG_THRESHOLD = 6;
+  let dragging = false, dragMoved = false, dragOffsetX = 0, dragOffsetY = 0;
+
+  function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+  function placeBubble(left, top) {
+    const size = bubbleBtn.offsetWidth || 52;
+    const margin = 8;
+    left = clamp(left, margin, Math.max(margin, window.innerWidth - size - margin));
+    top  = clamp(top,  margin, Math.max(margin, window.innerHeight - size - margin));
+    bubbleBtn.style.left   = left + 'px';
+    bubbleBtn.style.top    = top + 'px';
+    bubbleBtn.style.right  = 'auto';
+    bubbleBtn.style.bottom = 'auto';
+    return { left: left, top: top };
+  }
+
+  function saveBubblePos(left, top) {
+    try {
+      localStorage.setItem(BUBBLE_POS_KEY, JSON.stringify({
+        leftPct: left / window.innerWidth,
+        topPct:  top  / window.innerHeight
+      }));
+    } catch (e) {}
+  }
+
+  function restoreBubblePos() {
+    try {
+      const raw = localStorage.getItem(BUBBLE_POS_KEY);
+      if (!raw) return;
+      const pos = JSON.parse(raw);
+      if (typeof pos.leftPct !== 'number' || typeof pos.topPct !== 'number') return;
+      placeBubble(pos.leftPct * window.innerWidth, pos.topPct * window.innerHeight);
+    } catch (e) {}
+  }
+  restoreBubblePos();
+
+  /* Anchor the chat window to wherever the bubble is right now */
+  function positionChatWindow() {
+    const rect = bubbleBtn.getBoundingClientRect();
+    const gap = 12, margin = 12;
+    const winW = window.innerWidth, winH = window.innerHeight;
+    const cw = chatWindow.offsetWidth  || 340;
+    const ch = chatWindow.offsetHeight || 480;
+
+    let top, origin;
+    if (rect.top - gap - ch >= margin) {
+      top = rect.top - gap - ch;
+      origin = 'bottom';
+    } else {
+      top = Math.min(rect.bottom + gap, winH - ch - margin);
+      origin = 'top';
+    }
+    top = clamp(top, margin, Math.max(margin, winH - ch - margin));
+
+    let left = rect.left, hOrigin = 'left';
+    if (left + cw > winW - margin) {
+      left = rect.right - cw;
+      hOrigin = 'right';
+    }
+    left = clamp(left, margin, Math.max(margin, winW - cw - margin));
+
+    chatWindow.style.top    = top + 'px';
+    chatWindow.style.left   = left + 'px';
+    chatWindow.style.right  = 'auto';
+    chatWindow.style.bottom = 'auto';
+    chatWindow.style.transformOrigin = origin + ' ' + hOrigin;
+  }
+
+  bubbleBtn.addEventListener('pointerdown', function (e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    dragging  = true;
+    dragMoved = false;
+    const rect = bubbleBtn.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    bubbleBtn.classList.add('dragging');
+    try { bubbleBtn.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+
+  bubbleBtn.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    const newLeft = e.clientX - dragOffsetX;
+    const newTop  = e.clientY - dragOffsetY;
+    const rect = bubbleBtn.getBoundingClientRect();
+    if (!dragMoved && (Math.abs(newLeft - rect.left) > DRAG_THRESHOLD || Math.abs(newTop - rect.top) > DRAG_THRESHOLD)) {
+      dragMoved = true;
+    }
+    if (dragMoved) {
+      placeBubble(newLeft, newTop);
+      if (isOpen) positionChatWindow();
+    }
+  });
+
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    bubbleBtn.classList.remove('dragging');
+    if (dragMoved) {
+      const rect = bubbleBtn.getBoundingClientRect();
+      saveBubblePos(rect.left, rect.top);
+    }
+  }
+  bubbleBtn.addEventListener('pointerup', endDrag);
+  bubbleBtn.addEventListener('pointercancel', endDrag);
+
+  /* Keep the bubble on-screen (and the open window anchored) after a resize/rotate */
+  window.addEventListener('resize', function () {
+    if (bubbleBtn.style.left) {
+      const rect = bubbleBtn.getBoundingClientRect();
+      const pos = placeBubble(rect.left, rect.top);
+      saveBubblePos(pos.left, pos.top);
+    }
+    if (isOpen) positionChatWindow();
+  });
+
   /* ── Events ── */
-  bubbleBtn.addEventListener('click', toggleChat);
+  bubbleBtn.addEventListener('click', function (e) {
+    if (dragMoved) {
+      dragMoved = false;
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    toggleChat();
+  });
 
   sendBtn.addEventListener('click', function () {
     sendMessage(inputEl.value);
