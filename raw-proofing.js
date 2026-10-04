@@ -1,93 +1,135 @@
 /* ════════════════════════════════════════════════════
-   RAW + JPEG PROOFING — upload planner
-   Select a whole camera folder. RAW files are NEVER uploaded:
-   they are detected by extension before any upload starts,
-   only the matching JPEGs go to Cloudinary, and each JPEG's
-   Firestore doc remembers its RAW filename (raw_filename).
+   RAW PROOFING — admin page (separate from normal events)
+   RAWs are never uploaded. Select a RAW+JPG folder: the RAWs are
+   ignored, JPEGs go to Cloudinary, each proof remembers its RAW name.
 ════════════════════════════════════════════════════ */
-var IG_RAW_EXTS  = ['arw','cr2','cr3','nef','nrw','dng','raf','orf','rw2','pef','srw','x3f','3fr','iiq','erf','mrw','raw'];
+var IG_RAW_EXTS = ['arw','cr2','cr3','nef','nrw','dng','raf','orf','rw2','pef','srw','x3f','3fr','iiq','erf','mrw','raw'];
 var IG_JPEG_EXTS = ['jpg','jpeg'];
+var rpCur = null; /* {id, slug, code, name} of the gallery being edited */
 
-function igSplitName(name){
-  var i = name.lastIndexOf('.');
-  return { base: (i > 0 ? name.slice(0, i) : name).toLowerCase(), ext: (i > 0 ? name.slice(i + 1) : '').toLowerCase() };
-}
+function igSplitName(n){ var i = n.lastIndexOf('.'); return { base:(i>0?n.slice(0,i):n).toLowerCase(), ext:(i>0?n.slice(i+1):'').toLowerCase() }; }
 
-/* Returns { hasRaw, files, rawByFile, rawCount, jpegCount, pairedCount, orphanRaw[], jpegOnly[] }
-   files = what the normal uploader should process (RAWs removed). */
+/* Pairs RAWs with JPEGs by filename. Only JPEGs are ever uploaded. */
 function igPlanProofingUpload(fileList){
-  var all = Array.prototype.slice.call(fileList);
-  var raws = {}, jpegs = {}, others = [];
-  all.forEach(function(f){
+  var raws = {}, jpegs = {}, ignored = 0;
+  Array.prototype.slice.call(fileList).forEach(function(f){
     var p = igSplitName(f.name);
-    if(IG_RAW_EXTS.indexOf(p.ext) > -1)       raws[p.base]  = f;
+    if(IG_RAW_EXTS.indexOf(p.ext) > -1) raws[p.base] = f;
     else if(IG_JPEG_EXTS.indexOf(p.ext) > -1) jpegs[p.base] = f;
-    else others.push(f);
+    else ignored++;
   });
-  var rawKeys = Object.keys(raws), jpegKeys = Object.keys(jpegs);
-  var rawByFile = new Map(), paired = 0, orphanRaw = [], jpegOnly = [];
-  rawKeys.forEach(function(k){
-    if(jpegs[k]){ rawByFile.set(jpegs[k], raws[k].name); paired++; }
-    else orphanRaw.push(raws[k].name);
-  });
-  jpegKeys.forEach(function(k){ if(!raws[k]) jpegOnly.push(jpegs[k].name); });
-  return {
-    hasRaw: rawKeys.length > 0,
-    files: jpegKeys.map(function(k){ return jpegs[k]; }).concat(others),
-    rawByFile: rawByFile,
-    rawCount: rawKeys.length, jpegCount: jpegKeys.length, pairedCount: paired,
-    orphanRaw: orphanRaw, jpegOnly: jpegOnly, totalSelected: all.length
-  };
+  var rk = Object.keys(raws), jk = Object.keys(jpegs), rawByFile = new Map(), paired = 0, orphanRaw = [], jpegOnly = [];
+  rk.forEach(function(k){ if(jpegs[k]){ rawByFile.set(jpegs[k], raws[k].name); paired++; } else orphanRaw.push(raws[k].name); });
+  jk.forEach(function(k){ if(!raws[k]) jpegOnly.push(jpegs[k].name); });
+  return { files: jk.map(function(k){ return jpegs[k]; }), rawByFile: rawByFile, rawCount: rk.length, jpegCount: jk.length,
+           pairedCount: paired, orphanRaw: orphanRaw, jpegOnly: jpegOnly, ignored: ignored };
 }
 
-/* Summary box shown in the upload progress area. */
-function igRenderPlanSummary(plan, el){
-  var s = plan.totalSelected + ' files detected<br>'
-        + '<b>' + plan.jpegCount + ' JPEGs ready for upload</b><br>'
-        + plan.rawCount + ' RAW files ignored (never uploaded)<br>'
-        + plan.pairedCount + ' RAW + JPEG pairs verified';
-  if(plan.orphanRaw.length){
-    s += '<br><span style="color:var(--red);">⚠ ' + plan.orphanRaw.length + ' RAW without a matching JPEG proof: '
-      + plan.orphanRaw.slice(0, 8).join(', ') + (plan.orphanRaw.length > 8 ? '…' : '') + '</span>';
-  }
-  el.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.7;">' + s + '</div>';
+async function rpApi(path, opts){
+  var c = getSupabase(), sd = await c.auth.getSession();
+  var token = sd && sd.data && sd.data.session ? sd.data.session.access_token : null;
+  opts = opts || {};
+  var r = await fetch(EVENTS_API + '/api/proofing/' + path, {
+    method: opts.body ? 'POST' : 'GET',
+    headers: Object.assign({ 'Content-Type':'application/json' }, token ? { Authorization:'Bearer ' + token } : {}),
+    body: opts.body ? JSON.stringify(opts.body) : undefined });
+  var d = await r.json().catch(function(){ return {}; });
+  if(!r.ok) throw new Error(d.error || ('Server error ' + r.status));
+  return d;
 }
+function rpLink(g){ return location.origin + '/proof.html?g=' + g.slug + '&code=' + g.code; }
 
-
-/* ── Admin: client selection card ── */
-async function igLoadProofingCard(eventId){
-  var card = document.getElementById('proofing-card'), body = document.getElementById('proofing-body');
-  if(!card) return;
-  card.style.display = 'none';
-  if(!eventId) return;
+/* ── List ── */
+async function loadRawProofing(){
+  rpShow('list');
+  var el = document.getElementById('rpList'); el.innerHTML = 'Loading…';
   try{
-    var ev = await db.collection('events').doc(eventId).get();
-    if(!ev.exists || ev.data().mode !== 'proofing') return;
-    card.style.display = 'block';
-    var lim = ev.data().selection_limit || 0;
-    body.innerHTML = 'Loading…';
-    var c = getSupabase(), sd = await c.auth.getSession();
-    var token = sd && sd.data && sd.data.session ? sd.data.session.access_token : null;
-    var r = await fetch(EVENTS_API + '/api/proofing/admin/' + eventId, { headers: token ? { Authorization: 'Bearer ' + token } : {} });
-    var data = await r.json();
-    if(!r.ok) throw new Error(data.error || 'Server error');
-    var link = location.origin + '/event.html?event=' + ev.data().event_slug + '&code=' + ev.data().event_code;
-    var head = '<div style="margin-bottom:10px;">Share link: <input readonly value="' + link + '" style="width:100%;font-size:12px;" onclick="this.select()"/>'
-      + '<button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="navigator.clipboard.writeText(\'' + link + '\');toast(\'\',\'Link copied!\',\'\')">Copy link</button> '
-      + '<span class="field-hint">Limit: ' + (lim || 'none') + '</span></div>';
-    var sub = data.submission;
-    if(!sub){ body.innerHTML = head + '<div>No selection submitted yet.</div>'; return; }
-    var names = sub.items.map(function(i){ return i.raw_filename || i.file_name || i.photo_id; });
-    var stems = names.map(function(n){ return n.replace(/\.[^.]+$/, ''); });
-    window._igProofNames = names; window._igProofStems = stems;
-    body.innerHTML = head + '<div><b>' + esc(sub.client_name || 'Client') + '</b> ' + esc(sub.client_email || '') + ' — <b>' + sub.count + '</b> photos (v' + sub.revision + ', ' + new Date(sub.submitted_at).toLocaleString() + ')</div>'
-      + (sub.note ? '<div style="margin:6px 0;">Note: ' + esc(sub.note) + '</div>' : '')
-      + '<div style="margin:8px 0;display:flex;gap:6px;flex-wrap:wrap;">'
-      + '<button class="btn btn-ghost btn-sm" onclick="igCopyProof(0)">Copy filenames</button>'
-      + '<button class="btn btn-ghost btn-sm" onclick="igCopyProof(1)">Copy for Lightroom (no extension)</button>'
-      + '<button class="btn btn-ghost btn-sm" onclick="igDownloadProof()">Download .txt</button></div>'
-      + '<textarea readonly style="width:100%;height:140px;font-family:monospace;font-size:12px;">' + esc(names.join('\n')) + '</textarea>';
-  }catch(e){ if(body) body.textContent = 'Could not load selection: ' + e.message; }
+    var d = await rpApi('admin/list');
+    if(!d.galleries.length){ el.innerHTML = '<div class="empty"><div class="empty-txt">No RAW galleries yet — click “+ New RAW Gallery”.</div></div>'; return; }
+    el.innerHTML = d.galleries.map(function(g){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">'
+        + '<div><b>' + esc(g.name) + '</b><div style="font-size:12px;color:var(--text3);">' + esc(g.client_name || '') + ' · ' + g.photo_count + ' photos · limit ' + (g.selection_limit || 'none')
+        + (g.picked ? ' · <span style="color:var(--green);">' + g.picked + ' picked ✓</span>' : '') + '</div></div>'
+        + '<div style="display:flex;gap:6px;"><button class="btn btn-ghost btn-sm" onclick="rpOpen(\'' + g.id + '\')">Open</button>'
+        + '<button class="btn btn-ghost btn-sm" onclick="rpCopy(\'' + rpLink(g) + '\')">Copy RAW link</button></div></div>';
+    }).join('');
+  }catch(e){ el.textContent = 'Could not load: ' + e.message; }
 }
-function igCopyProof(stem){ navigator.clipboard.writeText((stem ? window._igProofStems.join(', ') : window._igProofNames.join('\n'))).then(function(){ toast('', 'Copied', ''); }); }
-function igDownloadProof(){ var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([window._igProofNames.join('\n')], {type:'text/plain'})); a.download = 'selected-raws.txt'; a.click(); }
+function rpShow(v){ document.getElementById('rpListView').style.display = v==='list' ? 'block':'none'; document.getElementById('rpEditorView').style.display = v==='edit' ? 'block':'none'; }
+function rpCopy(t){ navigator.clipboard.writeText(t).then(function(){ toast('', 'Copied', ''); }, function(){ prompt('Copy:', t); }); }
+
+/* ── Editor ── */
+function rpNew(){
+  rpCur = null;
+  ['rpName','rpClient','rpLimit'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('rpTitle').textContent = 'New RAW Gallery';
+  document.getElementById('rpAfterSave').style.display = 'none';
+  rpShow('edit');
+}
+async function rpSave(){
+  var name = document.getElementById('rpName').value.trim();
+  if(!name){ toast('', 'Name required', ''); return; }
+  try{
+    var d = await rpApi('admin/save', { body:{ id: rpCur && rpCur.id, name:name, clientName:document.getElementById('rpClient').value, limit:document.getElementById('rpLimit').value } });
+    toast('', 'Saved', ''); rpOpen(d.id);
+  }catch(e){ toast('', 'Save failed', e.message); }
+}
+async function rpOpen(id, keepProgress){
+  rpShow('edit');
+  try{
+    var d = await rpApi('admin/gallery/' + id), g = d.gallery;
+    rpCur = { id:g.id, slug:g.slug, code:g.code, name:g.name };
+    document.getElementById('rpTitle').textContent = g.name;
+    document.getElementById('rpName').value = g.name; document.getElementById('rpClient').value = g.client_name || '';
+    document.getElementById('rpLimit').value = g.selection_limit || '';
+    document.getElementById('rpAfterSave').style.display = 'block';
+    document.getElementById('rpLinkBox').value = rpLink(g);
+    document.getElementById('rpPhotoCount').textContent = d.photo_count + ' proofs uploaded';
+    if(!keepProgress) document.getElementById('rpProgress').innerHTML = '';
+    rpRenderSelection(d.submission);
+  }catch(e){ toast('', 'Could not open', e.message); }
+}
+function rpRenderSelection(sub){
+  var el = document.getElementById('rpSelection');
+  if(!sub){ el.innerHTML = 'No picks submitted yet.'; return; }
+  var names = sub.items.map(function(i){ return i.raw_filename || i.file_name || i.photo_id; });
+  window._rpNames = names;
+  el.innerHTML = '<div><b>' + esc(sub.client_name || 'Client') + '</b> ' + esc(sub.client_email || '') + ' — <b>' + sub.count + '</b> picked (v' + sub.revision + ', ' + new Date(sub.submitted_at).toLocaleString() + ')</div>'
+    + (sub.note ? '<div style="margin:6px 0;">Note: ' + esc(sub.note) + '</div>' : '')
+    + '<div style="margin:8px 0;display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" onclick="rpCopy(window._rpNames.join(\'\\n\'))">Copy RAW filenames</button>'
+    + '<button class="btn btn-ghost btn-sm" onclick="rpCopy(window._rpNames.map(function(n){return n.replace(/\\.[^.]+$/,\'\');}).join(\', \'))">Copy for Lightroom (no extension)</button>'
+    + '<button class="btn btn-ghost btn-sm" onclick="rpDownloadTxt()">Download .txt</button></div>'
+    + '<textarea readonly style="width:100%;height:150px;font-family:monospace;font-size:12px;">' + esc(names.join('\n')) + '</textarea>';
+}
+function rpDownloadTxt(){ var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([window._rpNames.join('\n')], {type:'text/plain'})); a.download = 'selected-raws.txt'; a.click(); }
+async function rpDelete(){
+  if(!rpCur || !confirm('Delete "' + rpCur.name + '" and all its previews? Client picks are removed too. This cannot be undone.')) return;
+  try{ var d = await rpApi('admin/delete', { body:{ id: rpCur.id } });
+    toast('', 'Gallery deleted', d.cloudinaryOk ? '' : 'Some Cloudinary files may remain — Cloudinary Cleanup will catch them');
+    loadRawProofing();
+  }catch(e){ toast('', 'Delete failed', e.message); }
+}
+
+/* ── Upload (JPEGs only) ── */
+async function rpUpload(fileList){
+  if(!rpCur){ toast('', 'Save the gallery first', ''); return; }
+  var plan = igPlanProofingUpload(fileList), prog = document.getElementById('rpProgress');
+  var s = (plan.jpegCount + plan.rawCount + plan.ignored) + ' files detected<br><b>' + plan.jpegCount + ' JPEGs ready for upload</b><br>' + plan.rawCount + ' RAW files ignored (never uploaded)<br>' + plan.pairedCount + ' RAW + JPEG pairs verified';
+  if(plan.orphanRaw.length) s += '<br><span style="color:var(--red);">⚠ ' + plan.orphanRaw.length + ' RAW without a JPEG proof: ' + plan.orphanRaw.slice(0,8).join(', ') + (plan.orphanRaw.length>8?'…':'') + '</span>';
+  prog.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.7;">' + s + '</div><div id="rpStatus" style="font-size:12px;"></div>';
+  if(!plan.files.length){ toast('', 'No JPEG proofs found', ''); return; }
+  if(plan.orphanRaw.length && !confirm(plan.orphanRaw.length + ' RAW file(s) have no matching JPEG and will be skipped. Upload the ' + plan.jpegCount + ' JPEGs anyway?')) return;
+  var st = document.getElementById('rpStatus'), done = 0, failed = 0;
+  for(var i = 0; i < plan.files.length; i++){
+    var f = plan.files[i]; st.textContent = 'Uploading ' + (i+1) + ' / ' + plan.files.length + ' — ' + f.name;
+    try{
+      var web = await uploadToCloudinary(await resizeImage(f, 3000, 0.88), 'proofing/' + rpCur.id + '/web');
+      var th  = await uploadToCloudinary(await resizeImageToThumb(f),        'proofing/' + rpCur.id + '/thumb');
+      await rpApi('admin/photo', { body:{ galleryId:rpCur.id, file_name:f.name, raw_filename:plan.rawByFile.get(f) || '',
+        preview_url:th.secure_url, web_url:web.secure_url, web_public_id:web.public_id, thumb_public_id:th.public_id } });
+      done++;
+    }catch(e){ failed++; console.warn('[rpUpload]', f.name, e.message); }
+  }
+  st.innerHTML = '<b style="color:var(--green);">Done: ' + done + ' uploaded</b>' + (failed ? ' · <span style="color:var(--red);">' + failed + ' failed (see console)</span>' : '');
+  rpOpen(rpCur.id, true);
+}
