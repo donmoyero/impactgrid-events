@@ -60,6 +60,7 @@ input,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid #8884;
 <div id="lb">
   <div class="lbtop"><span id="lbn"></span><span><button onclick="zToggle()">🔍 Zoom</button> <button onclick="closeLb()">✕ Close</button></span></div>
   <div id="lbimg"><img id="lbpic" alt="" draggable="false"/></div>
+  <div id="lbmeta" style="display:none;gap:8px;align-items:center;padding:0 16px 8px"><select id="lbKind" style="width:auto;margin:0"><option value="must">Must edit</option><option value="maybe">If possible</option></select><input id="lbNote" maxlength="500" placeholder="Note for this photo, e.g. remove the bin" style="margin:0;flex:1"/></div>
   <div class="lbbot"><button class="nav" onclick="step(-1)">‹</button><button class="p" id="lbPick" onclick="pickCur()"></button><button class="nav" onclick="step(1)">›</button></div>
 </div>
 <div id="toast"></div>
@@ -67,7 +68,7 @@ input,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid #8884;
 <script>
 var API = 'https://impactgrid-events-api.onrender.com/api/proofing';
 var Q = new URLSearchParams(location.search), SLUG = Q.get('g') || '', CODE = '';
-var photos = [], picked = new Set(), LIMIT = 0, cur = 0, CLOSED = '';
+var photos = [], picked = new Set(), LIMIT = 0, cur = 0, CLOSED = '', meta = {}, EXTRA_PRICE = 1;
 function $(i){ return document.getElementById(i); }
 function toast(t){ var e = $('toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function(){ e.style.display = 'none'; }, 2600); }
 
@@ -81,7 +82,9 @@ async function start(code){
     var fn = String(d.clientName || '').trim().split(/\s+/)[0];
     $('welcome').textContent = d.welcome || (fn ? 'Hi ' + fn + ', pick your favourites' : 'Pick your favourites');
     (d.selected || []).forEach(function(id){ if(photos.some(function(p){ return p.id === id; })) picked.add(id); });
+    EXTRA_PRICE = d.extraPrice || 1; (d.picks || []).forEach(function(p){ meta[p.id] = { kind:p.kind, comment:p.comment }; });
     $('limitBox').textContent = LIMIT ? 'You have a limit of ' + LIMIT + ' picture' + (LIMIT > 1 ? 's' : '') + '.' : 'Pick the pictures you want edited.';
+    if(LIMIT) $('limitBox').textContent += ' Extras are £' + EXTRA_PRICE + ' each.';
     if(d.pickBy) $('limitBox').textContent += ' Pick by ' + new Date(d.pickBy + 'T12:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'long'}) + '.';
     if(CLOSED) $('limitBox').textContent = CLOSED;
     render(); $('msg').style.display = 'none'; $('app').style.display = 'block';
@@ -99,24 +102,25 @@ function render(){
   count();
 }
 function count(){
-  $('count').innerHTML = '<b>' + picked.size + '</b>' + (LIMIT ? ' of ' + LIMIT : '') + ' picked';
+  $('count').innerHTML = '<b>' + picked.size + '</b>' + (LIMIT ? ' of ' + LIMIT : '') + ' picked' + (LIMIT && picked.size > LIMIT ? ' · ' + (picked.size - LIMIT) + ' extra = £' + (picked.size - LIMIT) * EXTRA_PRICE : '');
   $('submitBtn').disabled = !picked.size || !!CLOSED;
   var b = $('lbPick'); if(b && photos[cur]) b.textContent = picked.has(photos[cur].id) ? '✓ Picked (tap to remove)' : 'Pick this one';
+  syncMeta();
 }
 function toggle(i){
   if(CLOSED){ toast(CLOSED); return; }
   var id = photos[i].id;
   if(picked.has(id)) picked.delete(id);
-  else { if(LIMIT && picked.size >= LIMIT){ toast('You have reached your limit of ' + LIMIT + '. Remove one to swap.'); return; } picked.add(id); }
+  else { if(LIMIT && picked.size >= LIMIT && !confirm('You have used your ' + LIMIT + ' included pictures. Add this one as an extra for £' + EXTRA_PRICE + '?')) return; picked.add(id); }
   var el = document.querySelector('.ph[data-i="' + i + '"]'); if(el) el.classList.toggle('sel', picked.has(id));
-  count();
+  count(); saveDraft();
 }
 function openLb(i){ cur = i; $('lb').classList.add('on'); showLb(); }
 function showLb(){ zReset(); $('lbpic').src = photos[cur].web; $('lbn').textContent = (cur + 1) + ' / ' + photos.length; count(); }
 function step(d){ cur = (cur + d + photos.length) % photos.length; showLb(); }
 function closeLb(){ $('lb').classList.remove('on'); }
 function pickCur(){ toggle(cur); }
-document.addEventListener('keydown', function(e){ if(!$('lb').classList.contains('on')) return; if(e.key === 'ArrowRight') step(1); if(e.key === 'ArrowLeft') step(-1); if(e.key === 'Escape') closeLb(); });
+document.addEventListener('keydown', function(e){ if(!$('lb').classList.contains('on') || /INPUT|SELECT/.test(e.target.tagName)) return; if(e.key === 'ArrowRight') step(1); if(e.key === 'ArrowLeft') step(-1); if(e.key === 'Escape') closeLb(); });
 document.addEventListener('dragstart', function(e){ e.preventDefault(); });
 
 /* Zoom: wheel, Zoom button / double-click, pinch, drag-to-pan */
@@ -140,9 +144,21 @@ function zToggle(){ zSet(Z.s > 1 ? 1 : 2.5); }
   ['pointerup', 'pointercancel'].forEach(function(t){ b.addEventListener(t, function(e){ pts.delete(e.pointerId); }); });
 })();
 
+function syncMeta(){
+  var m = $('lbmeta'); if(!m || !photos[cur]) return;
+  var id = photos[cur].id, x = meta[id] || {}; m.style.display = picked.has(id) ? 'flex' : 'none';
+  $('lbKind').value = x.kind || 'must'; $('lbNote').value = x.comment || '';
+}
+function saveMeta(){ meta[photos[cur].id] = { kind:$('lbKind').value, comment:$('lbNote').value }; }
+$('lbKind').onchange = saveMeta; $('lbNote').oninput = saveMeta;
+function saveDraft(){
+  if(CLOSED) return; clearTimeout(saveDraft.t);
+  saveDraft.t = setTimeout(function(){ fetch(API + '/progress', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ slug:SLUG, code:CODE, count:picked.size }) }).catch(function(){}); }, 1500);
+}
+
 function openSubmit(){
   var m = document.createElement('div'); m.className = 'modal'; m.id = 'sm';
-  m.innerHTML = '<div><h3 style="margin:0 0 6px">Submit your picks</h3><div style="font-size:13px;margin-bottom:10px">' + picked.size + ' picture' + (picked.size > 1 ? 's' : '') + ' selected.</div>'
+  m.innerHTML = '<div><h3 style="margin:0 0 6px">Submit your picks</h3><div style="font-size:13px;margin-bottom:10px">' + picked.size + ' picture' + (picked.size > 1 ? 's' : '') + ' selected.' + (LIMIT && picked.size > LIMIT ? ' <b>' + (picked.size - LIMIT) + ' extra = £' + (picked.size - LIMIT) * EXTRA_PRICE + '</b> (invoiced separately).' : '') + '</div>'
     + '<input id="sn" placeholder="Your name"/><input id="se" type="email" placeholder="Your email"/><textarea id="so" rows="3" placeholder="Note (optional)"></textarea>'
     + '<div id="sx" style="color:var(--red);font-size:12px;min-height:16px"></div>'
     + '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="p" style="background:#8883;color:inherit" onclick="$(\'sm\').remove()">Back</button><button class="p" id="sg" onclick="send()">Submit</button></div></div>';
@@ -154,7 +170,7 @@ async function send(){
   $('sg').disabled = true; $('sg').textContent = 'Sending…';
   try{
     var r = await fetch(API + '/submit', { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ slug:SLUG, code:CODE, name:n, email:e, note:$('so').value, photoIds:Array.from(picked) }) });
+      body: JSON.stringify({ slug:SLUG, code:CODE, name:n, email:e, note:$('so').value, picks:Array.from(picked).map(function(id){ var m = meta[id] || {}; return { id:id, kind:m.kind || 'must', comment:m.comment || '' }; }) }) });
     var d = await r.json(); if(!r.ok) throw new Error(d.error || 'Could not submit');
     $('sm').remove(); toast('✓ Sent! ' + d.count + ' pictures submitted');
   }catch(x){ $('sx').textContent = x.message; $('sg').disabled = false; $('sg').textContent = 'Submit'; }

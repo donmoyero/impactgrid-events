@@ -51,7 +51,12 @@ function rpEnsureFields(){
   d.innerHTML = '<input id="rpWelcome" maxlength="200" placeholder="Welcome line, e.g. Hi Sarah, pick your favourites" style="width:100%;margin-top:8px">'
     + '<div style="margin-top:8px;font-size:13px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">'
     + '<label>Pick-by date <input id="rpPickBy" type="date"></label>'
-    + '<label><input id="rpLockSub" type="checkbox"> Lock picks once the client submits</label></div>';
+    + '<label><input id="rpLockSub" type="checkbox"> Lock picks once the client submits</label>'
+    + '<label>Order <select id="rpSort"><option value="name">By filename</option><option value="time">By capture time</option></select></label></div>'
+    + '<input id="rpClientEmail" type="email" placeholder="Client email (to send the link)" style="width:100%;margin-top:8px">'
+    + '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><button class="btn btn-ghost btn-sm" onclick="rpSend()">Email link to client</button><span id="rpStats" style="font-size:12px;color:var(--text3)"></span></div>'
+    + '<div style="font-size:12px;color:var(--text3);margin:10px 0 4px">Tap a photo to hide it from the client (tap again to unhide).</div>'
+    + '<div id="rpPhotos" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;"></div>';
   host.parentNode.insertBefore(d, host.nextSibling);
 }
 
@@ -92,8 +97,8 @@ function rpCopy(t){ navigator.clipboard.writeText(t).then(function(){ toast('', 
 function rpNew(){
   rpCur = null;
   rpEnsureFields();
-  ['rpName','rpClient','rpLimit','rpWelcome','rpPickBy'].forEach(function(id){ document.getElementById(id).value = ''; });
-  document.getElementById('rpLockSub').checked = false;
+  ['rpName','rpClient','rpLimit','rpWelcome','rpPickBy','rpClientEmail'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('rpLockSub').checked = false; document.getElementById('rpSort').value = 'name';
   document.getElementById('rpTitle').textContent = 'New RAW Gallery';
   document.getElementById('rpAfterSave').style.display = 'none';
   rpShow('edit');
@@ -103,7 +108,8 @@ async function rpSave(){
   if(!name){ toast('', 'Name required', ''); return; }
   try{
     var d = await rpApi('admin/save', { body:{ id: rpCur && rpCur.id, name:name, clientName:document.getElementById('rpClient').value, limit:document.getElementById('rpLimit').value,
-      welcome:document.getElementById('rpWelcome').value, pickBy:document.getElementById('rpPickBy').value, lockOnSubmit:document.getElementById('rpLockSub').checked } });
+      welcome:document.getElementById('rpWelcome').value, pickBy:document.getElementById('rpPickBy').value, lockOnSubmit:document.getElementById('rpLockSub').checked,
+      clientEmail:document.getElementById('rpClientEmail').value, sortBy:document.getElementById('rpSort').value } });
     toast('', 'Saved', ''); rpOpen(d.id);
   }catch(e){ toast('', 'Save failed', e.message); }
 }
@@ -115,10 +121,10 @@ async function rpOpen(id, keepProgress){
     document.getElementById('rpTitle').textContent = g.name;
     document.getElementById('rpName').value = g.name; document.getElementById('rpClient').value = g.client_name || '';
     document.getElementById('rpLimit').value = g.selection_limit || '';
-    rpEnsureFields(); document.getElementById('rpWelcome').value = g.welcome || ''; document.getElementById('rpPickBy').value = g.pick_by || ''; document.getElementById('rpLockSub').checked = !!g.lock_on_submit;
+    rpEnsureFields(); document.getElementById('rpWelcome').value = g.welcome || ''; document.getElementById('rpPickBy').value = g.pick_by || ''; document.getElementById('rpLockSub').checked = !!g.lock_on_submit; document.getElementById('rpClientEmail').value = g.client_email || ''; document.getElementById('rpSort').value = g.sort_by === 'time' ? 'time' : 'name';
     document.getElementById('rpAfterSave').style.display = 'block';
     document.getElementById('rpLinkBox').value = rpLink(g);
-    document.getElementById('rpPhotoCount').textContent = d.photo_count + ' proofs uploaded';
+    document.getElementById('rpPhotoCount').textContent = d.photo_count + ' proofs uploaded'; rpRenderTools(d);
     if(!keepProgress) document.getElementById('rpProgress').innerHTML = '';
     rpRenderSelection(d.submission);
   }catch(e){ toast('', 'Could not open', e.message); }
@@ -133,6 +139,8 @@ function rpRenderSelection(sub){
     + '<div style="margin:8px 0;display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" onclick="rpCopy(window._rpNames.join(\'\\n\'))">Copy RAW filenames</button>'
     + '<button class="btn btn-ghost btn-sm" onclick="rpCopy(window._rpNames.map(function(n){return n.replace(/\\.[^.]+$/,\'\');}).join(\', \'))">Copy for Lightroom (no extension)</button>'
     + '<button class="btn btn-ghost btn-sm" onclick="rpDownloadTxt()">Download .txt</button></div>'
+    + (sub.extras ? '<div style="margin:6px 0;color:var(--accent);"><b>' + sub.extras + ' paid extra' + (sub.extras > 1 ? 's' : '') + ' = £' + sub.extra_total + '</b> — invoice the client</div>' : '')
+    + '<div style="font-size:12px;line-height:1.7;margin:6px 0;">' + sub.items.map(function(i){ return esc(i.raw_filename || i.file_name || '') + (i.paid_extra ? ' <b style="color:var(--accent)">[extra]</b>' : '') + (i.kind === 'maybe' ? ' <i>[if possible]</i>' : '') + (i.comment ? ' — “' + esc(i.comment) + '”' : ''); }).join('<br>') + '</div>'
     + '<textarea readonly style="width:100%;height:150px;font-family:monospace;font-size:12px;">' + esc(names.join('\n')) + '</textarea>';
 }
 function rpDownloadTxt(){ var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([window._rpNames.join('\n')], {type:'text/plain'})); a.download = 'selected-raws.txt'; a.click(); }
@@ -142,6 +150,28 @@ async function rpDelete(){
     toast('', 'Gallery deleted', d.cloudinaryOk ? '' : 'Some Cloudinary files may remain — Cloudinary Cleanup will catch them');
     loadRawProofing();
   }catch(e){ toast('', 'Delete failed', e.message); }
+}
+
+/* ── Progress, hide/unhide, email link ── */
+function rpRenderTools(d){
+  var g = d.gallery;
+  var opened = g.open_count ? 'Opened ' + g.open_count + '×, last ' + new Date(g.last_opened_at).toLocaleString() : 'Not opened yet';
+  var prog = d.submission ? 'Submitted ' + d.submission.count + ' picks' : (g.draft_count ? g.draft_count + ' picked so far (not submitted)' : 'No picks yet');
+  document.getElementById('rpStats').innerHTML = '<b>Progress:</b> ' + opened + ' · ' + prog;
+  document.getElementById('rpPhotos').innerHTML = (d.photos || []).map(function(p){
+    return '<div onclick="rpHide(\'' + p.id + '\',' + (!p.hidden) + ')" title="' + esc(p.file_name) + '" style="position:relative;cursor:pointer;opacity:' + (p.hidden ? 0.3 : 1) + '"><img src="' + p.thumb + '" style="width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px">'
+      + (p.hidden ? '<span style="position:absolute;right:4px;bottom:4px;background:#000a;color:#fff;font-size:11px;padding:2px 6px;border-radius:4px">hidden</span>' : '') + '</div>';
+  }).join('');
+}
+async function rpHide(id, hidden){ try{ await rpApi('admin/hide', { body:{ id:id, hidden:hidden } }); rpOpen(rpCur.id, true); }catch(e){ toast('', 'Failed', e.message); } }
+async function rpSend(){
+  var to = document.getElementById('rpClientEmail').value.trim();
+  if(!rpCur || !to){ toast('', 'Add the client email first', ''); return; }
+  if(!confirm('Email the gallery link and access code to ' + to + '?')) return;
+  try{ await rpApi('admin/save', { body:{ id:rpCur.id, name:document.getElementById('rpName').value, clientName:document.getElementById('rpClient').value, limit:document.getElementById('rpLimit').value,
+      welcome:document.getElementById('rpWelcome').value, pickBy:document.getElementById('rpPickBy').value, lockOnSubmit:document.getElementById('rpLockSub').checked, clientEmail:to, sortBy:document.getElementById('rpSort').value } });
+    await rpApi('admin/send', { body:{ id:rpCur.id, to:to } }); toast('', 'Link sent', to);
+  }catch(e){ toast('', 'Send failed', e.message); }
 }
 
 /* ── Upload (JPEGs only) ── */
@@ -159,7 +189,7 @@ async function rpUpload(fileList){
     try{
       var web = await uploadToCloudinary(await rpWatermark(await resizeImage(f, 2000, 0.88)), 'proofing/' + rpCur.id + '/web');
       var th  = await uploadToCloudinary(await rpWatermark(await resizeImageToThumb(f)), 'proofing/' + rpCur.id + '/thumb');
-      await rpApi('admin/photo', { body:{ galleryId:rpCur.id, file_name:f.name, raw_filename:plan.rawByFile.get(f) || '',
+      await rpApi('admin/photo', { body:{ galleryId:rpCur.id, file_name:f.name, raw_filename:plan.rawByFile.get(f) || '', taken_at:f.lastModified || 0,
         preview_url:th.secure_url, web_url:web.secure_url, web_public_id:web.public_id, thumb_public_id:th.public_id } });
       done++;
     }catch(e){ failed++; console.warn('[rpUpload]', f.name, e.message); }
