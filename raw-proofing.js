@@ -25,6 +25,36 @@ function igPlanProofingUpload(fileList){
            pairedCount: paired, orphanRaw: orphanRaw, jpegOnly: jpegOnly, ignored: ignored };
 }
 
+/* Bakes a faint diagonal watermark into each proof BEFORE upload, so the clean image never leaves the browser. */
+function rpWatermark(blob){
+  return new Promise(function(resolve, reject){
+    var img = new Image(), url = URL.createObjectURL(blob);
+    img.onload = function(){
+      var c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+      var x = c.getContext('2d'); x.drawImage(img, 0, 0); URL.revokeObjectURL(url);
+      var fs = Math.max(18, Math.round(Math.min(c.width, c.height) / 14)), diag = Math.hypot(c.width, c.height), step = fs * 4.2, row = 0;
+      x.globalAlpha = 0.16; x.fillStyle = '#fff'; x.strokeStyle = '#000'; x.lineWidth = Math.max(1, fs / 18);
+      x.font = '700 ' + fs + 'px system-ui,Arial,sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.translate(c.width / 2, c.height / 2); x.rotate(-Math.PI / 6);
+      for(var yy = -diag / 2; yy < diag / 2; yy += step, row++)
+        for(var xx = -diag / 2 + (row % 2 ? fs * 5.5 : 0); xx < diag / 2; xx += fs * 11){ x.strokeText('IMPACTGRID', xx, yy); x.fillText('IMPACTGRID', xx, yy); }
+      c.toBlob(function(b){ b ? resolve(b) : reject(new Error('watermark failed')); }, 'image/jpeg', 0.88);
+    };
+    img.onerror = function(){ reject(new Error('could not read image')); };
+    img.src = url;
+  });
+}
+/* Extra editor fields (injected so admin.html needs no change) */
+function rpEnsureFields(){
+  if(document.getElementById('rpWelcome')) return;
+  var host = document.getElementById('rpLimit').parentNode, d = document.createElement('div');
+  d.innerHTML = '<input id="rpWelcome" maxlength="200" placeholder="Welcome line, e.g. Hi Sarah, pick your favourites" style="width:100%;margin-top:8px">'
+    + '<div style="margin-top:8px;font-size:13px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">'
+    + '<label>Pick-by date <input id="rpPickBy" type="date"></label>'
+    + '<label><input id="rpLockSub" type="checkbox"> Lock picks once the client submits</label></div>';
+  host.parentNode.insertBefore(d, host.nextSibling);
+}
+
 async function rpApi(path, opts){
   var c = getSupabase(), sd = await c.auth.getSession();
   var token = sd && sd.data && sd.data.session ? sd.data.session.access_token : null;
@@ -61,7 +91,9 @@ function rpCopy(t){ navigator.clipboard.writeText(t).then(function(){ toast('', 
 /* ── Editor ── */
 function rpNew(){
   rpCur = null;
-  ['rpName','rpClient','rpLimit'].forEach(function(id){ document.getElementById(id).value = ''; });
+  rpEnsureFields();
+  ['rpName','rpClient','rpLimit','rpWelcome','rpPickBy'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('rpLockSub').checked = false;
   document.getElementById('rpTitle').textContent = 'New RAW Gallery';
   document.getElementById('rpAfterSave').style.display = 'none';
   rpShow('edit');
@@ -70,7 +102,8 @@ async function rpSave(){
   var name = document.getElementById('rpName').value.trim();
   if(!name){ toast('', 'Name required', ''); return; }
   try{
-    var d = await rpApi('admin/save', { body:{ id: rpCur && rpCur.id, name:name, clientName:document.getElementById('rpClient').value, limit:document.getElementById('rpLimit').value } });
+    var d = await rpApi('admin/save', { body:{ id: rpCur && rpCur.id, name:name, clientName:document.getElementById('rpClient').value, limit:document.getElementById('rpLimit').value,
+      welcome:document.getElementById('rpWelcome').value, pickBy:document.getElementById('rpPickBy').value, lockOnSubmit:document.getElementById('rpLockSub').checked } });
     toast('', 'Saved', ''); rpOpen(d.id);
   }catch(e){ toast('', 'Save failed', e.message); }
 }
@@ -82,6 +115,7 @@ async function rpOpen(id, keepProgress){
     document.getElementById('rpTitle').textContent = g.name;
     document.getElementById('rpName').value = g.name; document.getElementById('rpClient').value = g.client_name || '';
     document.getElementById('rpLimit').value = g.selection_limit || '';
+    rpEnsureFields(); document.getElementById('rpWelcome').value = g.welcome || ''; document.getElementById('rpPickBy').value = g.pick_by || ''; document.getElementById('rpLockSub').checked = !!g.lock_on_submit;
     document.getElementById('rpAfterSave').style.display = 'block';
     document.getElementById('rpLinkBox').value = rpLink(g);
     document.getElementById('rpPhotoCount').textContent = d.photo_count + ' proofs uploaded';
@@ -123,8 +157,8 @@ async function rpUpload(fileList){
   for(var i = 0; i < plan.files.length; i++){
     var f = plan.files[i]; st.textContent = 'Uploading ' + (i+1) + ' / ' + plan.files.length + ' — ' + f.name;
     try{
-      var web = await uploadToCloudinary(await resizeImage(f, 3000, 0.88), 'proofing/' + rpCur.id + '/web');
-      var th  = await uploadToCloudinary(await resizeImageToThumb(f),        'proofing/' + rpCur.id + '/thumb');
+      var web = await uploadToCloudinary(await rpWatermark(await resizeImage(f, 2000, 0.88)), 'proofing/' + rpCur.id + '/web');
+      var th  = await uploadToCloudinary(await rpWatermark(await resizeImageToThumb(f)), 'proofing/' + rpCur.id + '/thumb');
       await rpApi('admin/photo', { body:{ galleryId:rpCur.id, file_name:f.name, raw_filename:plan.rawByFile.get(f) || '',
         preview_url:th.secure_url, web_url:web.secure_url, web_public_id:web.public_id, thumb_public_id:th.public_id } });
       done++;
