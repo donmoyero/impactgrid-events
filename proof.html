@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Pick your photos</title>
+<style>
+:root{--bg:#0e0e10;--card:#1a1a1e;--text:#f2f2f2;--mute:#9a9aa3;--accent:#f0b429;--red:#ff4d4f;--ok:#2ecc71}
+@media(prefers-color-scheme:light){:root{--bg:#f6f6f7;--card:#fff;--text:#111;--mute:#666}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+body{padding:0 0 90px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+header{padding:20px 16px 8px;max-width:1100px;margin:0 auto}
+h1{font-size:20px;margin:0 0 10px}
+.note{color:var(--red);font-weight:700;font-size:15px;margin:0 0 8px}
+.limit{background:var(--card);border-radius:10px;padding:10px 14px;font-size:14px;display:inline-block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-width:1100px;margin:12px auto;padding:0 16px}
+.ph{position:relative;aspect-ratio:3/2;background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;outline:3px solid transparent}
+.ph img{width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+.ph.sel{outline-color:var(--accent)}
+.tick{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:24px;text-align:center;padding:0;cursor:pointer}
+.ph.sel .tick{background:var(--accent);border-color:var(--accent);color:#000}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid #0003;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:5}
+button.p{background:var(--accent);color:#000;border:0;border-radius:8px;padding:11px 20px;font-weight:700;font-size:15px;cursor:pointer}
+button.p:disabled{opacity:.5}
+#gate,#msg{max-width:360px;margin:15vh auto;padding:0 16px;text-align:center}
+input,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid #8884;background:var(--card);color:var(--text);margin-bottom:8px;font:inherit;-webkit-user-select:text;user-select:text}
+#lb{position:fixed;inset:0;background:#000;z-index:20;display:none;flex-direction:column}
+#lb.on{display:flex}
+#lbimg{flex:1;min-height:0;background-size:contain;background-repeat:no-repeat;background-position:center}
+.lbtop,.lbbot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;color:#fff}
+.lbtop button,.nav{background:#fff2;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:18px;cursor:pointer}
+.ok{color:var(--ok);font-weight:700}
+.modal{position:fixed;inset:0;background:#000a;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal>div{background:var(--card);border-radius:12px;padding:18px;max-width:380px;width:100%}
+#toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#000d;color:#fff;padding:10px 16px;border-radius:8px;z-index:50;display:none;font-size:14px}
+</style>
+</head>
+<body oncontextmenu="return false">
+<div id="msg">Loading…</div>
+<div id="gate" style="display:none">
+  <h1>Enter your access code</h1>
+  <input id="codeIn" placeholder="Access code" autocapitalize="characters"/>
+  <button class="p" onclick="start(document.getElementById('codeIn').value)">Open</button>
+</div>
+
+<div id="app" style="display:none">
+  <header>
+    <h1 id="gname"></h1>
+    <div class="note">NOTE: this is a raw file pick what you want to be edited.</div>
+    <div class="limit" id="limitBox"></div>
+  </header>
+  <div class="grid" id="grid"></div>
+  <div class="bar"><div id="count"></div><button class="p" id="submitBtn" onclick="openSubmit()">Submit picks</button></div>
+</div>
+
+<div id="lb">
+  <div class="lbtop"><span id="lbn"></span><button onclick="closeLb()">✕ Close</button></div>
+  <div id="lbimg"></div>
+  <div class="lbbot"><button class="nav" onclick="step(-1)">‹</button><button class="p" id="lbPick" onclick="pickCur()"></button><button class="nav" onclick="step(1)">›</button></div>
+</div>
+<div id="toast"></div>
+
+<script>
+var API = 'https://impactgrid-events-api.onrender.com/api/proofing';
+var Q = new URLSearchParams(location.search), SLUG = Q.get('g') || '', CODE = '';
+var photos = [], picked = new Set(), LIMIT = 0, cur = 0;
+function $(i){ return document.getElementById(i); }
+function toast(t){ var e = $('toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function(){ e.style.display = 'none'; }, 2600); }
+
+async function start(code){
+  CODE = String(code || '').trim(); if(!SLUG){ $('msg').textContent = 'This link is not valid.'; return; }
+  $('gate').style.display = 'none'; $('msg').style.display = 'block'; $('msg').textContent = 'Loading…';
+  try{
+    var r = await fetch(API + '/gallery?slug=' + encodeURIComponent(SLUG) + '&code=' + encodeURIComponent(CODE));
+    var d = await r.json(); if(!r.ok) throw new Error(d.error);
+    photos = d.photos; LIMIT = d.limit || 0; $('gname').textContent = d.name; document.title = d.name;
+    (d.selected || []).forEach(function(id){ if(photos.some(function(p){ return p.id === id; })) picked.add(id); });
+    $('limitBox').textContent = LIMIT ? 'You have a limit of ' + LIMIT + ' picture' + (LIMIT > 1 ? 's' : '') + '.' : 'Pick the pictures you want edited.';
+    render(); $('msg').style.display = 'none'; $('app').style.display = 'block';
+    if(d.submitted) toast('Your picks were already sent — you can change them and submit again');
+  }catch(e){
+    $('msg').style.display = 'none'; $('gate').style.display = 'block';
+    if(CODE) toast('Wrong code or gallery not found');
+  }
+}
+function render(){
+  $('grid').innerHTML = photos.map(function(p, i){
+    return '<div class="ph' + (picked.has(p.id) ? ' sel' : '') + '" data-i="' + i + '" onclick="openLb(' + i + ')"><img loading="lazy" draggable="false" src="' + p.thumb + '" alt=""/>'
+      + '<button class="tick" onclick="event.stopPropagation();toggle(' + i + ')">✓</button></div>';
+  }).join('');
+  count();
+}
+function count(){
+  $('count').innerHTML = '<b>' + picked.size + '</b>' + (LIMIT ? ' of ' + LIMIT : '') + ' picked';
+  $('submitBtn').disabled = !picked.size;
+  var b = $('lbPick'); if(b && photos[cur]) b.textContent = picked.has(photos[cur].id) ? '✓ Picked (tap to remove)' : 'Pick this one';
+}
+function toggle(i){
+  var id = photos[i].id;
+  if(picked.has(id)) picked.delete(id);
+  else { if(LIMIT && picked.size >= LIMIT){ toast('You have reached your limit of ' + LIMIT + '. Remove one to swap.'); return; } picked.add(id); }
+  var el = document.querySelector('.ph[data-i="' + i + '"]'); if(el) el.classList.toggle('sel', picked.has(id));
+  count();
+}
+function openLb(i){ cur = i; $('lb').classList.add('on'); showLb(); }
+function showLb(){ $('lbimg').style.backgroundImage = 'url("' + photos[cur].web + '")'; $('lbn').textContent = (cur + 1) + ' / ' + photos.length; count(); }
+function step(d){ cur = (cur + d + photos.length) % photos.length; showLb(); }
+function closeLb(){ $('lb').classList.remove('on'); }
+function pickCur(){ toggle(cur); }
+document.addEventListener('keydown', function(e){ if(!$('lb').classList.contains('on')) return; if(e.key === 'ArrowRight') step(1); if(e.key === 'ArrowLeft') step(-1); if(e.key === 'Escape') closeLb(); });
+document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+function openSubmit(){
+  var m = document.createElement('div'); m.className = 'modal'; m.id = 'sm';
+  m.innerHTML = '<div><h3 style="margin:0 0 6px">Submit your picks</h3><div style="font-size:13px;margin-bottom:10px">' + picked.size + ' picture' + (picked.size > 1 ? 's' : '') + ' selected.</div>'
+    + '<input id="sn" placeholder="Your name"/><input id="se" type="email" placeholder="Your email"/><textarea id="so" rows="3" placeholder="Note (optional)"></textarea>'
+    + '<div id="sx" style="color:var(--red);font-size:12px;min-height:16px"></div>'
+    + '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="p" style="background:#8883;color:inherit" onclick="$(\'sm\').remove()">Back</button><button class="p" id="sg" onclick="send()">Submit</button></div></div>';
+  document.body.appendChild(m);
+}
+async function send(){
+  var n = $('sn').value.trim(), e = $('se').value.trim();
+  if(!n || !/^\S+@\S+\.\S+$/.test(e)){ $('sx').textContent = 'Enter your name and a valid email.'; return; }
+  $('sg').disabled = true; $('sg').textContent = 'Sending…';
+  try{
+    var r = await fetch(API + '/submit', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ slug:SLUG, code:CODE, name:n, email:e, note:$('so').value, photoIds:Array.from(picked) }) });
+    var d = await r.json(); if(!r.ok) throw new Error(d.error || 'Could not submit');
+    $('sm').remove(); toast('✓ Sent! ' + d.count + ' pictures submitted');
+  }catch(x){ $('sx').textContent = x.message; $('sg').disabled = false; $('sg').textContent = 'Submit'; }
+}
+if(Q.get('code')) start(Q.get('code')); else { $('msg').style.display = 'none'; $('gate').style.display = 'block'; }
+</script>
+</body>
+</html>

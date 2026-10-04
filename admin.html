@@ -399,6 +399,7 @@ tr:hover td{background:var(--bg2);}
         <a href="#" onclick="return nav('events',this)"><span class="sb-ico"></span>All Events</a>
         <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico"></span>Create Event</a>
         <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico"></span>Upload Photos</a>
+        <a href="#" onclick="return nav('rawproofing',this)"><span class="sb-ico"></span>RAW Proofing</a>
         <a href="#" onclick="return nav('reviews',this)"><span class="sb-ico"></span>Reviews</a>
         <a href="#" onclick="return nav('brandpartners',this)"><span class="sb-ico"></span>Brand Partners</a>
         <a href="#" onclick="return nav('bookings',this)"><span class="sb-ico"></span>Bookings<span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></a>
@@ -838,7 +839,6 @@ tr:hover td{background:var(--bg2);}
             <div class="card-body">
               <div id="createEventAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
               <div class="field-group" style="margin-bottom:12px;"><div class="field-label">Event Name *</div><input type="text" id="ev-name" placeholder="e.g. Johnson Wedding 2026" oninput="updateTemplatePreview()"/></div>
-              <div class="field-group" style="margin-bottom:12px;padding:10px 12px;border:1px dashed var(--border);border-radius:8px;"><label style="display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600;cursor:pointer;"><input type="checkbox" id="ev-proofing"/> RAW Proofing gallery (client picks photos, no downloads)</label><div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12px;">Selection limit <input type="number" id="ev-proof-limit" min="0" placeholder="e.g. 30" style="width:90px;"/> <span class="field-hint">0 or blank = no limit</span></div></div>
               <div class="form-grid" style="margin-bottom:12px;">
                 <div class="field-group"><div class="field-label">Owner Name</div><input type="text" id="ev-owner-name" placeholder="e.g. Sarah Johnson"/><div class="field-hint">Personalises the welcome email</div></div>
                 <div class="field-group"><div class="field-label">Owner Email</div><input type="email" id="ev-owner" placeholder="owner@email.com"/></div>
@@ -980,8 +980,7 @@ If you have any questions, just reply to this email.
       <div class="ws-layout">
         <div>
           <div class="card"><div class="card-head"><h2> Select Event</h2></div><div class="card-body"><div class="field-group"><div class="field-label">Event</div><select id="upload-event-select" onchange="onUploadEventChange()"><option value="">— Select an event —</option></select></div><div id="upload-event-info" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:4px;"><div style="font-size:12px;color:var(--text2);" id="upload-event-meta"></div></div></div></div>
-          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2> Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico"></div><div class="upload-zone-title">Drop photos or videos here or click to browse</div><div class="upload-zone-sub">RAW+JPG folders supported (RAWs are skipped, JPEGs uploaded) · JPG · PNG · WebP · MP4 · MOV · WebM (videos over 100MB are auto-compressed) · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,.arw,.cr2,.cr3,.nef,.nrw,.dng,.raf,.orf,.rw2,.pef,.srw" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
-          <div class="card" id="proofing-card" style="display:none;"><div class="card-head"><h2> Client Selection (RAW Proofing)</h2></div><div class="card-body"><div id="proofing-body" style="font-size:13px;">Loading…</div></div></div>
+          <div class="card" id="upload-dropcard" style="display:none;"><div class="card-head"><h2> Upload Photos</h2></div><div class="card-body"><div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()" ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')" ondrop="onDropMulti(event,'photoDropZone')"><div class="upload-zone-ico"></div><div class="upload-zone-title">Drop photos or videos here or click to browse</div><div class="upload-zone-sub">JPG · PNG · WebP · MP4 · MOV · WebM (videos over 100MB are auto-compressed) · Multiple files supported</div><input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple onchange="handlePhotoInputChange(event)"/></div><div id="photoUploadProgress" style="margin-top:12px;"></div></div></div>
           <div class="card" id="upload-photos-list-card" style="display:none;"><div class="card-head"><h2> Event Photos</h2><div style="display:flex;gap:10px;align-items:center;"><label style="font-size:12px;display:flex;gap:5px;align-items:center;cursor:pointer;color:var(--text2);"><input type="checkbox" id="epSelectAllCb" onchange="epToggleSelectAll(this)" style="margin:0;cursor:pointer;"/> Select all</label><button class="btn btn-ghost btn-sm" id="epBulkDeleteBtn" onclick="epBulkDeleteSelected()" style="display:none;color:var(--red);"> Delete Selected (<span id="epSelectedCount">0</span>)</button><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()"> Refresh</button></div></div><div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet.</div></div></div></div>
         </div>
         <div class="ws-sticky"></div>
@@ -990,6 +989,63 @@ If you have any questions, just reply to this email.
 
 
     <!-- PORTFOLIO (SEO) -->
+    <div class="page" id="page-rawproofing">
+      <div class="page-header">
+        <div class="page-title">RAW Proofing</div>
+        <div class="page-sub">Select a RAW+JPG folder, send the client one link, and they pick what they want edited. RAW files are never uploaded and clients cannot download anything.</div>
+      </div>
+
+      <div id="rpListView">
+        <div class="card">
+          <div class="card-head"><h2> RAW Galleries</h2>
+            <div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="loadRawProofing()"> Refresh</button><button class="btn btn-gold" onclick="rpNew()">+ New RAW Gallery</button></div>
+          </div>
+          <div class="card-body" id="rpList">Loading…</div>
+        </div>
+      </div>
+
+      <div id="rpEditorView" style="display:none;">
+        <div class="card">
+          <div class="card-head"><h2 id="rpTitle">New RAW Gallery</h2><button class="btn btn-ghost btn-sm" onclick="loadRawProofing()"> Back to list</button></div>
+          <div class="card-body">
+            <div class="field-group" style="margin-bottom:12px;"><div class="field-label">Gallery name</div><input type="text" id="rpName" placeholder="e.g. Johnson Wedding — RAW picks"/></div>
+            <div class="form-grid" style="margin-bottom:12px;">
+              <div class="field-group"><div class="field-label">Client name (optional)</div><input type="text" id="rpClient" placeholder="e.g. Sarah Johnson"/></div>
+              <div class="field-group"><div class="field-label">Picture limit</div><input type="number" id="rpLimit" min="0" placeholder="e.g. 10"/><div class="field-hint">Client sees: “You have a limit of N pictures.” Blank = no limit.</div></div>
+            </div>
+            <button class="btn btn-gold" onclick="rpSave()"> Save</button>
+          </div>
+        </div>
+
+        <div id="rpAfterSave" style="display:none;">
+          <div class="card">
+            <div class="card-head"><h2> RAW Picture Link (send this to the client)</h2></div>
+            <div class="card-body">
+              <input readonly id="rpLinkBox" style="width:100%;font-size:12px;" onclick="this.select()"/>
+              <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="rpCopy(document.getElementById('rpLinkBox').value)">Copy link</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2> Upload RAW + JPG folder</h2><span id="rpPhotoCount" class="field-hint"></span></div>
+            <div class="card-body">
+              <label for="rpFileIn" class="upload-zone" style="display:block;cursor:pointer;">
+                <div class="upload-zone-ico"></div>
+                <div class="upload-zone-title">Click to choose files (select all in the camera folder)</div>
+                <div class="upload-zone-sub">RAWs are detected and ignored · only the JPEGs are uploaded</div>
+                <input type="file" id="rpFileIn" multiple accept="image/jpeg,.jpg,.jpeg,.arw,.cr2,.cr3,.nef,.nrw,.dng,.raf,.orf,.rw2,.pef,.srw" onchange="rpUpload(this.files);this.value='';" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"/>
+              </label>
+              <div id="rpProgress" style="margin-top:12px;"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2> Client picks (RAW files to edit)</h2><button class="btn btn-ghost btn-sm" onclick="rpOpen(rpCur.id)"> Refresh</button></div>
+            <div class="card-body" id="rpSelection" style="font-size:13px;">No picks submitted yet.</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="rpDelete()"> Delete this gallery and its previews</button>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-portfolio">
       <div class="page-header">
         <div class="page-title">Portfolio</div>
@@ -2151,8 +2207,8 @@ If you have any questions, just reply to this email.
 
 <!-- Events management (Firebase Firestore + Cloudinary) -->
 <script src="gallery-looks.js"></script>
-<script src="raw-proofing.js"></script>
 <script src="events-script.js"></script>
+<script src="raw-proofing.js"></script>
 <script src="reviews-script.js"></script>
 <script src="review-emails-script.js"></script>
 <script src="brand-partners-script.js"></script>
@@ -2248,6 +2304,7 @@ function nav(id,el){
     bookings:'loadBookings',
     vouchers:'initVouchersPage',
     portfolio:'loadPortfolioCategories',
+    rawproofing:'loadRawProofing',
     blog:'loadBlogPosts',
     social:'loadSocialPage',
     receptionist:'loadReceptionist',
