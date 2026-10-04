@@ -314,6 +314,8 @@ async function igCreateEvent(){
       owner_email      : document.getElementById('ev-owner')      ? document.getElementById('ev-owner').value.trim()      || null : null,
       owner_name       : document.getElementById('ev-owner-name') ? document.getElementById('ev-owner-name').value.trim() || null : null,
       owner_avatar_url : ownerAvatarUrl,
+      mode             : (document.getElementById('ev-proofing') && document.getElementById('ev-proofing').checked) ? 'proofing' : 'standard',
+      selection_limit  : parseInt((document.getElementById('ev-proof-limit') || {}).value, 10) || 0,
       event_code       : code,
       event_slug       : slug,
       expiry_date      : new Date(expiry).toISOString(),
@@ -1573,7 +1575,8 @@ function onUploadEventChange(){
     var opt = sel.options[sel.selectedIndex];
     document.getElementById('upload-event-meta').textContent = ' ' + opt.textContent;
     loadEventPhotos();
-  }
+    if(typeof igLoadProofingCard === 'function') igLoadProofingCard(id);
+  } else if(typeof igLoadProofingCard === 'function'){ igLoadProofingCard(''); }
 }
 
 function handlePhotoInputChange(e){
@@ -1829,6 +1832,16 @@ async function uploadPhotos(files){
   var prog = document.getElementById('photoUploadProgress');
   prog.innerHTML = '';
 
+  /* RAW + JPEG proofing: drop RAWs before any upload, keep their names */
+  var plan = igPlanProofingUpload(files);
+  if(plan.hasRaw){
+    igRenderPlanSummary(plan, prog);
+    if(plan.orphanRaw.length && !confirm(plan.orphanRaw.length + ' RAW file(s) have no matching JPEG proof and will be skipped. Continue uploading the ' + plan.jpegCount + ' JPEGs?')) return;
+    files = plan.files;
+    if(!files.length){ toast(' ', 'Nothing to upload', 'No JPEG proofs found'); return; }
+  }
+  var proofMode = plan.hasRaw;
+
   var MAX_VIDEO_BYTES         = 100 * 1024 * 1024; /* 100MB — typical Cloudinary plan cap */
   var MAX_COMPRESSIBLE_BYTES  = 1.5 * 1024 * 1024 * 1024; /* 1.5GB — above this, in-browser compression is unreliable */
 
@@ -1903,35 +1916,50 @@ async function uploadPhotos(files){
         continue;
       }
 
-      /* 1 — Upload original to Cloudinary. Stays true original quality
-         unless the file is too big for Cloudinary's free-plan cap. */
-      setStatus('Uploading original…', 15, '');
-      var origBlob   = await prepareOriginalForUpload(file);
-      var origResult = await uploadToCloudinary(origBlob, folder + '/original');
+      var rawName = proofMode ? (plan.rawByFile.get(file) || '') : '';
+      var origResult = null, webResult, thumbResult;
 
-      /* 2 — Upload web preview */
-      setStatus('Creating web preview…', 40, '');
-      var webBlob   = await resizeImageToWebVersion(file);
-      var webResult = await uploadToCloudinary(webBlob, folder + '/web');
+      if(proofMode){
+        /* Proofing: no 'original' tier. One large proof (3000px) + thumbnail. */
+        setStatus('Creating proof preview…', 20, '');
+        webResult = await uploadToCloudinary(await resizeImage(file, 3000, 0.88), folder + '/web');
+        setStatus('Creating thumbnail…', 60, '');
+        thumbResult = await uploadToCloudinary(await resizeImageToThumb(file), folder + '/thumb');
+      } else {
+        /* 1 — Upload original to Cloudinary. Stays true original quality
+           unless the file is too big for Cloudinary's free-plan cap. */
+        setStatus('Uploading original…', 15, '');
+        var origBlob = await prepareOriginalForUpload(file);
+        origResult = await uploadToCloudinary(origBlob, folder + '/original');
 
-      /* 3 — Upload thumbnail */
-      setStatus('Creating thumbnail…', 65, '');
-      var thumbBlob   = await resizeImageToThumb(file);
-      var thumbResult = await uploadToCloudinary(thumbBlob, folder + '/thumb');
+        /* 2 — Upload web preview */
+        setStatus('Creating web preview…', 40, '');
+        webResult = await uploadToCloudinary(await resizeImageToWebVersion(file), folder + '/web');
+
+        /* 3 — Upload thumbnail */
+        setStatus('Creating thumbnail…', 65, '');
+        thumbResult = await uploadToCloudinary(await resizeImageToThumb(file), folder + '/thumb');
+      }
 
       /* 4 — Save to Firestore photos collection */
       setStatus('Saving record…', 85, '');
-      await addDoc(collection(db, 'photos'), {
+      var docData = {
         event_id      : selectedEventId,
         media_type    : 'photo',
         preview_url   : thumbResult.secure_url,
         web_url       : webResult.secure_url,
-        original_url  : origResult.secure_url,
-        cloudinary_id : origResult.public_id,
+        original_url  : (origResult || webResult).secure_url,
+        cloudinary_id : (origResult || webResult).public_id,
         web_public_id : webResult.public_id,
         thumb_public_id: thumbResult.public_id,
         created_at    : serverTimestamp()
-      });
+      };
+      if(proofMode){
+        docData.proofing     = true;
+        docData.file_name    = file.name;
+        docData.raw_filename = rawName; /* '' = JPEG-only shot */
+      }
+      await addDoc(collection(db, 'photos'), docData);
 
       setStatus(' Done', 100, 'var(--green)');
 
