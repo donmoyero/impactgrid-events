@@ -6,6 +6,16 @@
 var IG_RAW_EXTS = ['arw','cr2','cr3','nef','nrw','dng','raf','orf','rw2','pef','srw','x3f','3fr','iiq','erf','mrw','raw'];
 var IG_JPEG_EXTS = ['jpg','jpeg'];
 var rpCur = null; /* {id, slug, code, name} of the gallery being edited */
+var rpSel = {}, rpSelMode = false, rpPhotosCache = [], rpOpenTok = 0; /* photo multi-select state + guard against stale loads */
+
+/* Wipes everything gallery-specific from the editor so nothing from the previous gallery can show through. */
+function rpReset(){
+  rpEnsureFields();
+  rpSel = {}; rpSelMode = false; rpPhotosCache = []; window._rpSub = null; window._rpNames = []; window._rpG = null;
+  ['rpPhotos','rpPhotoBar','rpProgress','rpStats','rpPhotoCount'].forEach(function(id){ var e = document.getElementById(id); if(e) e.innerHTML = ''; });
+  var s = document.getElementById('rpSelection'); if(s) s.innerHTML = 'No picks submitted yet.';
+  var l = document.getElementById('rpLinkBox'); if(l) l.value = '';
+}
 
 function igSplitName(n){ var i = n.lastIndexOf('.'); return { base:(i>0?n.slice(0,i):n).toLowerCase(), ext:(i>0?n.slice(i+1):'').toLowerCase() }; }
 
@@ -55,7 +65,7 @@ function rpEnsureFields(){
     + '<label>Order <select id="rpSort"><option value="name">By filename</option><option value="time">By capture time</option></select></label></div>'
     + '<input id="rpClientEmail" type="email" placeholder="Client email (to send the link)" style="width:100%;margin-top:8px">'
     + '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><button class="btn btn-ghost btn-sm" onclick="rpSend()">Email link to client</button><span id="rpStats" style="font-size:12px;color:var(--text3)"></span></div>'
-    + '<div style="font-size:12px;color:var(--text3);margin:10px 0 4px">Tap a photo to hide it from the client (tap again to unhide).</div>'
+    + '<div id="rpPhotoBar" style="margin:10px 0 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--text3)"></div>'
     + '<div id="rpPhotos" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;"></div>';
   host.parentNode.insertBefore(d, host.nextSibling);
 }
@@ -76,7 +86,7 @@ function rpLink(g){ return location.origin + '/proof.html?g=' + g.slug + '&code=
 
 /* ── List ── */
 async function loadRawProofing(){
-  rpShow('list');
+  rpOpenTok++; rpShow('list');
   var el = document.getElementById('rpList'); el.innerHTML = 'Loading…';
   try{
     var d = await rpApi('admin/list');
@@ -95,8 +105,8 @@ function rpCopy(t){ navigator.clipboard.writeText(t).then(function(){ toast('', 
 
 /* ── Editor ── */
 function rpNew(){
-  rpCur = null;
-  rpEnsureFields();
+  rpCur = null; rpOpenTok++;
+  rpReset();
   ['rpName','rpClient','rpLimit','rpWelcome','rpPickBy','rpClientEmail'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('rpLockSub').checked = false; document.getElementById('rpSort').value = 'name';
   document.getElementById('rpTitle').textContent = 'New RAW Gallery';
@@ -114,9 +124,12 @@ async function rpSave(){
   }catch(e){ toast('', 'Save failed', e.message); }
 }
 async function rpOpen(id, keepProgress){
+  var tok = ++rpOpenTok, switching = !rpCur || rpCur.id !== id;
+  if(switching){ rpCur = null; rpReset(); document.getElementById('rpAfterSave').style.display = 'none'; }
   rpShow('edit');
   try{
     var d = await rpApi('admin/gallery/' + id), g = d.gallery;
+    if(tok !== rpOpenTok) return; /* user moved on to another gallery while this was loading */
     rpCur = { id:g.id, slug:g.slug, code:g.code, name:g.name };
     document.getElementById('rpTitle').textContent = g.name;
     document.getElementById('rpName').value = g.name; document.getElementById('rpClient').value = g.client_name || '';
@@ -125,7 +138,7 @@ async function rpOpen(id, keepProgress){
     document.getElementById('rpAfterSave').style.display = 'block';
     document.getElementById('rpLinkBox').value = rpLink(g);
     document.getElementById('rpPhotoCount').textContent = d.photo_count + ' proofs uploaded'; rpRenderTools(d);
-    if(!keepProgress) document.getElementById('rpProgress').innerHTML = '';
+    if(!keepProgress && !switching) document.getElementById('rpProgress').innerHTML = '';
     window._rpG = g; rpRenderSelection(d.submission);
   }catch(e){ toast('', 'Could not open', e.message); }
 }
@@ -205,10 +218,48 @@ function rpRenderTools(d){
   var opened = g.open_count ? 'Opened ' + g.open_count + '×, last ' + new Date(g.last_opened_at).toLocaleString() : 'Not opened yet';
   var prog = d.submission ? 'Submitted ' + d.submission.count + ' picks' : (g.draft_count ? g.draft_count + ' picked so far (not submitted)' : 'No picks yet');
   document.getElementById('rpStats').innerHTML = '<b>Progress:</b> ' + opened + ' · ' + prog;
-  document.getElementById('rpPhotos').innerHTML = (d.photos || []).map(function(p){
-    return '<div onclick="rpHide(\'' + p.id + '\',' + (!p.hidden) + ')" title="' + esc(p.file_name) + '" style="position:relative;cursor:pointer;opacity:' + (p.hidden ? 0.3 : 1) + '"><img src="' + p.thumb + '" style="width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px">'
+  rpPhotosCache = d.photos || []; rpPruneSel(); rpRenderPhotos();
+}
+function rpPruneSel(){ var ok = {}; rpPhotosCache.forEach(function(p){ ok[p.id] = 1; }); Object.keys(rpSel).forEach(function(k){ if(!ok[k]) delete rpSel[k]; }); }
+function rpSelCount(){ return Object.keys(rpSel).length; }
+
+/* Photo grid. Normal mode: tap = hide/unhide. Select mode: tap = tick for deleting. */
+function rpRenderPhotos(){
+  var bar = document.getElementById('rpPhotoBar'), grid = document.getElementById('rpPhotos'), n = rpSelCount();
+  if(!bar || !grid) return;
+  if(!rpPhotosCache.length){ bar.innerHTML = 'No proofs uploaded yet.'; grid.innerHTML = ''; return; }
+  bar.innerHTML = rpSelMode
+    ? '<b style="color:var(--text)">' + n + ' of ' + rpPhotosCache.length + ' selected</b>'
+      + '<button class="btn btn-ghost btn-sm" onclick="rpSelAll()">Select all</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="rpSelNone()">Clear</button>'
+      + '<button class="btn btn-ghost btn-sm" style="color:var(--red);" ' + (n ? '' : 'disabled ') + 'onclick="rpDeleteSelected()">Delete selected' + (n ? ' (' + n + ')' : '') + '</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="rpSelToggleMode()">Done</button>'
+    : '<span>Tap a photo to hide it from the client (tap again to unhide).</span>'
+      + '<button class="btn btn-ghost btn-sm" onclick="rpSelToggleMode()">Select &amp; delete</button>';
+  grid.innerHTML = rpPhotosCache.map(function(p){
+    var on = !!rpSel[p.id], act = rpSelMode ? 'rpTick(\'' + p.id + '\')' : 'rpHide(\'' + p.id + '\',' + (!p.hidden) + ')';
+    return '<div onclick="' + act + '" title="' + esc(p.file_name) + '" style="position:relative;cursor:pointer;border-radius:6px;opacity:' + (p.hidden ? 0.3 : 1) + ';outline:' + (on ? '3px solid var(--accent)' : 'none') + ';outline-offset:-3px">'
+      + '<img src="' + p.thumb + '" style="width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px;display:block">'
+      + (rpSelMode ? '<span style="position:absolute;left:4px;top:4px;width:20px;height:20px;border-radius:50%;background:' + (on ? 'var(--accent)' : '#0008') + ';border:2px solid #fff;color:#000;font-size:13px;line-height:16px;text-align:center;font-weight:700">' + (on ? '✓' : '') + '</span>' : '')
       + (p.hidden ? '<span style="position:absolute;right:4px;bottom:4px;background:#000a;color:#fff;font-size:11px;padding:2px 6px;border-radius:4px">hidden</span>' : '') + '</div>';
   }).join('');
+}
+function rpSelToggleMode(){ rpSelMode = !rpSelMode; if(!rpSelMode) rpSel = {}; rpRenderPhotos(); }
+function rpTick(id){ if(rpSel[id]) delete rpSel[id]; else rpSel[id] = 1; rpRenderPhotos(); }
+function rpSelAll(){ rpPhotosCache.forEach(function(p){ rpSel[p.id] = 1; }); rpRenderPhotos(); }
+function rpSelNone(){ rpSel = {}; rpRenderPhotos(); }
+async function rpDeleteSelected(){
+  var ids = Object.keys(rpSel); if(!rpCur || !ids.length) return;
+  var picked = 0, sub = window._rpSub;
+  if(sub && sub.items) sub.items.forEach(function(i){ if(rpSel[i.photo_id]) picked++; });
+  var msg = 'Permanently delete ' + ids.length + ' proof' + (ids.length > 1 ? 's' : '') + ' from "' + rpCur.name + '"? This cannot be undone.'
+    + (picked ? '\n\n' + picked + ' of them are in the client\'s submitted picks. Their RAW filenames stay in the picks list, but the client will no longer see them if they edit and resubmit.' : '');
+  if(!confirm(msg)) return;
+  try{
+    var d = await rpApi('admin/photos/delete', { body:{ galleryId:rpCur.id, ids:ids } });
+    toast('', d.removed + ' deleted', d.cloudinaryOk ? '' : 'Some Cloudinary files may remain — Cloudinary Cleanup will catch them');
+    rpSel = {}; rpSelMode = false; rpOpen(rpCur.id, true);
+  }catch(e){ toast('', 'Delete failed', e.message); }
 }
 async function rpHide(id, hidden){ try{ await rpApi('admin/hide', { body:{ id:id, hidden:hidden } }); rpOpen(rpCur.id, true); }catch(e){ toast('', 'Failed', e.message); } }
 async function rpSend(){
