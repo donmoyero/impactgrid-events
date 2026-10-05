@@ -41,9 +41,8 @@ input,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid #8884;
 <body oncontextmenu="return false">
 <div id="msg">Loading…</div>
 <div id="gate" style="display:none">
-  <h1>Enter your access code</h1>
-  <input id="codeIn" placeholder="Access code" autocapitalize="characters"/>
-  <button class="p" onclick="start(document.getElementById('codeIn').value)">Open</button>
+  <h1>This link looks incomplete</h1>
+  <p style="color:var(--mute)">Please open the full link from your email. If it still doesn't work, ask your photographer to resend it.</p>
 </div>
 
 <div id="app" style="display:none">
@@ -91,7 +90,7 @@ async function start(code){
     if(d.submitted) toast('Your picks were already sent — you can change them and submit again');
   }catch(e){
     $('msg').style.display = 'none'; $('gate').style.display = 'block';
-    if(CODE) toast('Wrong code or gallery not found');
+    toast('This link is not valid or the gallery was not found');
   }
 }
 function render(){

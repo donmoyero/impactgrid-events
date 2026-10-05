@@ -265,7 +265,7 @@ async function rpHide(id, hidden){ try{ await rpApi('admin/hide', { body:{ id:id
 async function rpSend(){
   var to = document.getElementById('rpClientEmail').value.trim();
   if(!rpCur || !to){ toast('', 'Add the client email first', ''); return; }
-  if(!confirm('Email the gallery link and access code to ' + to + '?')) return;
+  if(!confirm('Email the gallery link to ' + to + '?')) return;
   try{ await rpApi('admin/save', { body:{ id:rpCur.id, name:document.getElementById('rpName').value, clientName:document.getElementById('rpClient').value, limit:document.getElementById('rpLimit').value,
       welcome:document.getElementById('rpWelcome').value, pickBy:document.getElementById('rpPickBy').value, lockOnSubmit:document.getElementById('rpLockSub').checked, clientEmail:to, sortBy:document.getElementById('rpSort').value } });
     await rpApi('admin/send', { body:{ id:rpCur.id, to:to } }); toast('', 'Link sent', to);
