@@ -126,20 +126,20 @@ async function rpOpen(id, keepProgress){
     document.getElementById('rpLinkBox').value = rpLink(g);
     document.getElementById('rpPhotoCount').textContent = d.photo_count + ' proofs uploaded'; rpRenderTools(d);
     if(!keepProgress) document.getElementById('rpProgress').innerHTML = '';
-    rpRenderSelection(d.submission);
+    window._rpG = g; rpRenderSelection(d.submission);
   }catch(e){ toast('', 'Could not open', e.message); }
 }
 function rpRenderSelection(sub){
   var el = document.getElementById('rpSelection');
   if(!sub){ el.innerHTML = 'No picks submitted yet.'; return; }
   var names = sub.items.map(function(i){ return i.raw_filename || i.file_name || i.photo_id; });
-  window._rpNames = names;
+  window._rpNames = names; window._rpSub = sub;
   el.innerHTML = '<div><b>' + esc(sub.client_name || 'Client') + '</b> ' + esc(sub.client_email || '') + ' — <b>' + sub.count + '</b> picked (v' + sub.revision + ', ' + new Date(sub.submitted_at).toLocaleString() + ')</div>'
     + (sub.note ? '<div style="margin:6px 0;">Note: ' + esc(sub.note) + '</div>' : '')
     + '<div style="margin:8px 0;display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" onclick="rpCopy(window._rpNames.join(\'\\n\'))">Copy RAW filenames</button>'
     + '<button class="btn btn-ghost btn-sm" onclick="rpCopy(window._rpNames.map(function(n){return n.replace(/\\.[^.]+$/,\'\');}).join(\', \'))">Copy for Lightroom (no extension)</button>'
     + '<button class="btn btn-ghost btn-sm" onclick="rpDownloadTxt()">Download .txt</button></div>'
-    + (sub.extras ? '<div style="margin:6px 0;color:var(--accent);"><b>' + sub.extras + ' paid extra' + (sub.extras > 1 ? 's' : '') + ' = £' + sub.extra_total + '</b> — invoice the client</div>' : '')
+    + (sub.extras ? '<div style="margin:6px 0;color:var(--accent);"><b>' + sub.extras + ' paid extra' + (sub.extras > 1 ? 's' : '') + ' = £' + sub.extra_total + '</b> ' + rpInvoiceUi() + '</div>' : '')
     + '<div style="font-size:12px;line-height:1.7;margin:6px 0;">' + sub.items.map(function(i){ return esc(i.raw_filename || i.file_name || '') + (i.paid_extra ? ' <b style="color:var(--accent)">[extra]</b>' : '') + (i.kind === 'maybe' ? ' <i>[if possible]</i>' : '') + (i.comment ? ' — “' + esc(i.comment) + '”' : ''); }).join('<br>') + '</div>'
     + '<textarea readonly style="width:100%;height:150px;font-family:monospace;font-size:12px;">' + esc(names.join('\n')) + '</textarea>';
 }
@@ -150,6 +150,53 @@ async function rpDelete(){
     toast('', 'Gallery deleted', d.cloudinaryOk ? '' : 'Some Cloudinary files may remain — Cloudinary Cleanup will catch them');
     loadRawProofing();
   }catch(e){ toast('', 'Delete failed', e.message); }
+}
+
+/* ── Invoice for paid extras (same PDF + email + `invoices` table flow as event bookings) ── */
+function rpInvoiceUi(){
+  var sub = window._rpSub, g = window._rpG || {}, n = (sub.extras || 0) - (g.invoiced_extras || 0);
+  if(n > 0) return '<button class="btn btn-ghost btn-sm" onclick="rpInvoice()">' + (g.invoiced_extras ? 'Invoice ' + n + ' new extra' + (n > 1 ? 's' : '') : 'Create & send invoice') + '</button>';
+  return '<span style="color:var(--green);">✓ Invoiced' + (g.last_invoice_number ? ' (' + esc(g.last_invoice_number) + ')' : '') + '</span>'
+    + (n < 0 ? ' <span style="color:var(--red);">— client now has fewer extras than invoiced</span>' : '');
+}
+async function rpInvoice(){
+  var sub = window._rpSub, g = window._rpG || {};
+  if(!sub || !rpCur) return;
+  var n = (sub.extras || 0) - (g.invoiced_extras || 0);
+  if(n <= 0){ toast('', 'Nothing new to invoice', ''); return; }
+  var rate = sub.extras ? sub.extra_total / sub.extras : 1, total = n * rate;
+  var to = prompt('Send invoice for ' + n + ' extra' + (n > 1 ? 's' : '') + ' (£' + total.toFixed(2) + ') to:', sub.client_email || '');
+  if(!to) return; to = to.trim();
+  if(!/^\S+@\S+\.\S+$/.test(to)){ toast('', 'Enter a valid email', ''); return; }
+  try{
+    var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com', sb = getSupabase();
+    var biz = (typeof _bizSettings !== 'undefined' && _bizSettings) ? _bizSettings : {}, ls = function(k){ return localStorage.getItem(k) || ''; };
+    var num = parseInt(ls('ig_last_inv_num') || '2', 10), invNo = '';
+    for(var k = 0; k < 50; k++){
+      num++; invNo = 'INV-' + String(num).padStart(6, '0');
+      var ex = await sb.from('invoices').select('invoice_number').eq('invoice_number', invNo).limit(1);
+      if(!(ex.data && ex.data.length)) break;
+    }
+    var fmt = function(d){ return d.toISOString().split('T')[0]; }, due = new Date(); due.setDate(due.getDate() + 7);
+    var lines = [{ description:'Extra edited photos — ' + (rpCur.name || 'RAW gallery') + ' (' + n + ' × £' + rate.toFixed(2) + ')', qty:n, rate:rate, amount:total }];
+    var bank = { name: biz.account_name || ls('ig_biz_account_name'), no: biz.account_number || ls('ig_biz_account_number'), sort: biz.sort_code || ls('ig_biz_sort_code') };
+    var invoice = { invoice_number:invNo, invoice_date:fmt(new Date()), due_date:fmt(due), client_name:sub.client_name || 'Client',
+      line_items:lines, discount:0, subtotal:total, total:total, balance_due:total, notes:'Thanks for your business.',
+      payment_info:[bank.name, bank.no ? 'Account Number: ' + bank.no : '', bank.sort ? 'Sort Code: ' + bank.sort : ''].filter(Boolean).join(' | ') };
+    var bizName = biz.biz_name || ls('ig_biz_name') || 'Impact Grid Events';
+    var r = await fetch(API + '/api/send-invoice', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({
+      to:to, subject:'Your Invoice ' + invNo + ' — ' + bizName,
+      message:'Dear ' + (sub.client_name || 'Client') + ',\n\nThank you for choosing extra edited photos. Please find your invoice attached for £' + total.toFixed(2) + '.\n\nKind regards,\n' + bizName,
+      invoiceHtml:generateInvoiceHtml(invoice, to), invoiceNumber:invNo, bizName:bizName }) });
+    if(!r.ok) throw new Error('Invoice email failed (' + r.status + ')');
+    localStorage.setItem('ig_last_inv_num', String(num));
+    var up = await sb.from('invoices').upsert({ invoice_number:invNo, invoice_date:invoice.invoice_date, due_date:invoice.due_date, client_name:invoice.client_name, client_email:to,
+      lines:lines, discount:0, subtotal:total, total:total, notes:invoice.notes, sent:true, bank_name:bank.name, bank_account:bank.no, bank_sort:bank.sort,
+      biz_name:bizName, biz_location:biz.biz_address || ls('ig_biz_address') }, { onConflict:'invoice_number' });
+    if(up && up.error) toast('', 'Invoice sent, but not saved to your invoice list', up.error.message);
+    await rpApi('admin/invoiced', { body:{ id:rpCur.id, number:invNo, extras:sub.extras } });
+    toast('', 'Invoice ' + invNo + ' sent', to); rpOpen(rpCur.id, true);
+  }catch(e){ toast('', 'Invoice failed', e.message); }
 }
 
 /* ── Progress, hide/unhide, email link ── */
