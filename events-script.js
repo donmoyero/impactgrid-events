@@ -804,6 +804,18 @@ async function toggleEvent(id, cur){
   toast('', cur ? 'Event deactivated' : 'Event activated', '');
 }
 
+/* Sends the admin's Supabase login token to endpoints the API protects with requireAdmin.
+   Never throws: if there is no session or no helper on this page it returns {} and the
+   request is sent exactly as before. */
+async function _igAuthHeader(){
+  try{
+    if(typeof getSupabase !== 'function') return {};
+    var r = await getSupabase().auth.getSession();
+    var t = r && r.data && r.data.session ? r.data.session.access_token : null;
+    return t ? { 'Authorization': 'Bearer ' + t } : {};
+  }catch(e){ return {}; }
+}
+
 async function deleteEvent(id){
   if(!confirm('Delete this event and ALL its photos? This cannot be undone.')) return;
   try{
@@ -816,7 +828,7 @@ async function deleteEvent(id){
       if(idsToDelete.length){
         try{
           var pres = await fetch(EVENTS_API + '/api/delete-photo', {
-            method:'POST', headers:{'Content-Type':'application/json'},
+            method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
             body: JSON.stringify({ publicIds: idsToDelete, resourceType: pData.media_type === 'video' ? 'video' : 'image' })
           });
           if(!pres.ok) console.warn('[deleteEvent] Cloudinary delete failed for', pd.id, idsToDelete);
@@ -2085,7 +2097,7 @@ async function deletePhotoCore(id, meta){
   if(ids.length){
     try{
       var res = await fetch(EVENTS_API + '/api/delete-photo', {
-        method:'POST', headers:{'Content-Type':'application/json'},
+        method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
         body: JSON.stringify({ publicIds: ids, resourceType: meta.media_type === 'video' ? 'video' : 'image' })
       });
       if(!res.ok){
@@ -2339,7 +2351,7 @@ async function ccScan(){
   var summary = document.getElementById('ccSummary');
   if(btn){ btn.disabled = true; btn.textContent = 'Scanning…'; }
   try{
-    var res  = await fetch(EVENTS_API + '/api/cloudinary-scan');
+    var res  = await fetch(EVENTS_API + '/api/cloudinary-scan', { headers: await _igAuthHeader() });
     var data = await res.json();
     if(!res.ok) throw new Error(data.error || 'Scan failed');
 
@@ -2414,7 +2426,7 @@ async function ccDeleteSelected(){
   if(btn){ btn.disabled = true; btn.textContent = 'Deleting…'; }
   try{
     var res = await fetch(EVENTS_API + '/api/cloudinary-cleanup', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
       body: JSON.stringify({ items: items.map(function(o){ return { publicId: o.publicId, resourceType: o.resourceType, account: o.account }; }) })
     });
     var data = await res.json();

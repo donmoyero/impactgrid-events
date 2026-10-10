@@ -2207,7 +2207,7 @@ If you have any questions, just reply to this email.
 
 <!-- Events management (Firebase Firestore + Cloudinary) -->
 <script src="gallery-looks.js"></script>
-<script src="events-script.js"></script>
+<script src="events-script.js?v=20261011"></script>
 <script src="raw-proofing.js"></script>
 <script src="reviews-script.js"></script>
 <script src="review-emails-script.js"></script>
@@ -4695,7 +4695,7 @@ async function portfolioDeleteCategory(id, coverPublicId) {
     if (cloudinaryIds.length) {
       fetch(EVENTS_API + '/api/delete-photo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await _adminAuthHeader().catch(function(){ return {}; })),
         body: JSON.stringify({ publicIds: cloudinaryIds })
       }).catch(function(){});
     }
@@ -5101,7 +5101,7 @@ async function blogDeletePost(id, coverPublicId) {
     if (blogCloudinaryIds.length) {
       fetch(EVENTS_API + '/api/delete-photo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await _adminAuthHeader().catch(function(){ return {}; })),
         body: JSON.stringify({ publicIds: blogCloudinaryIds, account: 'blog' })
       }).catch(function(){});
     }
