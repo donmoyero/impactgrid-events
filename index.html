@@ -494,6 +494,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       user-drag: none;
     }
   </style>
+  <!-- Premium visual layer (viewfinder hero, grain, hover details). Delete these 3 lines to undo. -->
+  <script>document.documentElement.classList.add('pg-js');</script>
+  <link rel="stylesheet" href="premium.css"/>
+  <script src="premium.js" defer></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
      crossorigin="anonymous"></script>
 </head>
@@ -518,6 +522,12 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       <img id="hHeroImg" src="assets/home/hero.jpg" alt="Guest in a black sequined dress at an evening event, photographed by Impact Grid" width="1216" height="880" fetchpriority="high" />
     </div>
     <div class="h-hero-shade"></div>
+    <div class="pg-frame" aria-hidden="true">
+      <span class="pg-thirds"></span>
+      <i class="pg-c pg-c--tl"></i><i class="pg-c pg-c--tr"></i><i class="pg-c pg-c--bl"></i><i class="pg-c pg-c--br"></i>
+      <span class="pg-reticle"></span>
+    </div>
+    <div class="pg-flash" aria-hidden="true"></div>
 
     <div class="h-in h-hero-inner">
       <p class="h-eyebrow"><span>Events</span><span>People</span><span>Stories</span></p>
