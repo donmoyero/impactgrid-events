@@ -1,0 +1,132 @@
+/* ═══════════════════════════════════════════════════════
+   Impact Grid — Premium layer for the public pages
+   (Services, Portfolio, About, Blog, Booking, Join, Login,
+    Register, Reset Password, client gallery)
+
+   Additive only: loaded AFTER shared.css and any inline <style>.
+   Does not edit the locked shared classes — it layers on top of them.
+   Remove the <link> to premium-site.css to undo everything.
+═══════════════════════════════════════════════════════ */
+
+:root {
+  --pg-gold:      #d9c187;   /* on dark surfaces */
+  --pg-gold-ink:  #8a6a12;   /* on the cream light-mode surfaces */
+  --pg-ease:      cubic-bezier(.2, .7, .2, 1);
+}
+html[data-theme="dark"] { --pg-gold-ink: #d9c187; }
+
+::selection { background: #d9c187; color: #1a160f; }
+
+/* Warmer page background (light mode only; dark keeps its own) */
+html:not([data-theme="dark"]) body {
+  background:
+    radial-gradient(ellipse 70% 35% at 50% 0%,    rgba(190,160,70,.10) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(190,160,70,.06) 0%, transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* ───────────── Dividers: gold line with a viewfinder mark ─────────────
+   The gold line is visible by default. Only when JS is running AND the
+   divider has not been revealed yet do we start it collapsed; premium-site.js
+   reveals them on scroll and a timer guarantees they all show eventually. */
+.divider { position: relative; overflow: visible; }
+.divider::before {
+  content: '';
+  position: absolute; left: 50%; top: 50%;
+  width: min(220px, 40%); height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pg-gold-ink) 20%, var(--pg-gold-ink) 80%, transparent);
+  transform: translate(-50%, -50%) scaleX(1);
+  transform-origin: center;
+  opacity: .9;
+  transition: transform 1s var(--pg-ease), opacity .6s ease;
+}
+.divider::after {
+  content: '';
+  position: absolute; left: 50%; top: 50%;
+  width: 9px; height: 9px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 1px solid var(--pg-gold-ink);
+  background: var(--bg);
+  transition: opacity .6s ease .35s;
+}
+.pg-js .divider:not(.pg-in)::before { transform: translate(-50%, -50%) scaleX(0); opacity: 0; }
+.pg-js .divider:not(.pg-in)::after  { opacity: 0; }
+
+/* ───────────── Headings ───────────── */
+.sv-headline, .ab-headline, .pf-title, .blog-title, .bk-h1, .page-hero-title {
+  text-shadow: 0 1px 0 rgba(255,255,255,.35);
+}
+html[data-theme="dark"] .sv-headline, html[data-theme="dark"] .ab-headline,
+html[data-theme="dark"] .pf-title,   html[data-theme="dark"] .blog-title,
+html[data-theme="dark"] .bk-h1,      html[data-theme="dark"] .page-hero-title { text-shadow: none; }
+.label-tag { color: var(--pg-gold-ink); }
+.label-tag::before { background: var(--pg-gold-ink); }
+
+/* ───────────── Cards: gold hairline + viewfinder corners on hover ───────────── */
+.card, .sv-card, .related-card, .auth-card, .rg-card, .bk-panel, .cal-card, .success-card {
+  position: relative;
+  transition: transform .45s var(--pg-ease), box-shadow .45s var(--pg-ease), border-color .3s;
+}
+.card:hover, .sv-card:hover, .related-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(217,193,135,.7);
+  box-shadow: 0 0 0 1px rgba(217,193,135,.45), 0 26px 46px -26px rgba(0,0,0,.5);
+}
+.card::before, .sv-card::before, .related-card::before {
+  content: ''; position: absolute; inset: 10px; z-index: 2; pointer-events: none;
+  --t: var(--pg-gold);
+  background:
+    linear-gradient(var(--t),var(--t)) 0 0 / 14px 1.5px no-repeat, linear-gradient(var(--t),var(--t)) 0 0 / 1.5px 14px no-repeat,
+    linear-gradient(var(--t),var(--t)) 100% 0 / 14px 1.5px no-repeat, linear-gradient(var(--t),var(--t)) 100% 0 / 1.5px 14px no-repeat,
+    linear-gradient(var(--t),var(--t)) 0 100% / 14px 1.5px no-repeat, linear-gradient(var(--t),var(--t)) 0 100% / 1.5px 14px no-repeat,
+    linear-gradient(var(--t),var(--t)) 100% 100% / 14px 1.5px no-repeat, linear-gradient(var(--t),var(--t)) 100% 100% / 1.5px 14px no-repeat;
+  opacity: 0; transform: scale(1.04);
+  transition: opacity .35s ease, transform .5s var(--pg-ease);
+}
+.card:hover::before, .sv-card:hover::before, .related-card:hover::before { opacity: .95; transform: none; }
+
+/* Sign-in / register / booking panels: a quiet gold top edge */
+.auth-card, .rg-card, .bk-panel {
+  box-shadow: 0 30px 60px -36px rgba(0,0,0,.45), inset 0 1px 0 rgba(217,193,135,.55);
+}
+
+/* ───────────── Buttons: gold sheen sweep ───────────── */
+.btn-primary, .btn-gold, .btn-hero-gold, .btn-cta-gold, .btn-gold-sm {
+  position: relative; overflow: hidden; isolation: isolate;
+}
+.btn-primary::after, .btn-gold::after, .btn-hero-gold::after, .btn-cta-gold::after, .btn-gold-sm::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgba(217,193,135,.5) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+.btn-primary:hover::after, .btn-gold:hover::after, .btn-hero-gold:hover::after,
+.btn-cta-gold:hover::after, .btn-gold-sm:hover::after {
+  transform: translateX(120%); transition: transform .8s var(--pg-ease);
+}
+.btn-secondary:hover, .btn-outline:hover { border-color: var(--pg-gold-ink); }
+
+/* ───────────── Form fields: gold focus ───────────── */
+.form-input:focus, .form-select:focus, .form-textarea:focus,
+.auth-card input:focus, .rg-card input:focus, .auth-card select:focus, .rg-card select:focus {
+  outline: none;
+  border-color: var(--pg-gold-ink) !important;
+  box-shadow: 0 0 0 3px rgba(217,193,135,.28);
+}
+
+/* Nav rail: gold hairline */
+#mainNav, .nav-rail { border-color: rgba(217,193,135,.25); }
+
+/* ───────────── Touch + reduced motion ───────────── */
+@media (hover: none) {
+  .card::before, .sv-card::before, .related-card::before { display: none; }
+  .card:hover, .sv-card:hover, .related-card:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-js .divider:not(.pg-in)::before { transform: translate(-50%, -50%) scaleX(1); opacity: .9; }
+  .pg-js .divider:not(.pg-in)::after  { opacity: 1; }
+  .divider::before, .divider::after, .card, .sv-card, .related-card,
+  .card::before, .sv-card::before, .related-card::before,
+  .btn-primary::after, .btn-gold::after, .btn-hero-gold::after, .btn-cta-gold::after, .btn-gold-sm::after { transition: none !important; }
+  .card:hover, .sv-card:hover, .related-card:hover { transform: none; }
+}
