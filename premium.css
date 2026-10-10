@@ -199,9 +199,17 @@ body.home .h-newsletter-input:focus { outline: 2px solid var(--pg-gold); border-
 @media (max-width: 1100px) { .pg-frame { left: 34%; } }
 @media (max-width: 768px) {
   /* hero photo becomes a block at the top on phones — frame it there */
+  /* Compact phone hero: a wide strip of the photo (top of the picture, where the
+     face is), with the heading pulled up close underneath.
+     Tune here: --pg-mh = strip height, --pg-pos = which part of the photo shows. */
+  body.home .h-hero { --pg-mh: clamp(250px, 70vw, 330px); --pg-pos: 34% 8%; }
+  body.home .h-hero-photo { height: var(--pg-mh); max-height: none; }
+  body.home .h-hero-photo img { object-position: var(--pg-pos); }
+  body.home .h-hero-shade { height: var(--pg-mh); }
+  body.home .h-hero-inner { margin-top: -17vw; }
   .pg-frame {
-    top: 74px; left: 16px; right: 16px; bottom: auto;
-    height: calc(min(104vw, 620px) - 74px - 64px);
+    top: 70px; left: 16px; right: 16px; bottom: auto;
+    height: calc(var(--pg-mh) - 70px - 58px);
   }
   .pg-c { width: 20px; height: 20px; }
   .pg-reticle { width: 54px; height: 54px; margin: -27px 0 0 -27px; }
