@@ -1,0 +1,45 @@
+/* ═══════════════════════════════════════════════════════
+   Impact Grid — Premium LITE layer
+   For dense working pages (dashboards, settings, accounts, client area)
+   and legal pages. Colour and finish only: no layout changes, no
+   transforms, no clipping, so tools keep behaving exactly as before.
+   Remove the <link> to premium-lite.css to undo.
+═══════════════════════════════════════════════════════ */
+:root { --pg-gold: #d9c187; --pg-gold-ink: #8a6a12; --pg-ease: cubic-bezier(.2,.7,.2,1); }
+html[data-theme="dark"] { --pg-gold-ink: #d9c187; }
+
+::selection { background: #d9c187; color: #1a160f; }
+
+/* Warmer light-mode page tint */
+html:not([data-theme="dark"]) body {
+  background:
+    radial-gradient(ellipse 70% 35% at 50% 0%,    rgba(190,160,70,.09) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(190,160,70,.05) 0%, transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* Cards: gold hairline on hover (colour only) */
+.card { transition: border-color .3s ease, box-shadow .3s ease, background .25s ease; }
+.card:hover { transform: none; border-color: rgba(217,193,135,.65); box-shadow: 0 0 0 1px rgba(217,193,135,.35), 0 18px 36px -24px rgba(0,0,0,.4); }
+
+/* Primary buttons: warm gold glow on hover */
+.btn-primary:hover, .btn-gold:hover, .btn-hero-gold:hover, .btn-cta-gold:hover, .btn-gold-sm:hover {
+  box-shadow: 0 8px 26px -10px rgba(217,193,135,.75);
+}
+.btn-secondary:hover, .btn-outline:hover { border-color: var(--pg-gold-ink); }
+
+/* Gold focus on form fields and keyboard focus everywhere */
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--pg-gold-ink) !important;
+  box-shadow: 0 0 0 3px rgba(217,193,135,.28);
+}
+:focus-visible { outline: 2px solid var(--pg-gold-ink); outline-offset: 2px; }
+
+.label-tag { color: var(--pg-gold-ink); }
+.label-tag::before { background: var(--pg-gold-ink); }
+
+/* Nav rail hairline */
+#mainNav, .nav-rail { border-color: rgba(217,193,135,.25); }
+
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } }
