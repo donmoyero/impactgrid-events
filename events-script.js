@@ -2207,7 +2207,7 @@ async function approveRequest(id, email, eventId){
   try{
     var res  = await fetch(EVENTS_API + '/api/approve-request', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
       body   : JSON.stringify({ requestId: id })
     });
     var data = await res.json();

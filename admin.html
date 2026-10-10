@@ -2207,7 +2207,7 @@ If you have any questions, just reply to this email.
 
 <!-- Events management (Firebase Firestore + Cloudinary) -->
 <script src="gallery-looks.js"></script>
-<script src="events-script.js?v=20261011"></script>
+<script src="events-script.js?v=20261012"></script>
 <script src="raw-proofing.js"></script>
 <script src="reviews-script.js"></script>
 <script src="review-emails-script.js"></script>
@@ -3251,7 +3251,7 @@ async function sendMail(){
     /* Send via your existing Render API — same pattern as resendOwnerEmail */
     var res = await fetch(EVENTS_API + '/api/send-mail', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({ to, subject, body })
     });
     var data = await res.json();
@@ -6296,7 +6296,7 @@ async function confirmBooking(){
     btn.textContent=' Sending invoice…';
     var invoiceHtml=generateInvoiceHtml(invoice, b.email);
     await fetch(API+'/api/send-invoice',{
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body:JSON.stringify({
         to: b.email,
         subject: 'Your Invoice '+invoice.invoice_number+' — Impact Grid Events',
@@ -6447,7 +6447,7 @@ async function sendInvoiceOnly() {
   try {
     var invoiceHtml = generateInvoiceHtml(invoice, b.email);
     var res = await fetch(API + '/api/send-invoice', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({
         to: b.email,
         subject: 'Invoice ' + invoice.invoice_number + ' — Impact Grid Events',
@@ -6556,7 +6556,7 @@ async function saveAndResendInvoice() {
     var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
     var invoiceHtml = generateInvoiceHtml(invoice, b.email);
     var res = await fetch(API + '/api/send-invoice', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({
         to: b.email,
         subject: 'Updated Invoice ' + invoice.invoice_number + ' — Impact Grid Events',
@@ -6592,7 +6592,7 @@ async function resendInvoice(id) {
   try {
     var invoiceHtml = generateInvoiceHtml(invoice, b.email);
     var res = await fetch(API + '/api/send-invoice', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({
         to: b.email,
         subject: 'Invoice ' + (invoice.invoice_number||'') + ' — Impact Grid Events',

@@ -1031,6 +1031,15 @@ function switchMailTab(tab){
   if(tab==='sent')  loadSent();
 }
 function clearCompose(){ document.getElementById('mail-to').value=''; document.getElementById('mail-subject').value=''; document.getElementById('mail-body').value=''; var s=document.getElementById('mail-send-status'); if(s)s.style.display='none'; }
+/* Sends this user's Supabase login token to API routes that now require a logged-in user.
+   Never throws: with no session it returns {} and the API answers 401. */
+async function _dashAuthHeader(){
+  try{
+    var r = await getSupabase().auth.getSession();
+    var t = r && r.data && r.data.session ? r.data.session.access_token : null;
+    return t ? { 'Authorization': 'Bearer ' + t } : {};
+  }catch(e){ return {}; }
+}
 async function sendMail(){
   var to=(document.getElementById('mail-to').value||'').trim();
   var subject=(document.getElementById('mail-subject').value||'').trim();
@@ -1041,7 +1050,7 @@ async function sendMail(){
   var btn=document.querySelector('#mail-tab-compose .btn-gold');
   if(btn){btn.disabled=true;btn.textContent='Sending…';}
   try{
-    var res=await fetch(EVENTS_API+'/api/send-mail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject,body})});
+    var res=await fetch(EVENTS_API+'/api/send-mail',{method:'POST',headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),body:JSON.stringify({to,subject,body})});
     var data=await res.json();
     if(!res.ok||!data.success) throw new Error(data.error||'Send failed');
     await getSupabase().from('admin_mail_sent').insert({to_email:to,subject:subject,body:body});
@@ -1330,7 +1339,7 @@ async function fetchAIInvoiceMessage(d){
   try {
     var res = await fetch(EVENTS_API + '/api/generate-invoice-message', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body   : JSON.stringify({
         bizName      : d.bizName,
         clientName   : d.clientName,
@@ -1413,7 +1422,7 @@ async function confirmSendInvoice(){
     await saveInvoiceToDB(d, true);
     var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body   : JSON.stringify({
         to          : d.clientEmail,
         subject     : 'Invoice ' + d.number + ' from ' + (d.bizName || 'Impact Grid Events'),
@@ -1579,14 +1588,14 @@ async function resendInvoice(id){
     if (!d.clientEmail) { toast('⚠️', 'No email on file', 'Edit the invoice to add an email'); return; }
     /* Get AI message then send with PDF */
     var msgRes  = await fetch(EVENTS_API + '/api/generate-invoice-message', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body: JSON.stringify({ bizName: d.bizName, clientName: d.clientName, invoiceNumber: d.number, total: d.total, dueDate: d.dueDate, lines: d.lines, notes: d.notes })
     });
     var msgData = await msgRes.json();
     var message = msgData.message || buildInvoiceEmailBody(d);
     var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body: JSON.stringify({
         to: d.clientEmail,
         subject: 'Invoice ' + d.number + ' from ' + (d.bizName || 'Impact Grid Events'),
