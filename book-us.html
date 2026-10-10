@@ -118,6 +118,15 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 .bk-btn:focus-visible, .cal-day:focus-visible, .cal-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 .bk-fine { font-size: 12px; color: var(--text3); margin-top: 14px; line-height: 1.5; }
 
+/* Optional marketing consent tick box (unticked by default) */
+.bk-check { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 18px; cursor: pointer; }
+.bk-panel .bk-check input[type="checkbox"] {
+  width: 20px; height: 20px; min-width: 20px; padding: 0; margin: 2px 0 0; flex: none;
+  accent-color: var(--text); cursor: pointer;
+}
+.bk-check span { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.bk-check a { color: inherit; text-decoration: underline; }
+
 .bk-alert { display: none; padding: 12px 14px; border-radius: var(--r); font-size: 13px; line-height: 1.5; margin-bottom: 16px;
   background: var(--red-dim); border: 1px solid var(--red-glo, rgba(217,79,59,.28)); color: var(--red); }
 .bk-alert.show { display: block; }
@@ -324,6 +333,11 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
           <label class="f-label" for="bk-notes">Additional notes <span class="f-opt">(optional)</span></label>
           <textarea id="bk-notes" rows="3" placeholder="Timings, special requests, anything we should know"></textarea>
         </div>
+
+        <label class="bk-check" for="bk-marketing">
+          <input type="checkbox" id="bk-marketing"/>
+          <span>Keep me updated with occasional offers and news from ImpactGrid Events. <span class="f-opt">(optional)</span> You can unsubscribe at any time. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</span>
+        </label>
 
         <div class="bk-actions">
           <button type="button" class="bk-btn bk-btn-ghost" id="backBtn">Back</button>
@@ -647,7 +661,8 @@ renderFooter();
           email: customer.email, phone: customer.phone,
           event_type: svc.title, service_id: svc.id || null,
           event_date: selectedDate, guest_count: guests || null,
-          location: loc || null, notes: notesOut
+          location: loc || null, notes: notesOut,
+          marketing_opt_in: $('bk-marketing').checked === true
         })
       });
       var data = {}; try { data = await res.json(); } catch (_) {}
