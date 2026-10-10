@@ -202,14 +202,14 @@ body.home .h-newsletter-input:focus { outline: 2px solid var(--pg-gold); border-
   /* Compact phone hero: a wide strip of the photo (top of the picture, where the
      face is), with the heading pulled up close underneath.
      Tune here: --pg-mh = strip height, --pg-pos = which part of the photo shows. */
-  body.home .h-hero { --pg-mh: clamp(150px, 40vw, 180px); --pg-pos: 34% 8%; }
+  body.home .h-hero { --pg-mh: clamp(205px, 55vw, 250px); --pg-pos: 34% 8%; }
   body.home .h-hero-photo { height: var(--pg-mh); max-height: none; }
   body.home .h-hero-photo img { object-position: var(--pg-pos); }
   body.home .h-hero-shade { height: var(--pg-mh); }
-  body.home .h-hero-inner { margin-top: -7vw; }
+  body.home .h-hero-inner { margin-top: -9vw; }
   .pg-frame {
     top: 62px; left: 16px; right: 16px; bottom: auto;
-    height: calc(var(--pg-mh) - 62px - 40px);
+    height: calc(var(--pg-mh) - 64px - 40px);
   }
   .pg-c { width: 20px; height: 20px; }
   .pg-reticle { width: 38px; height: 38px; margin: -19px 0 0 -19px; }
