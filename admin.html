@@ -366,6 +366,7 @@ tr:hover td{background:var(--bg2);}
   </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
      crossorigin="anonymous"></script>
+<link rel="stylesheet" href="premium-admin.css"/>
 </head>
 <body>
 <div class="topbar">
@@ -447,10 +448,46 @@ tr:hover td{background:var(--bg2);}
   <div class="main">
     <!-- OVERVIEW -->
     <div class="page active" id="page-overview">
-      <div class="page-header"><div class="page-title">Overview</div><div class="page-sub">Full control of the ImpactGrid site content, events, and network.</div></div>
-      <div class="stats-row">
-<div class="stat-card"><div class="stat-label">Events</div><div class="stat-val" id="stat-events" style="color:var(--blue);">—</div><div class="stat-sub">Active</div></div>
+      <div class="pa-hero">
+        <div>
+          <div class="pa-eyebrow" id="paDate">Overview</div>
+          <h1 class="pa-greet" id="paGreet">Welcome back.</h1>
+          <p class="pa-sub">Here is what needs you today across bookings, galleries and conversations.</p>
+        </div>
+        <div class="pa-hero-actions">
+          <button class="btn btn-gold" onclick="nav('createevent',null)">New event</button>
+          <button class="btn btn-ghost" onclick="nav('uploadphotos',null)">Upload photos</button>
+        </div>
       </div>
+
+      <div class="pa-kpis">
+        <div class="pa-kpi" onclick="nav('events',null)"><div class="pa-kpi-label">Active events</div><div class="pa-kpi-val" id="stat-events">—</div><div class="pa-kpi-sub" id="pa-k-events-sub">Galleries live now</div></div>
+        <div class="pa-kpi" id="pa-k-pending-card" onclick="nav('bookings',null)"><div class="pa-kpi-label">Pending bookings</div><div class="pa-kpi-val" id="pa-k-pending">—</div><div class="pa-kpi-sub" id="pa-k-pending-sub">Waiting for your reply</div></div>
+        <div class="pa-kpi" onclick="nav('bookings',null)"><div class="pa-kpi-label">Upcoming confirmed</div><div class="pa-kpi-val" id="pa-k-upcoming">—</div><div class="pa-kpi-sub" id="pa-k-upcoming-sub">Nothing scheduled</div></div>
+        <div class="pa-kpi" id="pa-k-follow-card" onclick="nav('receptionist',null)"><div class="pa-kpi-label">Follow-ups</div><div class="pa-kpi-val" id="pa-k-follow">—</div><div class="pa-kpi-sub" id="pa-k-follow-sub">Conversations waiting</div></div>
+        <div class="pa-kpi" onclick="nav('eventactivity',null)"><div class="pa-kpi-label">Gallery visits · 7 days</div><div class="pa-kpi-val" id="pa-k-visits">—</div><div class="pa-kpi-sub" id="pa-k-visits-sub">Unique visitors</div></div>
+      </div>
+
+      <div class="pa-grid">
+        <div class="card">
+          <div class="card-head"><h2>Needs your attention</h2><button class="btn btn-ghost btn-sm" onclick="nav('bookings',null)">All bookings</button></div>
+          <div id="pa-pending"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Coming up</h2><button class="btn btn-ghost btn-sm" onclick="nav('bookings',null)">Calendar</button></div>
+          <div id="pa-upcoming"></div>
+        </div>
+        <div class="card pa-wide">
+          <div class="card-head"><h2>Gallery visits</h2><button class="btn btn-ghost btn-sm" onclick="nav('eventactivity',null)">Full activity</button></div>
+          <div id="pa-chart"></div>
+        </div>
+        <div class="card pa-wide">
+          <div class="card-head"><h2>Recent events</h2><button class="btn btn-ghost btn-sm" onclick="nav('events',null)">All events</button></div>
+          <div id="pa-events"></div>
+        </div>
+      </div>
+
+      <div class="pa-label">Quick actions</div>
       <div class="quick-grid">
         <div class="quick-card" id="rcp-overview-card" onclick="nav('receptionist',null)" style="border-color:var(--red-glo);background:var(--red-dim);"><div class="quick-ico"></div><div class="quick-title" style="color:var(--red);">Receptionist<span id="rcp-overview-badge" style="display:none;margin-left:6px;font-family:var(--fm);font-size:10px;background:var(--red);color:#fff;padding:1px 7px;border-radius:100px;">0</span></div><div class="quick-desc" id="rcp-overview-desc">See who Dijo talked to and who needs a follow-up</div></div>
         <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico"></div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
@@ -2212,6 +2249,7 @@ If you have any questions, just reply to this email.
 <script src="reviews-script.js"></script>
 <script src="review-emails-script.js"></script>
 <script src="brand-partners-script.js"></script>
+<script src="admin-dashboard.js"></script>
 
 <script>
 /*  CONFIG  */
@@ -2244,6 +2282,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   if(data.session.user.email !== IG_ADMIN_EMAIL){ window.location.href='dashboard.html'; return; }
   document.getElementById('topbarUser').textContent = data.session.user.email;
   loadStats();
+  if(window.loadDashboard) loadDashboard();
   loadBizSettings(); /* load biz settings on boot so invoice generation always has them */
   loadReceptionist(); /* so the follow-up badge is right there on login */
 });
@@ -2292,6 +2331,7 @@ function nav(id,el){
   if(page) page.classList.add('active');
   if(el) el.classList.add('active');
   var loaders={
+    overview:'loadDashboard',
     eventactivity:'loadEventActivity',
     events:'loadEvents',createevent:'initCreateEventPage',
     managegallery:'loadManageGallery',
