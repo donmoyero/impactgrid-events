@@ -177,12 +177,18 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
 
 /* ── EXPORT BTN ── */
 .export-bar { display:flex; gap:10px; margin-bottom:16px; align-items:center; }
+/* ── SITE NAV INTEGRATION: sits beside the shared nav rail (same pattern as settings.html) ── */
+.page-wrap { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+.topbar-logo, .topbar-div { display:none; }  /* rail already shows the logo */
 </style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
      crossorigin="anonymous"></script>
 <link rel="stylesheet" href="premium-accounts.css"/>
 </head>
 <body>
+
+<div id="ig-nav"></div>
+<div class="page-wrap">
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -401,6 +407,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
 
   </div><!-- /main -->
 </div><!-- /shell -->
+</div><!-- /page-wrap -->
 
 <!-- ══ EXPENSE MODAL ══ -->
 <div class="modal-wrap" id="expenseModal">
@@ -591,8 +598,11 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="plan-config.js"></script>
 <script src="supabase-config.js"></script>
+<script src="auth.js"></script>
 <script src="nav.js"></script>
+<script>document.addEventListener('DOMContentLoaded', function(){ renderNav('accounts.html'); });</script>
 
 <script>
 /* ══════════════════════════════════════════════
