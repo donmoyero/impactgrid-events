@@ -22,6 +22,9 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ImpactGrid — Event Gallery</title>
+<link rel="preconnect" href="https://impactgrid-events-api.onrender.com" crossorigin/>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin/>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin/>
 <link rel="icon" href="favicon.ico"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&family=Italiana&family=Syne:wght@700;800;900&family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
 <!-- Firebase compat SDK (Events DB) -->
@@ -35,17 +38,31 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 /* ── Firebase init for event.html — config fetched securely from backend ── */
 /* Resolve this promise once Firestore is ready */
 window._dbReadyPromise = new Promise(function(resolve, reject){
-  fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
+  /* Speed: the Firebase config is cached in this browser for 24h, so repeat
+     visits start instantly instead of waiting on the API (which can be slow
+     to wake). The cache is refreshed from the API in the background. */
+  var KEY = 'ig-fbcfg-v1', TTL = 24 * 60 * 60 * 1000, cached = null;
+  try {
+    var c = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (c && c.cfg && c.cfg.apiKey && (Date.now() - c.t) < TTL) cached = c.cfg;
+  } catch (e) {}
+  function ready(cfg){
+    if (!firebase.apps.length) firebase.initializeApp(cfg);
+    window._eventsDb = firebase.firestore();
+    resolve(window._eventsDb);
+  }
+  var net = fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
     .then(function(r){ return r.json(); })
     .then(function(cfg){
-      if (!firebase.apps.length) firebase.initializeApp(cfg);
-      window._eventsDb = firebase.firestore();
-      resolve(window._eventsDb);
-    })
-    .catch(function(err){
-      console.error('Failed to load Firebase config:', err);
-      reject(err);
+      if (!cfg || !cfg.apiKey) throw new Error('Firebase config unavailable');
+      try { localStorage.setItem(KEY, JSON.stringify({ t: Date.now(), cfg: cfg })); } catch (e) {}
+      return cfg;
     });
+  if (cached) { ready(cached); net.catch(function(){}); }
+  else net.then(ready).catch(function(err){
+    console.error('Failed to load Firebase config:', err);
+    reject(err);
+  });
 });
 </script>
 <style>
