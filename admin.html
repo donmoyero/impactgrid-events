@@ -2243,6 +2243,7 @@ If you have any questions, just reply to this email.
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 
 <!-- Events management (Firebase Firestore + Cloudinary) -->
+<script src="ig-dialog.js"></script>
 <script src="gallery-looks.js"></script>
 <script src="events-script.js?v=20261012"></script>
 <script src="raw-proofing.js"></script>
@@ -6031,10 +6032,17 @@ function payPill_(b){
 async function confirmPayment(id, stage){
   var b=(_allBookings||[]).find(function(x){ return x.id===id; }); if(!b) return;
   var amt=parseFloat(stage==='deposit' ? b.deposit_amount : b.balance_amount||0).toFixed(2);
-  var msg = stage==='deposit'
-    ? 'Confirm you have received the 50% deposit (£'+amt+') from '+b.name+'?\n\nThey will be emailed a receipt.'
-    : 'Confirm you have received the final 50% (£'+amt+') from '+b.name+'?\n\nTheir gallery will UNLOCK and they will be emailed.';
-  if(!confirm(msg)) return;
+  var isDep = stage==='deposit';
+  var ok = await igDialog.confirm({
+    eyebrow : 'Payment received',
+    title   : isDep ? 'Confirm 50% deposit' : 'Confirm final 50%',
+    chip    : b.name+' · £'+amt,
+    message : isDep
+      ? 'Confirm you have received the 50% deposit (£'+amt+') from '+b.name+'.\n\nThey will be emailed a receipt.'
+      : 'Confirm you have received the final 50% (£'+amt+') from '+b.name+'.\n\nTheir gallery will unlock and they will be emailed.',
+    confirmText: isDep ? 'Yes, deposit received' : 'Yes, unlock gallery'
+  });
+  if(!ok) return;
   var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
   try{
     var res=await fetch(API+'/api/booking-confirm-'+stage,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({bookingId:id})});
@@ -6042,7 +6050,7 @@ async function confirmPayment(id, stage){
     if(!data.success) throw new Error(data.error||'Backend error');
     toast('', stage==='deposit'?'Deposit confirmed':'Balance confirmed — gallery unlocked', b.name+(data.emailSent===false?' · email failed to send':' · client notified'));
     loadBookings();
-  }catch(e){ alert('Could not confirm payment: '+e.message); }
+  }catch(e){ igDialog.alert({ title:'Could not confirm payment', message:e.message, danger:true }); }
 }
 window.confirmPayment = confirmPayment;
 
@@ -6051,22 +6059,59 @@ async function applySplit(id){
   var b=(_allBookings||[]).find(function(x){ return x.id===id; }); if(!b) return;
   var total = b.invoice && b.invoice.total!=null ? parseFloat(b.invoice.total) : NaN;
   var totalArg;
+
+  /* Step 1 — no invoice total on file: ask for it */
   if(!(total>0)){
-    var t = prompt('This booking has no invoice total on file.\nEnter the total in £ (0 = free shoot, no payment needed):', '');
+    var t = await igDialog.money({
+      eyebrow : '50/50 payment plan',
+      title   : 'Invoice total',
+      chip    : b.name,
+      message : 'This booking has no invoice total on file. Enter the full amount to continue.',
+      quick   : [{ label:'Free shoot (£0)', value:0 }],
+      hintEmpty: 'Use Free shoot if no payment is needed.',
+      hint    : function(v){
+        if(v===0) return 'Free shoot — no payment needed, gallery stays open.';
+        var half=(Math.round(v*100)/2/100).toFixed(2);
+        var f=document.createElement('span');
+        f.appendChild(document.createTextNode('Split into two payments of '));
+        var strong=document.createElement('b'); strong.textContent='£'+half;
+        f.appendChild(strong);
+        return f;
+      },
+      confirmText: 'Continue'
+    });
     if(t===null) return;
-    total = parseFloat(String(t).replace(/[£,\s]/g,''));
-    if(isNaN(total) || total<0){ alert('That is not a valid amount.'); return; }
-    totalArg = total;
+    total = t; totalArg = t;
   }
+
+  /* Free shoot */
   if(total===0){
-    if(!confirm('Mark '+b.name+' as a free shoot?\n\nNo payment is needed and the gallery stays open.')) return;
+    var free = await igDialog.confirm({
+      eyebrow:'50/50 payment plan',
+      title:'Mark as a free shoot?',
+      chip:b.name,
+      message:'No payment is needed and the gallery stays open.',
+      confirmText:'Yes, free shoot'
+    });
+    if(!free) return;
     return sendSplit_(id,'none',totalArg,b);
   }
+
+  /* Step 2 — what has the client actually paid so far? */
   var half=(Math.round(total*100)/2/100).toFixed(2);
-  var ans=prompt('Total £'+total.toFixed(2)+' — split into two £'+half+' payments.\n\nWhat has '+b.name+' ACTUALLY paid so far?\n\n1 = Nothing yet (gallery locked)\n2 = Deposit paid (gallery locked until balance)\n3 = Paid in full (gallery stays open)\n\nType 1, 2 or 3:','');
-  if(ans===null) return;
-  var state={'1':'none','2':'deposit','3':'full'}[String(ans).trim()];
-  if(!state){ alert('Please type 1, 2 or 3.'); return; }
+  var state = await igDialog.choice({
+    eyebrow : '50/50 payment plan',
+    title   : 'What has been paid so far?',
+    chip    : b.name+' · £'+total.toFixed(2)+' total',
+    message : 'Split into two payments of £'+half+'. Pick what '+b.name+' has actually paid.',
+    options : [
+      { value:'none',    title:'Nothing yet',        sub:'Gallery stays locked',                    tag:'LOCKED' },
+      { value:'deposit', title:'Deposit paid (£'+half+')', sub:'Gallery locked until the balance is paid', tag:'LOCKED' },
+      { value:'full',    title:'Paid in full',       sub:'Gallery stays open',                      tag:'OPEN' }
+    ],
+    confirmText:'Apply 50/50'
+  });
+  if(!state) return;
   sendSplit_(id,state,totalArg,b);
 }
 async function sendSplit_(id,state,total,b){
@@ -6078,7 +6123,7 @@ async function sendSplit_(id,state,total,b){
     if(!data.success) throw new Error(data.error||'Backend error');
     toast('', '50/50 applied', b.name+' · no email sent');
     loadBookings();
-  }catch(e){ alert('Could not apply 50/50: '+e.message); }
+  }catch(e){ igDialog.alert({ title:'Could not apply 50/50', message:e.message, danger:true }); }
 }
 window.applySplit = applySplit;
 
