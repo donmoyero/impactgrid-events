@@ -1025,6 +1025,23 @@ input,textarea,select{font-family:inherit;}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════ LOCKED (balance unpaid) ══════════════════════════════════════ -->
+<div class="section" id="section-locked">
+  <nav class="ev-nav">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark"><img src="logo.png" alt="ImpactGrid" fetchpriority="low" loading="lazy"></div>
+      ImpactGrid
+    </a>
+  </nav>
+  <div class="gate">
+    <div class="gate-box">
+      <div class="gate-icon" style="font-size:44px;">🔒</div>
+      <div class="gate-title" id="lockedTitle">Gallery locked</div>
+      <div class="gate-sub" id="lockedSub">Your gallery will unlock once the remaining 50% balance has been paid and confirmed.</div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════════════════════════════ GALLERY ══════════════════════════════════════ -->
 <div class="section" id="section-gallery">
 
@@ -1505,7 +1522,11 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     styleGate(type, ev.name);
 
-    if(settings.require_code === false){
+    /* 50/50 payments: gallery stays locked until admin confirms the balance.
+       Free shoots and older events have no gallery_locked flag, so they are never affected. */
+    if(ev.gallery_locked === true){
+      showLockedGallery();
+    } else if(settings.require_code === false){
       enterGallery();
     } else if(code && code.toUpperCase() === ev.event_code){
       enterGallery();
@@ -1559,7 +1580,16 @@ function showGateAlert(msg){
 /* ══════════════════════════════════════
    GALLERY ENTRY
 ══════════════════════════════════════ */
+function showLockedGallery(){
+  document.getElementById('lockedTitle').textContent = eventData.name || 'Gallery locked';
+  document.getElementById('lockedSub').textContent = eventData.deposit_status === 'paid'
+    ? 'Thank you — your deposit is confirmed. Your gallery will unlock once the remaining 50% balance has been paid and confirmed. We\'ll email you the moment it\'s ready.'
+    : 'Your gallery will unlock once your payments have been confirmed. Please contact us if you have any questions.';
+  showSection('section-locked');
+}
+
 async function enterGallery(){
+  if(eventData && eventData.gallery_locked === true){ showLockedGallery(); return; }   /* defence in depth */
   showSection('section-gallery');
   await loadPhotos();
   /* Show review FAB once gallery is visible */

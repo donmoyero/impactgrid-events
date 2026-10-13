@@ -6017,6 +6017,34 @@ async function bkBulkUnbook(){
   await loadBookings();
 }
 
+/* ─── 50/50 PAYMENT STATUS + CONFIRMATION ─────────────────────── */
+function payPill_(b){
+  if(b.status!=='confirmed') return '';
+  var st='display:inline-block;margin-top:4px;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;';
+  if(!b.payment_required) return '<br><span style="'+st+'background:var(--bg2);color:var(--text3);border:1px solid var(--border);">Free · no payment</span>';
+  if(b.balance_status==='paid') return '<br><span style="'+st+'background:rgba(16,185,129,.12);color:var(--green);border:1px solid var(--green);">Paid in full · gallery unlocked</span>';
+  if(b.deposit_status==='paid') return '<br><span style="'+st+'background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);">50% paid · £'+parseFloat(b.balance_amount||0).toFixed(2)+' due · gallery locked</span>';
+  return '<br><span style="'+st+'background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);">Deposit £'+parseFloat(b.deposit_amount||0).toFixed(2)+' awaiting · gallery locked</span>';
+}
+
+async function confirmPayment(id, stage){
+  var b=(_allBookings||[]).find(function(x){ return x.id===id; }); if(!b) return;
+  var amt=parseFloat(stage==='deposit' ? b.deposit_amount : b.balance_amount||0).toFixed(2);
+  var msg = stage==='deposit'
+    ? 'Confirm you have received the 50% deposit (£'+amt+') from '+b.name+'?\n\nThey will be emailed a receipt.'
+    : 'Confirm you have received the final 50% (£'+amt+') from '+b.name+'?\n\nTheir gallery will UNLOCK and they will be emailed.';
+  if(!confirm(msg)) return;
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try{
+    var res=await fetch(API+'/api/booking-confirm-'+stage,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({bookingId:id})});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Backend error');
+    toast('', stage==='deposit'?'Deposit confirmed':'Balance confirmed — gallery unlocked', b.name+(data.emailSent===false?' · email failed to send':' · client notified'));
+    loadBookings();
+  }catch(e){ alert('Could not confirm payment: '+e.message); }
+}
+window.confirmPayment = confirmPayment;
+
 function renderBookingsTable(data) {
   _bkCurrentView = data;
   var el = document.getElementById('bookingsList');
@@ -6048,11 +6076,13 @@ function renderBookingsTable(data) {
           + '<td style="font-family:var(--fm);font-size:12px;color:var(--gold);">' + esc(b.event_date||'—') + '</td>'
           + '<td><span class="pill pill-applied" style="font-size:9px;">' + esc(b.event_type||'—') + '</span></td>'
           + '<td style="font-size:12px;color:var(--text2);">' + esc(b.location||'—') + '</td>'
-          + '<td>' + pill + '</td>'
+          + '<td>' + pill + payPill_(b) + '</td>'
           + '<td style="font-size:12px;color:var(--text3);">' + submitted + '</td>'
           + '<td><div class="td-actions">'
           + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')"> Confirm</button>' : '')
           + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')"> Reject</button>' : '')
+          + (b.status==='confirmed' && b.payment_required && b.deposit_status!=='paid' ? '<button class="btn btn-gold btn-sm" onclick="confirmPayment(\'' + b.id + '\',\'deposit\')">Confirm 50% Deposit</button>' : '')
+          + (b.status==='confirmed' && b.payment_required && b.deposit_status==='paid' && b.balance_status!=='paid' ? '<button class="btn btn-gold btn-sm" onclick="confirmPayment(\'' + b.id + '\',\'balance\')">Confirm Balance &amp; Unlock</button>' : '')
           + (b.status==='confirmed' ? '<button class="btn btn-sm" style="border:1px solid var(--gold);color:var(--gold);" onclick="openEditInvoiceModal(\'' + b.id + '\')"> Edit & Resend</button>' : '')
           + (b.status==='confirmed' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="cancelConfirmedBooking(\'' + b.id + '\')"> Cancel</button>' : '')
           + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')"> View</button>'
@@ -6065,7 +6095,7 @@ function renderBookingsTable(data) {
 function viewBookingDetail(id) {
   var b = _allBookings.find(function(x){ return x.id===id; });
   if(!b) return;
-  alert('Name: '+b.name+'\nEmail: '+b.email+'\nPhone: '+(b.phone||'—')+'\nDate: '+(b.event_date||'—')+'\nType: '+(b.event_type||'—')+'\nGuests: '+(b.guest_count||'—')+'\nLocation: '+(b.location||'—')+'\nNotes: '+(b.notes||'—'));
+  alert('Name: '+b.name+'\nEmail: '+b.email+'\nPhone: '+(b.phone||'—')+'\nDate: '+(b.event_date||'—')+'\nType: '+(b.event_type||'—')+'\nGuests: '+(b.guest_count||'—')+'\nLocation: '+(b.location||'—')+'\nNotes: '+(b.notes||'—')+(b.status==='confirmed' ? '\nPayment: '+(b.payment_required ? 'Total £'+parseFloat(b.total_amount||0).toFixed(2)+' · Deposit £'+parseFloat(b.deposit_amount||0).toFixed(2)+' ('+b.deposit_status+') · Balance £'+parseFloat(b.balance_amount||0).toFixed(2)+' ('+b.balance_status+')' : 'Free — no payment required') : ''));
 }
 
 async function rejectBooking(id) {
@@ -6590,6 +6620,14 @@ async function saveAndResendInvoice() {
 
     /* Update local booking cache so Edit & Resend re-opens with new data */
     b.invoice = invoice;
+
+    /* Keep the 50/50 amounts in step with the edited invoice */
+    try {
+      var API0 = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+      var r0 = await fetch(API0 + '/api/booking-update-total', { method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader()), body:JSON.stringify({ bookingId:b.id, total:invoice.total }) });
+      var d0 = await r0.json();
+      if (!d0.success) throw new Error(d0.error || 'Could not update payment split');
+    } catch (e0) { showModalAlert('Invoice saved, but the payment split was not updated: ' + e0.message); }
 
     /* Send updated PDF */
     btn.textContent = ' Sending…';
