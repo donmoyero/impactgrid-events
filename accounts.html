@@ -1,23 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1067608669288934');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<script src="consent.js"></script>
 
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -26,6 +10,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="shared.css"/>
+<link rel="stylesheet" href="premium-lite.css"/>
 <style>
 :root { --sidebar-w:220px; --red-glo:rgba(217,79,59,0.18); }
 [data-theme="dark"] { --red-glo:rgba(247,95,79,0.22); }
@@ -176,11 +161,16 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
 
 /* ── EXPORT BTN ── */
 .export-bar { display:flex; gap:10px; margin-bottom:16px; align-items:center; }
+/* ── SITE NAV INTEGRATION: sits beside the shared nav rail (same pattern as settings.html) ── */
+.page-wrap { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+.topbar-logo, .topbar-div { display:none; }  /* rail already shows the logo */
 </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
-     crossorigin="anonymous"></script>
+<link rel="stylesheet" href="premium-accounts.css"/>
 </head>
 <body>
+
+<div id="ig-nav"></div>
+<div class="page-wrap">
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -399,6 +389,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
 
   </div><!-- /main -->
 </div><!-- /shell -->
+</div><!-- /page-wrap -->
 
 <!-- ══ EXPENSE MODAL ══ -->
 <div class="modal-wrap" id="expenseModal">
@@ -589,8 +580,11 @@ input:focus,textarea:focus,select:focus { border-color:var(--gold); box-shadow:0
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="plan-config.js"></script>
 <script src="supabase-config.js"></script>
+<script src="auth.js"></script>
 <script src="nav.js"></script>
+<script>document.addEventListener('DOMContentLoaded', function(){ renderNav('accounts.html'); });</script>
 
 <script>
 /* ══════════════════════════════════════════════
@@ -1484,5 +1478,6 @@ window.deleteIncome         = deleteIncome;
 window.openInvoiceEditModal = openInvoiceEditModal;
 window.saveInvoiceEdit      = saveInvoiceEdit;
 </script>
+<script src="accounts-dashboard.js"></script>
 </body>
 </html>

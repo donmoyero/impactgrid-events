@@ -1,23 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1067608669288934');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<script src="consent.js"></script>
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -62,16 +46,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
   <!-- Shared design system -->
   <link rel="stylesheet" href="shared.css"/>
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KVJC5DE2WT');
-  </script>
-
-  <style>
+<style>
     /* ════════════════════════════════════════════════════
        HOMEPAGE — layout + component styles only.
        Fonts, resets, nav logic and footer markup still come
@@ -494,8 +469,10 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       user-drag: none;
     }
   </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
-     crossorigin="anonymous"></script>
+  <!-- Premium visual layer (viewfinder hero, grain, hover details). Delete these 3 lines to undo. -->
+  <script>document.documentElement.classList.add('pg-js');</script>
+  <link rel="stylesheet" href="premium.css"/>
+  <script src="premium.js" defer></script>
 </head>
 <body class="protect-page home">
 
@@ -518,6 +495,12 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
       <img id="hHeroImg" src="assets/home/hero.jpg" alt="Guest in a black sequined dress at an evening event, photographed by Impact Grid" width="1216" height="880" fetchpriority="high" />
     </div>
     <div class="h-hero-shade"></div>
+    <div class="pg-frame" aria-hidden="true">
+      <span class="pg-thirds"></span>
+      <i class="pg-c pg-c--tl"></i><i class="pg-c pg-c--tr"></i><i class="pg-c pg-c--bl"></i><i class="pg-c pg-c--br"></i>
+      <span class="pg-reticle"></span>
+    </div>
+    <div class="pg-flash" aria-hidden="true"></div>
 
     <div class="h-in h-hero-inner">
       <p class="h-eyebrow"><span>Events</span><span>People</span><span>Stories</span></p>

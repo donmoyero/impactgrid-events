@@ -1,23 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1067608669288934');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<script src="consent.js"></script>
 
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -356,16 +340,7 @@ tr:hover td{background:var(--bg2);}
 .vt-dz-text{font-size:11.5px;color:var(--text3);}
 .vt-dz-uploading{opacity:.6;pointer-events:none;}
 </style>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KVJC5DE2WT');
-  </script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
-     crossorigin="anonymous"></script>
+<link rel="stylesheet" href="premium-admin.css"/>
 </head>
 <body>
 <div class="topbar">
@@ -447,10 +422,46 @@ tr:hover td{background:var(--bg2);}
   <div class="main">
     <!-- OVERVIEW -->
     <div class="page active" id="page-overview">
-      <div class="page-header"><div class="page-title">Overview</div><div class="page-sub">Full control of the ImpactGrid site content, events, and network.</div></div>
-      <div class="stats-row">
-<div class="stat-card"><div class="stat-label">Events</div><div class="stat-val" id="stat-events" style="color:var(--blue);">—</div><div class="stat-sub">Active</div></div>
+      <div class="pa-hero">
+        <div>
+          <div class="pa-eyebrow" id="paDate">Overview</div>
+          <h1 class="pa-greet" id="paGreet">Welcome back.</h1>
+          <p class="pa-sub">Here is what needs you today across bookings, galleries and conversations.</p>
+        </div>
+        <div class="pa-hero-actions">
+          <button class="btn btn-gold" onclick="nav('createevent',null)">New event</button>
+          <button class="btn btn-ghost" onclick="nav('uploadphotos',null)">Upload photos</button>
+        </div>
       </div>
+
+      <div class="pa-kpis">
+        <div class="pa-kpi" onclick="nav('events',null)"><div class="pa-kpi-label">Active events</div><div class="pa-kpi-val" id="stat-events">—</div><div class="pa-kpi-sub" id="pa-k-events-sub">Galleries live now</div></div>
+        <div class="pa-kpi" id="pa-k-pending-card" onclick="nav('bookings',null)"><div class="pa-kpi-label">Pending bookings</div><div class="pa-kpi-val" id="pa-k-pending">—</div><div class="pa-kpi-sub" id="pa-k-pending-sub">Waiting for your reply</div></div>
+        <div class="pa-kpi" onclick="nav('bookings',null)"><div class="pa-kpi-label">Upcoming confirmed</div><div class="pa-kpi-val" id="pa-k-upcoming">—</div><div class="pa-kpi-sub" id="pa-k-upcoming-sub">Nothing scheduled</div></div>
+        <div class="pa-kpi" id="pa-k-follow-card" onclick="nav('receptionist',null)"><div class="pa-kpi-label">Follow-ups</div><div class="pa-kpi-val" id="pa-k-follow">—</div><div class="pa-kpi-sub" id="pa-k-follow-sub">Conversations waiting</div></div>
+        <div class="pa-kpi" onclick="nav('eventactivity',null)"><div class="pa-kpi-label">Gallery visits · 7 days</div><div class="pa-kpi-val" id="pa-k-visits">—</div><div class="pa-kpi-sub" id="pa-k-visits-sub">Unique visitors</div></div>
+      </div>
+
+      <div class="pa-grid">
+        <div class="card">
+          <div class="card-head"><h2>Needs your attention</h2><button class="btn btn-ghost btn-sm" onclick="nav('bookings',null)">All bookings</button></div>
+          <div id="pa-pending"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Coming up</h2><button class="btn btn-ghost btn-sm" onclick="nav('bookings',null)">Calendar</button></div>
+          <div id="pa-upcoming"></div>
+        </div>
+        <div class="card pa-wide">
+          <div class="card-head"><h2>Gallery visits</h2><button class="btn btn-ghost btn-sm" onclick="nav('eventactivity',null)">Full activity</button></div>
+          <div id="pa-chart"></div>
+        </div>
+        <div class="card pa-wide">
+          <div class="card-head"><h2>Recent events</h2><button class="btn btn-ghost btn-sm" onclick="nav('events',null)">All events</button></div>
+          <div id="pa-events"></div>
+        </div>
+      </div>
+
+      <div class="pa-label">Quick actions</div>
       <div class="quick-grid">
         <div class="quick-card" id="rcp-overview-card" onclick="nav('receptionist',null)" style="border-color:var(--red-glo);background:var(--red-dim);"><div class="quick-ico"></div><div class="quick-title" style="color:var(--red);">Receptionist<span id="rcp-overview-badge" style="display:none;margin-left:6px;font-family:var(--fm);font-size:10px;background:var(--red);color:#fff;padding:1px 7px;border-radius:100px;">0</span></div><div class="quick-desc" id="rcp-overview-desc">See who Dijo talked to and who needs a follow-up</div></div>
         <div class="quick-card" onclick="nav('eventactivity',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);"><div class="quick-ico"></div><div class="quick-title" style="color:var(--gold);">Event Activity</div><div class="quick-desc">See page visits, device types, locations and download requests per event</div></div>
@@ -2206,12 +2217,14 @@ If you have any questions, just reply to this email.
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 
 <!-- Events management (Firebase Firestore + Cloudinary) -->
+<script src="ig-dialog.js"></script>
 <script src="gallery-looks.js"></script>
-<script src="events-script.js"></script>
+<script src="events-script.js?v=20261012"></script>
 <script src="raw-proofing.js"></script>
 <script src="reviews-script.js"></script>
 <script src="review-emails-script.js"></script>
 <script src="brand-partners-script.js"></script>
+<script src="admin-dashboard.js"></script>
 
 <script>
 /*  CONFIG  */
@@ -2244,6 +2257,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   if(data.session.user.email !== IG_ADMIN_EMAIL){ window.location.href='dashboard.html'; return; }
   document.getElementById('topbarUser').textContent = data.session.user.email;
   loadStats();
+  if(window.loadDashboard) loadDashboard();
   loadBizSettings(); /* load biz settings on boot so invoice generation always has them */
   loadReceptionist(); /* so the follow-up badge is right there on login */
 });
@@ -2292,6 +2306,7 @@ function nav(id,el){
   if(page) page.classList.add('active');
   if(el) el.classList.add('active');
   var loaders={
+    overview:'loadDashboard',
     eventactivity:'loadEventActivity',
     events:'loadEvents',createevent:'initCreateEventPage',
     managegallery:'loadManageGallery',
@@ -3251,7 +3266,7 @@ async function sendMail(){
     /* Send via your existing Render API — same pattern as resendOwnerEmail */
     var res = await fetch(EVENTS_API + '/api/send-mail', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({ to, subject, body })
     });
     var data = await res.json();
@@ -4695,7 +4710,7 @@ async function portfolioDeleteCategory(id, coverPublicId) {
     if (cloudinaryIds.length) {
       fetch(EVENTS_API + '/api/delete-photo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await _adminAuthHeader().catch(function(){ return {}; })),
         body: JSON.stringify({ publicIds: cloudinaryIds })
       }).catch(function(){});
     }
@@ -5101,7 +5116,7 @@ async function blogDeletePost(id, coverPublicId) {
     if (blogCloudinaryIds.length) {
       fetch(EVENTS_API + '/api/delete-photo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await _adminAuthHeader().catch(function(){ return {}; })),
         body: JSON.stringify({ publicIds: blogCloudinaryIds, account: 'blog' })
       }).catch(function(){});
     }
@@ -5977,6 +5992,115 @@ async function bkBulkUnbook(){
   await loadBookings();
 }
 
+/* ─── 50/50 PAYMENT STATUS + CONFIRMATION ─────────────────────── */
+function payPill_(b){
+  if(b.status!=='confirmed') return '';
+  var st='display:inline-block;margin-top:4px;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;';
+  if(b.payment_required===undefined) return '<br><span style="'+st+'background:var(--bg2);color:var(--text3);border:1px dashed var(--border);">No payment tracking · gallery open</span>';
+  if(!b.payment_required) return '<br><span style="'+st+'background:var(--bg2);color:var(--text3);border:1px solid var(--border);">Free · no payment</span>';
+  if(b.balance_status==='paid') return '<br><span style="'+st+'background:rgba(16,185,129,.12);color:var(--green);border:1px solid var(--green);">Paid in full · gallery unlocked</span>';
+  if(b.deposit_status==='paid') return '<br><span style="'+st+'background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glo);">50% paid · £'+parseFloat(b.balance_amount||0).toFixed(2)+' due · gallery locked</span>';
+  return '<br><span style="'+st+'background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);">Deposit £'+parseFloat(b.deposit_amount||0).toFixed(2)+' awaiting · gallery locked</span>';
+}
+
+async function confirmPayment(id, stage){
+  var b=(_allBookings||[]).find(function(x){ return x.id===id; }); if(!b) return;
+  var amt=parseFloat(stage==='deposit' ? b.deposit_amount : b.balance_amount||0).toFixed(2);
+  var isDep = stage==='deposit';
+  var ok = await igDialog.confirm({
+    eyebrow : 'Payment received',
+    title   : isDep ? 'Confirm 50% deposit' : 'Confirm final 50%',
+    chip    : b.name+' · £'+amt,
+    message : isDep
+      ? 'Confirm you have received the 50% deposit (£'+amt+') from '+b.name+'.\n\nThey will be emailed a receipt.'
+      : 'Confirm you have received the final 50% (£'+amt+') from '+b.name+'.\n\nTheir gallery will unlock and they will be emailed.',
+    confirmText: isDep ? 'Yes, deposit received' : 'Yes, unlock gallery'
+  });
+  if(!ok) return;
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try{
+    var res=await fetch(API+'/api/booking-confirm-'+stage,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify({bookingId:id})});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Backend error');
+    toast('', stage==='deposit'?'Deposit confirmed':'Balance confirmed — gallery unlocked', b.name+(data.emailSent===false?' · email failed to send':' · client notified'));
+    loadBookings();
+  }catch(e){ igDialog.alert({ title:'Could not confirm payment', message:e.message, danger:true }); }
+}
+window.confirmPayment = confirmPayment;
+
+/* Put an older booking (confirmed before the 50/50 feature) onto the payment flow */
+async function applySplit(id){
+  var b=(_allBookings||[]).find(function(x){ return x.id===id; }); if(!b) return;
+  var total = b.invoice && b.invoice.total!=null ? parseFloat(b.invoice.total) : NaN;
+  var totalArg;
+
+  /* Step 1 — no invoice total on file: ask for it */
+  if(!(total>0)){
+    var t = await igDialog.money({
+      eyebrow : '50/50 payment plan',
+      title   : 'Invoice total',
+      chip    : b.name,
+      message : 'This booking has no invoice total on file. Enter the full amount to continue.',
+      quick   : [{ label:'Free shoot (£0)', value:0 }],
+      hintEmpty: 'Use Free shoot if no payment is needed.',
+      hint    : function(v){
+        if(v===0) return 'Free shoot — no payment needed, gallery stays open.';
+        var half=(Math.round(v*100)/2/100).toFixed(2);
+        var f=document.createElement('span');
+        f.appendChild(document.createTextNode('Split into two payments of '));
+        var strong=document.createElement('b'); strong.textContent='£'+half;
+        f.appendChild(strong);
+        return f;
+      },
+      confirmText: 'Continue'
+    });
+    if(t===null) return;
+    total = t; totalArg = t;
+  }
+
+  /* Free shoot */
+  if(total===0){
+    var free = await igDialog.confirm({
+      eyebrow:'50/50 payment plan',
+      title:'Mark as a free shoot?',
+      chip:b.name,
+      message:'No payment is needed and the gallery stays open.',
+      confirmText:'Yes, free shoot'
+    });
+    if(!free) return;
+    return sendSplit_(id,'none',totalArg,b);
+  }
+
+  /* Step 2 — what has the client actually paid so far? */
+  var half=(Math.round(total*100)/2/100).toFixed(2);
+  var state = await igDialog.choice({
+    eyebrow : '50/50 payment plan',
+    title   : 'What has been paid so far?',
+    chip    : b.name+' · £'+total.toFixed(2)+' total',
+    message : 'Split into two payments of £'+half+'. Pick what '+b.name+' has actually paid.',
+    options : [
+      { value:'none',    title:'Nothing yet',        sub:'Gallery stays locked',                    tag:'LOCKED' },
+      { value:'deposit', title:'Deposit paid (£'+half+')', sub:'Gallery locked until the balance is paid', tag:'LOCKED' },
+      { value:'full',    title:'Paid in full',       sub:'Gallery stays open',                      tag:'OPEN' }
+    ],
+    confirmText:'Apply 50/50'
+  });
+  if(!state) return;
+  sendSplit_(id,state,totalArg,b);
+}
+async function sendSplit_(id,state,total,b){
+  var API=window.EVENTS_API||'https://impactgrid-events-api.onrender.com';
+  try{
+    var body={bookingId:id,state:state}; if(total!==undefined) body.total=total;
+    var res=await fetch(API+'/api/booking-apply-split',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},await _adminAuthHeader()),body:JSON.stringify(body)});
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'Backend error');
+    toast('', '50/50 applied', b.name+' · no email sent');
+    loadBookings();
+  }catch(e){ igDialog.alert({ title:'Could not apply 50/50', message:e.message, danger:true }); }
+}
+window.applySplit = applySplit;
+
 function renderBookingsTable(data) {
   _bkCurrentView = data;
   var el = document.getElementById('bookingsList');
@@ -6008,11 +6132,14 @@ function renderBookingsTable(data) {
           + '<td style="font-family:var(--fm);font-size:12px;color:var(--gold);">' + esc(b.event_date||'—') + '</td>'
           + '<td><span class="pill pill-applied" style="font-size:9px;">' + esc(b.event_type||'—') + '</span></td>'
           + '<td style="font-size:12px;color:var(--text2);">' + esc(b.location||'—') + '</td>'
-          + '<td>' + pill + '</td>'
+          + '<td>' + pill + payPill_(b) + '</td>'
           + '<td style="font-size:12px;color:var(--text3);">' + submitted + '</td>'
           + '<td><div class="td-actions">'
           + (b.status==='pending' ? '<button class="btn btn-gold btn-sm" onclick="openConfirmModal(\'' + b.id + '\')"> Confirm</button>' : '')
           + (b.status==='pending' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="rejectBooking(\'' + b.id + '\')"> Reject</button>' : '')
+          + (b.status==='confirmed' && b.payment_required===undefined ? '<button class="btn btn-gold btn-sm" onclick="applySplit(\'' + b.id + '\')">Apply 50/50</button>' : '')
+          + (b.status==='confirmed' && b.payment_required && b.deposit_status!=='paid' ? '<button class="btn btn-gold btn-sm" onclick="confirmPayment(\'' + b.id + '\',\'deposit\')">Confirm 50% Deposit</button>' : '')
+          + (b.status==='confirmed' && b.payment_required && b.deposit_status==='paid' && b.balance_status!=='paid' ? '<button class="btn btn-gold btn-sm" onclick="confirmPayment(\'' + b.id + '\',\'balance\')">Confirm Balance &amp; Unlock</button>' : '')
           + (b.status==='confirmed' ? '<button class="btn btn-sm" style="border:1px solid var(--gold);color:var(--gold);" onclick="openEditInvoiceModal(\'' + b.id + '\')"> Edit & Resend</button>' : '')
           + (b.status==='confirmed' ? '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-glo);" onclick="cancelConfirmedBooking(\'' + b.id + '\')"> Cancel</button>' : '')
           + '<button class="btn btn-ghost btn-sm" onclick="viewBookingDetail(\'' + b.id + '\')"> View</button>'
@@ -6025,7 +6152,7 @@ function renderBookingsTable(data) {
 function viewBookingDetail(id) {
   var b = _allBookings.find(function(x){ return x.id===id; });
   if(!b) return;
-  alert('Name: '+b.name+'\nEmail: '+b.email+'\nPhone: '+(b.phone||'—')+'\nDate: '+(b.event_date||'—')+'\nType: '+(b.event_type||'—')+'\nGuests: '+(b.guest_count||'—')+'\nLocation: '+(b.location||'—')+'\nNotes: '+(b.notes||'—'));
+  alert('Name: '+b.name+'\nEmail: '+b.email+'\nPhone: '+(b.phone||'—')+'\nDate: '+(b.event_date||'—')+'\nType: '+(b.event_type||'—')+'\nGuests: '+(b.guest_count||'—')+'\nLocation: '+(b.location||'—')+'\nNotes: '+(b.notes||'—')+(b.status==='confirmed' ? '\nPayment: '+(b.payment_required===undefined ? 'No payment tracking (gallery open)' : b.payment_required ? 'Total £'+parseFloat(b.total_amount||0).toFixed(2)+' · Deposit £'+parseFloat(b.deposit_amount||0).toFixed(2)+' ('+b.deposit_status+') · Balance £'+parseFloat(b.balance_amount||0).toFixed(2)+' ('+b.balance_status+')' : 'Free — no payment required') : ''));
 }
 
 async function rejectBooking(id) {
@@ -6296,7 +6423,7 @@ async function confirmBooking(){
     btn.textContent=' Sending invoice…';
     var invoiceHtml=generateInvoiceHtml(invoice, b.email);
     await fetch(API+'/api/send-invoice',{
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body:JSON.stringify({
         to: b.email,
         subject: 'Your Invoice '+invoice.invoice_number+' — Impact Grid Events',
@@ -6447,7 +6574,7 @@ async function sendInvoiceOnly() {
   try {
     var invoiceHtml = generateInvoiceHtml(invoice, b.email);
     var res = await fetch(API + '/api/send-invoice', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({
         to: b.email,
         subject: 'Invoice ' + invoice.invoice_number + ' — Impact Grid Events',
@@ -6551,12 +6678,20 @@ async function saveAndResendInvoice() {
     /* Update local booking cache so Edit & Resend re-opens with new data */
     b.invoice = invoice;
 
+    /* Keep the 50/50 amounts in step with the edited invoice */
+    try {
+      var API0 = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+      var r0 = await fetch(API0 + '/api/booking-update-total', { method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader()), body:JSON.stringify({ bookingId:b.id, total:invoice.total }) });
+      var d0 = await r0.json();
+      if (!d0.success) throw new Error(d0.error || 'Could not update payment split');
+    } catch (e0) { showModalAlert('Invoice saved, but the payment split was not updated: ' + e0.message); }
+
     /* Send updated PDF */
     btn.textContent = ' Sending…';
     var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
     var invoiceHtml = generateInvoiceHtml(invoice, b.email);
     var res = await fetch(API + '/api/send-invoice', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({
         to: b.email,
         subject: 'Updated Invoice ' + invoice.invoice_number + ' — Impact Grid Events',
@@ -6592,7 +6727,7 @@ async function resendInvoice(id) {
   try {
     var invoiceHtml = generateInvoiceHtml(invoice, b.email);
     var res = await fetch(API + '/api/send-invoice', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _adminAuthHeader().catch(function(){ return {}; })),
       body: JSON.stringify({
         to: b.email,
         subject: 'Invoice ' + (invoice.invoice_number||'') + ' — Impact Grid Events',

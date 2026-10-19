@@ -1,0 +1,28 @@
+/* ═══════════════════════════════════════════════════════
+   Impact Grid — Premium layer for the client gallery (event.html)
+   Works with all five gallery templates: it never sets colours of its
+   own on photos or text — it reuses each template's --accent, so a
+   wedding gallery stays wedding and a nightlife gallery stays nightlife.
+   Remove the <link> to premium-gallery.css to undo.
+═══════════════════════════════════════════════════════ */
+::selection { background: var(--accent, #d9c187); color: #fff; }
+
+/* Photos render crisp and ease in on hover */
+.photo-card img { image-rendering: auto; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.photo-card { transition-timing-function: cubic-bezier(.2,.7,.2,1); }
+
+/* Password / access gate: fine accent edge on top */
+.gate-box { box-shadow: 0 30px 60px -34px rgba(0,0,0,.45), inset 0 2px 0 var(--accent, #d9c187); }
+.gate-input:focus { box-shadow: 0 0 0 3px var(--accent-dim, rgba(217,193,135,.28)); }
+
+/* Lightbox: deeper black, frosted controls with a fine accent edge */
+.lightbox { background: radial-gradient(ellipse at center, rgba(14,14,16,.97) 0%, rgba(0,0,0,.99) 100%); }
+.lightbox img { box-shadow: 0 30px 80px -20px rgba(0,0,0,.8); }
+.lightbox-nav { border-color: rgba(255,255,255,.22); }
+.lightbox-nav:hover { background: rgba(255,255,255,.22); border-color: var(--accent2, #d9c187); }
+.lightbox-close:hover { color: var(--accent2, #d9c187); }
+
+/* Keyboard focus */
+:focus-visible { outline: 2px solid var(--accent2, #d9c187); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) { .photo-card, .photo-card img, .lightbox-nav { transition: none !important; } }

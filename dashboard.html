@@ -1,23 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1067608669288934');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<script src="consent.js"></script>
 
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -27,6 +11,7 @@ src="https://www.facebook.com/tr?id=1067608669288934&ev=PageView&noscript=1"
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <!-- Shared design system (utility classes only — page keeps its own local tokens below, same as admin.html) -->
 <link rel="stylesheet" href="shared.css"/>
+<link rel="stylesheet" href="premium-lite.css"/>
 <style>
 :root{--bg:#f2f4fb;--bg2:#e6eaf5;--bg3:#d9dff0;--card:#ffffff;--card2:#f4f6fc;--border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);--text:#0d1017;--text2:#4a5068;--text3:#9099b8;--gold:#c97e08;--gold2:#a86505;--gold-dim:rgba(201,126,8,0.09);--gold-glo:rgba(201,126,8,0.22);--blue:#2d6edb;--blue2:#1a52b0;--blue-dim:rgba(45,110,219,0.08);--green:#0fa876;--green-dim:rgba(15,168,118,0.10);--red:#d94f3b;--red-dim:rgba(217,79,59,0.08);--red-glo:rgba(217,79,59,0.18);--purple:#7c3aed;--purple-dim:rgba(124,58,237,0.08);--fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;--r:12px;--r2:20px;--nav-h:60px;--sidebar-w:240px;--sh:0 4px 24px rgba(0,0,0,0.06);--sh2:0 16px 48px rgba(0,0,0,0.10);--sh-gold:0 8px 28px rgba(201,126,8,0.22);}
 [data-theme="dark"]{--bg:#07090f;--bg2:#0d1017;--bg3:#111520;--card:#151a28;--card2:#1c2235;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#eef0f6;--text2:#8a91a8;--text3:#4a5068;--gold:#f0b429;--gold2:#ffd166;--gold-dim:rgba(240,180,41,0.10);--gold-glo:rgba(240,180,41,0.25);--blue:#4f8ef7;--blue2:#7eb3ff;--blue-dim:rgba(79,142,247,0.10);--green:#2dd4a0;--green-dim:rgba(45,212,160,0.10);--red:#f75f4f;--red-dim:rgba(247,95,79,0.10);--red-glo:rgba(247,95,79,0.22);--purple:#a855f7;--purple-dim:rgba(168,85,247,0.10);--sh:0 4px 24px rgba(0,0,0,0.30);--sh2:0 16px 64px rgba(0,0,0,0.45);--sh-gold:0 8px 28px rgba(240,180,41,0.25);}
@@ -198,10 +183,6 @@ tr:hover td{background:var(--bg2);}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVJC5DE2WT"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-KVJC5DE2WT');</script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4028190825342082"
-     crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -1031,6 +1012,15 @@ function switchMailTab(tab){
   if(tab==='sent')  loadSent();
 }
 function clearCompose(){ document.getElementById('mail-to').value=''; document.getElementById('mail-subject').value=''; document.getElementById('mail-body').value=''; var s=document.getElementById('mail-send-status'); if(s)s.style.display='none'; }
+/* Sends this user's Supabase login token to API routes that now require a logged-in user.
+   Never throws: with no session it returns {} and the API answers 401. */
+async function _dashAuthHeader(){
+  try{
+    var r = await getSupabase().auth.getSession();
+    var t = r && r.data && r.data.session ? r.data.session.access_token : null;
+    return t ? { 'Authorization': 'Bearer ' + t } : {};
+  }catch(e){ return {}; }
+}
 async function sendMail(){
   var to=(document.getElementById('mail-to').value||'').trim();
   var subject=(document.getElementById('mail-subject').value||'').trim();
@@ -1041,7 +1031,7 @@ async function sendMail(){
   var btn=document.querySelector('#mail-tab-compose .btn-gold');
   if(btn){btn.disabled=true;btn.textContent='Sending…';}
   try{
-    var res=await fetch(EVENTS_API+'/api/send-mail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject,body})});
+    var res=await fetch(EVENTS_API+'/api/send-mail',{method:'POST',headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),body:JSON.stringify({to,subject,body})});
     var data=await res.json();
     if(!res.ok||!data.success) throw new Error(data.error||'Send failed');
     await getSupabase().from('admin_mail_sent').insert({to_email:to,subject:subject,body:body});
@@ -1330,7 +1320,7 @@ async function fetchAIInvoiceMessage(d){
   try {
     var res = await fetch(EVENTS_API + '/api/generate-invoice-message', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body   : JSON.stringify({
         bizName      : d.bizName,
         clientName   : d.clientName,
@@ -1413,7 +1403,7 @@ async function confirmSendInvoice(){
     await saveInvoiceToDB(d, true);
     var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body   : JSON.stringify({
         to          : d.clientEmail,
         subject     : 'Invoice ' + d.number + ' from ' + (d.bizName || 'Impact Grid Events'),
@@ -1579,14 +1569,14 @@ async function resendInvoice(id){
     if (!d.clientEmail) { toast('⚠️', 'No email on file', 'Edit the invoice to add an email'); return; }
     /* Get AI message then send with PDF */
     var msgRes  = await fetch(EVENTS_API + '/api/generate-invoice-message', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body: JSON.stringify({ bizName: d.bizName, clientName: d.clientName, invoiceNumber: d.number, total: d.total, dueDate: d.dueDate, lines: d.lines, notes: d.notes })
     });
     var msgData = await msgRes.json();
     var message = msgData.message || buildInvoiceEmailBody(d);
     var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
       body: JSON.stringify({
         to: d.clientEmail,
         subject: 'Invoice ' + d.number + ' from ' + (d.bizName || 'Impact Grid Events'),

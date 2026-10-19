@@ -374,7 +374,7 @@
             '</div>' +
             '<div class="fc"><h4>Navigate</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="book-us.html" id="footerBookUsLink" style="display:none;">Book Us</a><a href="leave-review.html">Leave a Review</a></div>' +
             '<div class="fc"><h4>Contact</h4><a href="mailto:events@impactgridgroup.com">events@impactgridgroup.com</a><a href="tel:07469016509">07469 016509</a></div>' +
-            '<div class="fc"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>' +
+            '<div class="fc"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="privacy.html#cookies">Cookie Policy</a><a href="#" data-cookie-settings>Cookie settings</a></div>' +
           '</div>' +
           '<div class="footer-bot">' +
             '<span>© 2026 ImpactGrid Group Ltd. All rights reserved.</span>' +
