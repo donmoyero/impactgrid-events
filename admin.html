@@ -770,6 +770,7 @@ tr:hover td{background:var(--bg2);}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:14px;" id="mgTabBar">
         <button class="btn btn-sm mg-tab" id="mg-tab-overview" onclick="mgSwitchTab('overview')">Overview</button>
         <button class="btn btn-sm mg-tab" id="mg-tab-photos" onclick="mgSwitchTab('photos')">Photos</button>
+        <button class="btn btn-sm mg-tab" id="mg-tab-videos" onclick="mgSwitchTab('videos')">Videos</button>
         <button class="btn btn-sm mg-tab" id="mg-tab-cover" onclick="mgSwitchTab('cover')">Cover</button>
         <button class="btn btn-sm mg-tab" id="mg-tab-design" onclick="mgSwitchTab('design')">Design</button>
         <button class="btn btn-sm mg-tab" id="mg-tab-branding" onclick="mgSwitchTab('branding')">Branding</button>
@@ -802,6 +803,15 @@ tr:hover td{background:var(--bg2);}
       </div>
 
       <!-- COVER -->
+      <div class="mg-panel" id="mg-panel-videos" style="display:none;">
+        <div class="card">
+          <div class="card-head"><h2>Videos (Google Drive)</h2></div>
+          <div class="card-body" id="mgVideosBody">
+            <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>
+          </div>
+        </div>
+      </div>
+
       <div class="mg-panel" id="mg-panel-cover" style="display:none;">
         <div class="card">
           <div class="card-head"><h2>Cover Photo</h2></div>

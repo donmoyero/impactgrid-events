@@ -964,12 +964,104 @@ function mgSwitchTab(tab){
   if(panel) panel.style.display = 'block';
   _mgActiveTab = tab;
   if(tab === 'photos') mgLoadPhotos();
+  if(tab === 'videos') mgLoadVideos();
   if(tab === 'cover')  mgLoadCover();
   if(tab === 'design') mgLoadDesign();
   if(tab === 'branding')  mgLoadBranding();
   if(tab === 'clientexp') mgLoadClientExp();
   if(tab === 'settings')  mgLoadSettings();
 }
+
+
+/* ── VIDEOS TAB — Google Drive links ──
+   Stored on the event as drive_videos: [{ id, title }] (id = the Drive file ID).
+   event.html shows each one as Drive's preview player, below all photos. */
+var _mgVideos = [];
+
+function mgDriveId(url){
+  url = String(url || '').trim();
+  if(/drive\.google\.com\/drive\/(u\/\d+\/)?folders\//.test(url)) return { error: 'That is a folder link. Open the video itself in Drive and copy its link.' };
+  var m = url.match(/\/file\/d\/([A-Za-z0-9_-]{10,80})/) || url.match(/[?&]id=([A-Za-z0-9_-]{10,80})/);
+  if(m) return { id: m[1] };
+  if(/^[A-Za-z0-9_-]{25,80}$/.test(url)) return { id: url };   /* a bare file ID */
+  return { error: 'Could not find a Drive file in that link. It should look like drive.google.com/file/d/…/view' };
+}
+
+async function mgLoadVideos(){
+  if(!_mgEventId) return;
+  var el = document.getElementById('mgVideosBody');
+  if(el) el.innerHTML = '<div class="skel-wrap"><div class="skel-row" style="width:70%;"></div></div>';
+  try{
+    if(!_mgEventData){
+      var evSnap = await getDoc(doc(db, 'events', _mgEventId));
+      if(evSnap.exists) _mgEventData = Object.assign({ id: _mgEventId }, evSnap.data());
+    }
+    _mgVideos = Array.isArray(_mgEventData && _mgEventData.drive_videos) ? _mgEventData.drive_videos.slice() : [];
+    mgRenderVideos();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="empty"><div class="empty-txt">Error: ' + esc(e.message) + '</div></div>';
+  }
+}
+
+function mgRenderVideos(){
+  var el = document.getElementById('mgVideosBody');
+  if(!el) return;
+  el.innerHTML =
+      '<div style="font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:14px;">'
+    + 'Upload the video to Google Drive, then right-click it → <b>Share</b> → General access: <b>Anyone with the link</b> (Viewer) → <b>Copy link</b>, and paste it below. '
+    + 'Videos appear in the gallery after all the photos. A new upload can take a few minutes before Drive can play it.</div>'
+    + '<div class="field-group"><div class="field-label">Google Drive link</div>'
+    +   '<input type="text" id="mg-vid-url" placeholder="https://drive.google.com/file/d/…/view?usp=sharing" /></div>'
+    + '<div class="field-group"><div class="field-label">Title (optional)</div>'
+    +   '<div style="display:flex;gap:8px;"><input type="text" id="mg-vid-title" placeholder="e.g. Highlights reel" style="flex:1;" />'
+    +   '<button class="btn btn-gold" onclick="mgAddVideo()">Add video</button></div></div>'
+    + '<div style="margin-top:18px;">'
+    + (_mgVideos.length ? _mgVideos.map(function(v, i){
+        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border);flex-wrap:wrap;">'
+          + '<div style="width:22px;color:var(--text3);font-size:12px;">' + (i + 1) + '</div>'
+          + '<div style="flex:1;min-width:160px;"><div style="font-size:13px;font-weight:700;">' + esc(v.title || 'Untitled video') + '</div>'
+          + '<div style="font-family:var(--fm);font-size:10px;color:var(--text3);">' + esc(v.id) + '</div></div>'
+          + '<a class="btn btn-ghost btn-sm" href="https://drive.google.com/file/d/' + esc(v.id) + '/view" target="_blank" rel="noopener">Open</a>'
+          + '<button class="btn btn-ghost btn-sm" onclick="mgMoveVideo(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+          + '<button class="btn btn-ghost btn-sm" onclick="mgMoveVideo(' + i + ',1)"' + (i === _mgVideos.length - 1 ? ' disabled' : '') + '>↓</button>'
+          + '<button class="btn btn-red btn-sm" onclick="mgRemoveVideo(' + i + ')">Remove</button>'
+          + '</div>';
+      }).join('') : '<div class="empty"><div class="empty-txt">No videos added yet.</div></div>')
+    + '</div>';
+}
+
+async function mgSaveVideos(msg){
+  try{
+    await updateDoc(doc(db, 'events', _mgEventId), { drive_videos: _mgVideos });
+    if(_mgEventData) _mgEventData.drive_videos = _mgVideos.slice();
+    toast(' ', msg || 'Videos saved', '');
+    if(typeof mgRefreshPreview === 'function') mgRefreshPreview();
+    return true;
+  }catch(e){
+    toast(' ', 'Save failed', e.message);
+    return false;
+  }
+}
+
+async function mgAddVideo(){
+  if(!_mgEventId) return;
+  var urlEl = document.getElementById('mg-vid-url'), titleEl = document.getElementById('mg-vid-title');
+  var r = mgDriveId(urlEl.value);
+  if(r.error){ toast(' ', 'Check the link', r.error); return; }
+  if(_mgVideos.some(function(v){ return v.id === r.id; })){ toast(' ', 'Already added', 'That video is already in the list.'); return; }
+  _mgVideos.push({ id: r.id, title: (titleEl.value || '').trim().slice(0, 80) });
+  if(await mgSaveVideos('Video added')) mgRenderVideos(); else _mgVideos.pop();
+}
+async function mgRemoveVideo(i){
+  var removed = _mgVideos.splice(i, 1);
+  if(await mgSaveVideos('Video removed')) mgRenderVideos(); else _mgVideos.splice(i, 0, removed[0]);
+}
+async function mgMoveVideo(i, d){
+  var j = i + d; if(j < 0 || j >= _mgVideos.length) return;
+  var t = _mgVideos[i]; _mgVideos[i] = _mgVideos[j]; _mgVideos[j] = t;
+  if(await mgSaveVideos('Order saved')) mgRenderVideos();
+}
+window.mgAddVideo = mgAddVideo; window.mgRemoveVideo = mgRemoveVideo; window.mgMoveVideo = mgMoveVideo;
 
 /* ── PHOTOS TAB — featured / hide / drag-reorder ──
    Order is persisted as an `order` int (index * 10, same spacing

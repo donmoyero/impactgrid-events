@@ -970,6 +970,25 @@ input,textarea,select{font-family:inherit;}
 [data-transition="none"] .slide{transition:none!important;}
 </style>
 <link rel="stylesheet" href="premium-gallery.css"/>
+<style>
+/* ── Videos from Google Drive + footer (event gallery) ── */
+.drive-videos{margin-top:56px;}
+.drive-videos-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.drive-videos-title{font-size:22px;font-weight:800;letter-spacing:-.01em;color:var(--text,#111);}
+.drive-videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px;}
+.drive-video{background:var(--card,#fff);border:1px solid var(--border,rgba(0,0,0,.1));border-radius:14px;overflow:hidden;}
+.drive-video-frame{position:relative;aspect-ratio:16/9;background:#000;}
+.drive-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.drive-video-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;}
+.drive-video-name{font-size:13.5px;font-weight:700;color:var(--text,#111);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.drive-video-links{display:flex;gap:12px;font-size:12.5px;}
+.drive-video-links a{color:var(--text2,#444);text-decoration:underline;text-underline-offset:2px;}
+.ev-footer{padding:28px 20px 40px;text-align:center;border-top:1px solid var(--border,rgba(0,0,0,.1));margin-top:8px;color:var(--text3,#777);}
+.ev-footer-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 20px;margin-bottom:10px;}
+.ev-footer-nav a{font-size:13px;font-weight:600;color:var(--text2,#444);text-decoration:none;}
+.ev-footer-nav a:hover,.ev-footer-nav a:focus-visible{text-decoration:underline;}
+.ev-footer-copy{font-size:12px;}
+</style>
 <link rel="stylesheet" href="scrollbars.css"/>
 </head>
 <body>
@@ -1082,7 +1101,28 @@ input,textarea,select{font-family:inherit;}
     </div>
 
     <div class="photo-grid" id="photoGrid" style="display:none;"></div>
+
+    <!-- VIDEOS (Google Drive previews) — always after every photo -->
+    <section class="drive-videos" id="videoSection" style="display:none;" aria-label="Videos">
+      <div class="drive-videos-head">
+        <div class="drive-videos-title">Videos</div>
+        <span class="photo-count-badge"><span id="videoCountNum">0</span> <span id="videoCountLabel">videos</span></span>
+      </div>
+      <div class="drive-videos-grid" id="videoGrid"></div>
+    </section>
   </div>
+
+  <!-- FOOTER: small nav + copyright -->
+  <footer class="ev-footer">
+    <nav class="ev-footer-nav" aria-label="Site links">
+      <a href="index.html">Home</a>
+      <a href="book-us.html">Book us</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <div class="ev-footer-copy">&copy; <span id="evFooterYear">2026</span> ImpactGrid Ltd. All rights reserved.</div>
+  </footer>
 </div>
 
 <!-- ══════════════════════════════════════ LIGHTBOX ══════════════════════════════════════ -->
@@ -1658,6 +1698,7 @@ async function loadPhotos(){
     buildHero();
     buildSlideshow(allPhotos.slice(0, 10));
     renderPhotos(allPhotos);
+    renderDriveVideos(eventData);   /* Google Drive videos sit after all photos */
     loadCelebrantPhoto();
 
   }catch(e){
@@ -2665,6 +2706,35 @@ function showError(msg){
     + 'color:#fff;border-radius:8px;font-weight:700;font-size:13px;">Back to ImpactGrid</a>'
     + '</div></div>';
 }
+
+
+/* ══════════════════════════════════════
+   GOOGLE DRIVE VIDEOS
+   The admin pastes Drive links in Manage → Videos; they are stored on the
+   event as drive_videos: [{ id, title }]. Each one is shown as Drive's own
+   preview player, below all the photos. Files must be shared as
+   "Anyone with the link can view" in Google Drive.
+══════════════════════════════════════ */
+function renderDriveVideos(ev){
+  var sec = document.getElementById('videoSection'), grid = document.getElementById('videoGrid');
+  if(!sec || !grid) return;
+  var list = (ev && Array.isArray(ev.drive_videos)) ? ev.drive_videos : [];
+  list = list.filter(function(v){ return v && /^[A-Za-z0-9_-]{10,80}$/.test(v.id || ''); });
+  if(!list.length){ sec.style.display = 'none'; return; }
+  document.getElementById('videoCountNum').textContent = list.length;
+  document.getElementById('videoCountLabel').textContent = list.length === 1 ? 'video' : 'videos';
+  grid.innerHTML = list.map(function(v, i){
+    var id = v.id, title = v.title || ('Video ' + (i + 1));
+    return '<div class="drive-video">'
+      + '<div class="drive-video-frame"><iframe src="https://drive.google.com/file/d/' + id + '/preview" title="' + esc(title) + '" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>'
+      + '<div class="drive-video-meta"><div class="drive-video-name">' + esc(title) + '</div>'
+      + '<div class="drive-video-links"><a href="https://drive.google.com/file/d/' + id + '/view" target="_blank" rel="noopener">Open in Drive</a>'
+      + '<a href="https://drive.google.com/uc?export=download&id=' + id + '" target="_blank" rel="noopener">Download</a></div></div>'
+      + '</div>';
+  }).join('');
+  sec.style.display = '';
+}
+(function(){ var y = document.getElementById('evFooterYear'); if(y) y.textContent = new Date().getFullYear(); })();
 
 /* ══════════════════════════════════════
    ACTIVITY TRACKING  (consent-gated)
