@@ -1263,6 +1263,9 @@ input,textarea,select{font-family:inherit;}
    CONFIG & STATE
 ══════════════════════════════════════ */
 var EVENTS_API   = 'https://impactgrid-events-api.onrender.com';
+/* Google Drive API key (restricted to the Drive API + this website) — lets guests save Drive
+   videos straight to their device, with no "can't scan for viruses" page. See setup notes. */
+var DRIVE_API_KEY = '';
 var TPL_MAP = {
   professional : { cls:'tpl-professional', icon:'', heroType:'dark-text'  },
   wedding      : { cls:'tpl-wedding',      icon:'', heroType:'elegant'    },
@@ -1633,20 +1636,6 @@ async function loadPhotos(){
 
     /* Hidden photos (admin-side Photos manager) never reach the client. */
     data = data.filter(function(p){ return p.hidden !== true; });
-
-    /* Videos live in a private Backblaze B2 bucket: ask the API for fresh signed
-       links (valid 24h) and drop them into the same fields photos use, so the
-       lightbox and every Save / Download All path work unchanged. */
-    if(data.some(function(p){ return p.b2_key; })){
-      try{
-        var vr = await fetch(EVENTS_API + '/api/video-urls?event_id=' + encodeURIComponent(eventData.id));
-        var vj = await vr.json();
-        var vmap = (vj && vj.urls) || {};
-        data.forEach(function(p){
-          if(p.b2_key && vmap[p.id]){ p.web_url = vmap[p.id]; p.original_url = vmap[p.id]; }
-        });
-      }catch(ve){ console.warn('[videos] could not load signed links:', ve.message); }
-    }
 
     var hasOrder = data.some(function(p){ return typeof p.order === 'number'; });
     if(hasOrder){
@@ -2729,11 +2718,82 @@ function renderDriveVideos(ev){
       + '<div class="drive-video-frame"><iframe src="https://drive.google.com/file/d/' + id + '/preview" title="' + esc(title) + '" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>'
       + '<div class="drive-video-meta"><div class="drive-video-name">' + esc(title) + '</div>'
       + '<div class="drive-video-links"><a href="https://drive.google.com/file/d/' + id + '/view" target="_blank" rel="noopener">Open in Drive</a>'
-      + '<a href="https://drive.google.com/uc?export=download&id=' + id + '" target="_blank" rel="noopener">Download</a></div></div>'
+      + '<a href="https://drive.google.com/uc?export=download&id=' + id + '" onclick="return driveSaveVideo(\'' + id + '\', this)">Save video</a></div></div>'
       + '</div>';
   }).join('');
   sec.style.display = '';
 }
+
+/* ── Save a Drive video the same way photos are saved ──────────────
+   Fetches the file through the Drive API (no virus-scan page), then:
+   • iPhone / iPad Safari: share sheet → "Save Video" → Photos
+   • Android / laptop: direct download → Downloads / Gallery
+   If no API key is set, or the fetch fails, falls back to Drive's own link. */
+var _driveDl = null;
+function driveOverlay(title, sub, pct, btnLabel, btnFn){
+  var el = document.getElementById('driveDlOverlay');
+  if(!el){ el = document.createElement('div'); el.id = 'driveDlOverlay'; el.className = 'dl-progress-overlay'; document.body.appendChild(el); }
+  el.innerHTML = '<div class="dl-progress-box"><div class="dl-progress-title">' + title + '</div>'
+    + '<div class="dl-progress-sub">' + sub + '</div>'
+    + (pct == null ? '' : '<div class="dl-progress-bar-wrap"><div class="dl-progress-bar-fill" style="width:' + pct + '%"></div></div>')
+    + (btnLabel ? '<button class="dl-cancel-btn" id="driveDlMain" style="background:#3b4eff;color:#fff;border-color:#3b4eff;margin-right:8px;">' + btnLabel + '</button>' : '')
+    + '<button class="dl-cancel-btn" id="driveDlCancel">' + (btnLabel ? 'Close' : 'Cancel') + '</button></div>';
+  document.getElementById('driveDlCancel').onclick = driveDlClose;
+  if(btnLabel) document.getElementById('driveDlMain').onclick = btnFn;
+}
+function driveDlClose(){
+  if(_driveDl && _driveDl.ctrl) try{ _driveDl.ctrl.abort(); }catch(e){}
+  _driveDl = null;
+  var el = document.getElementById('driveDlOverlay'); if(el) el.remove();
+}
+function driveFileDownload(file){
+  var u = URL.createObjectURL(file), a = document.createElement('a');
+  a.href = u; a.download = file.name; a.style.cssText = 'position:fixed;top:-100px;opacity:0;';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ a.remove(); URL.revokeObjectURL(u); }, 4000);
+}
+function driveSaveVideo(id, linkEl){
+  var fallback = 'https://drive.google.com/uc?export=download&id=' + id;
+  if(!DRIVE_API_KEY || !window.fetch) return true;           /* let the normal link work */
+  if(_driveDl) return false;
+  var name = ((linkEl && linkEl.closest('.drive-video').querySelector('.drive-video-name').textContent) || 'Video')
+    .replace(/[^\w .-]+/g, '').trim().slice(0, 60) || 'Video';
+  var ctrl = new AbortController(); _driveDl = { ctrl: ctrl };
+  driveOverlay('Preparing video', 'Keep this page open. Large videos can take a minute.', 0);
+  var url = 'https://www.googleapis.com/drive/v3/files/' + id + '?alt=media&supportsAllDrives=true&key=' + encodeURIComponent(DRIVE_API_KEY);
+  fetch(url, { signal: ctrl.signal }).then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    var total = parseInt(r.headers.get('Content-Length') || '0', 10), got = 0, chunks = [], type = r.headers.get('Content-Type') || '';
+    if(!r.body || !r.body.getReader) return r.blob().then(function(b){ return { blob: b, type: type }; });
+    var rd = r.body.getReader();
+    return (function pump(){
+      return rd.read().then(function(x){
+        if(x.done) return { blob: new Blob(chunks), type: type };
+        chunks.push(x.value); got += x.value.length;
+        if(total) driveOverlay('Preparing video', 'Keep this page open. Large videos can take a minute.', Math.round(got / total * 100));
+        return pump();
+      });
+    })();
+  }).then(function(res){
+    var mime = /^video\//.test(res.type) ? res.type : 'video/mp4';
+    var ext = mime === 'video/quicktime' ? 'mov' : (mime === 'video/webm' ? 'webm' : 'mp4');
+    var file = new File([res.blob], name + '.' + ext, { type: mime });
+    var canShare = false; try{ canShare = isSafariIOS() && navigator.canShare && navigator.canShare({ files: [file] }); }catch(e){}
+    if(!canShare){ driveDlClose(); driveFileDownload(file); toast('Video saved!', 'Check your Downloads / Gallery'); return; }
+    /* iPhone: share() needs a fresh tap, so ask for one now that the file is ready */
+    driveOverlay('Video ready', 'Tap <b>Save to Photos</b>, then choose <b>Save Video</b> in the share sheet.', null, 'Save to Photos', function(){
+      navigator.share({ files: [file], title: name }).then(function(){ driveDlClose(); toast('Video saved!', 'Check your Photos'); })
+        .catch(function(e){ if(e && e.name !== 'AbortError'){ driveDlClose(); driveFileDownload(file); } });
+    });
+  }).catch(function(e){
+    if(e && e.name === 'AbortError') return;
+    console.warn('[drive save] falling back to Drive link:', e && e.message);
+    driveDlClose(); toast('Opening Drive download', 'Direct save was not available');
+    window.open(fallback, '_blank', 'noopener');
+  });
+  return false;
+}
+window.driveSaveVideo = driveSaveVideo;
 (function(){ var y = document.getElementById('evFooterYear'); if(y) y.textContent = new Date().getFullYear(); })();
 
 /* ══════════════════════════════════════

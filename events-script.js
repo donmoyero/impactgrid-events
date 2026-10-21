@@ -825,7 +825,7 @@ async function deleteEvent(id){
       /* Delete from Cloudinary via your backend (optional) */
       var pData = pd.data();
       var delBody = buildDeleteBody(pData);
-      var idsToDelete = delBody.publicIds.concat(delBody.b2Keys);
+      var idsToDelete = delBody.publicIds;
       if(idsToDelete.length){
         try{
           var pres = await fetch(EVENTS_API + '/api/delete-photo', {
@@ -1096,7 +1096,6 @@ async function mgLoadPhotos(){
         cloudinary_id  : p.cloudinary_id   || '',
         web_public_id  : p.web_public_id   || '',
         thumb_public_id: p.thumb_public_id || '',
-        b2_key         : p.b2_key          || '',
         poster_public_id: p.poster_public_id || '',
         media_type     : p.media_type      || 'photo'
       };
@@ -1769,54 +1768,14 @@ async function uploadToCloudinary(blob, folder){
   return await res.json(); /* { secure_url, public_id, ... } */
 }
 
-/* ════════════════════════════════════════════════════
-   VIDEOS → BACKBLAZE B2 (private bucket)
-   1. Ask the API for a short-lived signed upload URL (admin only).
-   2. PUT the file straight from the browser to B2 (progress bar).
-   3. Grab a poster frame in the browser and upload it to Cloudinary
-      as a small image (B2 can't make thumbnails).
-   Only the B2 key is stored; download links are signed on demand
-   by the API every time a client opens the gallery.
-════════════════════════════════════════════════════ */
-var MAX_B2_VIDEO_BYTES = 2 * 1024 * 1024 * 1024; /* 2GB per video */
+/* Videos are added as Google Drive links (Manage → Videos), not uploaded here. */
 
 function buildDeleteBody(meta){
   meta = meta || {};
-  if(meta.b2_key){
-    return {
-      publicIds   : [meta.poster_public_id].filter(Boolean),
-      resourceType: 'image',
-      b2Keys      : [meta.b2_key]
-    };
-  }
   return {
-    publicIds   : [meta.cloudinary_id, meta.web_public_id, meta.thumb_public_id].filter(Boolean),
-    resourceType: meta.media_type === 'video' ? 'video' : 'image',
-    b2Keys      : []
+    publicIds   : [meta.cloudinary_id, meta.web_public_id, meta.thumb_public_id, meta.poster_public_id].filter(Boolean),
+    resourceType: meta.media_type === 'video' ? 'video' : 'image'
   };
-}
-
-async function b2UploadVideo(file, eventId, onProgress){
-  var res = await fetch(EVENTS_API + '/api/video-upload-url', {
-    method : 'POST',
-    headers: Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
-    body   : JSON.stringify({ eventId: eventId, filename: file.name, contentType: file.type, size: file.size })
-  });
-  var info = await res.json().catch(function(){ return {}; });
-  if(!res.ok || !info.url) throw new Error(info.error || 'Could not get upload link (' + res.status + ')');
-
-  await new Promise(function(resolve, reject){
-    var xhr = new XMLHttpRequest();
-    xhr.open('PUT', info.url);
-    xhr.setRequestHeader('Content-Type', file.type);
-    xhr.upload.onprogress = function(e){
-      if(e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100));
-    };
-    xhr.onload  = function(){ (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('Video upload failed (' + xhr.status + ')')); };
-    xhr.onerror = function(){ reject(new Error('Video upload failed — check the bucket CORS rules')); };
-    xhr.send(file);
-  });
-  return info.key;
 }
 
 /* Captures a JPEG frame from a local video file. Resolves null if the
@@ -2023,8 +1982,8 @@ async function uploadPhotos(files){
       toast(' ', 'Skipped ' + file.name, 'Not a supported photo or video type');
       continue;
     }
-    if(isVideo && file.size > MAX_B2_VIDEO_BYTES){
-      toast(' ', 'Skipped ' + file.name, 'Video is over 2GB — trim it and try again');
+    if(isVideo){
+      toast(' ', 'Skipped ' + file.name, 'Add videos from Manage → Videos using a Google Drive link');
       continue;
     }
 
@@ -2048,40 +2007,6 @@ async function uploadPhotos(files){
 
     try{
       var folder = selectedEventId;
-
-      if(isVideo){
-        /* Videos go straight to the private B2 bucket, no re-encoding. */
-        setStatus('Uploading video… 0%', 3, '');
-        var b2Key = await b2UploadVideo(file, selectedEventId, function(pct){
-          setStatus('Uploading video… ' + pct + '%', 3 + Math.round(pct * 0.8), '');
-        });
-
-        setStatus('Creating thumbnail…', 85, '');
-        var posterBlob = await captureVideoPoster(file);
-        var posterUrl = '', posterId = '';
-        if(posterBlob){
-          try{
-            var posterRes = await uploadToCloudinary(posterBlob, folder + '/thumb');
-            posterUrl = posterRes.secure_url; posterId = posterRes.public_id;
-          }catch(pe){ console.warn('[video poster] upload failed:', pe.message); }
-        }
-
-        setStatus('Saving record…', 95, '');
-        await addDoc(collection(db, 'photos'), {
-          event_id        : selectedEventId,
-          media_type      : 'video',
-          storage         : 'b2',
-          b2_key          : b2Key,
-          preview_url     : posterUrl,
-          poster_public_id: posterId,
-          web_url         : '',
-          original_url    : '',
-          created_at      : serverTimestamp()
-        });
-
-        setStatus(' Done', 100, 'var(--green)');
-        continue;
-      }
 
       /* 1 — Upload original to Cloudinary. Stays true original quality
          unless the file is too big for Cloudinary's free-plan cap. */
@@ -2162,7 +2087,6 @@ async function loadEventPhotos(){
             cloudinary_id   : p.cloudinary_id || '',
             web_public_id   : p.web_public_id || '',
             thumb_public_id : p.thumb_public_id || '',
-            b2_key          : p.b2_key || '',
             poster_public_id: p.poster_public_id || '',
             media_type      : p.media_type || 'photo'
           };
@@ -2263,7 +2187,7 @@ async function epBulkDeleteSelected(){
 async function deletePhotoCore(id, meta){
   meta = meta || {};
   var delBody = buildDeleteBody(meta);
-  var ids = delBody.publicIds.concat(delBody.b2Keys);
+  var ids = delBody.publicIds;
   var cloudinaryOk = true;
   if(ids.length){
     try{
