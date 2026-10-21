@@ -37,8 +37,8 @@ html:not([data-theme="dark"]) .main {
     radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,255,255,.09) 0%, transparent 65%),
     var(--bg);
 }
-.main::-webkit-scrollbar { width: 6px; }
-.main::-webkit-scrollbar-thumb { background: rgba(255,255,255,.45); border-radius: 3px; }
+.main::-webkit-scrollbar { width: 9px; }
+.main::-webkit-scrollbar-thumb { background: rgba(128,128,128,.7); border-radius: 5px; }
 
 /* ───────────── Dijo: dark premium panel ───────────── */
 .dijo-bar {

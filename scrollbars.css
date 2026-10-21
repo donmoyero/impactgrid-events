@@ -1,0 +1,8 @@
+/* Visible scrollbars on every page (light and dark).
+   Mid-grey reads clearly on both themes; Firefox/Chrome use the standard
+   properties, Safari/older Chrome use the ::-webkit-scrollbar rules below. */
+* { scrollbar-width: thin; scrollbar-color: rgba(128,128,128,.7) rgba(128,128,128,.15); }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: rgba(128,128,128,.15); border-radius: 5px; }
+*::-webkit-scrollbar-thumb { background: rgba(128,128,128,.7); border-radius: 5px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,.95); }

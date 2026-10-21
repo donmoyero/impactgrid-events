@@ -58,7 +58,7 @@ input:focus, textarea:focus, select:focus {
 th { color: var(--pg-gold-ink); }
 tr:hover td { background: rgba(255,255,255,.07); }
 .toast { box-shadow: 0 20px 50px -20px rgba(0,0,0,.6), inset 3px 0 0 var(--pg-gold-ink); }
-.main::-webkit-scrollbar-thumb, .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.45); }
+.main::-webkit-scrollbar-thumb, .sidebar::-webkit-scrollbar-thumb { background: rgba(128,128,128,.7); }
 
 /* ═══════════════════════════════════════════════════════
    OVERVIEW DASHBOARD

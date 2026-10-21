@@ -258,9 +258,9 @@
       gap: 8px;
       scroll-behavior: smooth;
     }
-    #ig-chat-messages::-webkit-scrollbar { width: 3px; }
+    #ig-chat-messages::-webkit-scrollbar { width: 6px; }
     #ig-chat-messages::-webkit-scrollbar-track { background: transparent; }
-    #ig-chat-messages::-webkit-scrollbar-thumb { background: var(--border2, rgba(0,0,0,0.13)); border-radius: 999px; }
+    #ig-chat-messages::-webkit-scrollbar-thumb { background: rgba(128,128,128,.7); border-radius: 999px; }
 
     .ig-msg {
       display: flex;
