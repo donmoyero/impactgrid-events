@@ -1263,9 +1263,6 @@ input,textarea,select{font-family:inherit;}
    CONFIG & STATE
 ══════════════════════════════════════ */
 var EVENTS_API   = 'https://impactgrid-events-api.onrender.com';
-/* Google Drive API key (restricted to the Drive API + this website) — lets guests save Drive
-   videos straight to their device, with no "can't scan for viruses" page. See setup notes. */
-var DRIVE_API_KEY = '';
 var TPL_MAP = {
   professional : { cls:'tpl-professional', icon:'', heroType:'dark-text'  },
   wedding      : { cls:'tpl-wedding',      icon:'', heroType:'elegant'    },
@@ -2725,7 +2722,7 @@ function renderDriveVideos(ev){
 }
 
 /* ── Save a Drive video the same way photos are saved ──────────────
-   Fetches the file through the Drive API (no virus-scan page), then:
+   Fetches the file through our API, which streams it from Drive (no virus-scan page), then:
    • iPhone / iPad Safari: share sheet → "Save Video" → Photos
    • Android / laptop: direct download → Downloads / Gallery
    If no API key is set, or the fetch fails, falls back to Drive's own link. */
@@ -2754,13 +2751,13 @@ function driveFileDownload(file){
 }
 function driveSaveVideo(id, linkEl){
   var fallback = 'https://drive.google.com/uc?export=download&id=' + id;
-  if(!DRIVE_API_KEY || !window.fetch) return true;           /* let the normal link work */
+  if(!window.fetch) return true;                             /* let the normal link work */
   if(_driveDl) return false;
   var name = ((linkEl && linkEl.closest('.drive-video').querySelector('.drive-video-name').textContent) || 'Video')
     .replace(/[^\w .-]+/g, '').trim().slice(0, 60) || 'Video';
   var ctrl = new AbortController(); _driveDl = { ctrl: ctrl };
   driveOverlay('Preparing video', 'Keep this page open. Large videos can take a minute.', 0);
-  var url = 'https://www.googleapis.com/drive/v3/files/' + id + '?alt=media&supportsAllDrives=true&key=' + encodeURIComponent(DRIVE_API_KEY);
+  var url = EVENTS_API + '/api/drive-video/' + encodeURIComponent(id);   /* API streams it from Drive; key stays on the server */
   fetch(url, { signal: ctrl.signal }).then(function(r){
     if(!r.ok) throw new Error('HTTP ' + r.status);
     var total = parseInt(r.headers.get('Content-Length') || '0', 10), got = 0, chunks = [], type = r.headers.get('Content-Type') || '';
