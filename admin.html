@@ -2675,7 +2675,7 @@ async function uploadHeroFile(file){
       url:urlData.publicUrl,type:isVideo?'video':'image',
       title:file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' '),
       subtitle:'',caption:'',tag_text:'New',tag_type:'new',
-      cta_text:'',cta_url:'',overlay_color:'#c97e08',
+      cta_text:'',cta_url:'',overlay_color:'#111111',
       sort_order:maxOrder+1,active:true,storage_path:fname
     }).select().single();
     if(insErr) throw insErr;
@@ -2720,7 +2720,7 @@ async function deleteSlide(id,path){
 }
 
 var OVERLAY_COLORS=[
-  {h:'#c97e08',l:'Gold'},{h:'#2d6edb',l:'Blue'},{h:'#0fa876',l:'Green'},
+  {h:'#111111',l:'Black'},{h:'#2d6edb',l:'Blue'},{h:'#0fa876',l:'Green'},
   {h:'#7c3aed',l:'Purple'},{h:'#d94f3b',l:'Red'},{h:'#ffffff',l:'White'}
 ];
 var TAG_TYPES=['new','live','soon'];
@@ -2740,7 +2740,7 @@ function openHeroCaption(slide){
     '<div class="field-group"><div class="field-label">Tag Type</div><select id="cap-tag-type" onchange="updateCapPreview()">'+TAG_TYPES.map(function(t){return'<option value="'+t+'"'+(slide.tag_type===t?' selected':'')+'>'+TAG_LABELS[t]+'</option>';}).join('')+'</select></div>'+
     '<div class="field-group"><div class="field-label">CTA Text</div><input type="text" id="cap-cta-text" value="'+esc(slide.cta_text||'')+'" oninput="updateCapPreview()"/></div>'+
     '<div class="field-group"><div class="field-label">CTA URL</div><input type="text" id="cap-cta-url" value="'+esc(slide.cta_url||'')+'"/></div>'+
-    '<div class="field-group"><div class="field-label">Accent Colour</div><div class="color-row">'+swatches+'</div><input type="hidden" id="cap-color" value="'+(slide.overlay_color||'#c97e08')+'"/></div>'+
+    '<div class="field-group"><div class="field-label">Accent Colour</div><div class="color-row">'+swatches+'</div><input type="hidden" id="cap-color" value="'+(slide.overlay_color||'#111111')+'"/></div>'+
     '<div class="caption-preview-box" id="capPreviewBox">'+buildCapPreview(slide)+'</div>'+
     '<div style="display:flex;gap:8px;margin-top:4px;">'+
       '<button class="btn btn-gold" style="flex:1;" onclick="saveCaption(\''+slide.id+'\')"> Save Caption</button>'+
@@ -2760,7 +2760,7 @@ function buildCapPreview(d){
 }
 function updateCapPreview(){var el=document.getElementById('capPreviewBox');if(!el)return;el.innerHTML=buildCapPreview({tag_text:g('cap-tag-text'),tag_type:g('cap-tag-type'),title:g('cap-title'),caption:g('cap-caption'),cta_text:g('cap-cta-text'),overlay_color:g('cap-color')});}
 async function saveCaption(id){
-  var payload={title:g('cap-title').trim(),caption:g('cap-caption').trim(),tag_text:g('cap-tag-text').trim()||'New',tag_type:g('cap-tag-type')||'new',cta_text:g('cap-cta-text').trim(),cta_url:g('cap-cta-url').trim(),overlay_color:g('cap-color')||'#c97e08'};
+  var payload={title:g('cap-title').trim(),caption:g('cap-caption').trim(),tag_text:g('cap-tag-text').trim()||'New',tag_type:g('cap-tag-type')||'new',cta_text:g('cap-cta-text').trim(),cta_url:g('cap-cta-url').trim(),overlay_color:g('cap-color')||'#111111'};
   var {error}=await getSupabase().from('site_slides').update(payload).eq('id',id);
   if(error){toast('','Save failed',error.message);return;}
   toast('','Caption saved!','Live on homepage');loadHeroSlides();
@@ -2785,7 +2785,7 @@ function renderUpdateCards(){
         '<input type="text" value="'+esc(c.icon||'')+'" placeholder="Emoji" style="width:56px;text-align:center;padding:6px 4px;font-size:18px;" oninput="updateCards['+i+'].icon=this.value"/>'+
         '<input type="text" value="'+esc(c.badge||'')+'" placeholder="Badge text" style="flex:1;" oninput="updateCards['+i+'].badge=this.value"/>'+
         '<input type="text" value="'+esc(c.num||'')+'" placeholder="No." style="width:56px;" oninput="updateCards['+i+'].num=this.value"/>'+
-        '<input type="text" value="'+esc(c.color||'#c97e08')+'" placeholder="#colour" style="width:90px;" oninput="updateCards['+i+'].color=this.value"/>'+
+        '<input type="text" value="'+esc(c.color||'#111111')+'" placeholder="#colour" style="width:90px;" oninput="updateCards['+i+'].color=this.value"/>'+
         '<button class="btn btn-red btn-icon btn-sm" onclick="removeUpdateCard('+i+')"></button></div>'+
       '<div class="field-group" style="margin-bottom:10px;"><div class="field-label">Title</div><input type="text" value="'+esc(c.title||'')+'" oninput="updateCards['+i+'].title=this.value"/></div>'+
       '<div class="field-group" style="margin-bottom:10px;"><div class="field-label">Description</div><textarea rows="2" oninput="updateCards['+i+'].desc=this.value">'+esc(c.desc||'')+'</textarea></div>'+
@@ -2796,14 +2796,14 @@ function renderUpdateCards(){
       '</div></div>';
   }).join('');
 }
-function addUpdateCard(){updateCards.push({icon:'',color:'#c97e08',badge:'New',title:'',desc:'',cta:'',cta_url:'',num:String(updateCards.length+1).padStart(2,'0'),ver:'2026',id:null,sort_order:updateCards.length+1,active:true});renderUpdateCards();}
+function addUpdateCard(){updateCards.push({icon:'',color:'#111111',badge:'New',title:'',desc:'',cta:'',cta_url:'',num:String(updateCards.length+1).padStart(2,'0'),ver:'2026',id:null,sort_order:updateCards.length+1,active:true});renderUpdateCards();}
 function removeUpdateCard(i){updateCards.splice(i,1);renderUpdateCards();}
 async function saveUpdateCards(){
   try{
     var c=getSupabase();
     await c.from('site_updates').delete().neq('id','00000000-0000-0000-0000-000000000000');
     var rows=updateCards.filter(function(u){return u.title&&u.title.trim();}).map(function(u,i){
-      return{icon:u.icon||'',color:u.color||'#c97e08',badge:u.badge||'New',badge_style:'',ico_style:'',title:u.title.trim(),desc:u.desc||'',cta:u.cta||'',cta_url:u.cta_url||'',num:u.num||String(i+1).padStart(2,'0'),ver:u.ver||'2026',sort_order:i+1,active:true};
+      return{icon:u.icon||'',color:u.color||'#111111',badge:u.badge||'New',badge_style:'',ico_style:'',title:u.title.trim(),desc:u.desc||'',cta:u.cta||'',cta_url:u.cta_url||'',num:u.num||String(i+1).padStart(2,'0'),ver:u.ver||'2026',sort_order:i+1,active:true};
     });
     var {error}=await c.from('site_updates').insert(rows);
     if(error) throw error;
