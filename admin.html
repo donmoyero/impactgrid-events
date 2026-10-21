@@ -670,6 +670,28 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
 
+      <!-- Guest activity (consent-based, from our own tracker) -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head">
+          <h2>Guest activity</h2>
+          <span style="font-size:11px;color:var(--text3);">Only guests who accepted analytics · last 30 days · no IPs stored</span>
+        </div>
+        <div class="card-body">
+          <div id="ga-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:6px;"></div>
+          <div id="ga-extra" style="font-size:12px;color:var(--text3);line-height:1.7;"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card">
+          <div class="card-head"><h2>Live feed</h2><span style="font-size:11px;color:var(--text3);">Latest 60 actions</span></div>
+          <div class="card-body" id="ga-feed" style="max-height:520px;overflow:auto;"><div class="empty-txt">Loading…</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Top photos</h2><span style="font-size:11px;color:var(--text3);">Downloads ×3 + views</span></div>
+          <div class="card-body" id="ga-top" style="max-height:520px;overflow:auto;"><div class="empty-txt">Loading…</div></div>
+        </div>
+      </div>
+
       <!-- Stats row -->
       <div class="stats-row" style="margin-bottom:18px;grid-template-columns:repeat(2,1fr);" id="activity-stats-row">
         <div class="stat-card"><div class="stat-label">Total Visits</div><div class="stat-val" id="act-stat-visits" style="color:var(--blue);">—</div><div class="stat-sub">Page loads recorded</div></div>
@@ -3026,6 +3048,62 @@ async function loadEventActivity(){
 
   /*  Load downloads log  */
   loadDownloadsLog(eventId);
+  loadGuestActivity(eventId);
+}
+
+/* ── Guest activity: feed with thumbnails, per-photo ranking, KPIs (from /api/admin/activity) ── */
+function _gaAgo(t){
+  var m = Math.max(0, Math.round((Date.now()-t)/60000));
+  if(m < 1) return 'just now'; if(m < 60) return m+' min ago';
+  var h = Math.round(m/60); if(h < 24) return h+' h ago';
+  return Math.round(h/24)+' d ago';
+}
+function _gaThumb(th, id){
+  return th[id]
+    ? '<img src="'+th[id]+'" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex:none;background:var(--bg3);">'
+    : '<div style="width:48px;height:48px;border-radius:8px;flex:none;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);text-align:center;">no<br>preview</div>';
+}
+async function loadGuestActivity(eventId){
+  var kp = document.getElementById('ga-kpis'), ex = document.getElementById('ga-extra'),
+      fd = document.getElementById('ga-feed'), tp = document.getElementById('ga-top');
+  if(!kp) return;
+  try{
+    var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+    var headers = await _adminAuthHeader();
+    var r = await fetch(API + '/api/admin/activity?days=30' + (eventId ? '&event_id='+encodeURIComponent(eventId) : ''), { headers: headers });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    var d = await r.json(), s = d.summary, th = d.thumbs || {};
+    function k(label, val, sub){ return '<div class="stat-card" style="margin:0;"><div class="stat-label">'+label+'</div><div class="stat-val" style="font-size:22px;">'+val+'</div>'+(sub?'<div class="stat-sub">'+sub+'</div>':'')+'</div>'; }
+    kp.innerHTML = k('Visitors', s.unique_visitors, s.opens+' gallery opens')
+      + k('Photo views', s.photo_views, '')
+      + k('Downloads', s.downloads, s.download_rate+'% of visitors')
+      + k('Avg time', (s.avg_time_seconds >= 60 ? Math.floor(s.avg_time_seconds/60)+'m '+(s.avg_time_seconds%60)+'s' : s.avg_time_seconds+'s'), 'per visitor')
+      + k('Returning', s.return_rate+'%', 'opened 2+ times')
+      + k('Drop-offs', s.dropoffs, 'viewed 5+, saved none');
+    var src = Object.keys(s.sources||{}).sort(function(a,b){return s.sources[b]-s.sources[a];}).map(function(x){return esc(x)+' '+s.sources[x];}).join(' · ');
+    ex.innerHTML = 'Peak hour (UTC): <b>'+(s.opens ? s.peak_hour_utc+':00' : '—')+'</b>'
+      + ' &nbsp;|&nbsp; Sources: <b>'+(src||'—')+'</b> <span style="opacity:.7;">(add ?src=qr, ?src=whatsapp or ?src=email to the links you share)</span>'
+      + (s.top_cities.length ? '<br>Top cities: <b>'+s.top_cities.map(function(c){return esc(c[0])+' '+c[1];}).join(' · ')+'</b>' : '');
+    var verbs = { gallery_open:'opened the gallery', photo_view:'viewed a photo', photo_download:'downloaded' };
+    fd.innerHTML = d.feed.length ? d.feed.map(function(f){
+      var who = (f.city ? esc(f.city) : 'A guest') + ' · ' + esc(f.device||'') + ' ' + esc(f.browser||'');
+      var detail = f.action==='photo_view' ? ' ('+f.seconds+'s)' : '';
+      return '<div style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
+        + (f.photo_id ? _gaThumb(th, f.photo_id) : '<div style="width:48px;height:48px;border-radius:8px;flex:none;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;">\u{1F441}</div>')
+        + '<div style="min-width:0;font-size:12.5px;line-height:1.5;"><div><b>'+(verbs[f.action]||esc(f.action))+'</b>'+detail+'</div>'
+        + '<div style="color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+who+(f.src?' · via '+esc(f.src):'')+(eventId?'':' · '+esc(f.event_name||''))+'</div>'
+        + '<div style="color:var(--text3);font-size:11px;">'+_gaAgo(f.t)+'</div></div></div>';
+    }).join('') : '<div class="empty"><div class="empty-txt">No guest activity yet. It appears once guests accept analytics and open a gallery.</div></div>';
+    tp.innerHTML = d.ranking.length ? d.ranking.map(function(p,i){
+      return '<div style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
+        + '<div style="width:18px;font-size:12px;color:var(--text3);">'+(i+1)+'</div>'+_gaThumb(th, p.photo_id)
+        + '<div style="font-size:12.5px;line-height:1.6;"><b>'+p.downloads+'</b> downloads · <b>'+p.views+'</b> views<br><span style="color:var(--text3);">avg '+p.avg_seconds+'s viewed · '+p.visitors+' guests</span></div></div>';
+    }).join('') : '<div class="empty"><div class="empty-txt">No photo activity yet.</div></div>';
+  }catch(e){
+    console.warn('[GuestActivity]', e.message);
+    var msg = '<div class="empty"><div class="empty-txt">Could not load guest activity ('+esc(e.message)+'). The API may be waking up — press Refresh.</div></div>';
+    kp.innerHTML=''; fd.innerHTML = msg; tp.innerHTML = '';
+  }
 }
 
 function renderActivityStats(visits, eventId){

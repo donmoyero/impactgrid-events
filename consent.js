@@ -7,7 +7,8 @@
 
    Categories
      essential  : always on (theme, login, this choice) — no consent needed
-     analytics  : Google Analytics (G-KVJC5DE2WT)
+     analytics  : Google Analytics (G-KVJC5DE2WT) + event-gallery activity (own server:
+                  photos viewed/saved, time on gallery, random visitor ID, city-level location)
      marketing  : Meta Pixel (1067608669288934) + Google AdSense
 
    Load this file in <head> on every page, in place of the old
@@ -17,7 +18,7 @@
   'use strict';
 
   var KEY = 'ig_cookie_consent';
-  var VERSION = 1;                       // bump to re-ask everyone
+  var VERSION = 2;                       // bump to re-ask everyone (v2: analytics now also covers event-gallery activity)
   var MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 
   var GA_ID = 'G-KVJC5DE2WT';
@@ -95,6 +96,20 @@
     });
   }
 
+  /* ── analytics withdrawn: erase this browser's event-gallery activity and local IDs ── */
+  var TRACK_API = 'https://impactgrid-events-api.onrender.com/api';
+  function forgetActivity() {
+    try {
+      var vid = localStorage.getItem('ig_visitor_id'), cn = localStorage.getItem('ig_chat_codename');
+      if ((vid || cn) && navigator.sendBeacon) {
+        navigator.sendBeacon(TRACK_API + '/track/forget',
+          new Blob([JSON.stringify({ visitor_id: vid, codename: cn })], { type: 'text/plain;charset=UTF-8' }));
+      }
+      localStorage.removeItem('ig_visitor_id');
+      sessionStorage.removeItem('ig_session_id');
+    } catch (e) {}
+  }
+
   /* ── banner UI ── */
   var CSS = '' +
     '#ig-cc{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;justify-content:center;padding:16px;pointer-events:none;font-family:var(--fb,"DM Sans",system-ui,sans-serif)}' +
@@ -125,6 +140,8 @@
     var withdrew = before && ((before.analytics && !analytics) || (before.marketing && !marketing));
     var r = write(analytics, marketing);
     close();
+    if (before && before.analytics && !analytics) forgetActivity();
+    try { document.dispatchEvent(new CustomEvent('ig-consent', { detail: r })); } catch (e) {}
     if (withdrew) { clearTrackingCookies(); location.reload(); return; }  /* stops already-loaded scripts */
     apply(r);
   }
@@ -141,7 +158,7 @@
     var main =
       '<div id="ig-cc-main"' + (showPrefs ? ' hidden' : '') + '>' +
         '<h2 id="ig-cc-t">Cookies on Impact Grid</h2>' +
-        '<p>We use essential cookies to make the site work. With your permission we also use analytics cookies (Google Analytics) to see how the site is used, and marketing cookies (Meta Pixel and Google AdSense) to measure and show relevant ads. ' +
+        '<p>We use essential cookies to make the site work. With your permission we also use analytics (Google Analytics, and our own gallery activity stats such as which photos are viewed or saved and for how long) to see how the site is used, and marketing cookies (Meta Pixel and Google AdSense) to measure and show relevant ads. ' +
         'You can change your mind at any time using “Cookie settings” in the footer. See our <a href="privacy.html#cookies">Cookies &amp; Tracking</a> policy.</p>' +
         '<div class="ig-cc-row">' +
           '<button type="button" class="ig-cc-fill" data-a="all">Accept all</button>' +
@@ -155,7 +172,7 @@
         '<h2>Cookie settings</h2>' +
         '<div class="ig-cc-prefs">' +
           '<label class="ig-cc-opt"><div><strong>Essential</strong><span>Keeps you logged in, remembers light/dark mode and stores this choice. Always on.</span></div><input type="checkbox" checked disabled aria-label="Essential cookies, always on"></label>' +
-          '<label class="ig-cc-opt"><div><strong>Analytics</strong><span>Google Analytics — anonymous-style stats on pages visited, so we can improve the site.</span></div><input type="checkbox" id="ig-cc-an"' + (cur.analytics ? ' checked' : '') + '></label>' +
+          '<label class="ig-cc-opt"><div><strong>Analytics</strong><span>Google Analytics for site stats. On event galleries we also record which photos are viewed or saved, how long you spend there, and which link brought you, using a random ID on this device and your city (never your IP address). Used to improve galleries for photographers and their guests.</span></div><input type="checkbox" id="ig-cc-an"' + (cur.analytics ? ' checked' : '') + '></label>' +
           '<label class="ig-cc-opt"><div><strong>Marketing</strong><span>Meta Pixel and Google AdSense — measure ad performance and show relevant ads.</span></div><input type="checkbox" id="ig-cc-mk"' + (cur.marketing ? ' checked' : '') + '></label>' +
         '</div>' +
         '<div class="ig-cc-row">' +
@@ -188,6 +205,7 @@
 
   /* ── public API + footer link ── */
   window.igOpenCookieSettings = function () { open(true); };
+  window.igConsent = { analytics: function () { var r = read(); return !!(r && r.analytics); } };
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest ? e.target.closest('[data-cookie-settings]') : null;
     if (t) { e.preventDefault(); open(true); }

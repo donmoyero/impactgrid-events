@@ -1480,7 +1480,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     var settings = ev.event_settings || {};
 
     /* ── VISIT TRACKING ── */
-    trackVisit(ev.id, ev.name);
+    trackVisit();   /* only fires if the guest accepted Analytics */
 
     /* Base skin stays constant — layout, slideshow transition and
        background are now driven per-event by applyEventDesign(), sourced
@@ -2562,6 +2562,7 @@ function showLightboxAt(idx){
     imgEl.classList.remove('lb-hidden');
     imgEl.src = p.preview_url;
   }
+  if(!isVid) IGT.viewStart(p); else IGT.viewEnd();   /* time-on-photo for the activity stream (consent-gated) */
 
   if(dlBtn) dlBtn.textContent = isVid ? 'Save Video' : 'Save Photo';
   document.getElementById('lbCounter').textContent = (lbIndex+1) + ' / ' + allPhotos.length;
@@ -2595,6 +2596,7 @@ function lbDownload(){
 }
 
 function closeLightbox(){
+  IGT.viewEnd();
   document.getElementById('lightbox').classList.add('hidden');
   document.body.style.overflow = '';
   var vidEl = document.getElementById('lightboxVideo');
@@ -2664,74 +2666,96 @@ function showError(msg){
 }
 
 /* ══════════════════════════════════════
-   VISIT TRACKING
-   Fires once per page load — logs device,
-   country, city and IP to Supabase so the
-   admin Event Activity dashboard stays live.
+   ACTIVITY TRACKING  (consent-gated)
+   Nothing is sent, and no ID is created, unless the guest accepted
+   "Analytics" in the cookie banner (consent.js → window.igConsent).
+   Events go to our own API, which looks up city server-side and never
+   stores the IP. Actions: gallery_open, photo_view (+seconds),
+   photo_download, gallery_leave (+seconds, visible time only).
 ══════════════════════════════════════ */
-async function trackVisit(eventId, eventName){
-  try{
-    var geo = {};
-    try{
-      var r = await fetch('https://ipapi.co/json/');
-      if(r.ok) geo = await r.json();
-    }catch(e){}
-    await window._eventsDb.collection('event_page_visits').add({
-      event_id:   eventId,
-      event_name: eventName,
-      user_agent: navigator.userAgent,
-      country:    geo.country_name || null,
-      city:       geo.city        || null,
-      ip:         geo.ip          || null,
-      visited_at: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }catch(e){
-    /* Silently ignore — collection may not exist yet */
+var IGT = (function(){
+  var API = 'https://impactgrid-events-api.onrender.com/api/track';
+  var opened = false, visStart = (document.visibilityState === 'visible') ? Date.now() : 0;
+  var visTotal = 0, sentTotal = 0, cur = null;
+
+  function ok(){ try{ return !!(window.igConsent && window.igConsent.analytics()); }catch(e){ return false; } }
+  function rand(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
+  function store(area, key, make){
+    try{ var v = window[area].getItem(key); if(!v){ v = make(); window[area].setItem(key, v); } return v; }catch(e){ return null; }
   }
-}
+  function src(){
+    try{ var s = new URLSearchParams(location.search).get('src'); return (s && /^[a-z0-9_-]{1,30}$/i.test(s)) ? s.toLowerCase() : null; }catch(e){ return null; }
+  }
+  function send(action, extra){
+    if(!ok() || !eventData || !eventData.id) return;
+    var body = {
+      consent: true, action: action,
+      event_id: eventData.id, event_name: eventData.name || null,
+      visitor_id: store('localStorage', 'ig_visitor_id', function(){ return 'v_' + rand(); }),
+      codename: (function(){ try{ return localStorage.getItem('ig_chat_codename'); }catch(e){ return null; } })(),
+      session_id: store('sessionStorage', 'ig_session_id', rand),
+      src: src()
+    };
+    if(!body.visitor_id) return;
+    for(var k in extra) body[k] = extra[k];
+    var blob = JSON.stringify(body);
+    /* text/plain = no CORS pre-flight, and sendBeacon survives the tab closing */
+    try{
+      if(navigator.sendBeacon && navigator.sendBeacon(API, new Blob([blob], { type:'text/plain;charset=UTF-8' }))) return;
+    }catch(e){}
+    try{ fetch(API, { method:'POST', body: blob, headers:{ 'Content-Type':'text/plain;charset=UTF-8' }, keepalive:true }); }catch(e){}
+  }
+  function visSecs(){ return visTotal + (visStart ? (Date.now() - visStart) / 1000 : 0); }
 
-/* ══════════════════════════════════════
-   DOWNLOAD TRACKING
-   Fires after each successful download.
-   Captures IP, country, city, device and
-   photo count — geo is cached so ipapi.co
-   is only called once per page load.
-══════════════════════════════════════ */
-var _geoCache = null;
+  function open(){ if(opened || !ok() || !eventData) return; opened = true; send('gallery_open', {}); }
 
-async function getGeo(){
-  if(_geoCache) return _geoCache;
-  try{
-    var r = await fetch('https://ipapi.co/json/');
-    if(r.ok) _geoCache = await r.json();
-  }catch(e){}
-  return _geoCache || {};
-}
+  function viewEnd(){
+    if(!cur) return;
+    var secs = cur.secs + (cur.start ? (Date.now() - cur.start) / 1000 : 0), p = cur.p;
+    cur = null;
+    if(secs >= 1 && p && p.id) send('photo_view', { photo_id: p.id, preview_url: p.preview_url || null, seconds: Math.round(secs) });
+  }
+  function viewStart(p){
+    viewEnd();
+    if(!ok() || !p || !p.id) return;
+    cur = { p: p, secs: 0, start: (document.visibilityState === 'visible') ? Date.now() : 0 };
+  }
+  function flushLeave(){
+    viewEnd();
+    var delta = Math.round(visSecs() - sentTotal);
+    if(delta >= 2){ sentTotal += delta; send('gallery_leave', { seconds: delta }); }
+  }
 
-async function trackDownload(photos){
-  try{
-    if(!eventData || !eventData.id) return;
-    var geo = await getGeo();
-    var arr = Array.isArray(photos) ? photos : [photos];
-    var rows = arr.map(function(p){
-      return {
-        event_id:   eventData.id,
-        event_name: eventData.name  || null,
-        photo_id:   p.id            || null,
-        user_agent: navigator.userAgent,
-        ip:         geo.ip          || null,
-        country:    geo.country_name|| null,
-        city:       geo.city        || null
-      };
-    });
-    var db = window._eventsDb;
-    var batch = db.batch();
-    rows.forEach(function(row){
-      row.created_at = firebase.firestore.FieldValue.serverTimestamp();
-      batch.set(db.collection('photo_downloads').doc(), row);
-    });
-    await batch.commit();
-  }catch(e){ /* silent */ }
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden'){
+      if(visStart){ visTotal += (Date.now() - visStart) / 1000; visStart = 0; }
+      if(cur && cur.start){ cur.secs += (Date.now() - cur.start) / 1000; cur.start = 0; }
+      flushLeave();
+    } else {
+      visStart = Date.now();
+      if(cur) cur.start = Date.now();
+    }
+  });
+  window.addEventListener('pagehide', function(){
+    if(visStart){ visTotal += (Date.now() - visStart) / 1000; visStart = 0; }
+    flushLeave();
+  });
+  /* guest accepts analytics after the page has loaded → start then, not before */
+  document.addEventListener('ig-consent', function(e){
+    if(e.detail && e.detail.analytics) open();
+    else { opened = false; cur = null; }
+  });
+
+  return { open: open, viewStart: viewStart, viewEnd: viewEnd, send: send };
+})();
+
+function trackVisit(){ IGT.open(); }
+
+function trackDownload(photos){
+  var arr = Array.isArray(photos) ? photos : [photos];
+  arr.forEach(function(p){
+    if(p && p.id) IGT.send('photo_download', { photo_id: p.id, preview_url: p.preview_url || null });
+  });
 }
 
 /* ══════════════════════════════════════
