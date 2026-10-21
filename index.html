@@ -57,23 +57,23 @@
     :root {
       /* Page chrome — theme-aware. Light is the default; dark is opt-in via
          the site-wide toggle (data-theme="dark" on <html>). */
-      --h-bg:      #f6f4f0;
-      --h-bg-2:    #efece5;
+      --h-bg:      #f5f5f5;
+      --h-bg-2:    #ececec;
       --h-ink:     #0d0d0d;                /* light mode: solid dark text   */
       --h-ink-2:   #1f1d1a;                /* secondary text — still dark   */
-      --h-line:    rgba(20,18,15,.12);
-      --h-line-2:  rgba(20,18,15,.28);     /* stronger dividers / outlines  */
+      --h-line:    rgba(0,0,0,.12);
+      --h-line-2:  rgba(0,0,0,.28);     /* stronger dividers / outlines  */
       --h-mute:    #2e2b27;                /* eyebrows / captions — dark    */
 
       /* Permanent "photo hero" scrim — used only behind the hero and the
          closing CTA banner, where a dark backdrop keeps text legible over a
          photograph. Stays constant regardless of light/dark mode, but is a
          warm, premium near-black rather than flat #000. */
-      --h-scrim:    #1a160f;
-      --h-scrim-2:  #221c12;
+      --h-scrim:    #0a0a0a;
+      --h-scrim-2:  #141414;
 
-      --h-light:   #f6f4f0;   /* theme-aware: see dark override below */
-      --h-gold:    #d9c187;
+      --h-light:   #f5f5f5;   /* theme-aware: see dark override below */
+      --h-gold:    #ffffff;
       --h-display: var(--fd, 'Bricolage Grotesque', system-ui, sans-serif);   /* same display face as every other page */
       --h-sans:    'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
       --h-pad:     clamp(20px, 5.7vw, 110px);   /* text column inset  */
@@ -82,9 +82,9 @@
     }
 
     html[data-theme="dark"] {
-      --h-bg:      var(--h-scrim, #1a160f);
-      --h-bg-2:    var(--h-scrim-2, #221c12);
-      --h-light:   var(--h-scrim, #1a160f);   /* services / how-it-works / partners follow dark mode */
+      --h-bg:      var(--h-scrim, #0a0a0a);
+      --h-bg-2:    var(--h-scrim-2, #141414);
+      --h-light:   var(--h-scrim, #0a0a0a);   /* services / how-it-works / partners follow dark mode */
       --h-ink:     #ffffff;                /* dark mode: pure white text    */
       --h-ink-2:   #ffffff;
       --h-line:    rgba(255,255,255,.18);
@@ -163,7 +163,7 @@
       transition: background .3s, border-color .3s, backdrop-filter .3s;
     }
     body.home.h-scrolled #mainNav {
-      background: rgba(26,22,15,.88) !important;
+      background: rgba(10,10,10,.88) !important;
       border-bottom-color: rgba(255,255,255,.08) !important;
       -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     }
@@ -175,7 +175,7 @@
         transition: background .3s;
       }
       body.home.h-scrolled #ig-mob-topbar {
-        background: rgba(26,22,15,.92) !important;
+        background: rgba(10,10,10,.92) !important;
         -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
       }
     }
@@ -197,9 +197,9 @@
     .h-hero-shade {
       position: absolute; inset: 0; pointer-events: none;
       background:
-        linear-gradient(90deg, var(--h-scrim) 0%, var(--h-scrim) 22%, rgba(26,22,15,.72) 38%, rgba(26,22,15,.3) 56%, rgba(26,22,15,0) 74%),
-        linear-gradient(180deg, rgba(26,22,15,.7) 0, rgba(26,22,15,0) 24%),
-        linear-gradient(0deg, rgba(26,22,15,.6) 0, rgba(26,22,15,0) 22%);
+        linear-gradient(90deg, var(--h-scrim) 0%, var(--h-scrim) 22%, rgba(10,10,10,.72) 38%, rgba(10,10,10,.3) 56%, rgba(10,10,10,0) 74%),
+        linear-gradient(180deg, rgba(10,10,10,.7) 0, rgba(10,10,10,0) 24%),
+        linear-gradient(0deg, rgba(10,10,10,.6) 0, rgba(10,10,10,0) 22%);
     }
     .h-hero-inner { position: relative; z-index: 2; width: 100%; padding-top: 96px; padding-bottom: 44px; }
     .h-hero .h-eyebrow { display: flex; gap: 1.9em; margin-bottom: clamp(14px, 1.4vw, 24px); color: #fff; }
@@ -258,7 +258,7 @@
     .h-svc {
       position: relative; overflow: hidden; isolation: isolate;
       aspect-ratio: 315 / 225; min-height: 250px;
-      border-radius: var(--h-r); background: #1a160f; color: #fff;
+      border-radius: var(--h-r); background: #0a0a0a; color: #fff;
       display: flex; flex-direction: column; justify-content: flex-end;
       padding: clamp(16px, 1.8vw, 30px);
     }
@@ -270,7 +270,7 @@
     }
     .h-svc::after {
       content: ''; position: absolute; inset: 0; z-index: -1;
-      background: linear-gradient(180deg, rgba(26,22,15,0) 30%, rgba(26,22,15,.6) 62%, rgba(26,22,15,.95) 86%);
+      background: linear-gradient(180deg, rgba(10,10,10,0) 30%, rgba(10,10,10,.6) 62%, rgba(10,10,10,.95) 86%);
     }
     .h-svc:hover > img { transform: scale(1.04); }
     .h-svc-ico { width: clamp(24px, 2vw, 32px); height: clamp(24px, 2vw, 32px); stroke: #fff; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; margin-bottom: clamp(10px, 1vw, 16px); }
@@ -295,12 +295,12 @@
     .h-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(5px, .5vw, 9px); }
     .h-tile {
       position: relative; overflow: hidden; isolation: isolate;
-      aspect-ratio: 237 / 127; border-radius: 5px; background: #1a160f; color: #fff;
+      aspect-ratio: 237 / 127; border-radius: 5px; background: #0a0a0a; color: #fff;
       display: flex; align-items: flex-end; padding: clamp(10px, 1vw, 16px);
     }
     .h-tile img { position: absolute; inset: 0 0 auto 0; width: 100%; height: 84%; object-fit: cover; z-index: -2; transition: transform .6s ease;
       -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%); mask-image: linear-gradient(180deg, #000 45%, transparent 100%); }
-    .h-tile::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(26,22,15,0) 30%, rgba(26,22,15,.7) 66%, #1a160f 96%); }
+    .h-tile::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10,10,10,0) 30%, rgba(10,10,10,.7) 66%, #0a0a0a 96%); }
     .h-tile:hover img { transform: scale(1.05); }
     .h-tile span { display: flex; align-items: center; gap: 12px; width: 100%; font: 400 clamp(11.5px, .95vw, 15px)/1 var(--h-sans); }
     .h-tile span::after { content: ''; height: 1px; width: clamp(34px, 4.4vw, 74px); background: rgba(255,255,255,.4); }
@@ -353,7 +353,7 @@
     .h-rate .h-stars { margin: 10px 0 8px; font-size: clamp(14px, 1.1vw, 18px); }
     .h-rate span { font: 400 clamp(12px, .9vw, 14px)/1.3 var(--h-sans); color: var(--h-ink-2); }
     /* Gold stars are too faint on the light background — deepen them in light mode only */
-    html:not([data-theme="dark"]) .h-reviews .h-stars { color: #9a7414; }
+    html:not([data-theme="dark"]) .h-reviews .h-stars { color: #111; }
     .h-reviews.is-single .h-arrow,
     .h-reviews.is-single .h-dots { display: none; }
 
@@ -369,7 +369,7 @@
       background: var(--h-scrim) url('assets/home/cta-crowd.jpg') center / cover no-repeat;
       padding: clamp(44px, 4.4vw, 84px) 0 clamp(40px, 4vw, 76px);
     }
-    .h-cta::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(26,22,15,.55), rgba(26,22,15,.18) 40%, rgba(26,22,15,.5)); }
+    .h-cta::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10,10,10,.55), rgba(10,10,10,.18) 40%, rgba(10,10,10,.5)); }
     .h-cta h2 { color: #fff; font-size: clamp(36px, 4.4vw, 76px); margin: clamp(12px, 1.2vw, 20px) 0 clamp(12px, 1.2vw, 20px); }
     .h-cta-sub { display: flex; align-items: center; justify-content: center; gap: clamp(14px, 1.6vw, 26px); margin-bottom: clamp(20px, 2vw, 34px); }
     .h-cta-sub::before, .h-cta-sub::after { content: ''; height: 1px; width: clamp(40px, 8vw, 130px); background: rgba(255,255,255,.4); }
@@ -428,8 +428,8 @@
       .h-hero-photo img { object-position: 34% 8%; }
       .h-hero-shade {
         background:
-          linear-gradient(180deg, rgba(26,22,15,.65) 0, rgba(26,22,15,0) 22%),
-          linear-gradient(0deg, var(--h-scrim) 0, var(--h-scrim) 4%, rgba(26,22,15,0) 50%);
+          linear-gradient(180deg, rgba(10,10,10,.65) 0, rgba(10,10,10,0) 22%),
+          linear-gradient(0deg, var(--h-scrim) 0, var(--h-scrim) 4%, rgba(10,10,10,0) 50%);
         height: min(104vw, 620px); bottom: auto;
       }
       .h-hero-inner { margin-top: -16vw; padding-top: 0; padding-bottom: 40px; }
@@ -748,7 +748,7 @@
         ? '<img src="' + escHtml(s.image_url) + '" alt="" loading="lazy" />'
         : '';
       var priceBadge = s.icon
-        ? '<span class="h-svc-ico" style="width:auto;height:auto;stroke:none;fill:none;font:600 13px var(--h-sans, sans-serif);color:#f0b429;display:inline-block;margin-bottom:clamp(10px,1vw,16px);">' + escHtml(s.icon) + '</span>'
+        ? '<span class="h-svc-ico" style="width:auto;height:auto;stroke:none;fill:none;font:600 13px var(--h-sans, sans-serif);color:#ffffff;display:inline-block;margin-bottom:clamp(10px,1vw,16px);">' + escHtml(s.icon) + '</span>'
         : '';
       var params = 'service=' + encodeURIComponent(s.title || '')
         + '&id=' + encodeURIComponent(s.id || '')

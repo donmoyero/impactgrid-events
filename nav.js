@@ -175,7 +175,7 @@
          Fixed dark chrome (matches the homepage); page content below follows the theme toggle.
          Selectors are #mainNav-scoped so they beat shared.css/.nav rules but stay below
          any body.home overrides (homepage keeps its transparent-on-hero behaviour). ── */
-      '#mainNav{background:rgba(26,22,15,.94);border-bottom:1px solid rgba(255,255,255,.08);height:84px;padding:0 clamp(20px,4vw,72px);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}' +
+      '#mainNav{background:rgba(10,10,10,.94);border-bottom:1px solid rgba(255,255,255,.08);height:84px;padding:0 clamp(20px,4vw,72px);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}' +
       '#mainNav .logo{margin-right:0;gap:12px;}' +
       '#mainNav .logo .logo-mark{display:none!important;}' +
       '#mainNav .logo .logo-img{display:block!important;width:42px;height:42px;object-fit:contain;border-radius:9px;flex:none;}' +
@@ -194,7 +194,7 @@
       '#mainNav .u-name{color:#111;}' +
       '#mainNav .u-chev{color:#555;}' +
       '@media(max-width:768px){' +
-        '#ig-mob-topbar{background:rgba(26,22,15,.94)!important;border-bottom:1px solid rgba(255,255,255,.08)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}' +
+        '#ig-mob-topbar{background:rgba(10,10,10,.94)!important;border-bottom:1px solid rgba(255,255,255,.08)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}' +
         '#ig-mob-topbar .mob-topbar-logo{font-size:0;display:flex;align-items:center;gap:10px;}' +
         '#ig-mob-topbar .mob-topbar-logo img{display:block!important;width:34px;height:34px;object-fit:contain;border-radius:7px;order:-1;}' +
         '#ig-mob-topbar .mob-topbar-logo::before{content:"IMPACT GRID";font:800 20px/1 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.02em;color:#fff;}' +

@@ -1593,6 +1593,20 @@ async function loadPhotos(){
     /* Hidden photos (admin-side Photos manager) never reach the client. */
     data = data.filter(function(p){ return p.hidden !== true; });
 
+    /* Videos live in a private Backblaze B2 bucket: ask the API for fresh signed
+       links (valid 24h) and drop them into the same fields photos use, so the
+       lightbox and every Save / Download All path work unchanged. */
+    if(data.some(function(p){ return p.b2_key; })){
+      try{
+        var vr = await fetch(EVENTS_API + '/api/video-urls?event_id=' + encodeURIComponent(eventData.id));
+        var vj = await vr.json();
+        var vmap = (vj && vj.urls) || {};
+        data.forEach(function(p){
+          if(p.b2_key && vmap[p.id]){ p.web_url = vmap[p.id]; p.original_url = vmap[p.id]; }
+        });
+      }catch(ve){ console.warn('[videos] could not load signed links:', ve.message); }
+    }
+
     var hasOrder = data.some(function(p){ return typeof p.order === 'number'; });
     if(hasOrder){
       /* Admin has explicitly reordered this gallery — that order wins.
@@ -1883,7 +1897,7 @@ function renderPhotos(photos){
     return '<div class="photo-card' + (isSel?' selected':'') + '" id="card-' + p.id + '" data-id="' + p.id + '" data-idx="' + i + '" onclick="handleCardClick(\'' + p.id + '\',' + i + ',event)">'
       + '<div class="select-checkbox" onclick="toggleSelect(\'' + p.id + '\',event)"></div>'
       + '<div class="select-overlay"></div>'
-      + '<img src="' + esc(p.preview_url) + '" alt="" loading="lazy"/>'
+      + '<img src="' + esc(p.preview_url || (isVid ? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22640%22 height=%22360%22%3E%3Crect width=%22640%22 height=%22360%22 fill=%22%23111%22/%3E%3C/svg%3E' : '')) + '" alt="" loading="lazy"/>'
       + (isVid ? '<div class="video-play-badge">▶</div>' : '')
       + '<div class="photo-card-overlay">'
       + '<button class="lb-btn lb-btn-dl" style="font-size:11px;padding:7px 14px;" onclick="event.stopPropagation();quickDownload(\'' + esc(p.original_url||p.preview_url) + '\',' + i + ')">Save</button>'
@@ -2732,7 +2746,7 @@ function esc(s){
 
 <script src="/js/impactgrid-chat-bubble.js"></script>
 <!-- ══════════════════════════════════════ REVIEW FAB ══════════════════════════════════════ -->
-<button id="review-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:800;align-items:center;gap:8px;padding:11px 18px;border-radius:100px;background:linear-gradient(135deg,var(--accent,#c97e08),var(--accent2,#a86505));color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.22);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.22)';">
+<button id="review-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:800;align-items:center;gap:8px;padding:11px 18px;border-radius:100px;background:linear-gradient(135deg,#111,#000);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.22);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.22)';">
   Leave a Review
 </button>
 

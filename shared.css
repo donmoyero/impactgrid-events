@@ -19,11 +19,11 @@
 ════════════════════════════════════════════════════ */
 :root {
   /* Backgrounds */
-  --bg:    #faf7f2;
-  --bg2:   #f3ede3;
-  --bg3:   #ece4d6;
+  --bg:    #fafafa;
+  --bg2:   #f2f2f2;
+  --bg3:   #e8e8e8;
   --card:  #ffffff;
-  --card2: #fdf9f4;
+  --card2: #ffffff;
 
   /* Borders */
   --border:  rgba(0,0,0,0.07);
@@ -91,7 +91,7 @@
 
   /* Ink — raw RGB triplet for text/border rgba() overlays that need a
      theme-aware base colour (used on blog.html). Light mode: dark ink. */
-  --ink: 40,32,18;
+  --ink: 17,17,17;
 
   /* Surface — raw RGB triplet for translucent card/panel backgrounds
      (e.g. blurred sticky bars) that need to sit opposite --ink. */
@@ -99,11 +99,11 @@
 }
 
 [data-theme="dark"] {
-  --bg:    #17140f;
-  --bg2:   #1d1810;
-  --bg3:   #241e15;
-  --card:  #1e1912;
-  --card2: #262019;
+  --bg:    #0a0a0a;
+  --bg2:   #111111;
+  --bg3:   #181818;
+  --card:  #141414;
+  --card2: #1c1c1c;
 
   --border:  rgba(255,255,255,0.06);
   --border2: rgba(255,255,255,0.11);
@@ -153,8 +153,8 @@
 html { scroll-behavior: smooth; }
 body {
   background:
-    radial-gradient(ellipse 70% 35% at 50% 0%,   rgba(170,152,3,0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(170,152,3,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 35% at 50% 0%,   rgba(255,255,255,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(255,255,255,0.04) 0%, transparent 55%),
     var(--bg);
   background-attachment: fixed;
   color: var(--text);

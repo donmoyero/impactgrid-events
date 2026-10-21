@@ -551,7 +551,7 @@
 
     return '<div style="margin:12px 0;padding-top:12px;border-top:1px solid rgba(0,0,0,0.08);">' +
       '<div style="display:flex;align-items:center;gap:6px;">' +
-        '<span style="color:#c97e08;font-size:14px;letter-spacing:1px;">' + _stars(stat.avg) + '</span>' +
+        '<span style="color:var(--text,#111);font-size:14px;letter-spacing:1px;">' + _stars(stat.avg) + '</span>' +
         '<span style="font-size:12px;font-weight:700;">' + stat.avg.toFixed(1) + '</span>' +
         '<span style="font-size:12px;color:var(--text3,#999);">· ' + stat.count + ' review' + (stat.count === 1 ? '' : 's') + '</span>' +
       '</div>' +

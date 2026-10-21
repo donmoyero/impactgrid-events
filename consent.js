@@ -105,7 +105,7 @@
     '#ig-cc a{color:var(--text,#0d0d0d);text-decoration:underline}' +
     '#ig-cc .ig-cc-row{display:flex;flex-wrap:wrap;gap:10px}' +
     '#ig-cc button{font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;border-radius:100px;padding:11px 20px;border:1px solid var(--text,#0d0d0d);flex:1 1 140px;min-height:44px}' +
-    '#ig-cc .ig-cc-fill{background:var(--text,#0d0d0d);color:var(--bg,#faf7f2)}' +
+    '#ig-cc .ig-cc-fill{background:var(--text,#0d0d0d);color:var(--bg,#fafafa)}' +
     '#ig-cc .ig-cc-line{background:transparent;color:var(--text,#0d0d0d)}' +
     '#ig-cc button:focus-visible,#ig-cc input:focus-visible{outline:3px solid #2563eb;outline-offset:2px}' +
     '#ig-cc .ig-cc-opt{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border,rgba(0,0,0,.07))}' +

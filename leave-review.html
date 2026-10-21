@@ -27,7 +27,7 @@
   :root{
     --bg:#0d0d10; --card:#17171c; --border:rgba(255,255,255,0.08);
     --text:#ffffff; --text2:#a8a8b8; --text3:#6f6f80;
-    --accent:#c97e08; --accent2:#a86505;
+    --accent:#ffffff; --accent2:#d0d0d0;
   }
   *{box-sizing:border-box;}
   body{
@@ -59,7 +59,7 @@
   #error{display:none;font-size:13px;color:#ff6b5a;background:rgba(255,107,90,0.1);border:1px solid rgba(255,107,90,0.25);border-radius:8px;padding:10px 13px;margin-bottom:14px;}
   .btn{
     width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-    color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:opacity .2s;
+    color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:opacity .2s;
   }
   .btn:disabled{opacity:.6;cursor:default;}
   #success{display:none;text-align:center;}
@@ -69,7 +69,7 @@
   #success a{
     display:inline-block;padding:11px 26px;border-radius:10px;
     background:linear-gradient(135deg,var(--accent),var(--accent2));
-    color:#fff;font-size:14px;font-weight:700;text-decoration:none;
+    color:#000;font-size:14px;font-weight:700;text-decoration:none;
   }
 </style>
 </head>
@@ -133,7 +133,7 @@ function setStar(n) {
   document.querySelectorAll('#stars span').forEach(function (s) {
     var v = parseInt(s.dataset.val, 10);
     s.style.opacity = v <= n ? '1' : '0.3';
-    s.style.color   = v <= n ? '#c97e08' : '';
+    s.style.color   = v <= n ? '#ffffff' : '';
   });
 }
 

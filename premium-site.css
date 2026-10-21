@@ -9,19 +9,19 @@
 ═══════════════════════════════════════════════════════ */
 
 :root {
-  --pg-gold:      #d9c187;   /* on dark surfaces */
-  --pg-gold-ink:  #8a6a12;   /* on the cream light-mode surfaces */
+  --pg-gold:      #ffffff;   /* on dark surfaces */
+  --pg-gold-ink:  #111111;   /* on the cream light-mode surfaces */
   --pg-ease:      cubic-bezier(.2, .7, .2, 1);
 }
-html[data-theme="dark"] { --pg-gold-ink: #d9c187; }
+html[data-theme="dark"] { --pg-gold-ink: #ffffff; }
 
-::selection { background: #d9c187; color: #1a160f; }
+::selection { background: #ffffff; color: #0a0a0a; }
 
 /* Warmer page background (light mode only; dark keeps its own) */
 html:not([data-theme="dark"]) body {
   background:
-    radial-gradient(ellipse 70% 35% at 50% 0%,    rgba(190,160,70,.10) 0%, transparent 65%),
-    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(190,160,70,.06) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 35% at 50% 0%,    rgba(255,255,255,.10) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 28% at 100% 100%, rgba(255,255,255,.06) 0%, transparent 55%),
     var(--bg);
   background-attachment: fixed;
 }
@@ -70,8 +70,8 @@ html[data-theme="dark"] .bk-h1,      html[data-theme="dark"] .page-hero-title { 
 }
 .card:hover, .sv-card:hover, .related-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(217,193,135,.7);
-  box-shadow: 0 0 0 1px rgba(217,193,135,.45), 0 26px 46px -26px rgba(0,0,0,.5);
+  border-color: rgba(255,255,255,.7);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.45), 0 26px 46px -26px rgba(0,0,0,.5);
 }
 .card::before, .sv-card::before, .related-card::before {
   content: ''; position: absolute; inset: 10px; z-index: 2; pointer-events: none;
@@ -88,7 +88,7 @@ html[data-theme="dark"] .bk-h1,      html[data-theme="dark"] .page-hero-title { 
 
 /* Sign-in / register / booking panels: a quiet gold top edge */
 .auth-card, .rg-card, .bk-panel {
-  box-shadow: 0 30px 60px -36px rgba(0,0,0,.45), inset 0 1px 0 rgba(217,193,135,.55);
+  box-shadow: 0 30px 60px -36px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.55);
 }
 
 /* ───────────── Buttons: gold sheen sweep ───────────── */
@@ -97,7 +97,7 @@ html[data-theme="dark"] .bk-h1,      html[data-theme="dark"] .page-hero-title { 
 }
 .btn-primary::after, .btn-gold::after, .btn-hero-gold::after, .btn-cta-gold::after, .btn-gold-sm::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(105deg, transparent 30%, rgba(217,193,135,.5) 50%, transparent 70%);
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.5) 50%, transparent 70%);
   transform: translateX(-120%);
 }
 .btn-primary:hover::after, .btn-gold:hover::after, .btn-hero-gold:hover::after,
@@ -111,11 +111,11 @@ html[data-theme="dark"] .bk-h1,      html[data-theme="dark"] .page-hero-title { 
 .auth-card input:focus, .rg-card input:focus, .auth-card select:focus, .rg-card select:focus {
   outline: none;
   border-color: var(--pg-gold-ink) !important;
-  box-shadow: 0 0 0 3px rgba(217,193,135,.28);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.28);
 }
 
 /* Nav rail: gold hairline */
-#mainNav, .nav-rail { border-color: rgba(217,193,135,.25); }
+#mainNav, .nav-rail { border-color: rgba(255,255,255,.25); }
 
 /* ───────────── Touch + reduced motion ───────────── */
 @media (hover: none) {

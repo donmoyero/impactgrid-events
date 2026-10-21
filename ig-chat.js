@@ -168,7 +168,7 @@
       color: #fff;
       display: flex; align-items: center; justify-content: center;
       font-family: 'DM Sans', sans-serif;
-      border: 2px solid var(--bg, #faf7f2);
+      border: 2px solid var(--bg, #fafafa);
       display: none;
     }
 
@@ -240,11 +240,11 @@
       font-size: 9px;
       font-weight: 700;
       font-family: 'DM Mono', monospace;
-      color: #ffe600;
-      background: rgba(255,230,0,0.12);
+      color: #ffffff;
+      background: rgba(255,255,255,0.12);
       padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(255,230,0,0.2);
+      border: 1px solid rgba(255,255,255,0.2);
       letter-spacing: 0.05em;
     }
 
@@ -279,12 +279,12 @@
       font-family: 'DM Sans', sans-serif;
     }
     .ig-msg.bot .ig-msg-bubble {
-      background: var(--bg2, #f3ede3);
+      background: var(--bg2, #f2f2f2);
       color: var(--text, #0d1017);
       border-bottom-left-radius: 4px;
     }
     .ig-msg.user .ig-msg-bubble {
-      background: linear-gradient(135deg, #ffe600, #ffe600);
+      background: linear-gradient(135deg, #ffffff, #ffffff);
       color: #07090f;
       font-weight: 500;
       border-bottom-right-radius: 4px;
@@ -300,7 +300,7 @@
       align-items: center;
       gap: 4px;
       padding: 10px 13px;
-      background: var(--bg2, #f3ede3);
+      background: var(--bg2, #f2f2f2);
       border-radius: 14px;
       border-bottom-left-radius: 4px;
       align-self: flex-start;
@@ -332,14 +332,14 @@
       font-weight: 600;
       padding: 7px 13px;
       border-radius: 100px;
-      border: 1px solid #ffe600;
+      border: 1px solid #ffffff;
       background: transparent;
       color: var(--text, #0d1017);
       cursor: pointer;
       transition: background 0.15s, transform 0.15s;
       white-space: nowrap;
     }
-    .ig-chip:hover { background: rgba(255,230,0,0.16); transform: translateY(-1px); }
+    .ig-chip:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
     [data-theme="dark"] .ig-chip { color: var(--text, #eef0f6); }
 
     /* Input area */
@@ -359,7 +359,7 @@
       padding: 9px 12px;
       font-size: 13px;
       font-family: 'DM Sans', sans-serif;
-      background: var(--bg, #faf7f2);
+      background: var(--bg, #fafafa);
       color: var(--text, #0d1017);
       outline: none;
       resize: none;
@@ -374,21 +374,21 @@
       color: var(--text, #eef0f6);
       border-color: var(--border2, rgba(255,255,255,0.13));
     }
-    #ig-chat-input:focus { border-color: #ffe600; }
+    #ig-chat-input:focus { border-color: #ffffff; }
     #ig-chat-input::placeholder { color: var(--text3, #9099b8); }
 
     #ig-chat-send {
       width: 38px; height: 38px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #ffe600, #ffe600);
+      background: linear-gradient(135deg, #ffffff, #ffffff);
       border: none;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 2px 8px rgba(255,230,0,0.3);
+      box-shadow: 0 2px 8px rgba(255,255,255,0.3);
     }
-    #ig-chat-send:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(255,230,0,0.45); }
+    #ig-chat-send:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(255,255,255,0.45); }
     #ig-chat-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     /* Footer note */
@@ -438,10 +438,10 @@
   wrap.innerHTML = `
     <!-- Bubble button -->
     <button id="ig-chat-bubble" aria-label="Chat with us">
-      <svg class="icon-chat" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffe600" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="icon-chat" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
-      <svg class="icon-close" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffe600" stroke-width="2.5" stroke-linecap="round">
+      <svg class="icon-close" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
       <div id="ig-chat-unread">1</div>

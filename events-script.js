@@ -824,12 +824,13 @@ async function deleteEvent(id){
     for(var pd of pSnap.docs){
       /* Delete from Cloudinary via your backend (optional) */
       var pData = pd.data();
-      var idsToDelete = [pData.cloudinary_id, pData.web_public_id, pData.thumb_public_id].filter(Boolean);
+      var delBody = buildDeleteBody(pData);
+      var idsToDelete = delBody.publicIds.concat(delBody.b2Keys);
       if(idsToDelete.length){
         try{
           var pres = await fetch(EVENTS_API + '/api/delete-photo', {
             method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
-            body: JSON.stringify({ publicIds: idsToDelete, resourceType: pData.media_type === 'video' ? 'video' : 'image' })
+            body: JSON.stringify(delBody)
           });
           if(!pres.ok) console.warn('[deleteEvent] Cloudinary delete failed for', pd.id, idsToDelete);
         }catch(e){ console.warn('[deleteEvent] Cloudinary delete request failed for', pd.id, e.message); }
@@ -1003,6 +1004,8 @@ async function mgLoadPhotos(){
         cloudinary_id  : p.cloudinary_id   || '',
         web_public_id  : p.web_public_id   || '',
         thumb_public_id: p.thumb_public_id || '',
+        b2_key         : p.b2_key          || '',
+        poster_public_id: p.poster_public_id || '',
         media_type     : p.media_type      || 'photo'
       };
     });
@@ -1674,7 +1677,82 @@ async function uploadToCloudinary(blob, folder){
   return await res.json(); /* { secure_url, public_id, ... } */
 }
 
-/* Upload a video file to Cloudinary (resource_type: video).
+/* ════════════════════════════════════════════════════
+   VIDEOS → BACKBLAZE B2 (private bucket)
+   1. Ask the API for a short-lived signed upload URL (admin only).
+   2. PUT the file straight from the browser to B2 (progress bar).
+   3. Grab a poster frame in the browser and upload it to Cloudinary
+      as a small image (B2 can't make thumbnails).
+   Only the B2 key is stored; download links are signed on demand
+   by the API every time a client opens the gallery.
+════════════════════════════════════════════════════ */
+var MAX_B2_VIDEO_BYTES = 2 * 1024 * 1024 * 1024; /* 2GB per video */
+
+function buildDeleteBody(meta){
+  meta = meta || {};
+  if(meta.b2_key){
+    return {
+      publicIds   : [meta.poster_public_id].filter(Boolean),
+      resourceType: 'image',
+      b2Keys      : [meta.b2_key]
+    };
+  }
+  return {
+    publicIds   : [meta.cloudinary_id, meta.web_public_id, meta.thumb_public_id].filter(Boolean),
+    resourceType: meta.media_type === 'video' ? 'video' : 'image',
+    b2Keys      : []
+  };
+}
+
+async function b2UploadVideo(file, eventId, onProgress){
+  var res = await fetch(EVENTS_API + '/api/video-upload-url', {
+    method : 'POST',
+    headers: Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
+    body   : JSON.stringify({ eventId: eventId, filename: file.name, contentType: file.type, size: file.size })
+  });
+  var info = await res.json().catch(function(){ return {}; });
+  if(!res.ok || !info.url) throw new Error(info.error || 'Could not get upload link (' + res.status + ')');
+
+  await new Promise(function(resolve, reject){
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', info.url);
+    xhr.setRequestHeader('Content-Type', file.type);
+    xhr.upload.onprogress = function(e){
+      if(e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100));
+    };
+    xhr.onload  = function(){ (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('Video upload failed (' + xhr.status + ')')); };
+    xhr.onerror = function(){ reject(new Error('Video upload failed — check the bucket CORS rules')); };
+    xhr.send(file);
+  });
+  return info.key;
+}
+
+/* Captures a JPEG frame from a local video file. Resolves null if the
+   browser can't decode it (e.g. some iPhone HEVC .mov on desktop Chrome). */
+function captureVideoPoster(file){
+  return new Promise(function(resolve){
+    var url = URL.createObjectURL(file);
+    var v = document.createElement('video');
+    var done = false;
+    function finish(blob){ if(done) return; done = true; URL.revokeObjectURL(url); resolve(blob); }
+    v.muted = true; v.playsInline = true; v.preload = 'metadata';
+    v.onerror = function(){ finish(null); };
+    v.onloadedmetadata = function(){ v.currentTime = Math.min(1, (v.duration || 2) / 2); };
+    v.onseeked = function(){
+      try{
+        var w = Math.min(640, v.videoWidth || 640);
+        var h = Math.round(w * (v.videoHeight || 360) / (v.videoWidth || 640));
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(v, 0, 0, w, h);
+        c.toBlob(function(b){ finish(b); }, 'image/jpeg', 0.8);
+      }catch(e){ finish(null); }
+    };
+    setTimeout(function(){ finish(null); }, 15000);
+    v.src = url;
+  });
+}
+
+/* LEGACY: Upload a video file to Cloudinary (resource_type: video). No longer used for new uploads.
    No client-side re-encoding — videos are uploaded as-is.
    Same unsigned preset/cloud as photos; Cloudinary presets are
    resource-type agnostic unless explicitly restricted. */
@@ -1853,8 +1931,8 @@ async function uploadPhotos(files){
       toast(' ', 'Skipped ' + file.name, 'Not a supported photo or video type');
       continue;
     }
-    if(isVideo && file.size > MAX_COMPRESSIBLE_BYTES){
-      toast(' ', 'Skipped ' + file.name, 'Video too large to compress in-browser — trim it and try again');
+    if(isVideo && file.size > MAX_B2_VIDEO_BYTES){
+      toast(' ', 'Skipped ' + file.name, 'Video is over 2GB — trim it and try again');
       continue;
     }
 
@@ -1880,35 +1958,33 @@ async function uploadPhotos(files){
       var folder = selectedEventId;
 
       if(isVideo){
-        /* Videos over the plan's cap get downscaled/re-encoded right in the
-           browser (ffmpeg.wasm) before upload. Files already under the cap
-           upload as-is, no re-encoding. Poster thumbnail is derived from the
-           video URL itself (no extra upload/API call needed). */
-        var uploadFile = file;
-        if(file.size > MAX_VIDEO_BYTES){
-          setStatus('Compressing video… 0%', 5, '');
-          uploadFile = await compressVideoToFit(file, MAX_VIDEO_BYTES, function(pct){
-            setStatus('Compressing video… ' + pct + '%', 5 + Math.round(pct * 0.5), '');
-          });
-          if(uploadFile.size > MAX_VIDEO_BYTES){
-            toast(' ', 'Skipped ' + file.name, 'Still over 100MB after compression — trim it and try again');
-            setStatus('Failed', 100, '#e33');
-            continue;
-          }
-        }
-        setStatus('Uploading video…', 60, '');
-        var vidResult  = await uploadVideoToCloudinary(uploadFile, folder + '/original');
-        var posterUrl  = cloudinaryVideoPosterUrl(vidResult.secure_url);
+        /* Videos go straight to the private B2 bucket, no re-encoding. */
+        setStatus('Uploading video… 0%', 3, '');
+        var b2Key = await b2UploadVideo(file, selectedEventId, function(pct){
+          setStatus('Uploading video… ' + pct + '%', 3 + Math.round(pct * 0.8), '');
+        });
 
-        setStatus('Saving record…', 85, '');
+        setStatus('Creating thumbnail…', 85, '');
+        var posterBlob = await captureVideoPoster(file);
+        var posterUrl = '', posterId = '';
+        if(posterBlob){
+          try{
+            var posterRes = await uploadToCloudinary(posterBlob, folder + '/thumb');
+            posterUrl = posterRes.secure_url; posterId = posterRes.public_id;
+          }catch(pe){ console.warn('[video poster] upload failed:', pe.message); }
+        }
+
+        setStatus('Saving record…', 95, '');
         await addDoc(collection(db, 'photos'), {
-          event_id      : selectedEventId,
-          media_type    : 'video',
-          preview_url   : posterUrl,
-          web_url       : vidResult.secure_url,
-          original_url  : vidResult.secure_url,
-          cloudinary_id : vidResult.public_id,
-          created_at    : serverTimestamp()
+          event_id        : selectedEventId,
+          media_type      : 'video',
+          storage         : 'b2',
+          b2_key          : b2Key,
+          preview_url     : posterUrl,
+          poster_public_id: posterId,
+          web_url         : '',
+          original_url    : '',
+          created_at      : serverTimestamp()
         });
 
         setStatus(' Done', 100, 'var(--green)');
@@ -1994,6 +2070,8 @@ async function loadEventPhotos(){
             cloudinary_id   : p.cloudinary_id || '',
             web_public_id   : p.web_public_id || '',
             thumb_public_id : p.thumb_public_id || '',
+            b2_key          : p.b2_key || '',
+            poster_public_id: p.poster_public_id || '',
             media_type      : p.media_type || 'photo'
           };
           var viewUrl = p.web_url || p.preview_url;
@@ -2092,13 +2170,14 @@ async function epBulkDeleteSelected(){
    by a failed call here still show up later in Cloudinary Cleanup. */
 async function deletePhotoCore(id, meta){
   meta = meta || {};
-  var ids = [meta.cloudinary_id, meta.web_public_id, meta.thumb_public_id].filter(Boolean);
+  var delBody = buildDeleteBody(meta);
+  var ids = delBody.publicIds.concat(delBody.b2Keys);
   var cloudinaryOk = true;
   if(ids.length){
     try{
       var res = await fetch(EVENTS_API + '/api/delete-photo', {
         method:'POST', headers:Object.assign({'Content-Type':'application/json'}, await _igAuthHeader()),
-        body: JSON.stringify({ publicIds: ids, resourceType: meta.media_type === 'video' ? 'video' : 'image' })
+        body: JSON.stringify(delBody)
       });
       if(!res.ok){
         cloudinaryOk = false;
