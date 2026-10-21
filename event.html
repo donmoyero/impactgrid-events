@@ -978,7 +978,95 @@ input,textarea,select{font-family:inherit;}
 .drive-videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px;}
 .drive-video{background:var(--card,#fff);border:1px solid var(--border,rgba(0,0,0,.1));border-radius:14px;overflow:hidden;}
 .drive-video-frame{position:relative;aspect-ratio:16/9;background:#000;}
-.drive-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.drive-video-poster{position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;margin:0;cursor:pointer;display:block;overflow:hidden;background:radial-gradient(120% 120% at 20% 10%,#2c2c2c 0%,#0b0b0b 70%);}
+.drive-video-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease;}
+.drive-video-poster:hover img{transform:scale(1.04);}
+.drive-video-poster::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,.05) 55%);}
+.drive-video-poster:focus-visible{outline:3px solid #d4b106;outline-offset:-3px;}
+.dv-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid #d4b106;display:flex;align-items:center;justify-content:center;z-index:2;backdrop-filter:blur(3px);transition:transform .2s,background .2s;}
+.dv-play svg{width:24px;height:24px;fill:#fff;margin-left:3px;}
+.drive-video-poster:hover .dv-play{transform:translate(-50%,-50%) scale(1.1);background:#d4b106;}
+.drive-video-poster:hover .dv-play svg{fill:#000;}
+.dv-tag{position:absolute;left:12px;bottom:10px;z-index:2;font:600 10px/1 'DM Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);}
+
+/* ── ImpactGrid Player (full-screen video overlay) ── */
+.igp{position:fixed;inset:0;z-index:1100;background:#000;color:#fff;--igp-accent:#d4b106;font-family:'DM Sans',sans-serif;-webkit-user-select:none;user-select:none;animation:fadeIn .2s ease;}
+.igp-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;}
+.igp-video{width:100%;height:100%;object-fit:contain;background:#000;outline:none;}
+.igp-video.hidden{display:none!important;}
+.igp-fallback{position:absolute;inset:0;padding-top:64px;display:flex;}
+.igp-fallback iframe{flex:1;width:100%;border:0;}
+.igp-top{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 30px;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);transition:opacity .3s;}
+.igp-brand{display:flex;align-items:center;gap:8px;font:800 12px/1 'Syne','DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;}
+.igp-brand b{color:var(--igp-accent);font-weight:800;}
+.igp-mark{width:22px;height:22px;border-radius:6px;background:var(--igp-accent);display:flex;align-items:center;justify-content:center;}
+.igp-mark svg{width:11px;height:11px;fill:#000;margin-left:1px;}
+.igp-eq{display:flex;align-items:flex-end;gap:2px;height:12px;}
+.igp-eq i{display:block;width:3px;height:3px;border-radius:1px;background:var(--igp-accent);}
+.igp.playing .igp-eq i{animation:igpEq .9s ease-in-out infinite;}
+.igp.playing .igp-eq i:nth-child(2){animation-delay:.15s;}
+.igp.playing .igp-eq i:nth-child(3){animation-delay:.3s;}
+@keyframes igpEq{0%,100%{height:3px}50%{height:12px}}
+.igp-title{flex:1;min-width:0;padding-left:12px;border-left:1px solid rgba(255,255,255,.22);font-size:13px;font-weight:600;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.igp-x{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;}
+.igp-x:hover{background:rgba(255,255,255,.25);}
+.igp-bar{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:34px 16px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(0,0,0,.88),transparent);transition:opacity .3s;}
+.igp-seek{position:relative;height:20px;display:flex;align-items:center;cursor:pointer;touch-action:none;}
+.igp-track{position:relative;width:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.22);transition:height .15s;}
+.igp-seek:hover .igp-track,.igp-seek.drag .igp-track{height:6px;}
+.igp-buf,.igp-fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;}
+.igp-buf{background:rgba(255,255,255,.28);}
+.igp-fill{background:var(--igp-accent);}
+.igp-knob{position:absolute;top:50%;left:0;width:14px;height:14px;border-radius:50%;background:var(--igp-accent);transform:translate(-50%,-50%) scale(0);transition:transform .15s;box-shadow:0 0 0 4px rgba(212,177,6,.28);}
+.igp-seek:hover .igp-knob,.igp-seek.drag .igp-knob{transform:translate(-50%,-50%) scale(1);}
+.igp-row{display:flex;align-items:center;gap:4px;margin-top:2px;}
+.igp-btn{background:none;border:0;color:#fff;min-width:40px;height:40px;padding:0 6px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;opacity:.92;font:700 12px 'DM Mono',monospace;}
+.igp-btn:hover{background:rgba(255,255,255,.14);opacity:1;}
+.igp-btn svg{width:22px;height:22px;fill:currentColor;}
+.igp-time{margin:0 8px;font:500 12px 'DM Mono',monospace;opacity:.8;white-space:nowrap;}
+.igp-spacer{flex:1;}
+.igp-vol{width:70px;accent-color:var(--igp-accent);}
+.igp .i-pause,.igp .i-mute{display:none;}
+.igp.playing .i-pause{display:inline;}
+.igp.playing .i-play{display:none;}
+.igp.muted .i-mute{display:inline;}
+.igp.muted .i-vol{display:none;}
+.igp-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:22px;line-height:1;cursor:pointer;transition:opacity .3s,background .2s;}
+.igp-nav:hover{background:rgba(255,255,255,.25);}
+.igp-prev{left:14px;}
+.igp-next{right:14px;}
+.igp-big{position:absolute;top:50%;left:50%;z-index:4;transform:translate(-50%,-50%);width:84px;height:84px;border-radius:50%;background:rgba(0,0,0,.55);border:2px solid var(--igp-accent);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;pointer-events:none;animation:igpPulse 2s ease-out infinite;}
+.igp-big svg{width:34px;height:34px;fill:#fff;margin-left:4px;}
+.igp-big.hidden{display:none!important;}
+@keyframes igpPulse{0%{box-shadow:0 0 0 0 rgba(212,177,6,.5)}100%{box-shadow:0 0 0 26px rgba(212,177,6,0)}}
+.igp-spin{position:absolute;top:50%;left:50%;z-index:3;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--igp-accent);animation:igpSpin .8s linear infinite;pointer-events:none;}
+.igp-spin.hidden{display:none!important;}
+@keyframes igpSpin{to{transform:rotate(360deg)}}
+.igp.igp-idle{cursor:none;}
+.igp.igp-idle .igp-top,.igp.igp-idle .igp-bar,.igp.igp-idle .igp-nav{opacity:0;pointer-events:none;}
+.igp.igp-fb .igp-bar{display:none;}
+.igp-intro{position:absolute;inset:0;z-index:8;background:radial-gradient(circle at 50% 45%,#1b1b1b,#000 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 24px;text-align:center;transition:opacity .5s,visibility .5s;}
+.igp-intro.out{opacity:0;visibility:hidden;pointer-events:none;}
+.igp-intro-mark{width:64px;height:64px;border-radius:18px;background:var(--igp-accent);display:flex;align-items:center;justify-content:center;}
+.igp-intro-mark svg{width:26px;height:26px;fill:#000;margin-left:3px;}
+.igp-intro-name{font:800 18px/1 'Syne','DM Sans',sans-serif;letter-spacing:.32em;text-transform:uppercase;}
+.igp-intro-name b{color:var(--igp-accent);font-weight:800;}
+.igp-intro-line{height:2px;width:0;background:linear-gradient(90deg,transparent,var(--igp-accent),transparent);}
+.igp-intro-sub{max-width:80vw;font:500 10px 'DM Mono',monospace;letter-spacing:.22em;text-transform:uppercase;opacity:.55;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.igp-intro.go .igp-intro-mark{animation:igpPop .7s cubic-bezier(.34,1.56,.64,1) both;}
+.igp-intro.go .igp-intro-name{animation:igpRise .7s .15s ease both;}
+.igp-intro.go .igp-intro-line{animation:igpLine 1s .2s ease forwards;}
+.igp-intro.go .igp-intro-sub{animation:igpRise .7s .3s ease both;}
+@keyframes igpPop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes igpRise{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes igpLine{to{width:min(240px,60vw)}}
+@media(max-width:640px){
+  .igp-vol,.igp-skip{display:none;}
+  .igp-btn{min-width:36px;height:36px;}
+  .igp-time{margin:0 4px;}
+  .igp-brand span.igp-word{display:none;}
+}
+@media(prefers-reduced-motion:reduce){.igp *{animation:none!important;}}
 .drive-video-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;}
 .drive-video-name{font-size:13.5px;font-weight:700;color:var(--text,#111);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .drive-video-links{display:flex;gap:12px;font-size:12.5px;}
@@ -1139,6 +1227,59 @@ input,textarea,select{font-family:inherit;}
   <div class="lightbox-actions" onclick="event.stopPropagation()">
     <button id="lbDownloadBtn" class="lb-btn lb-btn-dl" onclick="lbDownload()">Save Photo</button>
     <button class="lb-btn lb-btn-ghost" onclick="closeLightbox()">Close</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ IMPACTGRID PLAYER ══════════════════════════════════════ -->
+<div class="igp hidden" id="igp" role="dialog" aria-modal="true" aria-label="ImpactGrid Player">
+  <div class="igp-stage" id="igpStage">
+    <video class="igp-video" id="igpVideo" playsinline preload="auto"></video>
+    <div class="igp-fallback hidden" id="igpFallback"></div>
+    <div class="igp-spin hidden" id="igpSpin"></div>
+    <div class="igp-big hidden" id="igpBig"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+    <div class="igp-intro" id="igpIntro">
+      <div class="igp-intro-mark"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="igp-intro-name">Impact<b>Grid</b> Player</div>
+      <div class="igp-intro-line"></div>
+      <div class="igp-intro-sub" id="igpIntroSub"></div>
+    </div>
+  </div>
+
+  <div class="igp-top" id="igpTop">
+    <div class="igp-brand">
+      <div class="igp-mark"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <span class="igp-word">Impact<b>Grid</b> Player</span>
+      <div class="igp-eq" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+    <div class="igp-title" id="igpTitle"></div>
+    <button type="button" class="igp-x" id="igpClose" onclick="IGP.close()">Close</button>
+  </div>
+
+  <button type="button" class="igp-nav igp-prev hidden" id="igpPrev" onclick="IGP.step(-1)" aria-label="Previous video">&#8249;</button>
+  <button type="button" class="igp-nav igp-next hidden" id="igpNext" onclick="IGP.step(1)" aria-label="Next video">&#8250;</button>
+
+  <div class="igp-bar" id="igpBar">
+    <div class="igp-seek" id="igpSeek" role="slider" aria-label="Seek">
+      <div class="igp-track"><div class="igp-buf" id="igpBuf"></div><div class="igp-fill" id="igpFill"></div><div class="igp-knob" id="igpKnob"></div></div>
+    </div>
+    <div class="igp-row">
+      <button type="button" class="igp-btn" onclick="IGP.toggle()" aria-label="Play or pause">
+        <svg class="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </button>
+      <button type="button" class="igp-btn igp-skip" onclick="IGP.skip(-10)" aria-label="Back 10 seconds" title="Back 10s"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg></button>
+      <button type="button" class="igp-btn igp-skip" onclick="IGP.skip(10)" aria-label="Forward 10 seconds" title="Forward 10s"><svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7a6 6 0 106 6h2a8 8 0 11-8-8z"/></svg></button>
+      <button type="button" class="igp-btn" onclick="IGP.mute()" aria-label="Mute">
+        <svg class="i-vol" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8v8a4.5 4.5 0 002.5-4z"/></svg>
+        <svg class="i-mute" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13 .6L17.4 8 20 10.6 22.6 8 24 9.4 21.4 12 24 14.6 22.6 16 20 13.4 17.4 16 16 14.6 18.6 12z"/></svg>
+      </button>
+      <input type="range" class="igp-vol" id="igpVol" min="0" max="1" step="0.05" value="1" aria-label="Volume"/>
+      <div class="igp-time"><span id="igpCur">0:00</span> / <span id="igpDur">0:00</span></div>
+      <div class="igp-spacer"></div>
+      <button type="button" class="igp-btn" id="igpSpeed" onclick="IGP.speed()" aria-label="Playback speed">1&times;</button>
+      <button type="button" class="igp-btn" id="igpSave" onclick="driveSaveVideo(IGP.currentId(), this)" aria-label="Save video" title="Save video"><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg></button>
+      <button type="button" class="igp-btn" onclick="IGP.fullscreen()" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+    </div>
   </div>
 </div>
 
@@ -2709,13 +2850,15 @@ function renderDriveVideos(ev){
   if(!list.length){ sec.style.display = 'none'; return; }
   document.getElementById('videoCountNum').textContent = list.length;
   document.getElementById('videoCountLabel').textContent = list.length === 1 ? 'video' : 'videos';
-  grid.innerHTML = list.map(function(v, i){
-    var id = v.id, title = v.title || ('Video ' + (i + 1));
+  window._igpList = list.map(function(v, i){ return { id: v.id, title: v.title || ('Video ' + (i + 1)) }; });
+  grid.innerHTML = window._igpList.map(function(v, i){
     return '<div class="drive-video">'
-      + '<div class="drive-video-frame"><iframe src="https://drive.google.com/file/d/' + id + '/preview" title="' + esc(title) + '" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>'
-      + '<div class="drive-video-meta"><div class="drive-video-name">' + esc(title) + '</div>'
-      + '<div class="drive-video-links"><a href="https://drive.google.com/file/d/' + id + '/view" target="_blank" rel="noopener">Open in Drive</a>'
-      + '<a href="https://drive.google.com/uc?export=download&id=' + id + '" onclick="return driveSaveVideo(\'' + id + '\', this)">Save video</a></div></div>'
+      + '<div class="drive-video-frame"><button type="button" class="drive-video-poster" onclick="igpOpen(' + i + ')" aria-label="Play ' + esc(v.title) + ' in ImpactGrid Player">'
+      +   '<img src="https://drive.google.com/thumbnail?id=' + v.id + '&sz=w800" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">'
+      +   '<span class="dv-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>'
+      +   '<span class="dv-tag">ImpactGrid Player</span></button></div>'
+      + '<div class="drive-video-meta"><div class="drive-video-name">' + esc(v.title) + '</div>'
+      + '<div class="drive-video-links"><a href="https://drive.google.com/uc?export=download&id=' + v.id + '" data-title="' + esc(v.title) + '" onclick="return driveSaveVideo(\'' + v.id + '\', this)">Save video</a></div></div>'
       + '</div>';
   }).join('');
   sec.style.display = '';
@@ -2753,7 +2896,7 @@ function driveSaveVideo(id, linkEl){
   var fallback = 'https://drive.google.com/uc?export=download&id=' + id;
   if(!window.fetch) return true;                             /* let the normal link work */
   if(_driveDl) return false;
-  var name = ((linkEl && linkEl.closest('.drive-video').querySelector('.drive-video-name').textContent) || 'Video')
+  var name = ((linkEl && (linkEl.getAttribute('data-title') || (linkEl.closest('.drive-video') && linkEl.closest('.drive-video').querySelector('.drive-video-name').textContent))) || 'Video')
     .replace(/[^\w .-]+/g, '').trim().slice(0, 60) || 'Video';
   var ctrl = new AbortController(); _driveDl = { ctrl: ctrl };
   driveOverlay('Preparing video', 'Keep this page open. Large videos can take a minute.', 0);
@@ -2791,6 +2934,247 @@ function driveSaveVideo(id, linkEl){
   return false;
 }
 window.driveSaveVideo = driveSaveVideo;
+
+/* ══════════════════════════════════════
+   IMPACTGRID PLAYER
+   Full-screen overlay for the gallery's Drive videos. Branded intro, custom
+   controls (seek, ±10s, volume, speed, full screen, save), keyboard shortcuts.
+   Streams through our API (/api/drive-video/:id); if that can't play the file
+   it falls back to Drive's own preview player inside the same overlay.
+══════════════════════════════════════ */
+var IGP = (function(){
+  var root, vid, list = [], idx = 0, opener = null, ready = false;
+  var introReady = false, mediaReady = false, introOut = false, started = false, inFb = false, scrub = false;
+  var introT = null, failT = null, idleT = null, speedI = 0;
+  var SPEEDS = [1, 1.25, 1.5, 2, 0.5];
+
+  function $(id){ return document.getElementById(id); }
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+  function fmt(t){
+    if(!isFinite(t) || t < 0) t = 0;
+    var m = Math.floor(t / 60), r = Math.floor(t % 60), h = Math.floor(m / 60);
+    return h ? (h + ':' + ('0' + (m % 60)).slice(-2) + ':' + ('0' + r).slice(-2)) : (m + ':' + ('0' + r).slice(-2));
+  }
+  function fsEl(){ return document.fullscreenElement || document.webkitFullscreenElement; }
+  function isOpen(){ return root && !root.classList.contains('hidden'); }
+  function spin(on){ $('igpSpin').classList.toggle('hidden', !on); }
+  function setProg(r){ $('igpFill').style.width = (r * 100) + '%'; $('igpKnob').style.left = (r * 100) + '%'; }
+
+  function refreshBig(){
+    var show = vid.paused && introOut && !inFb;
+    $('igpBig').classList.toggle('hidden', !show);
+  }
+  function syncPlay(){
+    var playing = !vid.paused && !vid.ended;
+    root.classList.toggle('playing', playing);
+    refreshBig();
+    if(playing) wake(); else { root.classList.remove('igp-idle'); clearTimeout(idleT); }
+  }
+  function syncVol(){
+    var m = vid.muted || vid.volume === 0;
+    root.classList.toggle('muted', m);
+    $('igpVol').value = m ? 0 : vid.volume;
+  }
+  function tick(){
+    var d = vid.duration;
+    $('igpDur').textContent = fmt(d);
+    if(scrub) return;
+    $('igpCur').textContent = fmt(vid.currentTime);
+    setProg((isFinite(d) && d) ? clamp(vid.currentTime / d, 0, 1) : 0);
+  }
+  function buffered(){
+    var d = vid.duration, w = 0;
+    if(isFinite(d) && d && vid.buffered.length) w = clamp(vid.buffered.end(vid.buffered.length - 1) / d, 0, 1);
+    $('igpBuf').style.width = (w * 100) + '%';
+  }
+  function wake(){
+    root.classList.remove('igp-idle');
+    clearTimeout(idleT);
+    if(vid.paused || inFb) return;
+    idleT = setTimeout(function(){
+      if(scrub || $('igpBar').matches(':hover')) return wake();
+      root.classList.add('igp-idle');
+    }, 2800);
+  }
+
+  function tryStart(){
+    if(started || inFb || !introReady || !mediaReady) return;
+    started = true;
+    $('igpIntro').classList.add('out');
+    introOut = true;
+    var p = vid.play();
+    if(p && p.catch) p.catch(function(){ refreshBig(); });   /* autoplay blocked: big play button shows */
+    refreshBig();
+  }
+
+  function toFallback(){
+    if(inFb || !isOpen()) return;
+    inFb = true;
+    clearTimeout(failT); clearTimeout(introT);
+    vid.pause(); vid.removeAttribute('src'); vid.load();
+    vid.classList.add('hidden');
+    var v = list[idx];
+    var fb = $('igpFallback');
+    fb.innerHTML = '<iframe src="https://drive.google.com/file/d/' + v.id + '/preview" title="' + esc(v.title) + '" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>';
+    fb.classList.remove('hidden');
+    root.classList.add('igp-fb');
+    root.classList.remove('playing', 'igp-idle');
+    $('igpIntro').classList.add('out');
+    introOut = true;
+    spin(false);
+    $('igpBig').classList.add('hidden');
+  }
+
+  function load(i){
+    idx = (i + list.length) % list.length;
+    var v = list[idx];
+    inFb = false; started = false; introReady = false; mediaReady = false; introOut = false;
+    clearTimeout(introT); clearTimeout(failT); clearTimeout(idleT);
+    root.classList.remove('igp-fb', 'igp-idle', 'playing');
+    var fb = $('igpFallback'); fb.classList.add('hidden'); fb.innerHTML = '';
+    vid.classList.remove('hidden');
+    $('igpTitle').textContent = v.title;
+    $('igpIntroSub').textContent = v.title;
+    $('igpBig').classList.add('hidden');
+    spin(false);
+    $('igpPrev').classList.toggle('hidden', list.length < 2);
+    $('igpNext').classList.toggle('hidden', list.length < 2);
+    var intro = $('igpIntro');
+    intro.classList.remove('go', 'out'); void intro.offsetWidth; intro.classList.add('go');   /* replay the intro animation */
+    setProg(0); $('igpBuf').style.width = '0%'; $('igpCur').textContent = '0:00'; $('igpDur').textContent = '0:00';
+    vid.pause(); vid.removeAttribute('src'); vid.load();
+    vid.defaultPlaybackRate = SPEEDS[speedI]; vid.playbackRate = SPEEDS[speedI];
+    vid.src = EVENTS_API + '/api/drive-video/' + encodeURIComponent(v.id);
+    vid.load();
+    introT = setTimeout(function(){ introReady = true; if(!mediaReady) spin(true); tryStart(); }, 1300);
+    failT  = setTimeout(function(){ if(!mediaReady) toFallback(); }, 25000);   /* slow wake-up or Drive refusal */
+    syncVol();
+  }
+
+  function init(){
+    if(ready) return true;
+    root = $('igp'); vid = $('igpVideo');
+    if(!root || !vid) return false;
+    ready = true;
+
+    vid.addEventListener('play', syncPlay);
+    vid.addEventListener('pause', syncPlay);
+    vid.addEventListener('ended', syncPlay);
+    vid.addEventListener('timeupdate', tick);
+    vid.addEventListener('loadedmetadata', tick);
+    vid.addEventListener('durationchange', tick);
+    vid.addEventListener('progress', buffered);
+    vid.addEventListener('waiting', function(){ if(introOut) spin(true); });
+    vid.addEventListener('playing', function(){ spin(false); });
+    vid.addEventListener('canplay', function(){ mediaReady = true; spin(false); tryStart(); });
+    vid.addEventListener('volumechange', syncVol);
+    vid.addEventListener('error', function(){ if(vid.getAttribute('src')) toFallback(); });
+
+    /* tap the picture = play / pause, double-tap = full screen */
+    var stage = $('igpStage');
+    stage.addEventListener('click', function(){
+      if(inFb || !introOut) return;
+      toggle(); wake();
+    });
+    stage.addEventListener('dblclick', function(){ if(!inFb && introOut) fullscreen(); });
+    root.addEventListener('pointermove', wake);
+    root.addEventListener('pointerdown', wake);
+
+    /* seek bar (drag with mouse or finger) */
+    var seek = $('igpSeek');
+    function ratio(e){ var r = seek.getBoundingClientRect(); return clamp((e.clientX - r.left) / r.width, 0, 1); }
+    function preview(e){ var r = ratio(e); setProg(r); $('igpCur').textContent = fmt(r * vid.duration); return r; }
+    seek.addEventListener('pointerdown', function(e){
+      if(!isFinite(vid.duration) || !vid.duration) return;
+      scrub = true; seek.classList.add('drag');
+      try{ seek.setPointerCapture(e.pointerId); }catch(_){}
+      preview(e);
+    });
+    seek.addEventListener('pointermove', function(e){ if(scrub) preview(e); });
+    function endScrub(e){
+      if(!scrub) return;
+      var r = ratio(e);
+      scrub = false; seek.classList.remove('drag');
+      vid.currentTime = r * vid.duration;
+      wake();
+    }
+    seek.addEventListener('pointerup', endScrub);
+    seek.addEventListener('pointercancel', function(){ scrub = false; seek.classList.remove('drag'); tick(); });
+
+    $('igpVol').addEventListener('input', function(){
+      vid.volume = parseFloat(this.value);
+      vid.muted = vid.volume === 0;
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(!isOpen() || e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target, tag = t && t.tagName, isRange = tag === 'INPUT';
+      var k = e.key;
+      if(k === 'Escape'){ e.preventDefault(); close(); return; }
+      if(inFb) return;
+      if(k === ' ' || k === 'k' || k === 'K'){
+        if(k === ' ' && tag === 'BUTTON') return;      /* let a focused button act on Space itself */
+        e.preventDefault(); toggle(); wake();
+      } else if(k === 'ArrowLeft'  && !isRange){ e.preventDefault(); skip(-5);  wake(); }
+      else if(k === 'ArrowRight'   && !isRange){ e.preventDefault(); skip(5);   wake(); }
+      else if(k === 'ArrowUp'      && !isRange){ e.preventDefault(); vid.muted = false; vid.volume = clamp(vid.volume + 0.1, 0, 1); wake(); }
+      else if(k === 'ArrowDown'    && !isRange){ e.preventDefault(); vid.volume = clamp(vid.volume - 0.1, 0, 1); wake(); }
+      else if(k === 'm' || k === 'M'){ mute(); wake(); }
+      else if(k === 'f' || k === 'F'){ fullscreen(); }
+    });
+    return true;
+  }
+
+  function open(i){
+    if(!init()) return;
+    list = window._igpList || [];
+    if(!list.length) return;
+    opener = document.activeElement;
+    root.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    load(i || 0);
+  }
+  function close(){
+    if(!isOpen()) return;
+    clearTimeout(introT); clearTimeout(failT); clearTimeout(idleT);
+    if(fsEl()){ try{ (document.exitFullscreen || document.webkitExitFullscreen).call(document); }catch(e){} }
+    vid.pause(); vid.removeAttribute('src'); vid.load();   /* also stops the download from the API */
+    $('igpFallback').innerHTML = '';
+    root.classList.add('hidden');
+    document.body.style.overflow = '';
+    if(opener && opener.focus){ try{ opener.focus({ preventScroll: true }); }catch(e){} }
+  }
+  function toggle(){
+    if(inFb) return;
+    if(vid.paused || vid.ended){ var p = vid.play(); if(p && p.catch) p.catch(function(){}); }
+    else vid.pause();
+  }
+  function skip(sec){
+    if(!isFinite(vid.duration)) return;
+    vid.currentTime = clamp(vid.currentTime + sec, 0, vid.duration);
+  }
+  function mute(){
+    if(vid.muted || vid.volume === 0){ vid.muted = false; if(vid.volume === 0) vid.volume = 0.6; }
+    else vid.muted = true;
+  }
+  function speed(){
+    speedI = (speedI + 1) % SPEEDS.length;
+    vid.defaultPlaybackRate = SPEEDS[speedI]; vid.playbackRate = SPEEDS[speedI];
+    $('igpSpeed').innerHTML = SPEEDS[speedI] + '&times;';
+  }
+  function fullscreen(){
+    if(fsEl()){ try{ (document.exitFullscreen || document.webkitExitFullscreen).call(document); }catch(e){} return; }
+    var rq = root.requestFullscreen || root.webkitRequestFullscreen;
+    if(rq){ var p = rq.call(root); if(p && p.catch) p.catch(function(){}); }
+    else if(vid.webkitEnterFullscreen){ vid.webkitEnterFullscreen(); }   /* iPhone Safari: native video full screen */
+  }
+  function step(d){ if(list.length > 1) load(idx + d); }
+  function currentId(){ return list[idx] ? list[idx].id : ''; }
+
+  return { open: open, close: close, toggle: toggle, skip: skip, mute: mute, speed: speed, fullscreen: fullscreen, step: step, currentId: currentId };
+})();
+function igpOpen(i){ IGP.open(i); }
+window.igpOpen = igpOpen;
 (function(){ var y = document.getElementById('evFooterYear'); if(y) y.textContent = new Date().getFullYear(); })();
 
 /* ══════════════════════════════════════
