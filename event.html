@@ -2943,12 +2943,18 @@ function driveSaveVideo(id, linkEl){
     var mime = /^video\//.test(res.type) ? res.type : 'video/mp4';
     var ext = mime === 'video/quicktime' ? 'mov' : (mime === 'video/webm' ? 'webm' : 'mp4');
     var file = new File([res.blob], name + '.' + ext, { type: mime });
-    var canShare = false; try{ canShare = isSafariIOS() && navigator.canShare && navigator.canShare({ files: [file] }); }catch(e){}
+    /* iPhone/iPad: always offer the Save to Photos button. canShare() can wrongly say no for big files,
+       and the old silent fallback dropped the video into Files with no explanation. */
+    var canShare = false; try{ canShare = isSafariIOS() && !!navigator.share; }catch(e){}
     if(!canShare){ driveDlClose(); driveFileDownload(file); toast('Video saved!', 'Check your Downloads / Gallery'); return; }
     /* iPhone: share() needs a fresh tap, so ask for one now that the file is ready */
     driveOverlay('Video ready', 'Tap <b>Save to Photos</b>, then choose <b>Save Video</b> in the share sheet.', null, 'Save to Photos', function(){
       navigator.share({ files: [file], title: name }).then(function(){ driveDlClose(); toast('Video saved!', 'Check your Photos'); })
-        .catch(function(e){ if(e && e.name !== 'AbortError'){ driveDlClose(); driveFileDownload(file); } });
+        .catch(function(e){
+          if(e && e.name === 'AbortError') return;   /* they closed the share sheet: leave the button so they can tap again */
+          driveDlClose(); driveFileDownload(file);
+          toast('Saved to Files', 'Open Files, then Downloads, tap the video, Share, Save Video');
+        });
     });
   }).catch(function(e){
     if(e && e.name === 'AbortError') return;
