@@ -2916,7 +2916,7 @@ function driveSaveVideo(id, linkEl){
       var known = info && info.size || 0;
       /* iPhone/iPad + big file: holding it all in page memory makes Safari drop it, so use a native download instead.
          Safari shows its own progress in the toolbar; the file lands in Files -> Share -> Save Video. */
-      if(known > 400 * 1048576 && isSafariIOS()){
+      if(known > 100 * 1048576 && isSafariIOS()){   /* above ~100 MB the in-page file build can crash iPhone Safari */
         driveOverlay('Large video (' + mb(known) + ')', 'Tap <b>Download</b>. Safari shows the progress in the toolbar. When it finishes, open it from Downloads, tap Share, then <b>Save Video</b>.', null, 'Download', function(){
           window.location.href = url + '?dl=1&name=' + encodeURIComponent(name);
         });
