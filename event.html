@@ -2904,22 +2904,42 @@ function driveSaveVideo(id, linkEl){
   var name = ((linkEl && (linkEl.getAttribute('data-title') || (linkEl.closest('.drive-video') && linkEl.closest('.drive-video').querySelector('.drive-video-name').textContent))) || 'Video')
     .replace(/[^\w .-]+/g, '').trim().slice(0, 60) || 'Video';
   var ctrl = new AbortController(); _driveDl = { ctrl: ctrl };
-  driveOverlay('Preparing video', 'Keep this page open. Large videos can take a minute.', 0);
+  var SUB = 'Keep this page open. Large videos can take a minute.';
+  driveOverlay('Preparing video', SUB, 0);
   var url = EVENTS_API + '/api/drive-video/' + encodeURIComponent(id);   /* API streams it from Drive; key stays on the server */
-  fetch(url, { signal: ctrl.signal }).then(function(r){
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    var total = parseInt(r.headers.get('Content-Length') || '0', 10), got = 0, chunks = [], type = r.headers.get('Content-Type') || '';
-    if(!r.body || !r.body.getReader) return r.blob().then(function(b){ return { blob: b, type: type }; });
-    var rd = r.body.getReader();
-    return (function pump(){
-      return rd.read().then(function(x){
-        if(x.done) return { blob: new Blob(chunks), type: type };
-        chunks.push(x.value); got += x.value.length;
-        if(total) driveOverlay('Preparing video', 'Keep this page open. Large videos can take a minute.', Math.round(got / total * 100));
-        return pump();
+  var mb = function(n){ return (n / 1048576).toFixed(n > 10485760 ? 0 : 1) + ' MB'; };
+  /* 1) ask the API for the real file size first, so the percentage works even if Drive sends no Content-Length */
+  fetch(EVENTS_API + '/api/drive-video-info/' + encodeURIComponent(id), { signal: ctrl.signal })
+    .then(function(r){ return r.ok ? r.json() : { size: 0 }; })
+    .catch(function(e){ if(e && e.name === 'AbortError') throw e; return { size: 0 }; })
+    .then(function(info){
+      var known = info && info.size || 0;
+      /* iPhone/iPad + big file: holding it all in page memory makes Safari drop it, so use a native download instead.
+         Safari shows its own progress in the toolbar; the file lands in Files -> Share -> Save Video. */
+      if(known > 400 * 1048576 && isSafariIOS()){
+        driveOverlay('Large video (' + mb(known) + ')', 'Tap <b>Download</b>. Safari shows the progress in the toolbar. When it finishes, open it from Downloads, tap Share, then <b>Save Video</b>.', null, 'Download', function(){
+          window.location.href = url + '?dl=1&name=' + encodeURIComponent(name);
+        });
+        _driveDl = null;
+        return null;
+      }
+      return fetch(url, { signal: ctrl.signal }).then(function(r){
+        if(!r.ok) throw new Error('HTTP ' + r.status);
+        var total = known || parseInt(r.headers.get('Content-Length') || '0', 10), got = 0, chunks = [], type = r.headers.get('Content-Type') || '';
+        if(!r.body || !r.body.getReader) return r.blob().then(function(b){ return { blob: b, type: type }; });
+        var rd = r.body.getReader();
+        return (function pump(){
+          return rd.read().then(function(x){
+            if(x.done) return { blob: new Blob(chunks), type: type };
+            chunks.push(x.value); got += x.value.length;
+            if(total) driveOverlay('Downloading ' + Math.min(100, Math.round(got / total * 100)) + '%', mb(got) + ' of ' + mb(total) + '. ' + SUB, Math.min(100, Math.round(got / total * 100)));
+            else driveOverlay('Downloading', mb(got) + ' so far. ' + SUB, null);
+            return pump();
+          });
+        })();
       });
-    })();
-  }).then(function(res){
+    }).then(function(res){
+    if(!res) return;
     var mime = /^video\//.test(res.type) ? res.type : 'video/mp4';
     var ext = mime === 'video/quicktime' ? 'mov' : (mime === 'video/webm' ? 'webm' : 'mp4');
     var file = new File([res.blob], name + '.' + ext, { type: mime });
