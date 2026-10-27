@@ -40,8 +40,19 @@
   }
 
   /* ── Events (Firestore) ── */
+  function waitForDb() {
+    return new Promise(function (res, rej) {
+      if (typeof db !== 'undefined' && db) return res();
+      var n = 0, t = setInterval(function () {
+        if (typeof db !== 'undefined' && db) { clearInterval(t); res(); }
+        else if (++n > 120) { clearInterval(t); rej(new Error('database not ready')); }
+      }, 500);
+    });
+  }
+
   async function loadEventsPanel() {
     try {
+      await waitForDb();
       var snap = await db.collection('events').where('is_active', '==', true).get();
       setText('stat-events', snap.size);
       var evs = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
@@ -139,6 +150,7 @@
   /* ── Gallery visits (Firestore) → 14-day chart ── */
   async function loadVisits() {
     try {
+      await waitForDb();
       var snap;
       try { snap = await db.collection('event_page_visits').orderBy('visited_at', 'desc').limit(500).get(); }
       catch (idx) { snap = await db.collection('event_page_visits').limit(500).get(); }
