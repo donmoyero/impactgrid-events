@@ -236,6 +236,36 @@
       margin-top: 1px;
       font-family: 'DM Sans', sans-serif;
     }
+    .ig-hbtn {
+      width: 28px; height: 28px; flex-shrink: 0;
+      border: none; border-radius: 8px; cursor: pointer;
+      background: rgba(255,255,255,0.12); color: #ffffff;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .ig-hbtn:hover { background: rgba(255,255,255,0.25); }
+    #ig-chat-teaser {
+      position: fixed; z-index: 2147483000;
+      max-width: 250px; box-sizing: border-box;
+      background: #ffffff; color: #000000;
+      border: 1px solid #e5e5e5; border-radius: 14px;
+      padding: 12px 34px 12px 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.45;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      cursor: pointer;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+    }
+    #ig-chat-teaser.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #ig-chat-teaser b { font-weight: 700; }
+    #ig-teaser-x {
+      position: absolute; top: 6px; right: 6px;
+      width: 22px; height: 22px; border: none; border-radius: 50%;
+      background: transparent; color: #000000; font-size: 16px; line-height: 1;
+      cursor: pointer;
+    }
+    #ig-teaser-x:hover { background: #f0f0f0; }
     #ig-chat-codename-badge {
       font-size: 9px;
       font-weight: 700;
@@ -456,6 +486,12 @@
           <div id="ig-chat-header-status">Online</div>
         </div>
         <div id="ig-chat-codename-badge">${codename}</div>
+        <button class="ig-hbtn" id="ig-chat-min" type="button" aria-label="Minimise chat" title="Minimise">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="ig-hbtn" id="ig-chat-close" type="button" aria-label="Close chat" title="Close chat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
       <div id="ig-chat-messages"></div>
@@ -672,6 +708,56 @@
       unreadDot.style.display = 'flex';
     }
   }, isReturning ? 5000 : 9000);
+
+  /* ── Minimise / close buttons ──
+     Minimise: tuck the window away, the bubble stays so they can reopen.
+     Close: also hides the bubble for the rest of this browser session,
+     so it never sits on top of what they're trying to read. ── */
+  const SS = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+               set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} } };
+  document.getElementById('ig-chat-min').addEventListener('click', function () { if (isOpen) toggleChat(); });
+  document.getElementById('ig-chat-close').addEventListener('click', function () {
+    if (isOpen) toggleChat();
+    bubbleBtn.style.display = 'none';
+    hideTeaser();
+    SS.set('ig_chat_hidden', '1');
+  });
+  if (SS.get('ig_chat_hidden') === '1') bubbleBtn.style.display = 'none';
+
+  /* ── Friendly pop-up a few seconds after landing ──
+     Once per browser session, never if the chat is open/hidden, auto-fades,
+     and has its own × so it's never in the way. ── */
+  const teaser = document.createElement('div');
+  teaser.id = 'ig-chat-teaser';
+  teaser.innerHTML = '<button id="ig-teaser-x" type="button" aria-label="Dismiss">&times;</button><div id="ig-teaser-text"></div>';
+  document.body.appendChild(teaser);
+  let teaserTimer = null;
+  function hideTeaser() { teaser.classList.remove('show'); clearTimeout(teaserTimer); }
+  function placeTeaser() {
+    const r = bubbleBtn.getBoundingClientRect();
+    const onRight = r.left > window.innerWidth / 2;
+    teaser.style.bottom = (window.innerHeight - r.top + 12) + 'px';
+    if (onRight) { teaser.style.right = Math.max(8, window.innerWidth - r.right) + 'px'; teaser.style.left = 'auto'; }
+    else         { teaser.style.left  = Math.max(8, r.left) + 'px';                      teaser.style.right = 'auto'; }
+    teaser.style.top = 'auto';
+  }
+  function showTeaser() {
+    if (isOpen || SS.get('ig_teaser_done') === '1' || SS.get('ig_chat_hidden') === '1') return;
+    document.getElementById('ig-teaser-text').innerHTML = isReturning
+      ? '<b>Welcome back!</b> Want to pick up where we left off?'
+      : '<b>Hi, I&rsquo;m Dijo 👋</b> Planning an event? Ask me anything or check a date.';
+    placeTeaser();
+    teaser.classList.add('show');
+    SS.set('ig_teaser_done', '1');
+    teaserTimer = setTimeout(hideTeaser, 14000);
+  }
+  teaser.addEventListener('click', function (e) {
+    if (e.target.id === 'ig-teaser-x') { hideTeaser(); return; }
+    hideTeaser();
+    if (!isOpen) toggleChat();
+  });
+  bubbleBtn.addEventListener('click', hideTeaser);
+  setTimeout(showTeaser, 6000);
 
   /* ── Draggable bubble ──
      The launcher can be dragged anywhere on screen (mouse or touch). A small
