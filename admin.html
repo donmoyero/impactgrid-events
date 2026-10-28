@@ -4912,6 +4912,33 @@ function portfolioDeleteImage(idx) {
   portfolioCurrentCat.images.splice(idx, 1);
   portfolioRenderImages();
 }
+/* ── Bulk select / delete (changes are only saved when you press "Save Portfolio") ── */
+function portfolioToggleSel(idx, on) {
+  if (portfolioCurrentCat && portfolioCurrentCat.images[idx]) portfolioCurrentCat.images[idx]._sel = !!on;
+  portfolioRenderImages();
+}
+function portfolioSelectAll(on) {
+  if (!portfolioCurrentCat) return;
+  portfolioCurrentCat.images.forEach(function(i){ i._sel = !!on; });
+  portfolioRenderImages();
+}
+function portfolioDeleteSelected() {
+  if (!portfolioCurrentCat) return;
+  var n = portfolioCurrentCat.images.filter(function(i){ return i._sel; }).length;
+  if (!n) return;
+  if (!confirm('Remove ' + n + ' selected photo' + (n > 1 ? 's' : '') + ' from this portfolio? They are only removed for good when you press Save Portfolio.')) return;
+  portfolioCurrentCat.images = portfolioCurrentCat.images.filter(function(i){ return !i._sel; });
+  portfolioRenderImages();
+  toast('', n + ' photo' + (n > 1 ? 's' : '') + ' removed', 'Press Save Portfolio to keep this change.');
+}
+function portfolioDeleteAll() {
+  if (!portfolioCurrentCat || !portfolioCurrentCat.images.length) return;
+  var n = portfolioCurrentCat.images.length;
+  if (!confirm('Remove ALL ' + n + ' photos from this portfolio? They are only removed for good when you press Save Portfolio.')) return;
+  portfolioCurrentCat.images = [];
+  portfolioRenderImages();
+  toast('', 'All photos removed', 'Press Save Portfolio to keep this change.');
+}
 function portfolioMoveImage(idx, dir) {
   var arr = portfolioCurrentCat.images;
   var newIdx = idx + dir;
@@ -4973,7 +5000,17 @@ function portfolioRenderImages() {
     el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet — add some above.</div></div>';
     return;
   }
-  el.innerHTML = images.map(function(img, idx) {
+  var selCount = images.filter(function(i){ return i._sel; }).length;
+  var bar = '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);">' +
+      '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">' +
+        '<input type="checkbox" ' + (selCount === images.length ? 'checked' : '') + ' onchange="portfolioSelectAll(this.checked)"> Select all' +
+      '</label>' +
+      '<span style="font-size:12px;opacity:.7;">' + selCount + ' of ' + images.length + ' selected</span>' +
+      '<span style="flex:1;"></span>' +
+      '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" ' + (selCount ? '' : 'disabled') + ' onclick="portfolioDeleteSelected()">Delete selected (' + selCount + ')</button>' +
+      '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="portfolioDeleteAll()">Delete all</button>' +
+    '</div>';
+  el.innerHTML = bar + images.map(function(img, idx) {
     return '<div class="blog-page-card" draggable="true"' +
         ' ondragstart="portfolioDragStart(event,' + idx + ')"' +
         ' ondragover="portfolioDragOver(event)"' +
@@ -4983,6 +5020,7 @@ function portfolioRenderImages() {
         ' style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;background:var(--bg2);">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
         '<span style="display:flex;align-items:center;gap:8px;">' +
+          '<input type="checkbox" ' + (img._sel ? 'checked' : '') + ' onchange="portfolioToggleSel(' + idx + ',this.checked)" title="Select this photo" style="cursor:pointer;">' +
           '<span class="blog-page-handle" title="Drag to reorder">⠿⠿</span>' +
           '<span class="chip chip-gold">Photo ' + (idx + 1) + '</span>' +
         '</span>' +
@@ -5090,6 +5128,10 @@ window.portfolioCoverFileChange   = portfolioCoverFileChange;
 window.portfolioUploadCover       = portfolioUploadCover;
 window.portfolioAddImageFiles     = portfolioAddImageFiles;
 window.portfolioShuffleImages     = portfolioShuffleImages;
+window.portfolioToggleSel         = portfolioToggleSel;
+window.portfolioSelectAll         = portfolioSelectAll;
+window.portfolioDeleteSelected    = portfolioDeleteSelected;
+window.portfolioDeleteAll         = portfolioDeleteAll;
 window.portfolioSaveCategory      = portfolioSaveCategory;
 
 /* ════════════════════════════════════════
