@@ -713,8 +713,10 @@
      Minimise: tuck the window away, the bubble stays so they can reopen.
      Close: also hides the bubble for the rest of this browser session,
      so it never sits on top of what they're trying to read. ── */
-  const SS = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
-               set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} } };
+  /* Closing the chat is remembered permanently on this browser (localStorage), even after refresh or a
+     new visit. The pop-up teaser is still once per browser session. */
+  const SS = { get: function (k) { try { return (k === 'ig_chat_hidden' ? localStorage : sessionStorage).getItem(k); } catch (e) { return null; } },
+               set: function (k, v) { try { (k === 'ig_chat_hidden' ? localStorage : sessionStorage).setItem(k, v); } catch (e) {} } };
   document.getElementById('ig-chat-min').addEventListener('click', function () { if (isOpen) toggleChat(); });
   document.getElementById('ig-chat-close').addEventListener('click', function () {
     if (isOpen) toggleChat();
