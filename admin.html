@@ -703,20 +703,20 @@ tr:hover td{background:var(--bg2);}
       <!-- Stats row -->
       <div class="stats-row" style="margin-bottom:18px;grid-template-columns:repeat(2,1fr);" id="activity-stats-row">
         <div class="stat-card"><div class="stat-label">Total Visits</div><div class="stat-val" id="act-stat-visits" style="color:var(--blue);">—</div><div class="stat-sub">Sessions (refreshes not repeated)</div></div>
-        <div class="stat-card"><div class="stat-label">Unique Visitors</div><div class="stat-val" id="act-stat-unique" style="color:var(--gold);">—</div><div class="stat-sub">Distinct devices (no IPs)</div></div>
+        <div class="stat-card"><div class="stat-label">Devices</div><div class="stat-val" id="act-stat-unique" style="color:var(--gold);">—</div><div class="stat-sub">Distinct devices, older data grouped by browser</div></div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <!-- Device breakdown -->
         <div class="card">
-          <div class="card-head"><h2> Device Types</h2></div>
+          <div class="card-head"><h2> Device Types</h2><span style="font-size:11px;color:var(--text3);">Share of devices</span></div>
           <div class="card-body" id="act-devices">
             <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>
           </div>
         </div>
         <!-- Location breakdown -->
         <div class="card">
-          <div class="card-head"><h2> Visitor Locations</h2></div>
+          <div class="card-head"><h2> Visitor Locations</h2><span style="font-size:11px;color:var(--text3);">By visits</span></div>
           <div class="card-body" id="act-locations">
             <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>
           </div>
@@ -3010,41 +3010,6 @@ async function loadEventActivity(){
     }catch(e){}
   }
 
-  /*  Load visits from Firebase  */
-  try{
-    var visitsSnap;
-    try{
-      /* Try filtered + ordered (requires composite index if filtering by event_id) */
-      var visitsRef = eventId
-        ? db.collection('event_page_visits').where('event_id','==',eventId).orderBy('visited_at','desc').limit(1000)
-        : db.collection('event_page_visits').orderBy('visited_at','desc').limit(1000);
-      visitsSnap = await visitsRef.get();
-    }catch(idxErr){
-      /* Composite index not ready — fetch all and filter client-side */
-      console.warn('[Activity] index not ready, falling back to full fetch:', idxErr.message);
-      visitsSnap = await db.collection('event_page_visits').limit(1000).get();
-    }
-    var visits = visitsSnap.docs.map(function(d){
-      var v = Object.assign({ id: d.id }, d.data());
-      if(v.visited_at && v.visited_at.toDate) v.visited_at = v.visited_at.toDate().toISOString();
-      return v;
-    });
-    if(eventId) visits = visits.filter(function(v){ return v.event_id === eventId; });
-    visits.sort(function(a,b){ return (b.visited_at||'') > (a.visited_at||'') ? 1 : -1; });
-    renderActivityStats(visits, eventId);
-    renderDeviceBreakdown(visits);
-    renderLocationBreakdown(visits);
-    renderVisitLog(visits);
-    window._histVisits = visits; renderHistoryCard();
-  }catch(e){
-    renderActivityStats([], eventId);
-    renderDeviceBreakdown([]);
-    renderLocationBreakdown([]);
-    renderVisitLog([]);
-    console.warn('[Activity] visits error:', e.message);
-  }
-
-  /*  Load downloads log  */
   loadGuestActivity(eventId);
   loadDevices(1);
 }
@@ -3112,6 +3077,26 @@ async function loadDevices(page){
     var r = await fetch(API + '/api/admin/devices?per=10&page=' + _devPage + (eventId ? '&event_id='+encodeURIComponent(eventId) : ''), { headers: await _adminAuthHeader() });
     if(!r.ok) throw new Error('HTTP '+r.status);
     var d = await r.json(); _devPage = d.page;
+    var sm = d.summary || {};
+    var setT = function(id, v){ var x = document.getElementById(id); if(x) x.textContent = v; };
+    setT('act-stat-visits', sm.visits || 0); setT('act-stat-unique', sm.devices || 0);
+    var dt = document.getElementById('act-devices'), lc = document.getElementById('act-locations');
+    var bar = function(label, count, total, extra){
+      var pct = total ? Math.round(count/total*100) : 0;
+      return '<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;"><span>'+esc(label)+'</span><span style="color:var(--text3);">'+count+' <span style="font-size:11px;">('+pct+'%)</span></span></div>'
+        + '<div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:4px;"></div></div></div>';
+    };
+    if(dt){
+      var tn = {mobile:'Mobile', desktop:'Desktop', tablet:'Tablet', unknown:'Other'}, types = sm.device_types || {}, tt = 0;
+      Object.keys(types).forEach(function(k){ tt += types[k]; });
+      dt.innerHTML = tt ? Object.keys(types).sort(function(a,b){ return types[b]-types[a]; }).map(function(k){ return bar(tn[k]||k, types[k], tt); }).join('')
+        : '<div class="empty"><div class="empty-txt">No device data yet.</div></div>';
+    }
+    if(lc){
+      var locs = sm.locations || [], lt = 0; locs.forEach(function(x){ lt += x[1]; });
+      lc.innerHTML = lt ? locs.map(function(x){ return bar(x[0], x[1], lt); }).join('')
+        : '<div class="empty"><div class="empty-txt">No location data yet. Location is only recorded when a guest opens a gallery.</div></div>';
+    }
     var fmtT = function(sec){ return !sec ? '—' : sec >= 60 ? Math.floor(sec/60)+'m '+(sec%60)+'s' : sec+'s'; };
     if(bz) bz.innerHTML = (d.events||[]).length > 1 ? '<span style="font-size:11px;color:var(--text3);align-self:center;">Most active:</span>' + d.events.slice(0,4).map(function(e){
       return '<span style="font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:99px;padding:4px 10px;"><b>'+esc(e.event_name||'Unnamed event')+'</b> · '+e.visits+' visits · '+e.downloads+' downloads</span>';
