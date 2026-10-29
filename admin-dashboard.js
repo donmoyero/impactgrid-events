@@ -54,8 +54,12 @@
     try {
       await waitForDb();
       var snap = await db.collection('events').where('is_active', '==', true).get();
-      setText('stat-events', snap.size);
       var evs = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+      /* is_active is never cleared for Firestore events (the expiry cron only touches Supabase),
+         so an event is only "live" if it has no expiry or the expiry hasn't passed. */
+      var nowMs = startOfDay(new Date()).getTime();
+      var live = evs.filter(function (e) { var x = toDate(e.expiry_date); return !x || x.getTime() >= nowMs; });
+      setText('stat-events', live.length);
       evs.sort(function (a, b) {
         var da = toDate(a.created_at), dbb = toDate(b.created_at);
         return (dbb ? dbb.getTime() : 0) - (da ? da.getTime() : 0);
@@ -152,23 +156,33 @@
     try {
       await waitForDb();
       var snap;
-      try { snap = await db.collection('event_page_visits').orderBy('visited_at', 'desc').limit(500).get(); }
-      catch (idx) { snap = await db.collection('event_page_visits').limit(500).get(); }
+      try { snap = await db.collection('event_page_visits').orderBy('visited_at', 'desc').limit(2000).get(); }
+      catch (idx) { snap = await db.collection('event_page_visits').limit(2000).get(); }
       var visits = snap.docs.map(function (d) { return d.data(); });
       var DAYS = 14, today = startOfDay(new Date()), counts = [], labels = [];
       for (var i = DAYS - 1; i >= 0; i--) {
         var d = new Date(today); d.setDate(d.getDate() - i);
         counts.push({ t: d.getTime(), n: 0, label: d.getDate() + ' ' + MONTHS[d.getMonth()] });
       }
-      var week = 0, weekStart = today.getTime() - 6 * 86400000, uniq = {};
+      var week = 0, weekStart = today.getTime() - 6 * 86400000;
       visits.forEach(function (v) {
         var d = toDate(v.visited_at); if (!d) return;
         var t = startOfDay(d).getTime();
         for (var j = 0; j < counts.length; j++) if (counts[j].t === t) { counts[j].n++; break; }
-        if (t >= weekStart) { week++; uniq[v.ip || v.id || Math.random()] = 1; }
+        if (t >= weekStart) week++;
       });
       setText('pa-k-visits', week);
-      setText('pa-k-visits-sub', Object.keys(uniq).length + ' unique visitors · 7 days');
+      setText('pa-k-visits-sub', 'Consented visitors · 7 days');
+      /* Unique visitors can't come from event_page_visits (no IP, no visitor id) —
+         ask the activity API, which counts distinct visitor_id. */
+      try {
+        var ar = await fetch(EVENTS_API + '/api/admin/activity?days=7', { headers: await _adminAuthHeader() });
+        if (ar.ok) {
+          var sm = (await ar.json()).summary || {};
+          setText('pa-k-visits', sm.opens || 0);
+          setText('pa-k-visits-sub', (sm.unique_visitors || 0) + ' unique visitors · 7 days');
+        }
+      } catch (ae) { console.warn('[dashboard] activity summary', ae && ae.message); }
 
       var max = Math.max.apply(null, counts.map(function (c) { return c.n; }).concat([1]));
       var W = 700, H = 150, bw = W / DAYS, bars = counts.map(function (c, k) {
@@ -178,7 +192,7 @@
       }).join('');
       html('pa-chart', '<div class="pa-chart"><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="Gallery visits, last 14 days">' +
         '<line class="pa-axis" x1="0" y1="' + H + '" x2="' + W + '" y2="' + H + '"/>' + bars + '</svg>' +
-        '<div class="pa-chart-foot"><span>' + esc(counts[0].label) + '</span><span>Last ' + DAYS + ' days · most recent 500 visits</span><span>Today</span></div></div>');
+        '<div class="pa-chart-foot"><span>' + esc(counts[0].label) + '</span><span>Last ' + DAYS + ' days · most recent 2000 visits</span><span>Today</span></div></div>');
     } catch (e) {
       setText('pa-k-visits', '—');
       html('pa-chart', empty('Could not load visits.'));

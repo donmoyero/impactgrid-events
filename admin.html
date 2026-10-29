@@ -3168,12 +3168,14 @@ async function loadGuestActivity(eventId){
 }
 
 function renderActivityStats(visits, eventId){
-  var uniq = {};
-  visits.forEach(function(v){ if(v.ip) uniq[v.ip] = true; else if(v.id) uniq[v.id] = true; });
+  /* event_page_visits no longer stores an IP, so distinct visitors can't be derived here.
+     Show the page-load count; the Guest Activity panel below has the true unique-visitor figure. */
   var vEl = document.getElementById('act-stat-visits');
   var uEl = document.getElementById('act-stat-unique');
+  var legacy = {}; visits.forEach(function(v){ if(v.ip) legacy[v.ip] = true; });
+  var n = Object.keys(legacy).length;
   if(vEl) vEl.textContent = visits.length;
-  if(uEl) uEl.textContent = Object.keys(uniq).length || visits.length;
+  if(uEl){ uEl.textContent = n ? n : 'see Guest Activity'; if(!n) uEl.style.fontSize = '13px'; }
 }
 
 function parseDevice(ua){
