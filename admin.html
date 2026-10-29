@@ -693,6 +693,10 @@ tr:hover td{background:var(--bg2);}
           <div id="hist-top" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
         </div>
       </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head"><h2>Devices</h2><span style="font-size:11px;color:var(--text3);">Each device gets an automatic name · repeat visits are counted, not listed again</span></div>
+        <div class="card-body" id="ga-devices" style="max-height:420px;overflow:auto;"><div class="empty-txt">Loading…</div></div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card">
           <div class="card-head"><h2>Live feed</h2><span style="font-size:11px;color:var(--text3);">Latest 60 actions</span></div>
@@ -706,8 +710,8 @@ tr:hover td{background:var(--bg2);}
 
       <!-- Stats row -->
       <div class="stats-row" style="margin-bottom:18px;grid-template-columns:repeat(2,1fr);" id="activity-stats-row">
-        <div class="stat-card"><div class="stat-label">Total Visits</div><div class="stat-val" id="act-stat-visits" style="color:var(--blue);">—</div><div class="stat-sub">Page loads recorded</div></div>
-        <div class="stat-card"><div class="stat-label">Unique Visitors</div><div class="stat-val" id="act-stat-unique" style="color:var(--gold);">—</div><div class="stat-sub">By IP / fingerprint</div></div>
+        <div class="stat-card"><div class="stat-label">Total Visits</div><div class="stat-val" id="act-stat-visits" style="color:var(--blue);">—</div><div class="stat-sub">Sessions (refreshes not repeated)</div></div>
+        <div class="stat-card"><div class="stat-label">Unique Visitors</div><div class="stat-val" id="act-stat-unique" style="color:var(--gold);">—</div><div class="stat-sub">Distinct devices (no IPs)</div></div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -3135,20 +3139,33 @@ async function loadGuestActivity(eventId){
     if(!r.ok) throw new Error('HTTP '+r.status);
     var d = await r.json(), s = d.summary, th = d.thumbs || {};
     function k(label, val, sub){ return '<div class="stat-card" style="margin:0;"><div class="stat-label">'+label+'</div><div class="stat-val" style="font-size:22px;">'+val+'</div>'+(sub?'<div class="stat-sub">'+sub+'</div>':'')+'</div>'; }
-    kp.innerHTML = k('Visitors', s.unique_visitors, s.opens+' gallery opens')
+    kp.innerHTML = k('Devices', s.unique_visitors, s.opens+' visits')
       + k('Photo views', s.photo_views, '')
       + k('Downloads', s.downloads, s.download_rate+'% of visitors')
       + k('Avg time', (s.avg_time_seconds >= 60 ? Math.floor(s.avg_time_seconds/60)+'m '+(s.avg_time_seconds%60)+'s' : s.avg_time_seconds+'s'), 'per visitor')
-      + k('Returning', s.return_rate+'%', 'opened 2+ times')
+      + k('Returning', s.return_rate+'%', 'came back in a new visit')
       + k('Drop-offs', s.dropoffs, 'viewed 5+, saved none');
     var src = Object.keys(s.sources||{}).sort(function(a,b){return s.sources[b]-s.sources[a];}).map(function(x){return esc(x)+' '+s.sources[x];}).join(' · ');
     ex.innerHTML = 'Peak hour (UTC): <b>'+(s.opens ? s.peak_hour_utc+':00' : '—')+'</b>'
       + ' &nbsp;|&nbsp; Sources: <b>'+(src||'—')+'</b> <span style="opacity:.7;">(add ?src=qr, ?src=whatsapp or ?src=email to the links you share)</span>'
       + (s.top_cities.length ? '<br>Top cities: <b>'+s.top_cities.map(function(c){return esc(c[0])+' '+c[1];}).join(' · ')+'</b>' : '');
+    var dv = document.getElementById('ga-devices');
+    if(dv){
+      var fmtT = function(sec){ return sec >= 60 ? Math.floor(sec/60)+'m '+(sec%60)+'s' : sec+'s'; };
+      dv.innerHTML = (d.devices && d.devices.length)
+        ? '<table><thead><tr><th>Device</th><th>Where</th><th>Visits</th><th>Photos viewed</th><th>Downloads</th><th>Time</th><th>Last seen</th></tr></thead><tbody>'
+          + d.devices.map(function(x){
+              return '<tr><td><b>'+esc(x.name)+'</b><div style="font-size:11px;color:var(--text3);">'+esc((x.device||'')+' · '+(x.browser||'')+' · '+(x.os||''))+'</div></td>'
+                + '<td style="font-size:12px;">'+esc(x.city ? x.city+(x.country?', '+x.country:'') : '—')+(x.src?'<div style="font-size:11px;color:var(--text3);">via '+esc(x.src)+'</div>':'')+'</td>'
+                + '<td><b>'+x.visits+'</b></td><td>'+x.views+'</td><td>'+x.downloads+'</td><td>'+fmtT(x.seconds||0)+'</td>'
+                + '<td style="font-size:11px;color:var(--text3);white-space:nowrap;">'+_gaAgo(x.last)+'</td></tr>';
+            }).join('') + '</tbody></table>'
+        : '<div class="empty"><div class="empty-txt">No devices yet.</div></div>';
+    }
     var verbs = { gallery_open:'opened the gallery', photo_view:'viewed a photo', photo_download:'downloaded' };
     fd.innerHTML = d.feed.length ? d.feed.map(function(f){
-      var who = (f.city ? esc(f.city) : 'A guest') + ' · ' + esc(f.device||'') + ' ' + esc(f.browser||'');
-      var detail = f.action==='photo_view' ? ' ('+f.seconds+'s)' : '';
+      var who = '<b>'+esc(f.device_name||'A guest')+'</b> · ' + (f.city ? esc(f.city)+' · ' : '') + esc(f.device||'') + ' ' + esc(f.browser||'');
+      var detail = (f.n>1 ? ' ×'+f.n : '') + (f.action==='photo_view' ? ' ('+f.seconds+'s total)' : '');
       return '<div style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
         + (f.photo_id ? _gaThumb(th, f.photo_id) : '<div style="width:48px;height:48px;border-radius:8px;flex:none;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;">\u{1F441}</div>')
         + '<div style="min-width:0;font-size:12.5px;line-height:1.5;"><div><b>'+(verbs[f.action]||esc(f.action))+'</b>'+detail+'</div>'
@@ -3163,19 +3180,18 @@ async function loadGuestActivity(eventId){
   }catch(e){
     console.warn('[GuestActivity]', e.message);
     var msg = '<div class="empty"><div class="empty-txt">Could not load guest activity ('+esc(e.message)+'). The API may be waking up — press Refresh.</div></div>';
-    kp.innerHTML=''; fd.innerHTML = msg; tp.innerHTML = '';
+    kp.innerHTML=''; fd.innerHTML = msg; tp.innerHTML = ''; var dv2 = document.getElementById('ga-devices'); if(dv2) dv2.innerHTML = '';
   }
 }
 
 function renderActivityStats(visits, eventId){
-  /* event_page_visits no longer stores an IP, so distinct visitors can't be derived here.
-     Show the page-load count; the Guest Activity panel below has the true unique-visitor figure. */
+  /* A visit record = one session; v.n = page loads in it. Devices are counted by anonymous visitor_id. */
+  var devs = {}, legacy = 0;
+  visits.forEach(function(v){ if(v.visitor_id) devs[v.visitor_id] = true; else legacy++; });
   var vEl = document.getElementById('act-stat-visits');
   var uEl = document.getElementById('act-stat-unique');
-  var legacy = {}; visits.forEach(function(v){ if(v.ip) legacy[v.ip] = true; });
-  var n = Object.keys(legacy).length;
   if(vEl) vEl.textContent = visits.length;
-  if(uEl){ uEl.textContent = n ? n : 'see Guest Activity'; if(!n) uEl.style.fontSize = '13px'; }
+  if(uEl) uEl.textContent = Object.keys(devs).length + (legacy ? '+' : '');
 }
 
 function parseDevice(ua){
@@ -3260,7 +3276,7 @@ function renderVisitLog(visits, keepPage){
     el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No page visits recorded yet. See setup instructions below.</div></div>';
     return;
   }
-  el.innerHTML = '<table><thead><tr><th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>IP</th></tr></thead><tbody>'
+  el.innerHTML = '<table><thead><tr><th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>Visits</th></tr></thead><tbody>'
     + visits.slice(_pg.visit*PG_SIZE, _pg.visit*PG_SIZE+PG_SIZE).map(function(v){
         var dev = parseDevice(v.user_agent);
         var loc = (v.city && v.country) ? v.city+', '+v.country : (v.country || v.city || '—');
@@ -3269,9 +3285,9 @@ function renderVisitLog(visits, keepPage){
         return '<tr>'
           + '<td style="font-size:11px;color:var(--text3);white-space:nowrap;">'+esc(timeStr)+'</td>'
           + '<td style="font-size:12px;font-weight:600;">'+esc(v.event_name||v.event_id||'—')+'</td>'
-          + '<td>'+dev.icon+' <span style="font-size:11px;color:var(--text2);">'+dev.type+'</span></td>'
+          + '<td>'+dev.icon+' <span style="font-size:11px;color:var(--text2);">'+esc(v.device_name ? v.device_name+' · ' : '')+dev.type+'</span></td>'
           + '<td style="font-size:12px;">'+esc(loc)+'</td>'
-          + '<td style="font-family:var(--fm);font-size:10px;color:var(--text3);">'+esc(v.ip||'—')+'</td>'
+          + '<td style="font-family:var(--fm);font-size:11px;color:var(--text3);">'+(v.n||1)+'</td>'
           + '</tr>';
       }).join('')
     + '</tbody></table>'
@@ -3344,7 +3360,7 @@ function renderDownloadsLog(data, keepPage){
     + '</div>'
     + '</div>'
     + '<table><thead><tr>'
-    + '<th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>IP</th><th>Photo ID</th>'
+    + '<th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>Times</th><th>Photo ID</th>'
     + '</tr></thead><tbody>'
     + data.slice(_pg.dl*PG_SIZE, _pg.dl*PG_SIZE+PG_SIZE).map(function(d){
         var dev = parseDevice(d.user_agent);
@@ -3355,9 +3371,9 @@ function renderDownloadsLog(data, keepPage){
         return '<tr>'
           + '<td style="font-size:11px;color:var(--text3);white-space:nowrap;">' + esc(timeStr) + '</td>'
           + '<td style="font-size:12px;font-weight:600;">' + esc(d.event_name || d.event_id || '—') + '</td>'
-          + '<td>' + dev.icon + ' <span style="font-size:11px;color:var(--text2);">' + dev.type + '</span></td>'
+          + '<td>' + dev.icon + ' <span style="font-size:11px;color:var(--text2);">' + esc(d.device_name ? d.device_name + ' · ' : '') + dev.type + '</span></td>'
           + '<td style="font-size:12px;"> ' + esc(loc) + '</td>'
-          + '<td style="font-family:var(--fm);font-size:10px;color:var(--text3);">' + esc(d.ip || '—') + '</td>'
+          + '<td style="font-family:var(--fm);font-size:11px;color:var(--text3);">' + (d.count || 1) + '</td>'
           + '<td style="font-family:var(--fm);font-size:10px;color:var(--text3);">' + esc(shortId) + '</td>'
           + '</tr>';
       }).join('')
@@ -3372,7 +3388,7 @@ function renderActivitySetupPrompt(){
     + '<strong>1. Create Supabase table</strong><br>'
     + '<code style="display:block;background:var(--bg3);padding:12px;border-radius:8px;margin:8px 0;font-size:11px;white-space:pre-wrap;">create table event_page_visits (\n  id uuid primary key default gen_random_uuid(),\n  event_id uuid references events(id) on delete cascade,\n  event_name text,\n  visited_at timestamptz default now(),\n  user_agent text,\n  country text,\n  city text,\n  ip text\n);</code>'
     + '<strong>2. Add this to your event.html page</strong><br>'
-    + '<code style="display:block;background:var(--bg3);padding:12px;border-radius:8px;margin:8px 0;font-size:11px;white-space:pre-wrap;">// Call once when the event page loads\nasync function trackVisit(eventId, eventName) {\n  var geo = {};\n  try {\n    var r = await fetch(\'https://ipapi.co/json/\');\n    geo = await r.json();\n  } catch(e){}\n  await getSupabase().from(\'event_page_visits\').insert({\n    event_id:   eventId,\n    event_name: eventName,\n    user_agent: navigator.userAgent,\n    country:    geo.country_name || null,\n    city:       geo.city || null,\n    ip:         geo.ip || null\n  });\n}</code>'
+    + '<code style="display:block;background:var(--bg3);padding:12px;border-radius:8px;margin:8px 0;font-size:11px;white-space:pre-wrap;">// Call once when the event page loads\nasync function trackVisit(eventId, eventName) {\n  var geo = {};\n  try {\n    var r = await fetch(\'https://ipapi.co/json/\');\n    geo = await r.json();\n  } catch(e){}\n  await getSupabase().from(\'event_page_visits\').insert({\n    event_id:   eventId,\n    event_name: eventName,\n    user_agent: navigator.userAgent,\n    country:    geo.country_name || null,\n    city:       geo.city || null\n  });\n}</code>'
     + 'Once set up, refresh this page to see live visit data.'
     + '</div>';
 
