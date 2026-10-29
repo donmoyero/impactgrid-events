@@ -651,7 +651,7 @@ tr:hover td{background:var(--bg2);}
     <div class="page" id="page-eventactivity">
       <div class="page-header">
         <div class="page-title">Event Activity</div>
-        <div class="page-sub">See exactly who visits your events, what device they use, where they are, and all download requests.</div>
+        <div class="page-sub">See which events get the buzz: every device, what it viewed and downloaded, and how often it came back.</div>
       </div>
 
       <!-- Filter bar -->
@@ -682,20 +682,12 @@ tr:hover td{background:var(--bg2);}
           <div id="ga-extra" style="font-size:12px;color:var(--text3);line-height:1.7;"></div>
         </div>
       </div>
-      <!-- History: read-only view of data collected before consent tracking -->
       <div class="card" style="margin-bottom:16px;">
-        <div class="card-head">
-          <h2>Before consent tracking (history)</h2>
-          <span style="font-size:11px;color:var(--text3);">Read from the older visit and download logs · not copied</span>
-        </div>
+        <div class="card-head"><h2>Devices</h2><span style="font-size:11px;color:var(--text3);">One line per device per event · repeat visits are counted, not listed again · older data grouped by browser</span></div>
         <div class="card-body">
-          <div id="hist-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px;"><div class="empty-txt">Loading…</div></div>
-          <div id="hist-top" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+          <div id="ga-buzz" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
+          <div id="ga-devices" class="table-wrap"><div class="empty-txt">Loading…</div></div>
         </div>
-      </div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-head"><h2>Devices</h2><span style="font-size:11px;color:var(--text3);">Each device gets an automatic name · repeat visits are counted, not listed again</span></div>
-        <div class="card-body" id="ga-devices" style="max-height:420px;overflow:auto;"><div class="empty-txt">Loading…</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card">
@@ -731,27 +723,6 @@ tr:hover td{background:var(--bg2);}
         </div>
       </div>
 
-      <!-- Visit log table -->
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-head">
-          <h2> Page Visit Log</h2>
-          <span style="font-size:11px;color:var(--text3);">Most recent first</span>
-        </div>
-        <div class="card-body table-wrap" id="act-visit-log">
-          <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>
-        </div>
-      </div>
-
-      <!-- Downloads log table -->
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-head">
-          <h2> Downloads Log</h2>
-          <span style="font-size:11px;color:var(--text3);">Every photo download recorded from event galleries</span>
-        </div>
-        <div class="card-body table-wrap" id="act-downloads-log">
-          <div class="skel-wrap"><div class="skel-row" style="width:70%;"></div><div class="skel-row" style="width:92%;"></div><div class="skel-row" style="width:55%;"></div></div>
-        </div>
-      </div>
 
     </div>
     <!-- ALL EVENTS -->
@@ -3074,8 +3045,8 @@ async function loadEventActivity(){
   }
 
   /*  Load downloads log  */
-  loadDownloadsLog(eventId);
   loadGuestActivity(eventId);
+  loadDevices(1);
 }
 
 
@@ -3128,6 +3099,47 @@ function _gaThumb(th, id){
     ? '<img src="'+th[id]+'" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex:none;background:var(--bg3);">'
     : '<div style="width:48px;height:48px;border-radius:8px;flex:none;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);text-align:center;">no<br>preview</div>';
 }
+/* ── Devices table: one row per device per event, 10 per page, older data included ── */
+var _devPage = 1;
+function devPage(delta){ loadDevices(_devPage + delta); }
+async function loadDevices(page){
+  var el = document.getElementById('ga-devices'); if(!el) return;
+  var bz = document.getElementById('ga-buzz');
+  _devPage = Math.max(1, page || 1);
+  var eventId = (document.getElementById('activity-event-select')||{}).value || '';
+  try{
+    var API = window.EVENTS_API || 'https://impactgrid-events-api.onrender.com';
+    var r = await fetch(API + '/api/admin/devices?per=10&page=' + _devPage + (eventId ? '&event_id='+encodeURIComponent(eventId) : ''), { headers: await _adminAuthHeader() });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    var d = await r.json(); _devPage = d.page;
+    var fmtT = function(sec){ return !sec ? '—' : sec >= 60 ? Math.floor(sec/60)+'m '+(sec%60)+'s' : sec+'s'; };
+    if(bz) bz.innerHTML = (d.events||[]).length > 1 ? '<span style="font-size:11px;color:var(--text3);align-self:center;">Most active:</span>' + d.events.slice(0,4).map(function(e){
+      return '<span style="font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:99px;padding:4px 10px;"><b>'+esc(e.event_name||'Unnamed event')+'</b> · '+e.visits+' visits · '+e.downloads+' downloads</span>';
+    }).join('') : '';
+    if(!d.rows.length){ el.innerHTML = '<div class="empty"><div class="empty-txt">No devices yet. They appear once guests accept analytics and open a gallery.</div></div>'; return; }
+    var from = (d.page-1)*d.per + 1, to = Math.min(d.total, d.page*d.per);
+    el.innerHTML = '<table><thead><tr><th>Device</th><th>Event</th><th>Visits</th><th>Photos viewed</th><th>Downloads</th><th>Time</th><th>Last seen</th></tr></thead><tbody>'
+      + d.rows.map(function(x){
+          var sub = [x.device, x.browser, x.os].filter(Boolean).join(' · ') + (x.city ? ' · ' + x.city + (x.country ? ', '+x.country : '') : '');
+          return '<tr><td><b>'+esc(x.name)+'</b>'+(x.legacy?' <span style="font-size:10px;color:var(--text3);border:1px solid var(--border);border-radius:99px;padding:1px 6px;">older data</span>':'')
+            + '<div style="font-size:11px;color:var(--text3);">'+esc(sub)+'</div></td>'
+            + '<td style="font-size:12.5px;font-weight:600;">'+esc(x.event_name||'—')+'</td>'
+            + '<td><b>'+x.visits+'</b></td><td>'+(x.legacy?'—':x.views)+'</td><td>'+x.downloads+'</td><td>'+fmtT(x.seconds)+'</td>'
+            + '<td style="font-size:11px;color:var(--text3);white-space:nowrap;">'+_gaAgo(x.last)+'</td></tr>';
+        }).join('') + '</tbody></table>'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 4px 2px;flex-wrap:wrap;">'
+      + '<span style="font-size:11px;color:var(--text3);">'+d.total+' device'+(d.total===1?'':'s')+' · '+from+'–'+to+'</span>'
+      + '<span style="display:flex;align-items:center;gap:8px;">'
+      + '<button class="btn btn-ghost btn-sm" onclick="devPage(-1)"'+(d.page<=1?' disabled':'')+'>← Previous</button>'
+      + '<span style="font-size:12px;color:var(--text2);">Page '+d.page+' of '+d.pages+'</span>'
+      + '<button class="btn btn-ghost btn-sm" onclick="devPage(1)"'+(d.page>=d.pages?' disabled':'')+'>Next →</button>'
+      + '</span></div>';
+  }catch(e){
+    console.warn('[Devices]', e.message);
+    el.innerHTML = '<div class="empty"><div class="empty-txt">Could not load devices ('+esc(e.message)+'). The API may be waking up — press Refresh.</div></div>';
+  }
+}
+
 async function loadGuestActivity(eventId){
   var kp = document.getElementById('ga-kpis'), ex = document.getElementById('ga-extra'),
       fd = document.getElementById('ga-feed'), tp = document.getElementById('ga-top');
@@ -3149,19 +3161,6 @@ async function loadGuestActivity(eventId){
     ex.innerHTML = 'Peak hour (UTC): <b>'+(s.opens ? s.peak_hour_utc+':00' : '—')+'</b>'
       + ' &nbsp;|&nbsp; Sources: <b>'+(src||'—')+'</b> <span style="opacity:.7;">(add ?src=qr, ?src=whatsapp or ?src=email to the links you share)</span>'
       + (s.top_cities.length ? '<br>Top cities: <b>'+s.top_cities.map(function(c){return esc(c[0])+' '+c[1];}).join(' · ')+'</b>' : '');
-    var dv = document.getElementById('ga-devices');
-    if(dv){
-      var fmtT = function(sec){ return sec >= 60 ? Math.floor(sec/60)+'m '+(sec%60)+'s' : sec+'s'; };
-      dv.innerHTML = (d.devices && d.devices.length)
-        ? '<table><thead><tr><th>Device</th><th>Where</th><th>Visits</th><th>Photos viewed</th><th>Downloads</th><th>Time</th><th>Last seen</th></tr></thead><tbody>'
-          + d.devices.map(function(x){
-              return '<tr><td><b>'+esc(x.name)+'</b><div style="font-size:11px;color:var(--text3);">'+esc((x.device||'')+' · '+(x.browser||'')+' · '+(x.os||''))+'</div></td>'
-                + '<td style="font-size:12px;">'+esc(x.city ? x.city+(x.country?', '+x.country:'') : '—')+(x.src?'<div style="font-size:11px;color:var(--text3);">via '+esc(x.src)+'</div>':'')+'</td>'
-                + '<td><b>'+x.visits+'</b></td><td>'+x.views+'</td><td>'+x.downloads+'</td><td>'+fmtT(x.seconds||0)+'</td>'
-                + '<td style="font-size:11px;color:var(--text3);white-space:nowrap;">'+_gaAgo(x.last)+'</td></tr>';
-            }).join('') + '</tbody></table>'
-        : '<div class="empty"><div class="empty-txt">No devices yet.</div></div>';
-    }
     var verbs = { gallery_open:'opened the gallery', photo_view:'viewed a photo', photo_download:'downloaded' };
     fd.innerHTML = d.feed.length ? d.feed.map(function(f){
       var who = '<b>'+esc(f.device_name||'A guest')+'</b> · ' + (f.city ? esc(f.city)+' · ' : '') + esc(f.device||'') + ' ' + esc(f.browser||'');
@@ -3180,7 +3179,7 @@ async function loadGuestActivity(eventId){
   }catch(e){
     console.warn('[GuestActivity]', e.message);
     var msg = '<div class="empty"><div class="empty-txt">Could not load guest activity ('+esc(e.message)+'). The API may be waking up — press Refresh.</div></div>';
-    kp.innerHTML=''; fd.innerHTML = msg; tp.innerHTML = ''; var dv2 = document.getElementById('ga-devices'); if(dv2) dv2.innerHTML = '';
+    kp.innerHTML=''; fd.innerHTML = msg; tp.innerHTML = '';
   }
 }
 
