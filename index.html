@@ -783,7 +783,7 @@
          day shows a different set (same set for all visitors that day). */
       var catById = {};
       cats.forEach(function(c){ catById[c.id] = c; });
-      var pool = imgs.filter(function(m){ return m.url && catById[m.category_id]; });
+      var pool = imgs.filter(function(m){ return (m.url || window.igSafeUrl(m.instagram_url)) && catById[m.category_id]; });
       function seeded(seed){
         return function(){
           seed |= 0; seed = seed + 0x6D2B79F5 | 0;
@@ -843,10 +843,12 @@
         var imgExt = (isVideo && ig) ? ' target="_blank" rel="noopener noreferrer"' : '';
         var imgLabel = (isVideo && ig) ? 'Watch video on Instagram' : ('View ' + c.title + ' gallery');
         return '<article class="h-work-card">' +
-          '<figure class="ig-wrap"><a class="h-work-img" href="' + escHtml(imgHref) + '"' + imgExt + ' aria-label="' + escHtml(imgLabel) + '">' +
-            '<img src="' + escHtml(m.url) + '" alt="' + escHtml(alt) + '" loading="lazy" decoding="async" />' +
-            (isVideo ? window.igPlayBadge : '') +
-          '</a>' + window.igBadge(ig, 'View ' + c.title + ' on Instagram') + '</figure>' +
+          (m.url
+            ? '<figure class="ig-wrap"><a class="h-work-img" href="' + escHtml(imgHref) + '"' + imgExt + ' aria-label="' + escHtml(imgLabel) + '">' +
+                '<img src="' + escHtml(m.url) + '" alt="' + escHtml(alt) + '" loading="lazy" decoding="async" />' +
+                (isVideo ? window.igPlayBadge : '') +
+              '</a>' + window.igBadge(ig, 'View ' + c.title + ' on Instagram') + '</figure>'
+            : '<figure class="ig-wrap">' + window.igPlaceholder(ig, 'View ' + c.title + ' on Instagram', isVideo) + '</figure>') +
           '<div class="h-work-body">' +
             (text ? '<p class="h-work-text" id="hWorkText' + i + '">' + escHtml(text) + '</p>' : '') +
             '<div class="h-work-actions">' +

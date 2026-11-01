@@ -26,6 +26,16 @@
       ICON.replace(/__ID__/g, String(n)) + '</a>';
   };
 
+  /* Tile for items that are only an Instagram link (no uploaded photo) */
+  window.igPlaceholder = function (url, label, isVideo) {
+    var safe = window.igSafeUrl(url);
+    if (!safe) return '';
+    n++;
+    return '<a class="ig-ph" href="' + esc(safe) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(label || 'View on Instagram') + '">' +
+      '<span class="ig-ph-ico">' + ICON.replace(/__ID__/g, String(n)) + '</span>' +
+      '<span class="ig-ph-txt">' + (isVideo ? 'Watch on Instagram' : 'View on Instagram') + '</span></a>';
+  };
+
   window.igPlayBadge = '<span class="ig-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="#fff" d="M8 5v14l11-7z"/></svg></span>';
 
   var css = '.ig-wrap{position:relative}' +
@@ -36,7 +46,13 @@
     '.ig-badge:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
     '.ig-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:54px;height:54px;' +
     'border-radius:50%;background:rgba(0,0,0,.55);border:2px solid #fff;display:grid;place-items:center;pointer-events:none}' +
-    '.ig-play svg{margin-left:3px}';
+    '.ig-play svg{margin-left:3px}' +
+    '.ig-ph{display:grid;place-items:center;align-content:center;gap:12px;width:100%;aspect-ratio:4/3;box-sizing:border-box;' +
+    'background:linear-gradient(135deg,#141414,#2a2a2a);color:#fff;text-decoration:none;text-align:center}' +
+    '.ig-ph-ico{width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;transition:transform .2s ease}' +
+    '.ig-ph-ico svg{width:36px;height:36px}' +
+    '.ig-ph:hover .ig-ph-ico{transform:scale(1.08)}' +
+    '.ig-ph-txt{font:500 14px/1 system-ui,-apple-system,Segoe UI,sans-serif;letter-spacing:.02em}';
   var st = document.createElement('style');
   st.textContent = css.replace(/%/g, '%');
   document.head.appendChild(st);

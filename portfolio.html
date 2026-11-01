@@ -395,7 +395,7 @@
       'description': cat.metaDescription || '',
       'url': 'https://impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug),
       'author': { '@type': 'Organization', 'name': 'Impact Grid', 'url': 'https://impactgridgroup.com' },
-      'image': cat.images.map(function(img){
+      'image': cat.images.filter(function(img){ return img.url; }).map(function(img){
         return {
           '@type': 'ImageObject',
           'contentUrl': img.url,
@@ -446,6 +446,10 @@
     el.innerHTML = images.map(function(img) {
       var ig = window.igSafeUrl(img.instagramUrl);
       var isVideo = img.mediaType === 'video';
+      if (!img.url) {
+        return ig ? '<figure class="ig-wrap">' + window.igPlaceholder(ig, 'View on Instagram', isVideo) +
+          (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') + '</figure>' : '';
+      }
       var alt = esc(img.altText || (activeCategory.title + ' — Impact Grid event photography, Manchester'));
       var tag = '<img src="' + esc(img.url) + '" alt="' + alt + '" loading="lazy" decoding="async"' +
         ((isVideo && ig) ? '' : ' onclick="openLightbox(this.src)"') + '>';
