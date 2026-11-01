@@ -4833,7 +4833,7 @@ async function portfolioEditCategory(id) {
       coverImage: cat.cover_image || '',
       coverPublicId: cat.cover_public_id || '',
       images: (images || []).map(function(img) {
-        return { _dbId: img.id, url: img.url, cloudinaryId: img.cloudinary_id || '', altText: img.alt_text || '', caption: img.caption || '' };
+        return { _dbId: img.id, url: img.url, cloudinaryId: img.cloudinary_id || '', altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', mediaType: img.media_type || 'photo' };
       })
     };
     document.getElementById('portfolioEditorTitle').textContent = ' Edit Portfolio';
@@ -5024,7 +5024,7 @@ function portfolioRenderImages() {
         '<span style="display:flex;align-items:center;gap:8px;">' +
           '<input type="checkbox" ' + (img._sel ? 'checked' : '') + ' onchange="portfolioToggleSel(' + idx + ',this.checked)" title="Select this photo" style="cursor:pointer;">' +
           '<span class="blog-page-handle" title="Drag to reorder">⠿⠿</span>' +
-          '<span class="chip chip-gold">Photo ' + (idx + 1) + '</span>' +
+          '<span class="chip chip-gold">' + (img.mediaType === 'video' ? 'Video ' : 'Photo ') + (idx + 1) + '</span>' +
         '</span>' +
         '<div style="display:flex;gap:4px;">' +
           '<button class="btn btn-ghost btn-sm" onclick="portfolioMoveImage(' + idx + ',-1)" ' + (idx===0?'disabled':'') + '>&#9650;</button>' +
@@ -5034,7 +5034,11 @@ function portfolioRenderImages() {
       '</div>' +
       (img.url ? '<img src="' + esc(img.url) + '" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--r);margin-bottom:8px;display:block;">' : '') +
       '<input type="text" placeholder="Alt text — describe what\'s in the photo (this is your image SEO)" value="' + esc(img.altText) + '" oninput="portfolioUpdateImageField(' + idx + ',\'altText\',this.value)" style="margin-bottom:8px;">' +
-      '<input type="text" placeholder="Caption (optional, shown under the photo)" value="' + esc(img.caption) + '" oninput="portfolioUpdateImageField(' + idx + ',\'caption\',this.value)">' +
+      '<input type="text" placeholder="Caption / write-up (optional, shown under the photo)" value="' + esc(img.caption) + '" oninput="portfolioUpdateImageField(' + idx + ',\'caption\',this.value)">' +
+      '<input type="url" placeholder="Instagram link (optional) — paste the post or reel link, e.g. https://www.instagram.com/p/..." value="' + esc(img.instagramUrl || '') + '" oninput="portfolioUpdateImageField(' + idx + ',\'instagramUrl\',this.value)" style="margin-top:8px;">' +
+      '<label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;cursor:pointer;">' +
+        '<input type="checkbox" ' + (img.mediaType === 'video' ? 'checked' : '') + ' onchange="portfolioUpdateImageField(' + idx + ',\'mediaType\',this.checked?\'video\':\'photo\');portfolioRenderImages()"> This is a video (upload a cover frame as the photo, and paste the Instagram reel link above)' +
+      '</label>' +
     '</div>';
   }).join('');
 }
@@ -5051,7 +5055,7 @@ async function portfolioAddImageFiles(e) {
       portfolioCurrentCat.images.push({
         _localId: 'npi' + (portfolioImageSeq++),
         url: result.secure_url, cloudinaryId: result.public_id,
-        altText: '', caption: ''
+        altText: '', caption: '', instagramUrl: '', mediaType: 'photo'
       });
     } catch(err) { toast('', 'Upload failed', err.message); }
   }
@@ -5107,10 +5111,20 @@ async function portfolioSaveCategory() {
           url: img.url || '',
           cloudinary_id: img.cloudinaryId || '',
           alt_text: img.altText || '',
-          caption: img.caption || ''
+          caption: img.caption || '',
+          instagram_url: (img.instagramUrl || '').trim() || null,
+          media_type: img.mediaType === 'video' ? 'video' : 'photo'
         };
       });
       var { error: imgErr } = await sb.from('portfolio_images').insert(imageRows);
+      if (imgErr && /instagram_url|media_type/.test(imgErr.message || '')) {
+        /* The two new columns aren't in the database yet — save without them. */
+        var usedNew = imageRows.some(function(r){ return r.instagram_url || r.media_type === 'video'; });
+        imageRows.forEach(function(r){ delete r.instagram_url; delete r.media_type; });
+        var retry = await sb.from('portfolio_images').insert(imageRows);
+        imgErr = retry.error;
+        if (!imgErr && usedNew) toast('', 'Saved without Instagram links', 'Run the Supabase SQL for Instagram links first, then save again.');
+      }
       if (imgErr) throw imgErr;
     }
 

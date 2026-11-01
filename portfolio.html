@@ -223,6 +223,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="plan-config.js"></script>
   <script src="supabase-config.js"></script>
+  <script src="ig-link.js"></script>
   <script src="auth.js"></script>
 
   <div id="ig-nav"></div>
@@ -443,8 +444,15 @@
       return;
     }
     el.innerHTML = images.map(function(img) {
-      return '<figure>' +
-        '<img src="' + esc(img.url) + '" alt="' + esc(img.altText || (activeCategory.title + ' — Impact Grid event photography, Manchester')) + '" loading="lazy" decoding="async" onclick="openLightbox(this.src)">' +
+      var ig = window.igSafeUrl(img.instagramUrl);
+      var isVideo = img.mediaType === 'video';
+      var alt = esc(img.altText || (activeCategory.title + ' — Impact Grid event photography, Manchester'));
+      var tag = '<img src="' + esc(img.url) + '" alt="' + alt + '" loading="lazy" decoding="async"' +
+        ((isVideo && ig) ? '' : ' onclick="openLightbox(this.src)"') + '>';
+      if (isVideo && ig) {
+        tag = '<a href="' + esc(ig) + '" target="_blank" rel="noopener noreferrer" aria-label="Watch video on Instagram" style="display:block;position:relative;">' + tag + window.igPlayBadge + '</a>';
+      }
+      return '<figure class="ig-wrap">' + tag + window.igBadge(ig, 'View on Instagram') +
         (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') +
         '</figure>';
     }).join('');
@@ -554,7 +562,7 @@
           coverImage: c.cover_image || '',
           createdAt: c.created_at || '',
           images: (imgs || []).map(function(img) {
-            return { id: img.id, url: img.url, altText: img.alt_text || '', caption: img.caption || '' };
+            return { id: img.id, url: img.url, altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', mediaType: img.media_type || 'photo' };
           })
         });
       }

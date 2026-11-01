@@ -501,6 +501,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="plan-config.js"></script>
   <script src="supabase-config.js"></script>
+  <script src="ig-link.js"></script>
   <script src="auth.js"></script>
 
   <!-- ── Nav (rendered by nav.js — handles auth state site-wide) ── -->
@@ -772,7 +773,7 @@
       if (cr.error || !cats || !cats.length) return;
 
       var ir = await sb.from('portfolio_images')
-        .select('id, category_id, url, alt_text, caption, order')
+        .select('*')
         .in('category_id', cats.map(function(c){ return c.id; }))
         .order('order', { ascending: true });
       var imgs = ir && ir.data;
@@ -836,10 +837,16 @@
         var text = ((m.caption || '').trim()) || ((c.meta_description || '').trim());
         var alt = m.alt_text || (c.title + ' — event photography by Impact Grid, Manchester');
         var long = text.length > 120 || text.indexOf('\n') > -1;
+        var ig = window.igSafeUrl(m.instagram_url);
+        var isVideo = m.media_type === 'video';
+        var imgHref = (isVideo && ig) ? ig : href;
+        var imgExt = (isVideo && ig) ? ' target="_blank" rel="noopener noreferrer"' : '';
+        var imgLabel = (isVideo && ig) ? 'Watch video on Instagram' : ('View ' + c.title + ' gallery');
         return '<article class="h-work-card">' +
-          '<figure><a class="h-work-img" href="' + escHtml(href) + '" aria-label="View ' + escHtml(c.title) + ' gallery">' +
+          '<figure class="ig-wrap"><a class="h-work-img" href="' + escHtml(imgHref) + '"' + imgExt + ' aria-label="' + escHtml(imgLabel) + '">' +
             '<img src="' + escHtml(m.url) + '" alt="' + escHtml(alt) + '" loading="lazy" decoding="async" />' +
-          '</a></figure>' +
+            (isVideo ? window.igPlayBadge : '') +
+          '</a>' + window.igBadge(ig, 'View ' + c.title + ' on Instagram') + '</figure>' +
           '<div class="h-work-body">' +
             (text ? '<p class="h-work-text" id="hWorkText' + i + '">' + escHtml(text) + '</p>' : '') +
             '<div class="h-work-actions">' +
