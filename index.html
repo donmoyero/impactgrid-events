@@ -753,43 +753,57 @@
   }
   loadHomepageImages();
 
-  /* ── "Featured Work" — your real portfolio, newest categories first ──
-     Pulls cover photo + write-up (the category description you write in
-     Admin > Portfolio) from Supabase. The write-up is clamped to 3 lines with
-     a "Read more" toggle to finish reading it. If nothing loads, the original
-     static tiles above stay exactly as they are. */
+  /* ── "Featured Work" — your real portfolio PHOTOS, each with its write-up ──
+     Pulls individual photos from Supabase (portfolio_images), newest folders
+     first, mixing folders so the section shows variety. Each photo shows the
+     write-up/caption you wrote for it in Admin > Portfolio (falling back to the
+     folder description), clamped to 3 lines with a "Read more" toggle.
+     If nothing loads, the static tiles above stay as they are. */
   async function loadFeaturedWork(){
     var host = document.getElementById('hFeatured');
     if (!host) return;
     try {
       var sb = (typeof getContentClient === 'function') ? getContentClient() : null;
       if (!sb) return;
-      var res = await sb.from('portfolio_categories')
-        .select('id, title, slug, meta_description, cover_image, created_at')
-        .order('created_at', { ascending: false })
-        .limit(8);
-      var cats = res && res.data;
-      if (res.error || !cats || !cats.length) return;
+      var cr = await sb.from('portfolio_categories')
+        .select('id, title, slug, meta_description, created_at')
+        .order('created_at', { ascending: false });
+      var cats = cr && cr.data;
+      if (cr.error || !cats || !cats.length) return;
 
-      /* categories with no cover use their first photo */
-      for (var i = 0; i < cats.length; i++) {
-        if (!cats[i].cover_image) {
-          var r = await sb.from('portfolio_images').select('url').eq('category_id', cats[i].id)
-            .order('order', { ascending: true }).limit(1);
-          if (r.data && r.data[0]) cats[i].cover_image = r.data[0].url;
+      var ir = await sb.from('portfolio_images')
+        .select('id, category_id, url, alt_text, caption, order')
+        .in('category_id', cats.map(function(c){ return c.id; }))
+        .order('order', { ascending: true });
+      var imgs = ir && ir.data;
+      if (ir.error || !imgs || !imgs.length) return;
+
+      /* group photos per folder (newest folder first), then take them round-robin */
+      var queues = cats.map(function(c){
+        return { cat: c, items: imgs.filter(function(m){ return m.category_id === c.id && m.url; }) };
+      }).filter(function(q){ return q.items.length; });
+      var picked = [];
+      var MAX = 8;
+      for (var round = 0; picked.length < MAX; round++) {
+        var added = false;
+        for (var qi = 0; qi < queues.length && picked.length < MAX; qi++) {
+          var it = queues[qi].items[round];
+          if (it) { picked.push({ img: it, cat: queues[qi].cat }); added = true; }
         }
+        if (!added) break;
       }
-      cats = cats.filter(function(c){ return c.cover_image; }).slice(0, 4);
-      if (!cats.length) return;
+      if (!picked.length) return;
 
       host.className = 'h-work';
-      host.innerHTML = cats.map(function(c, i){
+      host.innerHTML = picked.map(function(p, i){
+        var c = p.cat, m = p.img;
         var href = 'portfolio.html?category=' + encodeURIComponent(c.slug || '');
-        var text = (c.meta_description || '').trim();
+        var text = ((m.caption || '').trim()) || ((c.meta_description || '').trim());
+        var alt = m.alt_text || (c.title + ' — event photography by Impact Grid, Manchester');
         var long = text.length > 120 || text.indexOf('\n') > -1;
         return '<article class="h-work-card">' +
           '<figure><a class="h-work-img" href="' + escHtml(href) + '" aria-label="View ' + escHtml(c.title) + ' gallery">' +
-            '<img src="' + escHtml(c.cover_image) + '" alt="' + escHtml(c.title) + ' — event photography by Impact Grid, Manchester" loading="lazy" decoding="async" />' +
+            '<img src="' + escHtml(m.url) + '" alt="' + escHtml(alt) + '" loading="lazy" decoding="async" />' +
           '</a></figure>' +
           '<div class="h-work-body">' +
             '<h3>' + escHtml(c.title) + '</h3>' +
