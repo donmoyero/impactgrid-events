@@ -1142,25 +1142,9 @@ If you have any questions, just reply to this email.
                 <h2> Photos</h2>
                 <div style="display:flex;gap:6px;">
                   <button class="btn btn-ghost btn-sm" onclick="portfolioShuffleImages()" title="Randomize photo order">Shuffle</button>
-                  <button class="btn btn-ghost btn-sm" onclick="portfolioToggleLinkPanel()" title="Add a picture that links to one of your Instagram posts or reels">+ Add Instagram Link</button>
                   <label class="btn btn-ghost btn-sm" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
                     <input type="file" id="portfolioAddImageIn" accept="image/*" multiple style="display:none;" onchange="portfolioAddImageFiles(event)">
                   </label>
-                </div>
-              </div>
-              <div id="portfolioLinkPanel" style="display:none;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg2);">
-                <div style="font-size:13px;margin-bottom:8px;">Paste your Instagram post or reel link and choose the picture for it. Visitors see the picture, with a small Instagram icon that opens the post.</div>
-                <input type="url" id="portfolioLinkUrl" placeholder="https://www.instagram.com/p/... or /reel/..." style="margin-bottom:8px;">
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-                  <label class="btn btn-ghost btn-sm" for="portfolioLinkPic" style="cursor:pointer;">Choose the picture
-                    <input type="file" id="portfolioLinkPic" accept="image/*" style="display:none;" onchange="portfolioLinkPicChosen()">
-                  </label>
-                  <span id="portfolioLinkPicName" style="font-size:12px;opacity:.75;">No picture chosen</span>
-                </div>
-                <input type="text" id="portfolioLinkCaption" placeholder="Caption / write-up (optional)" style="margin-bottom:10px;">
-                <div style="display:flex;gap:6px;">
-                  <button class="btn btn-gold btn-sm" id="portfolioLinkAddBtn" onclick="portfolioConfirmLinkItem()">Add</button>
-                  <button class="btn btn-ghost btn-sm" onclick="portfolioToggleLinkPanel(false)">Cancel</button>
                 </div>
               </div>
               <div class="card-body" id="portfolioImagesList">
@@ -4849,7 +4833,7 @@ async function portfolioEditCategory(id) {
       coverImage: cat.cover_image || '',
       coverPublicId: cat.cover_public_id || '',
       images: (images || []).map(function(img) {
-        return { _dbId: img.id, url: img.url, cloudinaryId: img.cloudinary_id || '', altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', mediaType: img.media_type || 'photo' };
+        return { _dbId: img.id, url: img.url, cloudinaryId: img.cloudinary_id || '', altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', tiktokUrl: img.tiktok_url || '', pinterestUrl: img.pinterest_url || '', mediaType: img.media_type || 'photo' };
       })
     };
     document.getElementById('portfolioEditorTitle').textContent = ' Edit Portfolio';
@@ -5056,68 +5040,15 @@ function portfolioRenderImages() {
           '</label></div>') +
       '<input type="text" placeholder="Alt text — describe what\'s in the photo (this is your image SEO)" value="' + esc(img.altText) + '" oninput="portfolioUpdateImageField(' + idx + ',\'altText\',this.value)" style="margin-bottom:8px;">' +
       '<input type="text" placeholder="Caption / write-up (optional, shown under the photo)" value="' + esc(img.caption) + '" oninput="portfolioUpdateImageField(' + idx + ',\'caption\',this.value)">' +
-      '<input type="url" placeholder="Instagram link (optional) — paste the post or reel link, e.g. https://www.instagram.com/p/..." value="' + esc(img.instagramUrl || '') + '" oninput="portfolioUpdateImageField(' + idx + ',\'instagramUrl\',this.value)" style="margin-top:8px;">' +
+      '<div style="font-size:12px;opacity:.7;margin-top:10px;">Social links (optional) — a small icon shows on the photo and opens the post</div>' +
+      '<input type="url" placeholder="Instagram link — https://www.instagram.com/p/..." value="' + esc(img.instagramUrl || '') + '" oninput="portfolioUpdateImageField(' + idx + ',\'instagramUrl\',this.value)" style="margin-top:6px;">' +
+      '<input type="url" placeholder="TikTok link — https://www.tiktok.com/@you/video/..." value="' + esc(img.tiktokUrl || '') + '" oninput="portfolioUpdateImageField(' + idx + ',\'tiktokUrl\',this.value)" style="margin-top:6px;">' +
+      '<input type="url" placeholder="Pinterest link — https://www.pinterest.com/pin/..." value="' + esc(img.pinterestUrl || '') + '" oninput="portfolioUpdateImageField(' + idx + ',\'pinterestUrl\',this.value)" style="margin-top:6px;">' +
       '<label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;cursor:pointer;">' +
         '<input type="checkbox" ' + (img.mediaType === 'video' ? 'checked' : '') + ' onchange="portfolioUpdateImageField(' + idx + ',\'mediaType\',this.checked?\'video\':\'photo\');portfolioRenderImages()"> This is a video (upload a cover frame as the photo, and paste the Instagram reel link above)' +
       '</label>' +
     '</div>';
   }).join('');
-}
-
-function portfolioToggleLinkPanel(show) {
-  var el = document.getElementById('portfolioLinkPanel');
-  if (!el) return;
-  var open = (typeof show === 'boolean') ? show : (el.style.display === 'none');
-  el.style.display = open ? '' : 'none';
-  if (!open) {
-    document.getElementById('portfolioLinkUrl').value = '';
-    document.getElementById('portfolioLinkCaption').value = '';
-    document.getElementById('portfolioLinkPic').value = '';
-    document.getElementById('portfolioLinkPicName').textContent = 'No picture chosen';
-  } else {
-    document.getElementById('portfolioLinkUrl').focus();
-  }
-}
-
-function portfolioLinkPicChosen() {
-  var f = document.getElementById('portfolioLinkPic').files[0];
-  document.getElementById('portfolioLinkPicName').textContent = f ? f.name : 'No picture chosen';
-}
-
-async function portfolioConfirmLinkItem() {
-  if (!portfolioCurrentCat) return;
-  var link = document.getElementById('portfolioLinkUrl').value.trim();
-  if (!/^https:\/\/(www\.)?(instagram\.com|instagr\.am)\/\S+$/i.test(link)) {
-    toast('', 'Not an Instagram link', 'It should start with https://www.instagram.com/');
-    return;
-  }
-  var caption = document.getElementById('portfolioLinkCaption').value.trim();
-  var file = document.getElementById('portfolioLinkPic').files[0];
-  var btn = document.getElementById('portfolioLinkAddBtn');
-  var url = '', cloudinaryId = '';
-  btn.disabled = true;
-  try {
-    if (file) {
-      toast('', 'Uploading picture…', '');
-      var webBlob = await resizeImageForBlog(file);
-      var result = await uploadToCloudinary(webBlob, 'portfolio');
-      url = result.secure_url; cloudinaryId = result.public_id;
-    }
-    portfolioCurrentCat.images.push({
-      _localId: 'npi' + (portfolioImageSeq++),
-      url: url, cloudinaryId: cloudinaryId,
-      altText: '', caption: caption,
-      instagramUrl: link,
-      mediaType: /\/(reel|reels|tv)\//i.test(link) ? 'video' : 'photo'
-    });
-    portfolioToggleLinkPanel(false);
-    portfolioRenderImages();
-    toast('', url ? 'Picture added' : 'Instagram link added', url ? 'Add alt text, then Save.' : 'No picture yet — add one on the item, then Save.');
-  } catch (err) {
-    toast('', 'Upload failed', err.message);
-  } finally {
-    btn.disabled = false;
-  }
 }
 
 async function portfolioSetItemCover(idx, e) {
@@ -5147,7 +5078,7 @@ async function portfolioAddImageFiles(e) {
       portfolioCurrentCat.images.push({
         _localId: 'npi' + (portfolioImageSeq++),
         url: result.secure_url, cloudinaryId: result.public_id,
-        altText: '', caption: '', instagramUrl: '', mediaType: 'photo'
+        altText: '', caption: '', instagramUrl: '', tiktokUrl: '', pinterestUrl: '', mediaType: 'photo'
       });
     } catch(err) { toast('', 'Upload failed', err.message); }
   }
@@ -5205,10 +5136,20 @@ async function portfolioSaveCategory() {
           alt_text: img.altText || '',
           caption: img.caption || '',
           instagram_url: (img.instagramUrl || '').trim() || null,
+          tiktok_url: (img.tiktokUrl || '').trim() || null,
+          pinterest_url: (img.pinterestUrl || '').trim() || null,
           media_type: img.mediaType === 'video' ? 'video' : 'photo'
         };
       });
       var { error: imgErr } = await sb.from('portfolio_images').insert(imageRows);
+      if (imgErr && /tiktok_url|pinterest_url/.test(imgErr.message || '')) {
+        /* TikTok/Pinterest columns aren't in the database yet — save without them. */
+        var usedSocial = imageRows.some(function(r){ return r.tiktok_url || r.pinterest_url; });
+        imageRows.forEach(function(r){ delete r.tiktok_url; delete r.pinterest_url; });
+        var retry0 = await sb.from('portfolio_images').insert(imageRows);
+        imgErr = retry0.error;
+        if (!imgErr && usedSocial) toast('', 'Saved without TikTok/Pinterest links', 'Run the Supabase SQL for TikTok and Pinterest links first, then save again.');
+      }
       if (imgErr && /instagram_url|media_type/.test(imgErr.message || '')) {
         /* The two new columns aren't in the database yet — save without them. */
         var usedNew = imageRows.some(function(r){ return r.instagram_url || r.media_type === 'video'; });

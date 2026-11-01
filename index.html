@@ -847,7 +847,7 @@
             ? '<figure class="ig-wrap"><a class="h-work-img" href="' + escHtml(imgHref) + '"' + imgExt + ' aria-label="' + escHtml(imgLabel) + '">' +
                 '<img src="' + escHtml(m.url) + '" alt="' + escHtml(alt) + '" loading="lazy" decoding="async" />' +
                 (isVideo ? window.igPlayBadge : '') +
-              '</a>' + window.igBadge(ig, 'View ' + c.title + ' on Instagram') + '</figure>'
+              '</a>' + window.igSocials(ig, m.tiktok_url, m.pinterest_url, c.title) + '</figure>'
             : '<figure class="ig-wrap">' + window.igPlaceholder(ig, 'View ' + c.title + ' on Instagram', isVideo) + '</figure>') +
           '<div class="h-work-body">' +
             (text ? '<p class="h-work-text" id="hWorkText' + i + '">' + escHtml(text) + '</p>' : '') +

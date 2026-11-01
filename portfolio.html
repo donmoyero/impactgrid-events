@@ -456,7 +456,7 @@
       if (isVideo && ig) {
         tag = '<a href="' + esc(ig) + '" target="_blank" rel="noopener noreferrer" aria-label="Watch video on Instagram" style="display:block;position:relative;">' + tag + window.igPlayBadge + '</a>';
       }
-      return '<figure class="ig-wrap">' + tag + window.igBadge(ig, 'View on Instagram') +
+      return '<figure class="ig-wrap">' + tag + window.igSocials(ig, img.tiktokUrl, img.pinterestUrl) +
         (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') +
         '</figure>';
     }).join('');
@@ -566,7 +566,7 @@
           coverImage: c.cover_image || '',
           createdAt: c.created_at || '',
           images: (imgs || []).map(function(img) {
-            return { id: img.id, url: img.url, altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', mediaType: img.media_type || 'photo' };
+            return { id: img.id, url: img.url, altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', tiktokUrl: img.tiktok_url || '', pinterestUrl: img.pinterest_url || '', mediaType: img.media_type || 'photo' };
           })
         });
       }
