@@ -5789,8 +5789,10 @@ function socialRenderList() {
       '<select onchange="socialUpdateField(' + idx + ',\'platform\',this.value)" style="margin-bottom:8px;width:100%;">' +
         '<option value="instagram"' + (v.platform==='instagram'?' selected':'') + '>Instagram</option>' +
         '<option value="tiktok"' + (v.platform==='tiktok'?' selected':'') + '>TikTok</option>' +
+        '<option value="pinterest"' + (v.platform==='pinterest'?' selected':'') + '>Pinterest</option>' +
       '</select>' +
-      '<input type="text" placeholder="Post link (paste the Instagram/TikTok URL)" value="' + esc(v.postUrl) + '" oninput="socialUpdateField(' + idx + ',\'postUrl\',this.value)" style="margin-bottom:8px;">' +
+      '<input type="text" placeholder="Post link (paste the full Instagram / TikTok / Pinterest URL)" value="' + esc(v.postUrl) + '" oninput="socialUpdateField(' + idx + ',\'postUrl\',this.value)" style="margin-bottom:4px;">' +
+      '<div style="font-size:11px;opacity:.7;margin-bottom:8px;">TikTok videos play silently on your page when the link looks like tiktok.com/@you/video/123… (the full link, not a short vm.tiktok.com one). Instagram and Pinterest show the picture above and open the post when tapped.</div>' +
       '<input type="text" placeholder="Caption (optional)" value="' + esc(v.caption) + '" oninput="socialUpdateField(' + idx + ',\'caption\',this.value)">' +
     '</div>';
   }).join('');
