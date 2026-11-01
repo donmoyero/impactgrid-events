@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://impactgridgroup.com/</loc>
     <lastmod>2026-07-16</lastmod>
@@ -53,5 +53,37 @@
     <lastmod>2026-07-16</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://impactgridgroup.com/portfolio.html?category=portrait-photography-manchester</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+      <image:image>
+        <image:loc>https://res.cloudinary.com/dr7wqaqbm/image/upload/v1793545668/impactgrid/portfolio/ohi5lhjxubzqxvj8dhhk.jpg</image:loc>
+        <image:title>A portrait of confidence and identity. Her eyes hold the viewer&apos;s attention while the colours and textures celebrate individuality.</image:title>
+        <image:caption>Some stories are told without speaking. Confidence has its own language.</image:caption>
+      </image:image>
+      <image:image>
+        <image:loc>https://res.cloudinary.com/dr7wqaqbm/image/upload/v1793547711/impactgrid/portfolio/ad9gzvfmfspwrebfohzf.jpg</image:loc>
+        <image:title>A quieter interpretation of the outdoor series. Surrounded by greenery, she sits naturally within the landscape, creating a sense of calm and belonging.</image:title>
+        <image:caption>A moment to pause, breathe and exist without hurry.”</image:caption>
+      </image:image>
+      <image:image>
+        <image:loc>https://res.cloudinary.com/dr7wqaqbm/image/upload/v1793568324/impactgrid/portfolio/z5mhptuqn8ntl8exow95.jpg</image:loc>
+        <image:title>An editorial portrait exploring identity, mystery and self-expression through bold colour and styling.</image:title>
+        <image:caption>Beauty in what is seen and unseen.</image:caption>
+      </image:image>
+      <image:image>
+        <image:loc>https://res.cloudinary.com/dr7wqaqbm/image/upload/v1793568430/impactgrid/portfolio/e3u2s1pw6xe6u0mrd3xr.jpg</image:loc>
+        <image:title>A contemporary studio portrait celebrating confidence and individuality through striking light, colour and expression.</image:title>
+        <image:caption>Confidence speaks without words.</image:caption>
+      </image:image>
+  </url>
+  <url>
+    <loc>https://impactgridgroup.com/portfolio.html?category=event-photography-manchester</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
