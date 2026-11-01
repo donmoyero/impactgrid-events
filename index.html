@@ -317,7 +317,7 @@
     .h-work-text { font: 400 clamp(13px, .9vw, 14.5px)/1.55 var(--h-sans); color: var(--h-ink-2); margin: 0; white-space: pre-line; overflow-wrap: anywhere;
       display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
     .h-work-card.is-open .h-work-text { display: block; -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
-    .h-work-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 2px; }
+    .h-work-actions { flex-wrap: wrap; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 2px; }
     .h-work-more { background: none; border: 0; padding: 0; cursor: pointer; color: var(--h-ink); text-decoration: underline; text-underline-offset: 3px; font: 500 clamp(12px, .9vw, 14px)/1 var(--h-sans); }
     .h-work-more:hover { opacity: .7; }
     .h-work-view { color: var(--h-ink); font: 500 clamp(12px, .9vw, 14px)/1 var(--h-sans); text-decoration: none; margin-left: auto; }
@@ -848,16 +848,18 @@
                 '<img src="' + escHtml(m.url) + '" alt="' + escHtml(alt) + '" loading="lazy" decoding="async" />' +
                 (isVideo ? window.igPlayBadge : '') +
               '</a>' + window.igBadge(ig, 'View ' + c.title + ' on Instagram') + '</figure>'
-            : '<figure class="ig-wrap">' + window.igPlaceholder(ig, 'View ' + c.title + ' on Instagram', isVideo) + '</figure>') +
+            : '<figure class="ig-wrap">' + window.igEmbed(ig, 'Show Instagram post', isVideo) + '</figure>') +
           '<div class="h-work-body">' +
             (text ? '<p class="h-work-text" id="hWorkText' + i + '">' + escHtml(text) + '</p>' : '') +
             '<div class="h-work-actions">' +
               (text && long ? '<button type="button" class="h-work-more" aria-expanded="false" aria-controls="hWorkText' + i + '">Read more</button>' : '') +
+              (m.url ? '' : window.igButton(ig, 'View on Instagram')) +
               '<a class="h-work-view" href="' + escHtml(href) + '">View gallery →</a>' +
             '</div>' +
           '</div></article>';
       }).join('');
 
+      window.igHydrate(host);
       host.querySelectorAll('.h-work-more').forEach(function(btn){
         btn.addEventListener('click', function(){
           var card = btn.closest('.h-work-card');

@@ -36,6 +36,69 @@
       '<span class="ig-ph-txt">' + (isVideo ? 'Watch on Instagram' : 'View on Instagram') + '</span></a>';
   };
 
+
+  /* Small "Instagram" button (icon + word) for card action rows */
+  window.igButton = function (url, label) {
+    var safe = window.igSafeUrl(url);
+    if (!safe) return '';
+    n++;
+    return '<a class="ig-btn" href="' + esc(safe) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(label || 'View on Instagram') + '">' +
+      ICON.replace(/__ID__/g, String(n)) + '<span>Instagram</span></a>';
+  };
+
+  /* The actual Instagram post/reel, shown on the page with Instagram's official embed.
+     Instagram's embed sets Meta cookies, so it only loads automatically when the visitor
+     has allowed Marketing cookies; otherwise they see a tile and one click loads it. */
+  function cleanPermalink(u) {
+    try { var x = new URL(u); return x.origin + x.pathname.replace(/\/?$/, '/'); } catch (e) { return u; }
+  }
+  window.igEmbed = function (url, label, isVideo) {
+    var safe = window.igSafeUrl(url);
+    if (!safe) return '';
+    n++;
+    return '<div class="ig-embed" data-ig-url="' + esc(cleanPermalink(safe)) + '">' +
+      '<button type="button" class="ig-ph" data-ig-load aria-label="' + esc(label || 'Show Instagram post') + '">' +
+        '<span class="ig-ph-ico">' + ICON.replace(/__ID__/g, String(n)) + '</span>' +
+        '<span class="ig-ph-txt">' + (isVideo ? 'Show Instagram reel' : 'Show Instagram post') + '</span>' +
+        '<span class="ig-ph-sub">Loads from Instagram</span>' +
+      '</button></div>';
+  };
+
+  var scriptState = 0;   // 0 none, 1 loading, 2 ready
+  function processEmbeds() { try { window.instgrm && window.instgrm.Embeds.process(); } catch (e) {} }
+  function loadEmbedScript() {
+    if (window.instgrm && window.instgrm.Embeds) { processEmbeds(); return; }
+    if (scriptState) return;
+    scriptState = 1;
+    var sc = document.createElement('script');
+    sc.async = true; sc.src = 'https://www.instagram.com/embed.js';
+    sc.onload = function () { scriptState = 2; processEmbeds(); };
+    sc.onerror = function () { scriptState = 0; };
+    document.body.appendChild(sc);
+  }
+  function mount(box) {
+    if (box.classList.contains('is-live')) return;
+    var url = box.getAttribute('data-ig-url');
+    box.classList.add('is-live');
+    box.innerHTML = '<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="' + esc(url) + '" data-instgrm-version="14">' +
+      '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">View this post on Instagram</a></blockquote>';
+    loadEmbedScript();
+  }
+  window.igHydrate = function (root) {
+    var ok = window.igConsent && window.igConsent.marketing && window.igConsent.marketing();
+    if (!ok) return;
+    (root || document).querySelectorAll('.ig-embed:not(.is-live)').forEach(mount);
+  };
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-ig-load]') : null;
+    if (!b) return;
+    var box = b.closest('.ig-embed');
+    if (box) mount(box);
+  });
+  document.addEventListener('ig-consent', function (e) {
+    if (e.detail && e.detail.marketing) window.igHydrate(document);
+  });
+
   window.igPlayBadge = '<span class="ig-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="#fff" d="M8 5v14l11-7z"/></svg></span>';
 
   var css = '.ig-wrap{position:relative}' +
@@ -52,6 +115,13 @@
     '.ig-ph-ico{width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;transition:transform .2s ease}' +
     '.ig-ph-ico svg{width:36px;height:36px}' +
     '.ig-ph:hover .ig-ph-ico{transform:scale(1.08)}' +
+    '.ig-ph-sub{font:400 11px/1 system-ui,-apple-system,Segoe UI,sans-serif;opacity:.65}' +
+    'button.ig-ph{border:0;cursor:pointer;font:inherit}' +
+    '.ig-embed{width:100%}' +
+    '.ig-embed.is-live .instagram-media{min-width:0!important;max-width:100%!important;width:100%!important;margin:0!important}' +
+    '.ig-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 11px 5px 7px;border:1px solid rgba(128,128,128,.45);border-radius:999px;' +
+    'color:inherit;text-decoration:none;font:500 13px/1 system-ui,-apple-system,Segoe UI,sans-serif;background:rgba(255,255,255,.92);color:#111}' +
+    '.ig-btn svg{width:18px;height:18px}.ig-btn:hover{opacity:.8}' +
     '.ig-ph-txt{font:500 14px/1 system-ui,-apple-system,Segoe UI,sans-serif;letter-spacing:.02em}';
   var st = document.createElement('style');
   st.textContent = css.replace(/%/g, '%');

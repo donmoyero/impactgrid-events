@@ -205,7 +205,10 @@
 
   /* ── public API + footer link ── */
   window.igOpenCookieSettings = function () { open(true); };
-  window.igConsent = { analytics: function () { var r = read(); return !!(r && r.analytics); } };
+  window.igConsent = {
+    analytics: function () { var r = read(); return !!(r && r.analytics); },
+    marketing: function () { var r = read(); return !!(r && r.marketing); }
+  };
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest ? e.target.closest('[data-cookie-settings]') : null;
     if (t) { e.preventDefault(); open(true); }
