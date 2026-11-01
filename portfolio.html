@@ -447,8 +447,7 @@
       var ig = window.igSafeUrl(img.instagramUrl);
       var isVideo = img.mediaType === 'video';
       if (!img.url) {
-        return ig ? '<figure class="ig-wrap">' + window.igEmbed(ig, 'Show Instagram post', isVideo) +
-          '<div style="margin-top:8px;">' + window.igButton(ig, 'View on Instagram') + '</div>' +
+        return ig ? '<figure class="ig-wrap">' + window.igPlaceholder(ig, 'View on Instagram', isVideo) +
           (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') + '</figure>' : '';
       }
       var alt = esc(img.altText || (activeCategory.title + ' — Impact Grid event photography, Manchester'));
@@ -461,7 +460,6 @@
         (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') +
         '</figure>';
     }).join('');
-    if (window.igHydrate) window.igHydrate(el);
   }
   function renderRelated() {
     var section = document.getElementById('relatedSection');

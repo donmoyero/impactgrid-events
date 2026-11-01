@@ -1142,10 +1142,25 @@ If you have any questions, just reply to this email.
                 <h2> Photos</h2>
                 <div style="display:flex;gap:6px;">
                   <button class="btn btn-ghost btn-sm" onclick="portfolioShuffleImages()" title="Randomize photo order">Shuffle</button>
-                  <button class="btn btn-ghost btn-sm" onclick="portfolioAddLinkItem()" title="Add a portfolio item using only an Instagram link — no photo file needed">+ Add Instagram Link</button>
+                  <button class="btn btn-ghost btn-sm" onclick="portfolioToggleLinkPanel()" title="Add a picture that links to one of your Instagram posts or reels">+ Add Instagram Link</button>
                   <label class="btn btn-ghost btn-sm" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
                     <input type="file" id="portfolioAddImageIn" accept="image/*" multiple style="display:none;" onchange="portfolioAddImageFiles(event)">
                   </label>
+                </div>
+              </div>
+              <div id="portfolioLinkPanel" style="display:none;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg2);">
+                <div style="font-size:13px;margin-bottom:8px;">Paste your Instagram post or reel link and choose the picture for it. Visitors see the picture, with a small Instagram icon that opens the post.</div>
+                <input type="url" id="portfolioLinkUrl" placeholder="https://www.instagram.com/p/... or /reel/..." style="margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                  <label class="btn btn-ghost btn-sm" for="portfolioLinkPic" style="cursor:pointer;">Choose the picture
+                    <input type="file" id="portfolioLinkPic" accept="image/*" style="display:none;" onchange="portfolioLinkPicChosen()">
+                  </label>
+                  <span id="portfolioLinkPicName" style="font-size:12px;opacity:.75;">No picture chosen</span>
+                </div>
+                <input type="text" id="portfolioLinkCaption" placeholder="Caption / write-up (optional)" style="margin-bottom:10px;">
+                <div style="display:flex;gap:6px;">
+                  <button class="btn btn-gold btn-sm" id="portfolioLinkAddBtn" onclick="portfolioConfirmLinkItem()">Add</button>
+                  <button class="btn btn-ghost btn-sm" onclick="portfolioToggleLinkPanel(false)">Cancel</button>
                 </div>
               </div>
               <div class="card-body" id="portfolioImagesList">
@@ -5035,8 +5050,8 @@ function portfolioRenderImages() {
       '</div>' +
       (img.url ? '<img src="' + esc(img.url) + '" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--r);margin-bottom:8px;display:block;">' :
         '<div style="padding:14px;margin-bottom:8px;border:1px dashed var(--border);border-radius:var(--r);font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
-          '<span>Instagram link only — your site shows the actual Instagram post here, with an Instagram button linking to it.</span>' +
-          '<label class="btn btn-ghost btn-sm" style="cursor:pointer;">Upload a cover photo (optional)' +
+          '<span>No picture yet — your site shows a plain Instagram tile. Upload the picture and it shows like your other photos, with a small Instagram icon linking to the post.</span>' +
+          '<label class="btn btn-ghost btn-sm" style="cursor:pointer;">Upload the picture' +
             '<input type="file" accept="image/*" style="display:none;" onchange="portfolioSetItemCover(' + idx + ',event)">' +
           '</label></div>') +
       '<input type="text" placeholder="Alt text — describe what\'s in the photo (this is your image SEO)" value="' + esc(img.altText) + '" oninput="portfolioUpdateImageField(' + idx + ',\'altText\',this.value)" style="margin-bottom:8px;">' +
@@ -5049,24 +5064,60 @@ function portfolioRenderImages() {
   }).join('');
 }
 
-function portfolioAddLinkItem() {
+function portfolioToggleLinkPanel(show) {
+  var el = document.getElementById('portfolioLinkPanel');
+  if (!el) return;
+  var open = (typeof show === 'boolean') ? show : (el.style.display === 'none');
+  el.style.display = open ? '' : 'none';
+  if (!open) {
+    document.getElementById('portfolioLinkUrl').value = '';
+    document.getElementById('portfolioLinkCaption').value = '';
+    document.getElementById('portfolioLinkPic').value = '';
+    document.getElementById('portfolioLinkPicName').textContent = 'No picture chosen';
+  } else {
+    document.getElementById('portfolioLinkUrl').focus();
+  }
+}
+
+function portfolioLinkPicChosen() {
+  var f = document.getElementById('portfolioLinkPic').files[0];
+  document.getElementById('portfolioLinkPicName').textContent = f ? f.name : 'No picture chosen';
+}
+
+async function portfolioConfirmLinkItem() {
   if (!portfolioCurrentCat) return;
-  var link = window.prompt('Paste the Instagram post or reel link (https://www.instagram.com/...)');
-  if (link == null) return;
-  link = link.trim();
+  var link = document.getElementById('portfolioLinkUrl').value.trim();
   if (!/^https:\/\/(www\.)?(instagram\.com|instagr\.am)\/\S+$/i.test(link)) {
     toast('', 'Not an Instagram link', 'It should start with https://www.instagram.com/');
     return;
   }
-  portfolioCurrentCat.images.push({
-    _localId: 'npi' + (portfolioImageSeq++),
-    url: '', cloudinaryId: '',
-    altText: '', caption: '',
-    instagramUrl: link,
-    mediaType: /\/(reel|reels|tv)\//i.test(link) ? 'video' : 'photo'
-  });
-  portfolioRenderImages();
-  toast('', 'Instagram link added', 'Add a caption, then Save.');
+  var caption = document.getElementById('portfolioLinkCaption').value.trim();
+  var file = document.getElementById('portfolioLinkPic').files[0];
+  var btn = document.getElementById('portfolioLinkAddBtn');
+  var url = '', cloudinaryId = '';
+  btn.disabled = true;
+  try {
+    if (file) {
+      toast('', 'Uploading picture…', '');
+      var webBlob = await resizeImageForBlog(file);
+      var result = await uploadToCloudinary(webBlob, 'portfolio');
+      url = result.secure_url; cloudinaryId = result.public_id;
+    }
+    portfolioCurrentCat.images.push({
+      _localId: 'npi' + (portfolioImageSeq++),
+      url: url, cloudinaryId: cloudinaryId,
+      altText: '', caption: caption,
+      instagramUrl: link,
+      mediaType: /\/(reel|reels|tv)\//i.test(link) ? 'video' : 'photo'
+    });
+    portfolioToggleLinkPanel(false);
+    portfolioRenderImages();
+    toast('', url ? 'Picture added' : 'Instagram link added', url ? 'Add alt text, then Save.' : 'No picture yet — add one on the item, then Save.');
+  } catch (err) {
+    toast('', 'Upload failed', err.message);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 async function portfolioSetItemCover(idx, e) {

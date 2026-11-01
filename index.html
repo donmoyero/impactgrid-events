@@ -848,18 +848,16 @@
                 '<img src="' + escHtml(m.url) + '" alt="' + escHtml(alt) + '" loading="lazy" decoding="async" />' +
                 (isVideo ? window.igPlayBadge : '') +
               '</a>' + window.igBadge(ig, 'View ' + c.title + ' on Instagram') + '</figure>'
-            : '<figure class="ig-wrap">' + window.igEmbed(ig, 'Show Instagram post', isVideo) + '</figure>') +
+            : '<figure class="ig-wrap">' + window.igPlaceholder(ig, 'View ' + c.title + ' on Instagram', isVideo) + '</figure>') +
           '<div class="h-work-body">' +
             (text ? '<p class="h-work-text" id="hWorkText' + i + '">' + escHtml(text) + '</p>' : '') +
             '<div class="h-work-actions">' +
               (text && long ? '<button type="button" class="h-work-more" aria-expanded="false" aria-controls="hWorkText' + i + '">Read more</button>' : '') +
-              (m.url ? '' : window.igButton(ig, 'View on Instagram')) +
               '<a class="h-work-view" href="' + escHtml(href) + '">View gallery →</a>' +
             '</div>' +
           '</div></article>';
       }).join('');
 
-      window.igHydrate(host);
       host.querySelectorAll('.h-work-more').forEach(function(btn){
         btn.addEventListener('click', function(){
           var card = btn.closest('.h-work-card');
