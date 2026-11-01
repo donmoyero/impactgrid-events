@@ -394,7 +394,18 @@
       'description': cat.metaDescription || '',
       'url': 'https://impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug),
       'author': { '@type': 'Organization', 'name': 'Impact Grid', 'url': 'https://impactgridgroup.com' },
-      'image': cat.images.map(function(img){ return img.url; })
+      'image': cat.images.map(function(img){
+        return {
+          '@type': 'ImageObject',
+          'contentUrl': img.url,
+          'name': img.altText || (cat.title + ' — Impact Grid event photography, Manchester'),
+          'caption': img.caption || img.altText || cat.title,
+          'creator': { '@type': 'Organization', 'name': 'Impact Grid' },
+          'creditText': 'Impact Grid',
+          'copyrightNotice': '© Impact Grid',
+          'acquireLicensePage': 'https://impactgridgroup.com/book-us.html'
+        };
+      })
     };
     script.textContent = JSON.stringify(data);
     document.head.appendChild(script);
@@ -433,7 +444,7 @@
     }
     el.innerHTML = images.map(function(img) {
       return '<figure>' +
-        '<img src="' + esc(img.url) + '" alt="' + esc(img.altText || activeCategory.title) + '" onclick="openLightbox(this.src)">' +
+        '<img src="' + esc(img.url) + '" alt="' + esc(img.altText || (activeCategory.title + ' — Impact Grid event photography, Manchester')) + '" loading="lazy" decoding="async" onclick="openLightbox(this.src)">' +
         (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') +
         '</figure>';
     }).join('');

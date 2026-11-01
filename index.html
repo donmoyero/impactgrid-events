@@ -305,6 +305,24 @@
     .h-tile span { display: flex; align-items: center; gap: 12px; width: 100%; font: 400 clamp(11.5px, .95vw, 15px)/1 var(--h-sans); }
     .h-tile span::after { content: ''; height: 1px; width: clamp(34px, 4.4vw, 74px); background: rgba(255,255,255,.4); }
 
+    /* ── Featured Work cards (live from portfolio_categories) ── */
+    .h-work { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 1.1vw, 20px); align-items: start; }
+    .h-work-card { display: flex; flex-direction: column; background: var(--h-bg-2); border: 1px solid var(--h-line); border-radius: 8px; overflow: hidden; color: var(--h-ink); }
+    .h-work-card figure { margin: 0; }
+    .h-work-card .h-work-img { display: block; position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #0a0a0a; }
+    .h-work-card .h-work-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
+    .h-work-card .h-work-img:hover img { transform: scale(1.05); }
+    .h-work-body { padding: clamp(12px, 1.1vw, 18px); display: flex; flex-direction: column; gap: 8px; }
+    .h-work-body h3 { font: 600 clamp(16px, 1.3vw, 21px)/1.2 var(--h-display); letter-spacing: -.02em; margin: 0; }
+    .h-work-text { font: 400 clamp(13px, .9vw, 14.5px)/1.55 var(--h-sans); color: var(--h-ink-2); margin: 0; white-space: pre-line; overflow-wrap: anywhere;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+    .h-work-card.is-open .h-work-text { display: block; -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
+    .h-work-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 2px; }
+    .h-work-more { background: none; border: 0; padding: 0; cursor: pointer; color: var(--h-ink); text-decoration: underline; text-underline-offset: 3px; font: 500 clamp(12px, .9vw, 14px)/1 var(--h-sans); }
+    .h-work-more:hover { opacity: .7; }
+    .h-work-view { color: var(--h-ink); font: 500 clamp(12px, .9vw, 14px)/1 var(--h-sans); text-decoration: none; margin-left: auto; }
+    .h-work-view:hover { opacity: .7; }
+
     /* ── 5. HOW IT WORKS (light) ─────────────────── */
     .h-how { background: var(--h-light); color: var(--h-ink); padding: clamp(28px, 3vw, 54px) 0; }
     .h-how .h-in { display: grid; grid-template-columns: 27fr 73fr; gap: 24px; align-items: start; }
@@ -414,6 +432,7 @@
       .h-svc-grid { grid-template-columns: minmax(0, 1fr); }
       .h-svc { aspect-ratio: auto; min-height: 300px; }
       .h-tiles { grid-template-columns: repeat(2, 1fr); }
+      .h-work { grid-template-columns: repeat(2, 1fr); }
       .h-stats .h-in { grid-template-columns: repeat(2, 1fr); }
       .h-stat:nth-child(3) { border-left: 0; }
       .h-stat:nth-child(n+3) { border-top: 1px solid var(--h-line); }
@@ -448,12 +467,13 @@
       .h-stat { flex-direction: column; text-align: center; gap: 8px; }
       .h-steps { grid-template-columns: 1fr; }
       .h-tile { aspect-ratio: 1 / .92; align-items: flex-end; }
+      .h-work { grid-template-columns: 1fr; }
       .h-tile span::after { display: none; }
       .h-quote-wrap { gap: 8px; }
       .h-arrow { width: 32px; height: 32px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .h-svc > img, .h-tile img, .h-quote, .h-btn, .h-svc-go, .h-arrow { transition: none !important; }
+      .h-svc > img, .h-tile img, .h-work-img img, .h-quote, .h-btn, .h-svc-go, .h-arrow { transition: none !important; }
       .h-svc:hover > img, .h-tile:hover img { transform: none; }
     }
 
@@ -557,11 +577,11 @@
       </div>
     </div>
     <div class="h-in--wide">
-      <div class="h-tiles">
-        <a href="portfolio.html" class="h-tile"><img id="hEvt1Img" src="assets/home/event-celebrations.jpg" alt="" loading="lazy" /><span>Celebrations</span></a>
-        <a href="portfolio.html" class="h-tile"><img id="hEvt2Img" src="assets/home/event-corporate.jpg" alt="" loading="lazy" /><span>Corporate Events</span></a>
-        <a href="portfolio.html" class="h-tile"><img id="hEvt3Img" src="assets/home/event-private.jpg" alt="" loading="lazy" /><span>Private Events</span></a>
-        <a href="portfolio.html" class="h-tile"><img id="hEvt4Img" src="assets/home/event-sports.jpg" alt="" loading="lazy" /><span>Sports &amp; Community</span></a>
+      <div class="h-tiles" id="hFeatured">
+        <a href="portfolio.html" class="h-tile"><img id="hEvt1Img" src="assets/home/event-celebrations.jpg" alt="Celebration event photography by Impact Grid, Manchester" loading="lazy" /><span>Celebrations</span></a>
+        <a href="portfolio.html" class="h-tile"><img id="hEvt2Img" src="assets/home/event-corporate.jpg" alt="Corporate event photography by Impact Grid, Manchester" loading="lazy" /><span>Corporate Events</span></a>
+        <a href="portfolio.html" class="h-tile"><img id="hEvt3Img" src="assets/home/event-private.jpg" alt="Private event photography by Impact Grid, Manchester" loading="lazy" /><span>Private Events</span></a>
+        <a href="portfolio.html" class="h-tile"><img id="hEvt4Img" src="assets/home/event-sports.jpg" alt="Sports and community event photography by Impact Grid, Manchester" loading="lazy" /><span>Sports &amp; Community</span></a>
       </div>
     </div>
   </section>
@@ -732,6 +752,68 @@
     }
   }
   loadHomepageImages();
+
+  /* ── "Featured Work" — your real portfolio, newest categories first ──
+     Pulls cover photo + write-up (the category description you write in
+     Admin > Portfolio) from Supabase. The write-up is clamped to 3 lines with
+     a "Read more" toggle to finish reading it. If nothing loads, the original
+     static tiles above stay exactly as they are. */
+  async function loadFeaturedWork(){
+    var host = document.getElementById('hFeatured');
+    if (!host) return;
+    try {
+      var sb = (typeof getContentClient === 'function') ? getContentClient() : null;
+      if (!sb) return;
+      var res = await sb.from('portfolio_categories')
+        .select('id, title, slug, meta_description, cover_image, created_at')
+        .order('created_at', { ascending: false })
+        .limit(8);
+      var cats = res && res.data;
+      if (res.error || !cats || !cats.length) return;
+
+      /* categories with no cover use their first photo */
+      for (var i = 0; i < cats.length; i++) {
+        if (!cats[i].cover_image) {
+          var r = await sb.from('portfolio_images').select('url').eq('category_id', cats[i].id)
+            .order('order', { ascending: true }).limit(1);
+          if (r.data && r.data[0]) cats[i].cover_image = r.data[0].url;
+        }
+      }
+      cats = cats.filter(function(c){ return c.cover_image; }).slice(0, 4);
+      if (!cats.length) return;
+
+      host.className = 'h-work';
+      host.innerHTML = cats.map(function(c, i){
+        var href = 'portfolio.html?category=' + encodeURIComponent(c.slug || '');
+        var text = (c.meta_description || '').trim();
+        var long = text.length > 120 || text.indexOf('\n') > -1;
+        return '<article class="h-work-card">' +
+          '<figure><a class="h-work-img" href="' + escHtml(href) + '" aria-label="View ' + escHtml(c.title) + ' gallery">' +
+            '<img src="' + escHtml(c.cover_image) + '" alt="' + escHtml(c.title) + ' — event photography by Impact Grid, Manchester" loading="lazy" decoding="async" />' +
+          '</a></figure>' +
+          '<div class="h-work-body">' +
+            '<h3>' + escHtml(c.title) + '</h3>' +
+            (text ? '<p class="h-work-text" id="hWorkText' + i + '">' + escHtml(text) + '</p>' : '') +
+            '<div class="h-work-actions">' +
+              (text && long ? '<button type="button" class="h-work-more" aria-expanded="false" aria-controls="hWorkText' + i + '">Read more</button>' : '') +
+              '<a class="h-work-view" href="' + escHtml(href) + '">View gallery →</a>' +
+            '</div>' +
+          '</div></article>';
+      }).join('');
+
+      host.querySelectorAll('.h-work-more').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var card = btn.closest('.h-work-card');
+          var open = card.classList.toggle('is-open');
+          btn.textContent = open ? 'Show less' : 'Read more';
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      });
+    } catch (e) {
+      console.warn('[featured-work] Could not load portfolio:', e && e.message);
+    }
+  }
+  loadFeaturedWork();
 
   /* ── "Our Services" section — always the real top 3 most-booked services ──
      Pulled live from /api/top-services (ranked by CONFIRMED bookings) on every
