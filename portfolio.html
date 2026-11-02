@@ -469,34 +469,50 @@
       var inner = (img.url ? '<img src="' + esc(img.url) + '" alt="' + esc(img.altText || (activeCategory.title + ' — video by Impact Grid')) + '" loading="lazy" decoding="async">'
                            : '<div class="vid-none">' + esc(label) + '</div>') +
         '<div class="vid-shade"></div><span class="vid-tag">' + esc(label) + '</span><span class="vid-play"></span>';
+      var clip = /^https:\/\/\S+$/i.test(String(img.clipUrl || '').trim()) ? String(img.clipUrl).trim() : '';
       var card = src
-        ? '<a class="vid-card" href="' + esc(src.url) + '" target="_blank" rel="noopener noreferrer" aria-label="Watch on ' + esc(label) + '"' + (id ? ' data-tt="' + id + '"' : '') + '>' + inner + '</a>'
+        ? '<a class="vid-card" href="' + esc(src.url) + '" target="_blank" rel="noopener noreferrer" aria-label="Watch on ' + esc(label) + '"' + (clip ? ' data-clip="' + esc(clip) + '"' : (id ? ' data-tt="' + id + '"' : '')) + '>' + inner + '</a>'
         : '<div class="vid-card">' + inner + '</div>';
       return '<figure>' + card + (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') + '</figure>';
     }).join('');
     VideoPlayer.init();
   }
 
-  /* Plays TikTok cards silently, ONE AT A TIME, in order, looping while this portfolio is open.
-     Instagram/Pinterest have no playable embed, so those stay as the cover picture and link out. */
+  /* Plays the video cards silently, ONE AT A TIME, in order, looping while this portfolio is open.
+     - Cards with a short preview clip play that clip (any platform).
+     - TikTok cards without a clip play through TikTok's official player (needs Marketing cookie consent).
+     - Anything else (Instagram / Pinterest with no clip) stays as the cover picture and links out. */
   var VideoPlayer = (function(){
-    var cards = [], idx = -1, iframe = null, current = null, startTimer = null, fails = 0, started = false;
+    var cards = [], idx = -1, media = null, isFrame = false, current = null, startTimer = null, fails = 0, started = false;
     var ORIGIN = 'https://www.tiktok.com';
     var PARAMS = 'autoplay=1&loop=0&controls=0&progress_bar=0&play_button=0&volume_control=0&fullscreen_button=0&timestamp=0&music_info=0&description=0&rewind=0&native_context_menu=0&closed_caption=0';
     function open() { var pv = document.getElementById('postView'); return !!(pv && pv.classList.contains('show')); }
-    function allowed() {
+    function motionOk() {
       try {
         if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
         var c = navigator.connection; if (c && c.saveData) return false;
       } catch (e) {}
-      return !!(window.igConsent && window.igConsent.marketing && window.igConsent.marketing());
+      return true;
     }
-    function send(type) { try { iframe && iframe.contentWindow.postMessage({ 'x-tiktok-player': true, type: type }, '*'); } catch (e) {} }
+    function consentOk() { return !!(window.igConsent && window.igConsent.marketing && window.igConsent.marketing()); }
+    /* Cloudinary clips are delivered as small silent MP4s; any other link is used as given. */
+    function clipSrc(u) {
+      if (/^https:\/\/res\.cloudinary\.com\/[^\/]+\/video\/upload\/(?!.*(?:f_|q_|w_|ac_))/i.test(u)) {
+        return u.replace('/video/upload/', '/video/upload/f_mp4,vc_h264,q_auto,w_540,ac_none/').replace(/\.[a-z0-9]+($|\?)/i, '.mp4$1');
+      }
+      return u;
+    }
+    function collect() {
+      var ok = consentOk();
+      return Array.prototype.slice.call(document.querySelectorAll('#pfGallery .vid-card[data-clip], #pfGallery .vid-card[data-tt]'))
+        .filter(function(c){ return c.hasAttribute('data-clip') || ok; });
+    }
+    function sendFrame(type) { try { isFrame && media && media.contentWindow.postMessage({ 'x-tiktok-player': true, type: type }, '*'); } catch (e) {} }
     function unmount() {
       clearTimeout(startTimer);
-      if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      if (media) { try { if (!isFrame) media.pause(); } catch (e) {} if (media.parentNode) media.parentNode.removeChild(media); }
       if (current) current.classList.remove('is-live');
-      iframe = null; current = null;
+      media = null; current = null;
     }
     function next(failed) {
       unmount();
@@ -506,48 +522,72 @@
       idx = (idx + 1) % cards.length;
       mount(cards[idx]);
     }
-    function mount(card) {
-      current = card;
-      iframe = document.createElement('iframe');
-      iframe.className = 'vid-live';
-      iframe.src = ORIGIN + '/player/v1/' + card.getAttribute('data-tt') + '?' + PARAMS;
-      iframe.setAttribute('allow', 'autoplay; encrypted-media');
-      iframe.setAttribute('title', 'Video preview');
-      iframe.setAttribute('tabindex', '-1');
-      iframe.setAttribute('aria-hidden', 'true');
-      card.insertBefore(iframe, card.querySelector('.vid-shade'));
-      card.classList.add('is-live');
+    function mountClip(card) {
+      var orig = card.getAttribute('data-clip'), triedOrig = false;
+      var v = document.createElement('video');
+      v.className = 'vid-live';
+      v.muted = true; v.defaultMuted = true; v.autoplay = true; v.playsInline = true; v.controls = false;
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.setAttribute('tabindex', '-1');
+      v.style.objectFit = 'cover';
+      v.addEventListener('playing', function(){ clearTimeout(startTimer); fails = 0; });
+      v.addEventListener('ended', function(){ next(false); });
+      v.addEventListener('error', function(){
+        if (!triedOrig && v.src !== orig) { triedOrig = true; v.src = orig; try { v.play(); } catch (e) {} }   /* optimised version not available - try the original file */
+        else next(true);
+      });
+      v.src = clipSrc(orig);
+      media = v; isFrame = false;
+      card.insertBefore(v, card.querySelector('.vid-shade'));
+      try { var pr = v.play(); if (pr && pr.catch) pr.catch(function(){}); } catch (e) {}
+      startTimer = setTimeout(function(){ next(true); }, 15000);
+    }
+    function mountTikTok(card) {
+      var f = document.createElement('iframe');
+      f.className = 'vid-live';
+      f.src = ORIGIN + '/player/v1/' + card.getAttribute('data-tt') + '?' + PARAMS;
+      f.setAttribute('allow', 'autoplay; encrypted-media');
+      f.setAttribute('title', 'Video preview');
+      f.setAttribute('tabindex', '-1');
+      f.setAttribute('aria-hidden', 'true');
+      media = f; isFrame = true;
+      card.insertBefore(f, card.querySelector('.vid-shade'));
       startTimer = setTimeout(function(){ next(true); }, 12000);
     }
+    function mount(card) {
+      current = card;
+      card.classList.add('is-live');
+      if (card.hasAttribute('data-clip')) mountClip(card); else mountTikTok(card);
+    }
     function onMessage(e) {
-      if (e.origin !== ORIGIN || !iframe || e.source !== iframe.contentWindow) return;
+      if (e.origin !== ORIGIN || !isFrame || !media || e.source !== media.contentWindow) return;
       var d = e.data; if (!d || !d['x-tiktok-player']) return;
-      if (d.type === 'onPlayerReady') { send('mute'); send('play'); }
+      if (d.type === 'onPlayerReady') { sendFrame('mute'); sendFrame('play'); }
       else if (d.type === 'onStateChange') {
-        if (d.value === 1) { clearTimeout(startTimer); fails = 0; send('mute'); }
+        if (d.value === 1) { clearTimeout(startTimer); fails = 0; sendFrame('mute'); }
         else if (d.value === 0) { next(false); }
       }
       else if (d.type === 'onError') { next(true); }
     }
     function begin() {
-      if (started || !cards.length || !open() || !allowed()) return;
+      if (started || !open() || !motionOk()) return;
+      cards = collect();
+      if (!cards.length) return;
       started = true; next(false);
     }
     return {
-      init: function() {
-        unmount(); started = false; idx = -1; fails = 0;
-        cards = Array.prototype.slice.call(document.querySelectorAll('#pfGallery .vid-card[data-tt]'));
-        begin();
-      },
+      init: function() { unmount(); started = false; idx = -1; fails = 0; cards = []; begin(); },
       stop: function() { unmount(); cards = []; started = false; },
       begin: begin,
       message: onMessage,
-      visibility: function() { send(document.hidden ? 'pause' : 'play'); }
+      visibility: function() {
+        if (isFrame) sendFrame(document.hidden ? 'pause' : 'play');
+        else if (media) { try { if (document.hidden) media.pause(); else media.play(); } catch (e) {} }
+      }
     };
   })();
   window.addEventListener('message', VideoPlayer.message);
   document.addEventListener('visibilitychange', VideoPlayer.visibility);
-  document.addEventListener('ig-consent', function(e){ if (e.detail && e.detail.marketing) VideoPlayer.begin(); });
+  document.addEventListener('ig-consent', function(e){ if (e.detail && e.detail.marketing) { VideoPlayer.init(); } });
 
   function renderGallery() {
     var el = document.getElementById('pfGallery');
@@ -685,7 +725,7 @@
           coverImage: c.cover_image || '',
           createdAt: c.created_at || '',
           images: (imgs || []).map(function(img) {
-            return { id: img.id, url: img.url, altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', tiktokUrl: img.tiktok_url || '', pinterestUrl: img.pinterest_url || '', mediaType: img.media_type || 'photo' };
+            return { id: img.id, url: img.url, altText: img.alt_text || '', caption: img.caption || '', clipUrl: img.clip_url || '', instagramUrl: img.instagram_url || '', tiktokUrl: img.tiktok_url || '', pinterestUrl: img.pinterest_url || '', mediaType: img.media_type || 'photo' };
           })
         });
       }
