@@ -1119,6 +1119,16 @@ If you have any questions, just reply to this email.
                   <textarea id="portfolioDescInput" rows="2" placeholder="e.g. Professional portrait photography in Manchester for models and businesses."></textarea>
                 </div>
 
+                <div class="field-group" style="margin-bottom:14px;">
+                  <div class="field-label">Portfolio type</div>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px;">
+                    <input type="radio" name="portfolioKind" value="photo" checked onchange="portfolioSetKind('photo')"> Pictures — upload photos
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+                    <input type="radio" name="portfolioKind" value="video" onchange="portfolioSetKind('video')"> Videos — add links (TikTok, Instagram, Pinterest) with a cover picture; TikTok plays silently one after another
+                  </label>
+                </div>
+
                 <div class="field-label">Cover image (shown on the closed book)</div>
                 <label for="portfolioCoverFileIn" class="upload-zone" id="portfolioCoverDropZone"
                   ondragover="onDragOver(event,'portfolioCoverDropZone')"
@@ -1139,10 +1149,11 @@ If you have any questions, just reply to this email.
 
             <div class="card">
               <div class="card-head">
-                <h2> Photos</h2>
+                <h2 id="portfolioItemsTitle"> Photos</h2>
                 <div style="display:flex;gap:6px;">
                   <button class="btn btn-ghost btn-sm" onclick="portfolioShuffleImages()" title="Randomize photo order">Shuffle</button>
-                  <label class="btn btn-ghost btn-sm" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
+                  <button class="btn btn-ghost btn-sm" id="portfolioAddVideoBtn" onclick="portfolioAddVideo()" style="display:none;">+ Add Video</button>
+                  <label class="btn btn-ghost btn-sm" id="portfolioAddPhotosLbl" for="portfolioAddImageIn" style="cursor:pointer;">+ Add Photos
                     <input type="file" id="portfolioAddImageIn" accept="image/*" multiple style="display:none;" onchange="portfolioAddImageFiles(event)">
                   </label>
                 </div>
@@ -4778,7 +4789,7 @@ async function loadPortfolioCategories() {
             : '<div style="width:100%;height:110px;background:var(--bg3);"></div>') +
           '<div style="padding:12px 14px;">' +
             '<div style="font-size:14px;font-weight:700;margin-bottom:6px;">' + esc(c.title || 'Untitled') + '</div>' +
-            '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">' + count + ' photo' + (count === 1 ? '' : 's') + ' · /portfolio.html?category=' + esc(c.slug || '') + '</div>' +
+            '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">' + count + (c.kind === 'video' ? ' video' : ' photo') + (count === 1 ? '' : 's') + ' · /portfolio.html?category=' + esc(c.slug || '') + '</div>' +
             '<div style="display:flex;gap:6px;">' +
               '<button class="btn btn-ghost btn-sm" style="flex:1;" onclick="portfolioEditCategory(\'' + safeId + '\')">Edit</button>' +
               '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" data-cat-id="' + safeId + '" data-cover-id="' + esc(c.cover_public_id||'') + '" onclick="portfolioDeleteCategory(this.dataset.catId, this.dataset.coverId)">Delete</button>' +
@@ -4808,12 +4819,13 @@ function portfolioUpdateSlugPreview() {
 }
 
 function portfolioNewCategory() {
-  portfolioCurrentCat = { id: null, title: '', slug: '', metaDescription: '', coverImage: '', coverPublicId: '', images: [] };
+  portfolioCurrentCat = { id: null, title: '', slug: '', kind: 'photo', metaDescription: '', coverImage: '', coverPublicId: '', images: [] };
   document.getElementById('portfolioEditorTitle').textContent = ' New Portfolio';
   document.getElementById('portfolioTitleInput').value = '';
   document.getElementById('portfolioDescInput').value = '';
   document.getElementById('portfolioSlugPreview').textContent = 'your-portfolio-name';
   document.getElementById('portfolioCoverPreviewWrap').style.display = 'none';
+  portfolioSyncKindUI();
   portfolioRenderImages();
   portfolioShowEditor();
 }
@@ -4829,6 +4841,7 @@ async function portfolioEditCategory(id) {
       id: id,
       title: cat.title || '',
       slug: cat.slug || '',
+      kind: cat.kind === 'video' ? 'video' : 'photo',
       metaDescription: cat.meta_description || '',
       coverImage: cat.cover_image || '',
       coverPublicId: cat.cover_public_id || '',
@@ -4840,6 +4853,7 @@ async function portfolioEditCategory(id) {
     document.getElementById('portfolioTitleInput').value = portfolioCurrentCat.title;
     document.getElementById('portfolioDescInput').value = portfolioCurrentCat.metaDescription;
     document.getElementById('portfolioSlugPreview').textContent = portfolioCurrentCat.slug || 'your-portfolio-name';
+    portfolioSyncKindUI();
     var pv = document.getElementById('portfolioCoverPreviewWrap');
     if (portfolioCurrentCat.coverImage) {
       document.getElementById('portfolioCoverPreview').src = portfolioCurrentCat.coverImage;
@@ -4999,7 +5013,7 @@ function portfolioRenderImages() {
   var el = document.getElementById('portfolioImagesList');
   var images = portfolioCurrentCat ? portfolioCurrentCat.images : [];
   if (!images.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">No photos yet — add some above.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"> </div><div class="empty-txt">' + (portfolioIsVideoKind() ? 'No videos yet — click + Add Video above.' : 'No photos yet — add some above.') + '</div></div>';
     return;
   }
   var selCount = images.filter(function(i){ return i._sel; }).length;
@@ -5013,6 +5027,7 @@ function portfolioRenderImages() {
       '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="portfolioDeleteAll()">Delete all</button>' +
     '</div>';
   el.innerHTML = bar + images.map(function(img, idx) {
+    if (portfolioIsVideoKind()) return portfolioVideoItemHtml(img, idx, images.length);
     return '<div class="blog-page-card" draggable="true"' +
         ' ondragstart="portfolioDragStart(event,' + idx + ')"' +
         ' ondragover="portfolioDragOver(event)"' +
@@ -5049,6 +5064,102 @@ function portfolioRenderImages() {
       '</label>' +
     '</div>';
   }).join('');
+}
+
+/* ── Portfolio type (pictures / videos) ── */
+function portfolioIsVideoKind() { return !!(portfolioCurrentCat && portfolioCurrentCat.kind === 'video'); }
+
+function portfolioSyncKindUI() {
+  var video = portfolioIsVideoKind();
+  document.querySelectorAll('input[name="portfolioKind"]').forEach(function(r){ r.checked = (r.value === (video ? 'video' : 'photo')); });
+  var t = document.getElementById('portfolioItemsTitle'); if (t) t.textContent = video ? ' Videos' : ' Photos';
+  var b = document.getElementById('portfolioAddVideoBtn'); if (b) b.style.display = video ? '' : 'none';
+  var l = document.getElementById('portfolioAddPhotosLbl'); if (l) l.style.display = video ? 'none' : '';
+}
+
+function portfolioSetKind(k) {
+  if (!portfolioCurrentCat) return;
+  portfolioCurrentCat.kind = (k === 'video') ? 'video' : 'photo';
+  portfolioSyncKindUI();
+  portfolioRenderImages();
+}
+
+function portfolioDetectLink(u) {
+  u = String(u || '').trim();
+  if (/^https:\/\/([a-z0-9-]+\.)?tiktok\.com\/\S+$/i.test(u)) return 'tiktok';
+  if (/^https:\/\/(www\.)?(instagram\.com|instagr\.am)\/\S+$/i.test(u)) return 'instagram';
+  if (/^https:\/\/([a-z0-9-]+\.)?pinterest\.[a-z.]+\/\S+$/i.test(u) || /^https:\/\/pin\.it\/\S+$/i.test(u)) return 'pinterest';
+  return '';
+}
+
+function portfolioVideoStatus(link) {
+  if (!String(link || '').trim()) return '';
+  var k = portfolioDetectLink(link);
+  if (!k) return 'Not a TikTok, Instagram or Pinterest link — it should start with https://';
+  if (k === 'tiktok') {
+    return /tiktok\.com\/@[^\/?#]+\/(video|photo)\/\d+/i.test(link)
+      ? 'TikTok — will play silently on your portfolio page'
+      : 'TikTok — short link: shows the cover picture only. Use the full link (tiktok.com/@you/video/123…) so it can play';
+  }
+  return (k === 'instagram' ? 'Instagram' : 'Pinterest') + ' — shows the cover picture and opens the post when tapped';
+}
+
+function portfolioAddVideo() {
+  if (!portfolioCurrentCat) return;
+  portfolioCurrentCat.images.push({
+    _localId: 'npi' + (portfolioImageSeq++),
+    url: '', cloudinaryId: '', altText: '', caption: '',
+    instagramUrl: '', tiktokUrl: '', pinterestUrl: '', mediaType: 'video'
+  });
+  portfolioRenderImages();
+}
+
+function portfolioSetVideoLink(idx, val) {
+  var img = portfolioCurrentCat && portfolioCurrentCat.images[idx];
+  if (!img) return;
+  img._link = val;
+  img.instagramUrl = ''; img.tiktokUrl = ''; img.pinterestUrl = '';
+  var k = portfolioDetectLink(val);
+  if (k === 'tiktok') img.tiktokUrl = val.trim();
+  else if (k === 'instagram') img.instagramUrl = val.trim();
+  else if (k === 'pinterest') img.pinterestUrl = val.trim();
+  img.mediaType = 'video';
+  var st = document.getElementById('pvStat' + idx);
+  if (st) st.textContent = portfolioVideoStatus(val);
+}
+
+function portfolioVideoItemHtml(img, idx, total) {
+  var link = (img._link != null) ? img._link : (img.tiktokUrl || img.instagramUrl || img.pinterestUrl || '');
+  return '<div class="blog-page-card" draggable="true"' +
+      ' ondragstart="portfolioDragStart(event,' + idx + ')"' +
+      ' ondragover="portfolioDragOver(event)"' +
+      ' ondragleave="portfolioDragLeave(event)"' +
+      ' ondrop="portfolioDrop(event,' + idx + ')"' +
+      ' ondragend="portfolioDragEnd(event)"' +
+      ' style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;background:var(--bg2);">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+      '<span style="display:flex;align-items:center;gap:8px;">' +
+        '<input type="checkbox" ' + (img._sel ? 'checked' : '') + ' onchange="portfolioToggleSel(' + idx + ',this.checked)" title="Select this video" style="cursor:pointer;">' +
+        '<span class="blog-page-handle" title="Drag to reorder">⠿⠿</span>' +
+        '<span class="chip chip-gold">Video ' + (idx + 1) + '</span>' +
+      '</span>' +
+      '<div style="display:flex;gap:4px;">' +
+        '<button class="btn btn-ghost btn-sm" onclick="portfolioMoveImage(' + idx + ',-1)" ' + (idx===0?'disabled':'') + '>&#9650;</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="portfolioMoveImage(' + idx + ',1)" ' + (idx===total-1?'disabled':'') + '>&#9660;</button>' +
+        '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="portfolioDeleteImage(' + idx + ')">Delete</button>' +
+      '</div>' +
+    '</div>' +
+    '<input type="url" placeholder="Video link — paste the TikTok, Instagram or Pinterest link" value="' + esc(link) + '" oninput="portfolioSetVideoLink(' + idx + ',this.value)">' +
+    '<div id="pvStat' + idx + '" style="font-size:11px;opacity:.75;margin:4px 0 10px;">' + esc(portfolioVideoStatus(link)) + '</div>' +
+    '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">' +
+      (img.url ? '<img src="' + esc(img.url) + '" style="width:72px;aspect-ratio:9/16;object-fit:cover;border-radius:var(--r);display:block;">' : '') +
+      '<div style="font-size:12px;">' + (img.url ? 'Cover picture' : 'No cover picture yet — upload one (it shows before and after the video, and for Instagram/Pinterest)') + '</div>' +
+      '<label class="btn btn-ghost btn-sm" style="cursor:pointer;">' + (img.url ? 'Replace cover' : 'Upload cover') +
+        '<input type="file" accept="image/*" style="display:none;" onchange="portfolioSetItemCover(' + idx + ',event)">' +
+      '</label>' +
+    '</div>' +
+    '<input type="text" placeholder="Caption (optional, shown under the video)" value="' + esc(img.caption) + '" oninput="portfolioUpdateImageField(' + idx + ',\'caption\',this.value)">' +
+  '</div>';
 }
 
 async function portfolioSetItemCover(idx, e) {
@@ -5092,6 +5203,10 @@ async function portfolioSaveCategory() {
   var title = document.getElementById('portfolioTitleInput').value.trim();
   var metaDescription = document.getElementById('portfolioDescInput').value.trim();
   if (!title) { toast('', 'Name required', ''); return; }
+  if (portfolioIsVideoKind()) {
+    var badVid = portfolioCurrentCat.images.findIndex(function(i){ return !portfolioDetectLink(i.tiktokUrl || i.instagramUrl || i.pinterestUrl); });
+    if (badVid !== -1) { toast('', 'Video ' + (badVid + 1) + ' needs a link', 'Paste a TikTok, Instagram or Pinterest link for every video.'); return; }
+  }
   var slug = portfolioSlugify(title);
   portfolioCurrentCat.title = title;
   portfolioCurrentCat.slug = slug;
@@ -5106,10 +5221,22 @@ async function portfolioSaveCategory() {
         title: title,
         slug: slug,
         meta_description: metaDescription,
+        kind: portfolioIsVideoKind() ? 'video' : 'photo',
         cover_image: portfolioCurrentCat.coverImage || '',
         cover_public_id: portfolioCurrentCat.coverPublicId || '',
         updated_at: new Date().toISOString()
       }).eq('id', catId);
+      if (upErr && /kind/.test(upErr.message || '')) {
+        /* The "kind" column isn't in the database yet — save without it. */
+        var retryUp = await sb.from('portfolio_categories').update({
+          title: title, slug: slug, meta_description: metaDescription,
+          cover_image: portfolioCurrentCat.coverImage || '',
+          cover_public_id: portfolioCurrentCat.coverPublicId || '',
+          updated_at: new Date().toISOString()
+        }).eq('id', catId);
+        upErr = retryUp.error;
+        if (!upErr && portfolioIsVideoKind()) toast('', 'Saved as a pictures portfolio', 'Run the Supabase SQL for video portfolios first, then save again.');
+      }
       if (upErr) throw upErr;
       var { error: delErr } = await sb.from('portfolio_images').delete().eq('category_id', catId);
       if (delErr) throw delErr;
@@ -5118,9 +5245,19 @@ async function portfolioSaveCategory() {
         title: title,
         slug: slug,
         meta_description: metaDescription,
+        kind: portfolioIsVideoKind() ? 'video' : 'photo',
         cover_image: portfolioCurrentCat.coverImage || '',
         cover_public_id: portfolioCurrentCat.coverPublicId || ''
       }).select('id').single();
+      if (insErr && /kind/.test(insErr.message || '')) {
+        var retryIns = await sb.from('portfolio_categories').insert({
+          title: title, slug: slug, meta_description: metaDescription,
+          cover_image: portfolioCurrentCat.coverImage || '',
+          cover_public_id: portfolioCurrentCat.coverPublicId || ''
+        }).select('id').single();
+        insErr = retryIns.error; newCat = retryIns.data;
+        if (!insErr && portfolioIsVideoKind()) toast('', 'Saved as a pictures portfolio', 'Run the Supabase SQL for video portfolios first, then save again.');
+      }
       if (insErr) throw insErr;
       catId = newCat.id;
       portfolioCurrentCat.id = catId;
@@ -5138,7 +5275,7 @@ async function portfolioSaveCategory() {
           instagram_url: (img.instagramUrl || '').trim() || null,
           tiktok_url: (img.tiktokUrl || '').trim() || null,
           pinterest_url: (img.pinterestUrl || '').trim() || null,
-          media_type: img.mediaType === 'video' ? 'video' : 'photo'
+          media_type: (portfolioIsVideoKind() || img.mediaType === 'video') ? 'video' : 'photo'
         };
       });
       var { error: imgErr } = await sb.from('portfolio_images').insert(imageRows);
@@ -5167,6 +5304,9 @@ async function portfolioSaveCategory() {
   } catch(e) { toast('', 'Save failed', e.message); }
 }
 
+window.portfolioSetKind = portfolioSetKind;
+window.portfolioAddVideo = portfolioAddVideo;
+window.portfolioSetVideoLink = portfolioSetVideoLink;
 window.loadPortfolioCategories = loadPortfolioCategories;
 window.portfolioNewCategory    = portfolioNewCategory;
 window.portfolioEditCategory   = portfolioEditCategory;
