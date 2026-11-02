@@ -1144,9 +1144,6 @@ If you have any questions, just reply to this email.
                 <div id="portfolioCoverPreviewWrap" style="margin-top:10px;display:none;">
                   <img id="portfolioCoverPreview" style="width:140px;height:auto;border-radius:var(--r);display:block;" />
                 </div>
-                <div class="field-label" style="margin-top:12px;">…or paste a picture link</div>
-                <input type="url" id="portfolioCoverUrlIn" placeholder="https://… direct link to a picture (ends in .jpg, .png or .webp)" oninput="portfolioCoverLinkInput(this.value)">
-                <div style="font-size:11px;opacity:.7;margin-top:4px;">It has to be a link straight to the picture file. An Instagram, TikTok or Pinterest post link can&rsquo;t be used as a picture.</div>
               </div>
             </div>
 
@@ -4847,10 +4844,10 @@ async function portfolioEditCategory(id) {
       slug: cat.slug || '',
       kind: cat.kind === 'video' ? 'video' : 'photo',
       metaDescription: cat.meta_description || '',
-      coverImage: cat.cover_image || '',
+      coverImage: (/^https?:\/\/(www\.)?(instagram|tiktok|pinterest)\./i.test(cat.cover_image || '') ? '' : (cat.cover_image || '')),
       coverPublicId: cat.cover_public_id || '',
       images: (images || []).map(function(img) {
-        return { _dbId: img.id, url: img.url, cloudinaryId: img.cloudinary_id || '', altText: img.alt_text || '', caption: img.caption || '', clipUrl: img.clip_url || '', instagramUrl: img.instagram_url || '', tiktokUrl: img.tiktok_url || '', pinterestUrl: img.pinterest_url || '', mediaType: img.media_type || 'photo' };
+        return { _dbId: img.id, url: (/^https?:\/\/(www\.)?(instagram|tiktok|pinterest)\./i.test(img.url || '') ? '' : img.url), cloudinaryId: img.cloudinary_id || '', altText: img.alt_text || '', caption: img.caption || '', instagramUrl: img.instagram_url || '', tiktokUrl: img.tiktok_url || '', pinterestUrl: img.pinterest_url || '', mediaType: img.media_type || 'photo' };
       })
     };
     document.getElementById('portfolioEditorTitle').textContent = ' Edit Portfolio';
@@ -5216,17 +5213,6 @@ function portfolioVideoItemHtml(img, idx, total) {
         '<input type="file" accept="image/*" style="display:none;" onchange="portfolioSetItemCover(' + idx + ',event)">' +
       '</label>' +
     '</div>' +
-    '<input type="url" placeholder="…or paste a picture link (direct link to a .jpg / .png)" value="' + esc(img.url && !img.cloudinaryId ? img.url : '') + '" oninput="portfolioSetItemCoverLink(' + idx + ',this.value)" style="margin-bottom:10px;">' +
-    '<div style="border-top:1px dashed var(--border);padding-top:10px;margin-bottom:10px;">' +
-      '<div style="font-size:12px;font-weight:600;margin-bottom:4px;">Silent preview clip (optional) — makes this video play on your page</div>' +
-      '<div style="font-size:11px;opacity:.75;margin-bottom:8px;">Instagram and Pinterest links can&rsquo;t play on a website by themselves. Add a short clip of the same video (a screen recording or the original file, 5–15 seconds is plenty) and it will play silently in the sequence. Tapping it still opens the post.</div>' +
-      (img.clipUrl
-        ? '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;"><span style="font-size:12px;">&#10003; Clip added</span><button class="btn btn-ghost btn-sm" onclick="portfolioRemoveClip(' + idx + ')">Remove clip</button></div>'
-        : '<label class="btn btn-ghost btn-sm" style="cursor:pointer;margin-bottom:6px;display:inline-block;">Upload clip' +
-            '<input type="file" accept="video/*" style="display:none;" onchange="portfolioUploadClip(' + idx + ',event)">' +
-          '</label>') +
-      '<input type="url" placeholder="…or paste a direct link to a video file (.mp4)" value="' + esc(img.clipUrl || '') + '" oninput="portfolioSetClipLink(' + idx + ',this.value)">' +
-    '</div>' +
     '<input type="text" placeholder="Caption (optional, shown under the video)" value="' + esc(img.caption) + '" oninput="portfolioUpdateImageField(' + idx + ',\'caption\',this.value)">' +
   '</div>';
 }
@@ -5342,7 +5328,6 @@ async function portfolioSaveCategory() {
           alt_text: img.altText || '',
           caption: img.caption || '',
           instagram_url: (img.instagramUrl || '').trim() || null,
-          clip_url: (img.clipUrl || '').trim() || null,
           tiktok_url: (img.tiktokUrl || '').trim() || null,
           pinterest_url: (img.pinterestUrl || '').trim() || null,
           media_type: (portfolioIsVideoKind() || img.mediaType === 'video') ? 'video' : 'photo'

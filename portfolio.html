@@ -467,7 +467,7 @@
       var src = videoSource(img);
       var label = src ? VID_LABEL[src.platform] : 'Video';
       var id = (src && src.platform === 'tiktok') ? tiktokIdOf(src.url) : '';
-      var clip = /^https:\/\/\S+$/i.test(String(img.clipUrl || '').trim()) ? String(img.clipUrl).trim() : '';
+      var clip = '';  /* preview clips are switched off: cover picture + link out (TikTok still plays) */
       /* No cover picture: show the label, with a still frame of the clip on top when there is one. */
       var still = (!img.url && clip) ? '<video class="vid-still" src="' + esc(clip) + '#t=0.5" preload="metadata" muted playsinline aria-hidden="true" tabindex="-1"></video>' : '';
       var inner = (img.url ? '<img src="' + esc(img.url) + '" alt="' + esc(img.altText || (activeCategory.title + ' — video by Impact Grid')) + '" loading="lazy" decoding="async">'
