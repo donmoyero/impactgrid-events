@@ -4859,6 +4859,7 @@ async function portfolioEditCategory(id) {
     document.getElementById('portfolioSlugPreview').textContent = portfolioCurrentCat.slug || 'your-portfolio-name';
     portfolioSyncKindUI();
     var _cu = document.getElementById('portfolioCoverUrlIn'); if (_cu) _cu.value = (portfolioCurrentCat.coverImage && !portfolioCurrentCat.coverPublicId) ? portfolioCurrentCat.coverImage : '';
+    var pv = document.getElementById('portfolioCoverPreviewWrap');
     if (portfolioCurrentCat.coverImage) {
       document.getElementById('portfolioCoverPreview').src = portfolioCurrentCat.coverImage;
       pv.style.display = '';
