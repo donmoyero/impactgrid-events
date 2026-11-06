@@ -713,18 +713,19 @@
      Minimise: tuck the window away, the bubble stays so they can reopen.
      Close: also hides the bubble for the rest of this browser session,
      so it never sits on top of what they're trying to read. ── */
-  /* Closing the chat is remembered permanently on this browser (localStorage), even after refresh or a
-     new visit. The pop-up teaser is still once per browser session. */
-  const SS = { get: function (k) { try { return (k === 'ig_chat_hidden' ? localStorage : sessionStorage).getItem(k); } catch (e) { return null; } },
-               set: function (k, v) { try { (k === 'ig_chat_hidden' ? localStorage : sessionStorage).setItem(k, v); } catch (e) {} } };
+  /* Closing the chat hides the bubble only until the page is refreshed or navigated.
+     Nothing is saved, so Dijo always comes back on the next load. */
+  let chatClosed = false;
+  try { localStorage.removeItem('ig_chat_hidden'); } catch (e) {}   /* clear the old saved "hidden" flag */
+  const SS = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+               set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} } };
   document.getElementById('ig-chat-min').addEventListener('click', function () { if (isOpen) toggleChat(); });
   document.getElementById('ig-chat-close').addEventListener('click', function () {
     if (isOpen) toggleChat();
     bubbleBtn.style.display = 'none';
     hideTeaser();
-    SS.set('ig_chat_hidden', '1');
+    chatClosed = true;
   });
-  if (SS.get('ig_chat_hidden') === '1') bubbleBtn.style.display = 'none';
 
   /* ── Friendly pop-up a few seconds after landing ──
      Once per browser session, never if the chat is open/hidden, auto-fades,
@@ -744,7 +745,7 @@
     teaser.style.top = 'auto';
   }
   function showTeaser() {
-    if (isOpen || SS.get('ig_teaser_done') === '1' || SS.get('ig_chat_hidden') === '1') return;
+    if (isOpen || SS.get('ig_teaser_done') === '1' || chatClosed) return;
     document.getElementById('ig-teaser-text').innerHTML = isReturning
       ? '<b>Welcome back!</b> Want to pick up where we left off?'
       : '<b>Hi, I&rsquo;m Dijo 👋</b> Planning an event? Ask me anything or check a date.';
