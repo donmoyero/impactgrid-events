@@ -27,7 +27,18 @@
   :root{
     --bg:#0d0d10; --card:#17171c; --border:rgba(255,255,255,0.08);
     --text:#ffffff; --text2:#a8a8b8; --text3:#6f6f80;
-    --accent:#ffffff; --accent2:#d0d0d0;
+    --accent:#ffffff; --accent2:#d0d0d0; --on-accent:#000000; --shadow:rgba(0,0,0,0.35);
+    --input-bg:#0d0d10; color-scheme:dark;
+  }
+  /* follows the device: light palette when the phone / computer is set to light */
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f6f6f8; --card:#ffffff; --border:rgba(0,0,0,0.12);
+      --text:#111114; --text2:#55555f; --text3:#7a7a86;
+      --accent:#111114; --accent2:#3a3a44; --on-accent:#ffffff; --shadow:rgba(0,0,0,0.10);
+      --input-bg:#f6f6f8; color-scheme:light;
+    }
+    #error{color:#c43a2a;}
   }
   *{box-sizing:border-box;}
   body{
@@ -40,7 +51,7 @@
   .logo img{height:34px;}
   .card{
     background:var(--card); border:1px solid var(--border); border-radius:20px;
-    padding:32px 28px; box-shadow:0 24px 64px rgba(0,0,0,0.35);
+    padding:32px 28px; box-shadow:0 24px 64px var(--shadow);
   }
   h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px;}
   .sub{font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 24px;}
@@ -48,7 +59,7 @@
   .field{margin-bottom:16px;}
   input[type=text], textarea{
     width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);
-    background:#0d0d10;color:var(--text);font-size:14px;outline:none;
+    background:var(--input-bg);color:var(--text);font-size:14px;outline:none;
     transition:border-color .2s;box-sizing:border-box;font-family:inherit;
   }
   input[type=text]:focus, textarea:focus{border-color:var(--accent);}
@@ -59,7 +70,7 @@
   #error{display:none;font-size:13px;color:#ff6b5a;background:rgba(255,107,90,0.1);border:1px solid rgba(255,107,90,0.25);border-radius:8px;padding:10px 13px;margin-bottom:14px;}
   .btn{
     width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-    color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:opacity .2s;
+    color:var(--on-accent);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:opacity .2s;
   }
   .btn:disabled{opacity:.6;cursor:default;}
   #success{display:none;text-align:center;}
@@ -69,7 +80,7 @@
   #success a{
     display:inline-block;padding:11px 26px;border-radius:10px;
     background:linear-gradient(135deg,var(--accent),var(--accent2));
-    color:#000;font-size:14px;font-weight:700;text-decoration:none;
+    color:var(--on-accent);font-size:14px;font-weight:700;text-decoration:none;
   }
 </style>
 <link rel="stylesheet" href="scrollbars.css"/>
@@ -134,7 +145,7 @@ function setStar(n) {
   document.querySelectorAll('#stars span').forEach(function (s) {
     var v = parseInt(s.dataset.val, 10);
     s.style.opacity = v <= n ? '1' : '0.3';
-    s.style.color   = v <= n ? '#ffffff' : '';
+    s.style.color   = v <= n ? 'var(--text)' : '';
   });
 }
 
