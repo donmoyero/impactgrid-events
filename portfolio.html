@@ -208,9 +208,14 @@
     .lightbox {
       position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.92);
       display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.22s;
+      /* visibility (not just pointer-events) hides it when closed: shared.css sets
+         "body.protect-page img { pointer-events: auto }", which made the invisible
+         lightbox image keep catching clicks and killed the buttons underneath. */
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.22s, visibility 0s linear 0.22s;
     }
-    .lightbox.show { opacity: 1; pointer-events: auto; }
+    .lightbox.show { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.22s; }
+    .lightbox:not(.show) img, .lightbox:not(.show) button { pointer-events: none; }
     .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 80px rgba(0,0,0,0.6); }
     .lightbox-close {
       position: fixed; top: 20px; right: 24px; width: 40px; height: 40px; border-radius: 50%;
