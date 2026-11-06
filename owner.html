@@ -717,7 +717,6 @@ img{display:block;max-width:100%;}
     <span class="nav-event-name" id="navEvent">My Event</span>
     <div class="nav-right">
       <span class="nav-code-badge" id="navCode">——</span>
-      <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="Toggle theme"></button>
       <button class="btn-signout" onclick="doSignOut()">Sign Out</button>
     </div>
   </nav>
@@ -848,21 +847,8 @@ var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform 
 
 /* ── init ── */
 window.addEventListener('DOMContentLoaded', function(){
-  var saved = localStorage.getItem('ig_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  applyTheme(saved);
   show('sLogin');
 });
-
-function applyTheme(t){
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('ig_theme', t);
-  var btn = document.getElementById('themeBtn');
-  if(btn) btn.textContent = t === 'dark' ? '' : '';
-}
-function toggleTheme(){
-  var cur = document.documentElement.getAttribute('data-theme') || 'light';
-  applyTheme(cur === 'dark' ? 'light' : 'dark');
-}
 
 /* ── sections ── */
 function show(id){

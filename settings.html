@@ -882,15 +882,6 @@
             </div>
 
             <div class="pref-item" style="padding-top:0">
-              <div class="pref-info"><h4>Theme</h4><p>Choose between light and dark mode.</p></div>
-              <div class="theme-opts">
-                <button class="theme-opt active" id="opt-light" onclick="setTheme('light')">☀️ Light</button>
-                <button class="theme-opt" id="opt-dark" onclick="setTheme('dark')">🌙 Dark</button>
-              </div>
-            </div>
-
-
-            <div class="pref-item">
               <div class="pref-info"><h4>Compact Dashboard</h4><p>Reduce card spacing in dashboard views for a denser layout.</p></div>
               <div class="toggle" id="tog-compact" onclick="togglePref('compact')"></div>
             </div>
@@ -1425,8 +1416,6 @@
 
     /* ─── Preferences ─── */
     function loadPreferences() {
-      var theme = localStorage.getItem('ig_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      setTheme(theme, false);
       ['compact','motion','jobs','apps','msgs','trends','updates',
        'pub','search','open','online','analytics','personal'].forEach(function(k) {
         var el = document.getElementById('tog-'+k);
@@ -1441,18 +1430,6 @@
       el.classList.toggle('on');
       localStorage.setItem('ig_pref_'+k, el.classList.contains('on'));
     }
-    function setTheme(t, save) {
-      if (save !== false) localStorage.setItem('ig_theme', t);
-      var current = document.documentElement.getAttribute('data-theme') || 'light';
-      if (current !== t && typeof window.toggleTheme === 'function') {
-        window.toggleTheme();
-      } else {
-        document.documentElement.setAttribute('data-theme', t);
-      }
-      document.getElementById('opt-light').classList.toggle('active', t === 'light');
-      document.getElementById('opt-dark').classList.toggle('active',  t === 'dark');
-    }
-
     /* ─── Animal avatars ─── */
     var ANIMALS = [
       '🦁','🐯','🐻','🦊','🐺','🦝','🐼','🐨',

@@ -968,6 +968,40 @@ input,textarea,select{font-family:inherit;}
 [data-transition="zoom"] .slide.active{opacity:1;transform:scale(1);z-index:2;}
 
 [data-transition="none"] .slide{transition:none!important;}
+
+/* ══════════════════════════════════════
+   DEVICE LIGHT / DARK
+   The gallery follows the visitor's device setting. Each skin / Look has one native
+   mode (light or dark). When the device wants the other one, igApplyDeviceTheme()
+   adds body.ig-flip and writes a mirrored palette (same hues, lightness flipped) into
+   the --bg/--text/... variables, so every skin and Look keeps its own character.
+   The rules below repaint the few surfaces that hard-code colours instead of using
+   the variables. Gallery backgrounds that are photos are never flipped.
+══════════════════════════════════════ */
+body.ig-flip{background:var(--bg)!important;color:var(--text)!important;color-scheme:var(--ig-scheme,light);}
+body.ig-flip .ev-nav,
+body.ig-flip .dl-bar{background:var(--ig-chrome)!important;border-color:var(--border2)!important;}
+/* the hero text always sits on the photo overlay, so it keeps the skin's own colours */
+body.ig-flip .hero-text-layer{--accent:var(--ig-n-accent);--accent2:var(--ig-n-accent2);--text:var(--ig-n-text);--text2:var(--ig-n-text2);}
+body.ig-flip .nav-event-name,
+body.ig-flip .gate-sub{color:var(--text2)!important;}
+body.ig-flip .dl-bar-count,
+body.ig-flip .gallery-title,
+body.ig-flip .gate-title,
+body.ig-flip .nav-logo{color:var(--text)!important;}
+body.ig-flip .dl-bar-sub{color:var(--text2)!important;}
+body.ig-flip .gallery-header{border-bottom-color:var(--border)!important;}
+body.ig-flip .btn-outline{background:var(--card)!important;border-color:var(--border2)!important;color:var(--text2)!important;}
+body.ig-flip .btn-outline:hover{border-color:var(--accent)!important;color:var(--accent)!important;}
+body.ig-flip .btn-primary,
+body.ig-flip .share-btn:hover,
+body.ig-flip .nav-logo-mark{color:var(--ig-on-accent)!important;}
+body.ig-flip .gate-box,
+body.ig-flip .toast{background:var(--card)!important;border-color:var(--border2)!important;color:var(--text);}
+body.ig-flip .gate-input{background:var(--bg2)!important;border-color:var(--border2)!important;color:var(--text)!important;}
+body.ig-flip .photo-card,
+body.ig-flip .photo-grid .photo-card{background:var(--bg2)!important;}
+body.ig-flip .photo-count-badge{background:var(--bg2)!important;border-color:var(--border2)!important;color:var(--text3)!important;}
 </style>
 <link rel="stylesheet" href="premium-gallery.css"/>
 <style>
@@ -1479,6 +1513,7 @@ async function applyEventDesign(ev, db){
 
   applyEventBranding(ev.branding || {});
   applyClientExperience(ev.event_settings || {});
+  if(window.igApplyDeviceTheme) igApplyDeviceTheme();
 }
 
 /* Branding — per-event overrides of logo / accent colour / welcome message.
@@ -1558,6 +1593,7 @@ window.addEventListener('message', function(e){
   }
   if(draft.branding) applyEventBranding(draft.branding);
   if(draft.clientExperience) applyClientExperience(draft.clientExperience);
+  if(window.igApplyDeviceTheme) igApplyDeviceTheme();
 });
 
 /* Inserts Cloudinary delivery transformations (auto format, auto quality,
@@ -3314,6 +3350,117 @@ function esc(s){
 </script>
 
 <script src="/js/impactgrid-chat-bubble.js"></script>
+<script>
+/* ══════════════════════════════════════
+   DEVICE LIGHT / DARK — see the DEVICE LIGHT / DARK note in the CSS above.
+══════════════════════════════════════ */
+(function(){
+  var DARK_SKINS = { 'tpl-gala':1, 'tpl-nightlife':1 };
+  var TOKENS = ['--bg','--bg2','--card','--border','--border2','--text','--text2','--text3',
+                '--accent','--accent2','--accent-dim','--accent-glo','--ig-chrome','--ig-on-accent','--ig-scheme',
+                '--ig-n-accent','--ig-n-accent2','--ig-n-text','--ig-n-text2'];
+  var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+  function parse(c){
+    c = String(c||'').trim();
+    var m = c.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if(m){
+      var h = m[1]; if(h.length === 3) h = h.replace(/(.)/g,'$1$1');
+      var n = parseInt(h,16); return [(n>>16)&255,(n>>8)&255,n&255];
+    }
+    m = c.match(/^rgba?\(([^)]+)\)/i);
+    if(m){ var p = m[1].split(',').map(parseFloat); return [p[0],p[1],p[2]]; }
+    return null;
+  }
+  function toHsl(r,g,b){
+    r/=255; g/=255; b/=255;
+    var mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2, h=0, s=0, d=mx-mn;
+    if(d){
+      s = l>.5 ? d/(2-mx-mn) : d/(mx+mn);
+      h = mx===r ? (g-b)/d + (g<b?6:0) : mx===g ? (b-r)/d + 2 : (r-g)/d + 4;
+      h *= 60;
+    }
+    return [h,s,l];
+  }
+  function hsl(h,s,l){
+    h = ((h%360)+360)%360;
+    var a = s*Math.min(l,1-l);
+    function f(n){ var k=(n+h/30)%12; return l - a*Math.max(-1,Math.min(k-3,Math.min(9-k,1))); }
+    return 'rgb(' + Math.round(f(0)*255) + ',' + Math.round(f(8)*255) + ',' + Math.round(f(4)*255) + ')';
+  }
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function lum(rgb){
+    var c = rgb.map(function(v){ v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
+    return .2126*c[0] + .7152*c[1] + .0722*c[2];
+  }
+  function rgbOf(str){ return str.match(/\d+/g).slice(0,3).map(Number); }
+
+  /* mirror one palette token. toDark=true → light skin going dark, false → dark skin going light */
+  function mirror(name, value, toDark){
+    var rgb = parse(value); if(!rgb) return null;
+    var hs = toHsl(rgb[0],rgb[1],rgb[2]), h=hs[0], s=hs[1], l=hs[2];
+    var inv = 1 - l;
+    if(name === '--bg')   return hsl(h, s*.55, toDark ? clamp(inv*.35,.05,.09) : clamp(.93+(.07*inv),.95,.985));
+    if(name === '--bg2')  return hsl(h, s*.55, toDark ? clamp(inv*.4+.02,.09,.14) : clamp(.89+(.05*inv),.9,.95));
+    if(name === '--card') return hsl(h, s*.55, toDark ? clamp(inv*.45+.04,.12,.18) : 1);
+    if(name === '--text')  return hsl(h, s*.5, toDark ? clamp(inv,.9,.96) : clamp(inv,.06,.12));
+    if(name === '--text2') return hsl(h, s*.6, toDark ? clamp(inv,.68,.8)  : clamp(inv,.28,.4));
+    if(name === '--text3') return hsl(h, s*.6, toDark ? clamp(inv,.5,.62)  : clamp(inv,.4,.5));
+    if(name === '--accent' || name === '--accent2'){
+      return hsl(h, s, toDark ? clamp(Math.max(l,.58),.58,.78) : clamp(Math.min(l,.4),.28,.42));
+    }
+    return null;
+  }
+
+  function nativeMode(){
+    var look = (document.body.getAttribute('data-look') && window.galleryLookById)
+      ? galleryLookById(document.body.getAttribute('data-look')) : null;
+    if(look) return look.mode === 'dark' ? 'dark' : 'light';
+    var cls = document.body.className.split(/\s+/);
+    for(var i=0;i<cls.length;i++){ if(DARK_SKINS[cls[i]]) return 'dark'; }
+    return 'light';
+  }
+
+  window.igApplyDeviceTheme = function(){
+    var b = document.body; if(!b) return;
+    TOKENS.forEach(function(t){ b.style.removeProperty(t); });
+    b.classList.remove('ig-flip');
+
+    var t = window._eventsTemplate || window.activeTemplate;
+    var isImage = t && t.background_type === 'image' && t.background_value;
+    var deviceDark = !!(mq && mq.matches);
+    var native = nativeMode();
+    if(isImage || (native === 'dark') === deviceDark) return;   /* nothing to flip */
+
+    var toDark = deviceDark;
+    var cs = getComputedStyle(b);
+    var out = {};
+    [['--accent','--ig-n-accent'],['--accent2','--ig-n-accent2'],['--text','--ig-n-text'],['--text2','--ig-n-text2']]
+      .forEach(function(p){ var v = cs.getPropertyValue(p[0]).trim(); if(v) out[p[1]] = v; });
+    ['--bg','--bg2','--card','--text','--text2','--text3','--accent','--accent2'].forEach(function(n){
+      var v = mirror(n, cs.getPropertyValue(n), toDark);
+      if(v) out[n] = v;
+    });
+    if(!out['--bg']) return;                                      /* unreadable palette → leave as is */
+    out['--border']  = toDark ? 'rgba(255,255,255,.10)' : 'rgba(0,0,0,.10)';
+    out['--border2'] = toDark ? 'rgba(255,255,255,.20)' : 'rgba(0,0,0,.18)';
+    var ac = out['--accent'] || 'rgb(128,128,128)', acRgb = rgbOf(ac);
+    out['--accent-dim'] = 'rgba(' + acRgb.join(',') + ',.14)';
+    out['--accent-glo'] = 'rgba(' + acRgb.join(',') + ',.32)';
+    out['--ig-chrome']  = 'rgba(' + rgbOf(out['--bg']).join(',') + ',.95)';
+    out['--ig-on-accent'] = lum(acRgb) > .38 ? '#0b0b0f' : '#fff';
+    out['--ig-scheme'] = toDark ? 'dark' : 'light';
+    Object.keys(out).forEach(function(k){ b.style.setProperty(k, out[k]); });
+    b.classList.add('ig-flip');
+  };
+
+  if(mq){
+    var again = function(){ igApplyDeviceTheme(); };
+    if(mq.addEventListener) mq.addEventListener('change', again);
+    else if(mq.addListener) mq.addListener(again);
+  }
+})();
+</script>
 <!-- ══════════════════════════════════════ REVIEW FAB ══════════════════════════════════════ -->
 <button id="review-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:800;align-items:center;gap:8px;padding:11px 18px;border-radius:100px;background:linear-gradient(135deg,#111,#000);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.22);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.22)';">
   Leave a Review
@@ -3343,8 +3490,86 @@ async function initReviewFab(eventId, eventName) {
   if (serviceId)    url += '&service=' + encodeURIComponent(serviceId);
   if (serviceTitle) url += '&sname=' + encodeURIComponent(serviceTitle);
 
-  fab.onclick = function () { window.location.href = url; };
+  fab.onclick = function () {
+    if (fab._igDragged) { fab._igDragged = false; return; }   /* a drag is not a tap */
+    window.location.href = url;
+  };
   fab.style.display = 'flex';
+  makeReviewFabDraggable(fab);
+}
+
+/* Lets the guest drag the review button out of the way (mouse, touch or pen).
+   A short press still opens the review page; only real movement counts as a drag.
+   The spot is remembered on this device and kept on screen if the window resizes. */
+function makeReviewFabDraggable(fab) {
+  var KEY = 'ig-review-fab-pos', MARGIN = 8, THRESHOLD = 6;
+  var pos = null;                                  /* {r, b} = px from the right / bottom edge */
+  try { pos = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+
+  function clampPos(p) {
+    var w = fab.offsetWidth, h = fab.offsetHeight;
+    var vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    return {
+      r: Math.min(Math.max(p.r, MARGIN), Math.max(MARGIN, vw - w - MARGIN)),
+      b: Math.min(Math.max(p.b, MARGIN), Math.max(MARGIN, vh - h - MARGIN))
+    };
+  }
+  function place(p) {
+    p = clampPos(p);
+    fab.style.right = p.r + 'px';
+    fab.style.bottom = p.b + 'px';
+    return p;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(pos)); } catch (e) {} }
+
+  fab.style.whiteSpace = 'nowrap';                 /* keep its size whatever the window width */
+  fab.style.touchAction = 'none';                  /* stop the page scrolling while dragging */
+  fab.style.userSelect = 'none';
+  fab.style.webkitUserSelect = 'none';
+  fab.title = 'Tap to leave a review — drag to move this button';
+  if (pos && isFinite(pos.r) && isFinite(pos.b)) pos = place(pos);
+
+  var startX, startY, startR, startB, dragging = false, down = false;
+
+  fab.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    down = true; dragging = false;
+    startX = e.clientX; startY = e.clientY;
+    startR = parseFloat(fab.style.right) || 24;
+    startB = parseFloat(fab.style.bottom) || 24;
+    try { fab.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  fab.addEventListener('pointermove', function (e) {
+    if (!down) return;
+    var dx = e.clientX - startX, dy = e.clientY - startY;
+    if (!dragging) {
+      if (Math.abs(dx) < THRESHOLD && Math.abs(dy) < THRESHOLD) return;
+      dragging = true;
+      fab.style.transition = 'none';
+      fab.style.cursor = 'grabbing';
+    }
+    e.preventDefault();
+    pos = place({ r: startR - dx, b: startB - dy });
+  });
+  function end(e) {
+    if (!down) return;
+    down = false;
+    try { fab.releasePointerCapture(e.pointerId); } catch (err) {}
+    fab.style.cursor = 'pointer';
+    fab.style.transition = '';
+    if (dragging) {
+      fab._igDragged = true;                       /* swallow the click that follows the drop */
+      setTimeout(function () { fab._igDragged = false; }, 0);
+      save();
+    }
+    dragging = false;
+  }
+  fab.addEventListener('pointerup', end);
+  fab.addEventListener('pointercancel', end);
+  window.addEventListener('resize', function () {
+    var cur = { r: parseFloat(fab.style.right) || 24, b: parseFloat(fab.style.bottom) || 24 };
+    pos = place(cur);
+  });
 }
 </script>
 

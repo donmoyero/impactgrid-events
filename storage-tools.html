@@ -89,8 +89,6 @@ th{color:var(--text3);font-weight:600;font-size:11px;text-transform:uppercase;le
 var IG_ADMIN_EMAIL = localStorage.getItem('ig_biz_admin_email') || 'admin@impactgridgroup.com';
 
 document.addEventListener('DOMContentLoaded', async function(){
-  var saved = localStorage.getItem('ig_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  document.documentElement.setAttribute('data-theme', saved);
   var c = getSupabase();
   var { data } = await c.auth.getSession();
   if(!data.session){ window.location.href='login.html'; return; }

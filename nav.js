@@ -241,7 +241,6 @@
 
         '<div class="nav-bottom">' +
           '<a href="book-us.html" class="nav-book-btn">Book an Event <span aria-hidden="true">→</span></a>' +
-          '<button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">Dark mode</button>' +
 
           /* ── GUEST: hidden from public — admin accesses login via footer link ── */
           '<div id="navGuest" class="nav-guest" style="display:none;flex-direction:column;gap:7px;">' +
@@ -297,10 +296,6 @@
             '<a href="admin.html" id="mobDashCta" class="mob-adash" onclick="closeSidebar()">Admin Panel →</a>' +
             '<button class="mob-asignout" onclick="igSignOut()">Sign out</button>' +
           '</div>' +
-        '</div>' +
-        '<div class="mob-theme-row">' +
-          '<span>Theme</span>' +
-          '<button class="mob-tbtn" id="mobTBtn" onclick="toggleTheme()">Dark</button>' +
         '</div>' +
       '</div>';
 
@@ -384,7 +379,6 @@
           '<div class="footer-bot">' +
             '<span>© 2026 ImpactGrid Group Ltd. All rights reserved.</span>' +
             '<div class="footer-legal"><a href="login.html" style="opacity:0.35;font-size:11px;" id="footerAdminLink">Admin</a></div>' +
-            '<button class="footer-tbtn" onclick="toggleTheme()" id="footerTBtn" aria-label="Toggle dark/light mode">Dark mode</button>' +
           '</div>' +
         '</div>' +
       '</footer>';
@@ -396,36 +390,18 @@
   /* ─────────────────────────────────────────
      THEME
   ───────────────────────────────────────── */
-  var _isDark = false;
-  /* persist=false → just paint (used for the device's own light/dark setting);
-     persist=true  → the visitor pressed the toggle, so remember their choice. */
-  function _applyTheme(dark, persist) {
-    _isDark = dark;
-    if (dark) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else if (document.documentElement.getAttribute('data-theme') === 'dark') {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    var tb = document.getElementById('themeBtn');   if(tb) tb.textContent = dark ? 'Light mode' : 'Dark mode';
-    var fb = document.getElementById('footerTBtn'); if(fb) fb.textContent = dark ? 'Light mode' : 'Dark mode';
-    var mb = document.getElementById('mobTBtn');    if(mb) mb.textContent = dark ? 'Light' : 'Dark';
-    if (persist) { try { localStorage.setItem('ig_theme', dark ? 'dark' : 'light'); } catch(e) {} }
-  }
-  window.toggleTheme = function() { _applyTheme(!_isDark, true); };
-
-  /* Follow the device's light/dark setting unless the visitor has chosen with the toggle. */
-  var _themeMQ = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-  function _savedTheme() {
-    try { var s = localStorage.getItem('ig_theme'); return (s === 'dark' || s === 'light') ? s : null; }
-    catch(e) { return null; }
-  }
+  /* The site follows the device's light/dark setting (theme-init.js does the work in <head>).
+     This keeps the attribute in sync if the nav loads on a page without theme-init.js. */
   (function() {
-    var s = _savedTheme();
-    _applyTheme(s ? s === 'dark' : !!(_themeMQ && _themeMQ.matches), false);
-    if (_themeMQ) {
-      var h = function(e) { if (!_savedTheme()) _applyTheme(e.matches, false); };
-      if (_themeMQ.addEventListener) _themeMQ.addEventListener('change', h);
-      else if (_themeMQ.addListener) _themeMQ.addListener(h);
+    var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    function paint(dark) {
+      if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+      else document.documentElement.removeAttribute('data-theme');
+    }
+    paint(!!(mq && mq.matches));
+    if (mq) {
+      if (mq.addEventListener) mq.addEventListener('change', function(e){ paint(e.matches); });
+      else if (mq.addListener) mq.addListener(function(e){ paint(e.matches); });
     }
   })();
 
@@ -485,10 +461,6 @@
      INIT
   ───────────────────────────────────────── */
   function _initNavInteractions() {
-    /* Theme is restored at IIFE boot (before the nav exists), so sync the
-       toggle labels now that the buttons are in the DOM. */
-    var tb = document.getElementById('themeBtn'); if (tb) tb.textContent = _isDark ? 'Light mode' : 'Dark mode';
-    var mb = document.getElementById('mobTBtn');  if (mb) mb.textContent = _isDark ? 'Light' : 'Dark';
   }
 
   /* ─────────────────────────────────────────
