@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+<script src="theme-init.js"></script>
 <script src="consent.js"></script>
 
 <meta charset="UTF-8"/>
@@ -2303,7 +2304,7 @@ function toggleAdminTheme(){
 }
 function initAdminTheme(){
   try{
-    var saved=localStorage.getItem('ig_theme')||'light';
+    var saved=localStorage.getItem('ig_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme',saved);
     var btn=document.getElementById('themeToggleBtn');
     if(btn) btn.textContent=saved==='dark'?'Light mode':'Dark mode';

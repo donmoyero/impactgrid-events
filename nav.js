@@ -397,22 +397,36 @@
      THEME
   ───────────────────────────────────────── */
   var _isDark = false;
-  function _applyTheme(dark) {
+  /* persist=false → just paint (used for the device's own light/dark setting);
+     persist=true  → the visitor pressed the toggle, so remember their choice. */
+  function _applyTheme(dark, persist) {
     _isDark = dark;
     if (dark) {
       document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
+    } else if (document.documentElement.getAttribute('data-theme') === 'dark') {
       document.documentElement.removeAttribute('data-theme');
     }
     var tb = document.getElementById('themeBtn');   if(tb) tb.textContent = dark ? 'Light mode' : 'Dark mode';
     var fb = document.getElementById('footerTBtn'); if(fb) fb.textContent = dark ? 'Light mode' : 'Dark mode';
     var mb = document.getElementById('mobTBtn');    if(mb) mb.textContent = dark ? 'Light' : 'Dark';
-    try { localStorage.setItem('ig_theme', dark ? 'dark' : 'light'); } catch(e) {}
+    if (persist) { try { localStorage.setItem('ig_theme', dark ? 'dark' : 'light'); } catch(e) {} }
   }
-  window.toggleTheme = function() { _applyTheme(!_isDark); };
-  /* Only activate dark if the user has previously chosen it — light is the default */
+  window.toggleTheme = function() { _applyTheme(!_isDark, true); };
+
+  /* Follow the device's light/dark setting unless the visitor has chosen with the toggle. */
+  var _themeMQ = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function _savedTheme() {
+    try { var s = localStorage.getItem('ig_theme'); return (s === 'dark' || s === 'light') ? s : null; }
+    catch(e) { return null; }
+  }
   (function() {
-    try { if (localStorage.getItem('ig_theme') === 'dark') _applyTheme(true); } catch(e) {}
+    var s = _savedTheme();
+    _applyTheme(s ? s === 'dark' : !!(_themeMQ && _themeMQ.matches), false);
+    if (_themeMQ) {
+      var h = function(e) { if (!_savedTheme()) _applyTheme(e.matches, false); };
+      if (_themeMQ.addEventListener) _themeMQ.addEventListener('change', h);
+      else if (_themeMQ.addListener) _themeMQ.addListener(h);
+    }
   })();
 
   /* ─────────────────────────────────────────

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+<script src="theme-init.js"></script>
 <script src="consent.js"></script>
 
 <meta charset="UTF-8"/>
@@ -847,7 +848,7 @@ var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform 
 
 /* ── init ── */
 window.addEventListener('DOMContentLoaded', function(){
-  var saved = localStorage.getItem('ig_theme') || 'light';
+  var saved = localStorage.getItem('ig_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   applyTheme(saved);
   show('sLogin');
 });

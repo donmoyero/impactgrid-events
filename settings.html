@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+<script src="theme-init.js"></script>
 <script src="consent.js"></script>
 
   <meta charset="UTF-8" />
@@ -1424,7 +1425,7 @@
 
     /* ─── Preferences ─── */
     function loadPreferences() {
-      var theme = localStorage.getItem('ig_theme') || 'light';
+      var theme = localStorage.getItem('ig_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       setTheme(theme, false);
       ['compact','motion','jobs','apps','msgs','trends','updates',
        'pub','search','open','online','analytics','personal'].forEach(function(k) {
