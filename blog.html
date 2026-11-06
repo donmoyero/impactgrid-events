@@ -7,7 +7,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title id="blogPageTitle">Blog — Impact Grid Group</title>
-<link rel="canonical" id="blogCanonical" href="https://impactgridgroup.com/blog.html"/>
+<link rel="canonical" id="blogCanonical" href="https://www.impactgridgroup.com/blog.html"/>
   <meta name="description" id="blogMetaDesc" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
 
   <!-- Default Open Graph (overridden per-post by JS) -->
@@ -15,12 +15,12 @@
   <meta property="og:site_name" content="Impact Grid Group" />
   <meta property="og:title" id="blogOgTitle" content="Blog — Impact Grid Group" />
   <meta property="og:description" id="blogOgDesc" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
-  <meta property="og:url" id="blogOgUrl" content="https://impactgridgroup.com/blog.html" />
-  <meta property="og:image" id="blogOgImage" content="https://impactgridgroup.com/logo.png" />
+  <meta property="og:url" id="blogOgUrl" content="https://www.impactgridgroup.com/blog.html" />
+  <meta property="og:image" id="blogOgImage" content="https://www.impactgridgroup.com/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" id="blogTwTitle" content="Blog — Impact Grid Group" />
   <meta name="twitter:description" id="blogTwDesc" content="Stories, updates and behind-the-scenes from Impact Grid Group — Manchester." />
-  <meta name="twitter:image" content="https://impactgridgroup.com/logo.png" />
+  <meta name="twitter:image" content="https://www.impactgridgroup.com/logo.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -741,7 +741,7 @@
       if (pg.type === 'text' && pg.body) { desc = pg.body.replace(/\s+/g, ' ').trim().slice(0, 160); return true; }
     });
     if (!desc) desc = _blogDefaultMeta.desc;
-    var url = 'https://impactgridgroup.com/blog.html?post=' + encodeURIComponent(slugify(post.title));
+    var url = 'https://www.impactgridgroup.com/blog.html?post=' + encodeURIComponent(slugify(post.title));
     document.title = title;
     document.getElementById('blogPageTitle').textContent = title;
     document.getElementById('blogCanonical').href = url;
@@ -1249,8 +1249,8 @@
       'description': description,
       'datePublished': datePublished,
       'dateModified': datePublished,
-      'author': { '@type': 'Organization', 'name': 'Impact Grid Group', 'url': 'https://impactgridgroup.com' },
-      'publisher': { '@type': 'Organization', 'name': 'Impact Grid Group', 'url': 'https://impactgridgroup.com' },
+      'author': { '@type': 'Organization', 'name': 'Impact Grid Group', 'url': 'https://www.impactgridgroup.com' },
+      'publisher': { '@type': 'Organization', 'name': 'Impact Grid Group', 'url': 'https://www.impactgridgroup.com' },
       'mainEntityOfPage': { '@type': 'WebPage', '@id': window.location.href },
       'articleSection': post.category || 'Journal'
     };

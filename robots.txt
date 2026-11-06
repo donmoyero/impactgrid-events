@@ -25,4 +25,4 @@ Disallow: /join.html
 Disallow: /event.html
 Disallow: /events-pages.html
 
-Sitemap: https://impactgridgroup.com/sitemap.xml
+Sitemap: https://www.impactgridgroup.com/sitemap.xml

@@ -7,18 +7,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title id="pfPageTitle">Photography Portfolio in Manchester — Impact Grid</title>
-  <link rel="canonical" id="pfCanonical" href="https://impactgridgroup.com/portfolio.html"/>
+  <link rel="canonical" id="pfCanonical" href="https://www.impactgridgroup.com/portfolio.html"/>
   <meta name="description" id="pfMetaDesc" content="Explore our portrait, event, fashion and commercial photography from Manchester and across the UK." />
   <meta property="og:type" content="website" id="pfOgType"/>
   <meta property="og:site_name" content="Impact Grid"/>
   <meta property="og:title" id="pfOgTitle" content="Photography Portfolio in Manchester — Impact Grid"/>
   <meta property="og:description" id="pfOgDesc" content="Explore our portrait, event, fashion and commercial photography from Manchester and across the UK."/>
-  <meta property="og:url" id="pfOgUrl" content="https://impactgridgroup.com/portfolio.html"/>
-  <meta property="og:image" id="pfOgImage" content="https://impactgridgroup.com/logo.png"/>
+  <meta property="og:url" id="pfOgUrl" content="https://www.impactgridgroup.com/portfolio.html"/>
+  <meta property="og:image" id="pfOgImage" content="https://www.impactgridgroup.com/logo.png"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" id="pfTwTitle" content="Photography Portfolio in Manchester — Impact Grid"/>
   <meta name="twitter:description" id="pfTwDesc" content="Explore our portrait, event, fashion and commercial photography from Manchester and across the UK."/>
-  <meta name="twitter:image" content="https://impactgridgroup.com/logo.png"/>
+  <meta name="twitter:image" content="https://www.impactgridgroup.com/logo.png"/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -374,7 +374,7 @@
     captureDefaultMeta();
     var title = cat.title + ' — Impact Grid Portfolio';
     var desc = cat.metaDescription || ('Professional ' + cat.title.toLowerCase() + ' by Impact Grid.');
-    var url = 'https://impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug);
+    var url = 'https://www.impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug);
     document.title = title;
     document.getElementById('pfPageTitle').textContent = title;
     document.getElementById('pfCanonical').href = url;
@@ -412,8 +412,8 @@
       '@type': 'ImageGallery',
       'name': cat.title,
       'description': cat.metaDescription || '',
-      'url': 'https://impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug),
-      'author': { '@type': 'Organization', 'name': 'Impact Grid', 'url': 'https://impactgridgroup.com' },
+      'url': 'https://www.impactgridgroup.com/portfolio.html?category=' + encodeURIComponent(cat.slug),
+      'author': { '@type': 'Organization', 'name': 'Impact Grid', 'url': 'https://www.impactgridgroup.com' },
       'image': cat.images.filter(function(img){ return img.url; }).map(function(img){
         return {
           '@type': 'ImageObject',
@@ -423,7 +423,7 @@
           'creator': { '@type': 'Organization', 'name': 'Impact Grid' },
           'creditText': 'Impact Grid',
           'copyrightNotice': '© Impact Grid',
-          'acquireLicensePage': 'https://impactgridgroup.com/book-us.html'
+          'acquireLicensePage': 'https://www.impactgridgroup.com/book-us.html'
         };
       })
     };

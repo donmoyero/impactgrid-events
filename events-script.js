@@ -664,7 +664,7 @@ window.onEventServiceSelect = onEventServiceSelect;
 
 async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode, eventSlug, emailSubject, emailBody){
   if(!ownerEmail) return;
-  var base     = 'https://impactgridgroup.com';
+  var base     = 'https://www.impactgridgroup.com';
   var eventUrl = base + '/event.html?event=' + eventSlug + '&code=' + eventCode;
 
   /* Replace merge fields */

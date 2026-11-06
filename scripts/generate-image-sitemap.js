@@ -19,7 +19,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const SITE = 'https://impactgridgroup.com';
+const SITE = 'https://www.impactgridgroup.com';
 const SITEMAP = path.join(ROOT, 'sitemap.xml');
 
 const cfg = fs.readFileSync(path.join(ROOT, 'supabase-config.js'), 'utf8');
