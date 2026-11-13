@@ -742,16 +742,15 @@ tr:hover td{background:var(--bg2);}
 <!-- Shared nav (auth utilities, theme, sidebar helpers — renderNav not called here, dashboard keeps its own sidebar, same as admin.html) -->
 <script src="nav.js"></script>
 
-<!-- Firebase (Events DB) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- Database access goes through the API (no Firebase SDK in the browser) -->
+<script src="ig-db.js?v=20261113"></script>
 
 <!-- ffmpeg.wasm (in-browser video compression for oversized uploads) -->
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 
 <!-- Events + Reviews scripts (shared with admin) -->
-<script src="events-script.js?v=20261020"></script>
+<script src="events-script.js?v=20261113"></script>
 <script src="reviews-script.js"></script>
 
 <script>
@@ -857,7 +856,7 @@ document.addEventListener('DOMContentLoaded', function(){
 /* ══ STATS (overview) ══ */
 async function loadStats(){
   try {
-    var snap = await db.collection('events').where('owner_id','==',_currentUser.id).where('is_active','==',true).get();
+    var snap = await igOwnerDb.collection('events').where('owner_id','==',_currentUser.id).where('is_active','==',true).get();
     var el = document.getElementById('stat-events');
     if (el) el.textContent = snap.size;
 
@@ -872,7 +871,7 @@ async function loadStats(){
     /* Firestore 'in' supports up to 30 items; batch if needed */
     for (var i = 0; i < myIds.length; i += 30) {
       var batch = myIds.slice(i, i + 30);
-      var vSnap = await db.collection('event_page_visits').where('event_id','in',batch).limit(500).get();
+      var vSnap = await igOwnerDb.collection('event_page_visits').where('event_id','in',batch).limit(500).get();
       totalVisits += vSnap.size;
     }
     var vEl = document.getElementById('stat-visits');
@@ -884,7 +883,7 @@ async function loadStats(){
     var totalDownloads = 0;
     for (var j = 0; j < myIds2.length; j += 30) {
       var batch2 = myIds2.slice(j, j + 30);
-      var dSnap = await db.collection('photo_downloads').where('event_id','in',batch2).limit(500).get();
+      var dSnap = await igOwnerDb.collection('photo_downloads').where('event_id','in',batch2).limit(500).get();
       totalDownloads += dSnap.size;
     }
     var dEl = document.getElementById('stat-downloads');
@@ -908,7 +907,7 @@ async function loadEventActivity(){
   var sel = document.getElementById('activity-event-select');
   if (sel && sel.options.length <= 1){
     try {
-      var evSnap = await db.collection('events').where('owner_id','==',_currentUser.id).orderBy('created_at','desc').get();
+      var evSnap = await igOwnerDb.collection('events').where('owner_id','==',_currentUser.id).orderBy('created_at','desc').get();
       evSnap.docs.forEach(function(d){
         var o = document.createElement('option');
         o.value = d.id; o.textContent = d.data().name;
@@ -923,7 +922,7 @@ async function loadEventActivity(){
     if (!myIds.length) {
       /* Fallback: load from Firestore if _myEventIds not set yet */
       try {
-        var evFallback = await db.collection('events').where('owner_id','==',_currentUser.id).get();
+        var evFallback = await igOwnerDb.collection('events').where('owner_id','==',_currentUser.id).get();
         myIds = evFallback.docs.map(function(d){ return d.id; });
         window._myEventIds = myIds;
       } catch(e2){}
@@ -936,13 +935,13 @@ async function loadEventActivity(){
         renderActivityStats([]); renderDeviceBreakdown([]); renderLocationBreakdown([]); renderVisitLog([]);
         return;
       }
-      var snap = await db.collection('event_page_visits').where('event_id','==',eventId).orderBy('visited_at','desc').limit(500).get();
+      var snap = await igOwnerDb.collection('event_page_visits').where('event_id','==',eventId).orderBy('visited_at','desc').limit(500).get();
       visits = snap.docs.map(function(d){ var v=Object.assign({id:d.id},d.data()); if(v.visited_at&&v.visited_at.toDate) v.visited_at=v.visited_at.toDate().toISOString(); return v; });
     } else if (myIds.length) {
       /* All events — batch query scoped to user's event IDs */
       for (var i = 0; i < myIds.length; i += 30) {
         var batch = myIds.slice(i, i + 30);
-        var bSnap = await db.collection('event_page_visits').where('event_id','in',batch).orderBy('visited_at','desc').limit(500).get();
+        var bSnap = await igOwnerDb.collection('event_page_visits').where('event_id','in',batch).orderBy('visited_at','desc').limit(500).get();
         bSnap.docs.forEach(function(d){ var v=Object.assign({id:d.id},d.data()); if(v.visited_at&&v.visited_at.toDate) v.visited_at=v.visited_at.toDate().toISOString(); visits.push(v); });
       }
     }
@@ -970,12 +969,12 @@ async function loadDownloadsLog(eventId){
       if (myIds.length && myIds.indexOf(eventId) === -1) {
         el.innerHTML='<div class="empty"><div class="empty-ico">⬇</div><div class="empty-txt">No downloads yet.</div></div>';return;
       }
-      var snap = await db.collection('photo_downloads').where('event_id','==',eventId).orderBy('created_at','desc').limit(200).get();
+      var snap = await igOwnerDb.collection('photo_downloads').where('event_id','==',eventId).orderBy('created_at','desc').limit(200).get();
       data = snap.docs.map(function(d){ var r=Object.assign({id:d.id},d.data()); if(r.created_at&&r.created_at.toDate)r.created_at=r.created_at.toDate().toISOString(); return r; });
     } else if (myIds.length) {
       for (var i = 0; i < myIds.length; i += 30) {
         var batch = myIds.slice(i, i + 30);
-        var bSnap = await db.collection('photo_downloads').where('event_id','in',batch).orderBy('created_at','desc').limit(200).get();
+        var bSnap = await igOwnerDb.collection('photo_downloads').where('event_id','in',batch).orderBy('created_at','desc').limit(200).get();
         bSnap.docs.forEach(function(d){ var r=Object.assign({id:d.id},d.data()); if(r.created_at&&r.created_at.toDate)r.created_at=r.created_at.toDate().toISOString(); data.push(r); });
       }
     }

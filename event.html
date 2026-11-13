@@ -7,48 +7,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ImpactGrid — Event Gallery</title>
 <link rel="preconnect" href="https://impactgrid-events-api.onrender.com" crossorigin/>
-<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin/>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin/>
 <link rel="icon" href="favicon.ico"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&family=Italiana&family=Syne:wght@700;800;900&family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
-<!-- Firebase compat SDK (Events DB) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <!-- Supabase SDK (Reviews DB — getContentClient()/getSupabase() from supabase-config.js) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
 <script src="gallery-looks.js"></script>
-<script>
-/* ── Firebase init for event.html — config fetched securely from backend ── */
-/* Resolve this promise once Firestore is ready */
-window._dbReadyPromise = new Promise(function(resolve, reject){
-  /* Speed: the Firebase config is cached in this browser for 24h, so repeat
-     visits start instantly instead of waiting on the API (which can be slow
-     to wake). The cache is refreshed from the API in the background. */
-  var KEY = 'ig-fbcfg-v1', TTL = 24 * 60 * 60 * 1000, cached = null;
-  try {
-    var c = JSON.parse(localStorage.getItem(KEY) || 'null');
-    if (c && c.cfg && c.cfg.apiKey && (Date.now() - c.t) < TTL) cached = c.cfg;
-  } catch (e) {}
-  function ready(cfg){
-    if (!firebase.apps.length) firebase.initializeApp(cfg);
-    window._eventsDb = firebase.firestore();
-    resolve(window._eventsDb);
-  }
-  var net = fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
-    .then(function(r){ return r.json(); })
-    .then(function(cfg){
-      if (!cfg || !cfg.apiKey) throw new Error('Firebase config unavailable');
-      try { localStorage.setItem(KEY, JSON.stringify({ t: Date.now(), cfg: cfg })); } catch (e) {}
-      return cfg;
-    });
-  if (cached) { ready(cached); net.catch(function(){}); }
-  else net.then(ready).catch(function(err){
-    console.error('Failed to load Firebase config:', err);
-    reject(err);
-  });
-});
-</script>
+
 <style>
 /* ══════════════════════════════════════
    RESET & BASE
@@ -1472,14 +1438,8 @@ var activeClientExp = { require_code:true, allow_download:true, watermark_enable
    shared "templates" collection — an event with no design of its own
    falls back to the single studio-wide default at studio_settings/design_defaults,
    and only then to the built-in DEFAULT_TEMPLATE above. */
-async function applyEventDesign(ev, db){
-  var design = ev.design || null;
-  if(!design){
-    try{
-      var defSnap = await db.collection('studio_settings').doc('design_defaults').get();
-      if(defSnap.exists) design = defSnap.data();
-    }catch(e){ console.warn('[applyEventDesign] could not load studio default, using built-in defaults:', e.message); }
-  }
+async function applyEventDesign(ev, defaults){
+  var design = ev.design || defaults || null;   /* studio default is supplied by /api/gallery/info */
 
   activeTemplate = Object.assign({}, DEFAULT_TEMPLATE, design || {});
 
@@ -1669,31 +1629,15 @@ document.addEventListener('DOMContentLoaded', async function(){
 
   if(!slug){ showError('No event specified in the URL.'); return; }
 
-  /* Wait for Firestore to be ready before querying */
-  try{ await window._dbReadyPromise; }
-  catch(e){ showError('Could not connect to database. Please refresh and try again.'); return; }
-
+  window._igSlug = slug;
   try{
-    var db = window._eventsDb;
-    /* Query events collection by slug */
-    var snap = await db.collection('events')
-      .where('event_slug', '==', slug)
-      .where('is_active', '==', true)
-      .limit(1)
-      .get();
-
-    if(snap.empty){ showError('This event was not found or has expired.'); return; }
-
-    var evDoc = snap.docs[0];
-    var ev = Object.assign({ id: evDoc.id }, evDoc.data());
-
-    /* Load event settings */
-    var settingsSnap = await db.collection('event_settings')
-      .where('event_id', '==', ev.id)
-      .limit(1)
-      .get();
-    var settings = settingsSnap.empty ? {} : settingsSnap.docs[0].data();
-    ev.event_settings = settings;
+    /* Safe, public event info only — the access code and owner details never leave the server. */
+    var infoRes  = await fetch(EVENTS_API + '/api/gallery/info?slug=' + encodeURIComponent(slug));
+    var info     = await infoRes.json().catch(function(){ return {}; });
+    if(!infoRes.ok){ showError(info.error || 'This event was not found or has expired.'); return; }
+    var ev       = info.event;
+    var settings = ev.event_settings || {};
+    window._igDesignDefaults = info.design_defaults || null;
     var error = null;
 
     if(error || !ev){ showError('This event was not found or has expired.'); return; }
@@ -1711,10 +1655,10 @@ document.addEventListener('DOMContentLoaded', async function(){
     var type = ev.type || ev.template || 'professional';
     var tpl  = TPL_MAP[type] || TPL_MAP.professional;
     document.body.className = tpl.cls;
-    await applyEventDesign(ev, db);
+    await applyEventDesign(ev, window._igDesignDefaults);
 
     document.getElementById('navEventName').textContent = ev.name;
-    document.getElementById('navCodeBadge').textContent = ev.event_code;
+    document.getElementById('navCodeBadge').textContent = '';   /* shown only after the server accepts the code */
 
     styleGate(type, ev.name);
 
@@ -1723,9 +1667,12 @@ document.addEventListener('DOMContentLoaded', async function(){
     if(ev.gallery_locked === true){
       showLockedGallery();
     } else if(settings.require_code === false){
-      enterGallery();
-    } else if(code && code.toUpperCase() === ev.event_code){
-      enterGallery();
+      var open0 = await openGalleryWithCode('');
+      if(open0.ok && !open0.locked) enterGallery(); else if(!open0.ok) showError(open0.error);
+    } else if(code){
+      var open1 = await openGalleryWithCode(code);
+      try{ history.replaceState(null, '', location.pathname + '?event=' + encodeURIComponent(slug)); }catch(e){}   /* keep the code out of history/logs */
+      if(open1.ok && !open1.locked) enterGallery(); else if(!open1.ok) showSection('section-gate');
     } else {
       showSection('section-gate');
     }
@@ -1757,12 +1704,38 @@ function styleGate(type, name){
   document.getElementById('gateSub').textContent   = subs[type] || subs.professional;
 }
 
+/* The code is checked ON THE SERVER (/api/gallery/open). Photos are only sent back if it is right. */
+async function openGalleryWithCode(code){
+  try{
+    var r = await fetch(EVENTS_API + '/api/gallery/open', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ slug: window._igSlug, code: code || '' })
+    });
+    var j = await r.json().catch(function(){ return {}; });
+    if(!r.ok) return { ok:false, error: j.error || 'Could not open this gallery. Please try again.' };
+    if(j.event){
+      var keep = eventData && eventData.event_settings;
+      Object.assign(eventData, j.event);
+      if(!j.event.event_settings && keep) eventData.event_settings = keep;
+    }
+    if(j.locked){ eventData.gallery_locked = true; showLockedGallery(); return { ok:true, locked:true }; }
+    window._galleryPhotos = j.photos || [];
+    document.getElementById('navCodeBadge').textContent = eventData.event_code || '';
+    return { ok:true, locked:false };
+  }catch(e){ return { ok:false, error:'Could not reach the server. Please check your connection and try again.' }; }
+}
+
 async function submitCode(){
   var input = document.getElementById('gateCodeInput').value.trim().toUpperCase();
   var btn   = document.getElementById('gateSubmitBtn');
   if(!input || input.length < 4){ showGateAlert('Please enter your access code.'); return; }
-  if(input !== eventData.event_code){ showGateAlert('Incorrect code. Please try again.'); return; }
+  var label = btn.textContent;
   btn.disabled    = true;
+  btn.textContent = 'Checking…';
+  var r = await openGalleryWithCode(input);
+  if(!r.ok){ btn.disabled = false; btn.textContent = label; showGateAlert(r.error); return; }
+  if(r.locked) return;
   btn.textContent = 'Entering…';
   enterGallery();
 }
@@ -1805,12 +1778,8 @@ function showSection(id){
 ══════════════════════════════════════ */
 async function loadPhotos(){
   try{
-    var db = window._eventsDb;
-    var snap = await db.collection('photos')
-      .where('event_id', '==', eventData.id)
-      .orderBy('created_at', 'asc')
-      .get();
-    var data = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    /* Photos arrive with the server's code check (/api/gallery/open) — nothing is read from a database here. */
+    var data = (window._galleryPhotos || []).slice();
 
     /* Hidden photos (admin-side Photos manager) never reach the client. */
     data = data.filter(function(p){ return p.hidden !== true; });
@@ -1891,7 +1860,7 @@ async function loadCelebrantPhoto(){
   try{
     var settings = eventData.event_settings || {};
     var celebUrl = settings.celebrant_photo_url || eventData.celebrant_photo_url || null;
-    /* Celebrant photo URL is stored directly in Firestore (uploaded via Cloudinary in admin) */
+    /* Celebrant photo URL is stored with the event (uploaded via Cloudinary in admin) */
     if(celebUrl){
       var wrap = document.getElementById('celebrantPhoto');
       var img  = document.getElementById('celebrantImg');
