@@ -5,33 +5,15 @@
    Storage Cloudinary (free 25GB)
 ════════════════════════════════════════════════════ */
 
-/* Firebase is loaded via CDN <script> tags in admin.html before this file.
-   The globals used here: firebase, firebase.initializeApp, firebase.firestore  */
+/* Needs ig-db.js loaded before this file (it provides window.igAdminDb). */
 
-/* Firebase config is fetched securely from the backend — API key never exposed in frontend code */
-var db;
-var _dbReady = false;
+/* The browser no longer talks to Firestore directly: ig-db.js (loaded before this file) sends every
+   call to the ImpactGrid API, which checks the admin's Supabase login on the server. */
+var db = window.igAdminDb;
+var _dbReady = true;
 var _dbReadyCallbacks = [];
 
-function onDbReady(fn){ if(_dbReady){ fn(); } else { _dbReadyCallbacks.push(fn); } }
-
-fetch('https://impactgrid-events-api.onrender.com/api/firebase-config')
-  .then(function(r){ return r.json(); })
-  .then(function(firebaseConfig){
-    if(!firebase.apps.length){ firebase.initializeApp(firebaseConfig); }
-    db = firebase.firestore();
-    _dbReady = true;
-    _dbReadyCallbacks.forEach(function(fn){ fn(); });
-    _dbReadyCallbacks = [];
-  })
-  .catch(function(err){
-    console.error('Failed to load Firebase config:', err);
-    var alertEl = document.getElementById('createEventAlert');
-    if(alertEl){
-      alertEl.textContent = 'Could not connect to database. Check your internet connection and refresh the page.';
-      alertEl.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);';
-    }
-  });
+function onDbReady(fn){ fn(); }
 
 /* Firestore helpers to replace the ES-module named imports */
 var collection      = function(db, col)       { return db.collection(col); };
@@ -42,7 +24,7 @@ var getDocs         = function(q)             { return q.get(); };
 var updateDoc       = function(docRef, data)  { return docRef.update(data); };
 var setDoc          = function(docRef, data, opts) { return docRef.set(data, opts || {}); };
 var deleteDoc       = function(docRef)        { return docRef.delete(); };
-var serverTimestamp = function()              { return firebase.firestore.FieldValue.serverTimestamp(); };
+var serverTimestamp = function()              { return window.igServerTimestamp(); };
 
 /* query / where / orderBy shims — build a Firestore query chain */
 function query(colRef) {
