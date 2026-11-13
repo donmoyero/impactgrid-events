@@ -682,7 +682,7 @@ async function sendOwnerNotification(ownerEmail, ownerName, eventName, eventCode
   try{
     var res  = await fetch(EVENTS_API + '/api/notify-owner', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, await _igAuthHeader()),
       body   : JSON.stringify({ ownerEmail: ownerEmail, ownerName: ownerName, eventName: eventName, eventCode: eventCode, eventUrl: eventUrl, subject: finalSubject, body: finalBody })
     });
     if(!res.ok){
@@ -774,7 +774,7 @@ async function resendOwnerEmail(ownerEmail, eventName){
   try{
     var res  = await fetch(EVENTS_API + '/api/resend-owner-email', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, await _igAuthHeader()),
       body   : JSON.stringify({ ownerEmail })
     });
     var data = await res.json();
@@ -789,7 +789,7 @@ async function sendEventReminder(ownerEmail, eventName){
   try{
     var res  = await fetch(EVENTS_API + '/api/send-reminder', {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, await _igAuthHeader()),
       body   : JSON.stringify({ ownerEmail })
     });
     var data = await res.json();
