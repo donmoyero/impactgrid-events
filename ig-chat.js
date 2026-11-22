@@ -642,7 +642,7 @@
       }
     } catch (e) {
       hideTyping();
-      addMessage("Hmm, can't reach me right now — drop us an email at events@impactgridgroup.com 👋", 'bot');
+      addMessage("Hmm, can't reach me right now — drop us an email at events@impactgridgroup.com", 'bot');
     }
 
     isTyping = false;
@@ -673,7 +673,7 @@
       /* Returning visitor */
       setTimeout(function () {
         addMessage(
-          'Welcome back, ' + codename + '! 👋 Good to see you again — ready to pick up where we left off?',
+          'Welcome back, ' + codename + '! Good to see you again — ready to pick up where we left off?',
           'bot'
         );
       }, 400);
@@ -681,7 +681,7 @@
       /* First-time visitor */
       setTimeout(function () {
         addMessage(
-          'Hey ' + codename + '! 👋 I’m Dijo — ImpactGrid’s AI. Looking to book something or just browsing?',
+          'Hey ' + codename + '! I’m Dijo — ImpactGrid’s AI. Looking to book something or just browsing?',
           'bot'
         );
       }, 400);
@@ -748,7 +748,7 @@
     if (isOpen || SS.get('ig_teaser_done') === '1' || chatClosed) return;
     document.getElementById('ig-teaser-text').innerHTML = isReturning
       ? '<b>Welcome back!</b> Want to pick up where we left off?'
-      : '<b>Hi, I&rsquo;m Dijo 👋</b> Planning an event? Ask me anything or check a date.';
+      : '<b>Hi, I&rsquo;m Dijo</b> Planning an event? Ask me anything or check a date.';
     placeTeaser();
     teaser.classList.add('show');
     SS.set('ig_teaser_done', '1');

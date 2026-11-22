@@ -599,7 +599,7 @@
 
     <div class="post-listen" id="postListen">
       <button class="post-listen-btn" id="postListenBtn" onclick="toggleListenToPost()">
-        <span id="postListenIcon">🔊</span>
+        <span id="postListenIcon"></span>
         <span id="postListenLabel">Listen to this post</span>
       </button>
     </div>
@@ -1045,7 +1045,7 @@
     var label = document.getElementById('postListenLabel');
     btn.disabled = false;
     btn.classList.remove('playing');
-    icon.textContent = '🔊';
+    icon.textContent = '';
     label.textContent = 'Listen to this post';
   }
 
@@ -1096,7 +1096,7 @@
     var utter = new SpeechSynthesisUtterance(item.text);
     utter.rate = 1;
     utter.onstart  = function() {
-      btn.classList.add('playing'); icon.textContent = '⏸'; label.textContent = 'Listening…';
+      btn.classList.add('playing'); icon.textContent = ''; label.textContent = 'Listening…';
       // Chrome/Edge bug workaround: nudge the engine every 10s or it goes silent
       // partway through a paragraph without firing onend/onerror.
       if (_speechWatchdog) clearInterval(_speechWatchdog);
@@ -1105,8 +1105,8 @@
         if (!synth.paused) { synth.pause(); synth.resume(); }
       }, 10000);
     };
-    utter.onpause  = function() { icon.textContent = '🔊'; label.textContent = 'Paused — tap to resume'; };
-    utter.onresume = function() { icon.textContent = '⏸'; label.textContent = 'Listening…'; };
+    utter.onpause  = function() { icon.textContent = ''; label.textContent = 'Paused — tap to resume'; };
+    utter.onresume = function() { icon.textContent = ''; label.textContent = 'Listening…'; };
     utter.onend    = function() { speakNextInQueue(); };
     utter.onerror  = function(e) {
       // 'interrupted'/'canceled' just means we (or the user closing the post)

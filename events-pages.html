@@ -15,7 +15,7 @@
       </div>
     </div>
     <div class="card-body table-wrap" id="eventsList">
-      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+      <div class="empty"><div class="empty-txt">Loading…</div></div>
     </div>
   </div>
 </div>
@@ -68,7 +68,7 @@
               <div class="field-label">Owner Avatar <span style="font-weight:400;color:var(--text3);font-size:11px;">(optional)</span></div>
               <div style="display:flex;align-items:center;gap:12px;">
                 <div id="ev-avatar-preview" onclick="document.getElementById('ev-avatar-input').click()" style="width:56px;height:56px;border-radius:50%;background:var(--bg3);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .2s;" title="Click to upload photo">
-                  <span id="ev-avatar-placeholder" style="font-size:22px;user-select:none;">👤</span>
+                  <span id="ev-avatar-placeholder" style="font-size:22px;user-select:none;"></span>
                   <img id="ev-avatar-img" style="display:none;width:100%;height:100%;object-fit:cover;" alt="Owner avatar"/>
                 </div>
                 <div style="flex:1;">
@@ -176,7 +176,6 @@
             ondragover="onDragOver(event,'photoDropZone')"
             ondragleave="onDragLeave(event,'photoDropZone')"
             ondrop="onDrop(event,'photoDropZone',handlePhotoFiles)">
-            <div class="upload-zone-ico">📸</div>
             <div class="upload-zone-title">Drop photos here or click to browse</div>
             <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div>
             <input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotoInputChange(event)"/>
@@ -191,7 +190,7 @@
           <button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button>
         </div>
         <div class="card-body" id="eventPhotosList">
-          <div class="empty"><div class="empty-ico">📸</div><div class="empty-txt">No photos yet.</div></div>
+          <div class="empty"><div class="empty-txt">No photos yet.</div></div>
         </div>
       </div>
     </div>
@@ -223,7 +222,7 @@
       <button class="btn btn-ghost btn-sm" onclick="loadDownloadRequests()">↻ Refresh</button>
     </div>
     <div class="card-body table-wrap" id="downloadRequestsList">
-      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+      <div class="empty"><div class="empty-txt">Loading…</div></div>
     </div>
   </div>
 </div>
@@ -242,14 +241,14 @@
       <h2>All Reviews</h2>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-ghost btn-sm" onclick="filterReviews('all',    this)">All</button>
-        <button class="btn btn-ghost btn-sm" id="rev-filter-pending"  onclick="filterReviews('pending',  this)">⏳ Pending</button>
-        <button class="btn btn-ghost btn-sm" id="rev-filter-approved" onclick="filterReviews('approved', this)">✅ Approved</button>
+        <button class="btn btn-ghost btn-sm" id="rev-filter-pending"  onclick="filterReviews('pending',  this)">Pending</button>
+        <button class="btn btn-ghost btn-sm" id="rev-filter-approved" onclick="filterReviews('approved', this)">Approved</button>
         <button class="btn btn-ghost btn-sm" id="rev-filter-rejected" onclick="filterReviews('rejected', this)">✕ Rejected</button>
         <button class="btn btn-ghost btn-sm" onclick="loadEventReviews()">↻ Refresh</button>
       </div>
     </div>
     <div class="card-body table-wrap" id="reviewsList">
-      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+      <div class="empty"><div class="empty-txt">Loading…</div></div>
     </div>
   </div>
 

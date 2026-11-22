@@ -167,6 +167,7 @@ tr:hover td{background:var(--bg2);}
 .toast{position:fixed;bottom:22px;right:22px;z-index:9999;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:14px 20px;min-width:260px;box-shadow:var(--sh2);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:12px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast-icon{font-size:18px;flex-shrink:0;}
+.toast-icon:empty{display:none;}
 .toast-msg{font-size:13px;font-weight:600;}
 .toast-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 
@@ -197,10 +198,10 @@ tr:hover td{background:var(--bg2);}
   </a>
   <button class="mobile-menu-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
   <div class="topbar-div"></div>
-  <div class="dash-badge">📸 Photographer</div>
+  <div class="dash-badge">Photographer</div>
   <div class="topbar-right">
     <span class="topbar-user" id="topbarUser"></span>
-    <a href="index.html" target="_blank" class="topbar-btn">🔗 View Site</a>
+    <a href="index.html" target="_blank" class="topbar-btn">View Site</a>
     <button class="topbar-btn topbar-btn-red" onclick="doLogout()">⎋ Sign Out</button>
   </div>
 </div>
@@ -210,7 +211,6 @@ tr:hover td{background:var(--bg2);}
 <div class="shell">
   <aside class="sidebar" id="mainSidebar">
     <div class="sb-brand">
-      <div class="sb-brand-icon">📸</div>
       <div style="flex:1;">
         <div class="sb-brand-name">My Dashboard</div>
         <div class="sb-brand-sub">Impact Grid</div>
@@ -231,25 +231,25 @@ tr:hover td{background:var(--bg2);}
       <div class="sb-section-label">Overview</div>
       <nav class="sb-nav">
         <a href="#" class="active" onclick="return nav('overview',this)"><span class="sb-ico">◈</span>Overview</a>
-        <a href="#" onclick="return nav('activity',this)"><span class="sb-ico">📊</span>Event Activity</a>
+        <a href="#" onclick="return nav('activity',this)">Event Activity</a>
       </nav>
     </div>
 
     <div class="sb-section">
-      <div class="sb-section-label">📅 Events</div>
+      <div class="sb-section-label">Events</div>
       <nav class="sb-nav">
-        <a href="#" onclick="return nav('events',this)"><span class="sb-ico">📅</span>All Events</a>
-        <a href="#" onclick="return nav('createevent',this)"><span class="sb-ico">➕</span>Create Event</a>
-        <a href="#" onclick="return nav('uploadphotos',this)"><span class="sb-ico">🖼️</span>Upload Photos</a>
+        <a href="#" onclick="return nav('events',this)">All Events</a>
+        <a href="#" onclick="return nav('createevent',this)">Create Event</a>
+        <a href="#" onclick="return nav('uploadphotos',this)">Upload Photos</a>
       </nav>
     </div>
 
 
     <div class="sb-section">
-      <div class="sb-section-label">💰 Money</div>
+      <div class="sb-section-label">Money</div>
       <nav class="sb-nav">
-        <a href="#" onclick="return nav('invoices',this)"><span class="sb-ico">🧾</span>Invoices</a>
-        <a href="#" onclick="return nav('createinvoice',this)"><span class="sb-ico">➕</span>New Invoice</a>
+        <a href="#" onclick="return nav('invoices',this)">Invoices</a>
+        <a href="#" onclick="return nav('createinvoice',this)">New Invoice</a>
       </nav>
     </div>
 
@@ -275,17 +275,14 @@ tr:hover td{background:var(--bg2);}
       </div>
       <div class="quick-grid">
         <div class="quick-card" onclick="nav('createevent',null)" style="border-color:var(--gold-glo);background:var(--gold-dim);">
-          <div class="quick-ico">➕</div>
           <div class="quick-title" style="color:var(--gold);">Create Event</div>
           <div class="quick-desc">Set up a new photo event with access code and expiry</div>
         </div>
         <div class="quick-card" onclick="nav('uploadphotos',null)">
-          <div class="quick-ico">📤</div>
           <div class="quick-title">Upload Photos</div>
           <div class="quick-desc">Add photos to an existing event gallery</div>
         </div>
         <div class="quick-card" onclick="nav('activity',null)">
-          <div class="quick-ico">📊</div>
           <div class="quick-title">Event Activity</div>
           <div class="quick-desc">See visits, devices, locations, and downloads per event</div>
         </div>
@@ -297,14 +294,14 @@ tr:hover td{background:var(--bg2);}
       <div class="page-header"><div class="page-title">Events</div><div class="page-sub">All your photo events.</div></div>
       <div class="card">
         <div class="card-head">
-          <h2>📅 All Events</h2>
+          <h2>All Events</h2>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-ghost btn-sm" onclick="loadEvents()">↻ Refresh</button>
-            <button class="btn btn-gold" onclick="nav('createevent',null)">➕ Create Event</button>
+            <button class="btn btn-gold" onclick="nav('createevent',null)">Create Event</button>
           </div>
         </div>
         <div class="card-body table-wrap" id="eventsList">
-          <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+          <div class="empty"><div class="empty-txt">Loading…</div></div>
         </div>
       </div>
     </div>
@@ -315,7 +312,7 @@ tr:hover td{background:var(--bg2);}
       <div class="ws-layout">
         <div>
           <div class="card">
-            <div class="card-head"><h2>📋 Event Details</h2></div>
+            <div class="card-head"><h2>Event Details</h2></div>
             <div class="card-body">
               <div id="createEventAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
               <div class="field-group"><div class="field-label">Event Name *</div><input type="text" id="ev-name" placeholder="e.g. Johnson Wedding 2026" oninput="updateTemplatePreview()"/></div>
@@ -328,18 +325,18 @@ tr:hover td{background:var(--bg2);}
               </div>
               <div class="form-grid" style="margin-bottom:16px;">
                 <div class="field-group"><div class="field-label">Access Code</div>
-                  <div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/><button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;">🎲</button></div>
+                  <div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/><button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;">Generate</button></div>
                 </div>
                 <div class="field-group"><div class="field-label">Template *</div>
                   <select id="ev-template" onchange="updateTemplatePreview()" style="width:100%;">
-                    <option value="professional">📊 Professional</option>
-                    <option value="kids">🎉 Kids</option>
-                    <option value="birthday">🎂 Birthday</option>
-                    <option value="wedding">💍 Wedding</option>
-                    <option value="sports">🏆 Sports</option>
-                    <option value="nightlife">🎧 Nightlife</option>
+                    <option value="professional">Professional</option>
+                    <option value="kids">Kids</option>
+                    <option value="birthday">Birthday</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="sports">Sports</option>
+                    <option value="nightlife">Nightlife</option>
                     <option value="gala">✦ Gala / Premium</option>
-                    <option value="ceremony">🎓 Ceremony</option>
+                    <option value="ceremony">Ceremony</option>
                   </select>
                 </div>
               </div>
@@ -347,13 +344,13 @@ tr:hover td{background:var(--bg2);}
                 <div class="toggle on" id="ev-code-toggle" onclick="toggleRequireCode()"></div>
                 <div><div style="font-size:13px;font-weight:600;">Require Access Code</div><div style="font-size:11px;color:var(--text3);">Guests must enter the code to view the gallery</div></div>
               </div>
-              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()">✨ Create Event →</button>
+              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()">Create Event →</button>
             </div>
           </div>
         </div>
         <div class="ws-sticky">
           <div id="templatePreviewCard" style="border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2);box-shadow:var(--sh);transition:all .3s;">
-            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">👁 Template Preview</div>
+            <div style="padding:10px 14px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);">Template Preview</div>
             <div id="templatePreviewInner"></div>
           </div>
           <div class="hint-box" style="margin-top:12px;"><strong>How events work</strong><br><br>After creating, upload photos from <strong>Upload Photos</strong>. Guests scan their face to find their photos instantly.</div>
@@ -368,7 +365,7 @@ tr:hover td{background:var(--bg2);}
       <div class="ws-layout">
         <div>
           <div class="card">
-            <div class="card-head"><h2>📅 Select Event</h2></div>
+            <div class="card-head"><h2>Select Event</h2></div>
             <div class="card-body">
               <div class="field-group"><div class="field-label">Event</div>
                 <select id="upload-event-select" onchange="onUploadEventChange()"><option value="">— Select an event —</option></select>
@@ -379,12 +376,11 @@ tr:hover td{background:var(--bg2);}
             </div>
           </div>
           <div class="card" id="upload-dropcard" style="display:none;">
-            <div class="card-head"><h2>📤 Upload Photos</h2></div>
+            <div class="card-head"><h2>Upload Photos</h2></div>
             <div class="card-body">
               <div class="upload-zone" id="photoDropZone" onclick="document.getElementById('photoFileIn').click()"
                 ondragover="onDragOver(event,'photoDropZone')" ondragleave="onDragLeave(event,'photoDropZone')"
                 ondrop="onDropMulti(event,'photoDropZone')">
-                <div class="upload-zone-ico">📸</div>
                 <div class="upload-zone-title">Drop photos here or click to browse</div>
                 <div class="upload-zone-sub">JPG · PNG · WebP · Multiple files supported</div>
                 <input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotoInputChange(event)"/>
@@ -393,8 +389,8 @@ tr:hover td{background:var(--bg2);}
             </div>
           </div>
           <div class="card" id="upload-photos-list-card" style="display:none;">
-            <div class="card-head"><h2>🖼️ Event Photos</h2><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button></div>
-            <div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-ico">📸</div><div class="empty-txt">No photos yet.</div></div></div>
+            <div class="card-head"><h2>Event Photos</h2><button class="btn btn-ghost btn-sm" onclick="loadEventPhotos()">↻ Refresh</button></div>
+            <div class="card-body" id="eventPhotosList"><div class="empty"><div class="empty-txt">No photos yet.</div></div></div>
           </div>
         </div>
         <div class="ws-sticky">
@@ -427,16 +423,16 @@ tr:hover td{background:var(--bg2);}
         <div class="stat-card"><div class="stat-label">Unique Visitors</div><div class="stat-val" id="act-stat-unique" style="color:var(--gold);">—</div><div class="stat-sub">Distinct devices (no IPs)</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-        <div class="card"><div class="card-head"><h2>📱 Device Types</h2></div><div class="card-body" id="act-devices"><div class="empty"><div class="empty-ico">⏳</div></div></div></div>
-        <div class="card"><div class="card-head"><h2>🌍 Visitor Locations</h2></div><div class="card-body" id="act-locations"><div class="empty"><div class="empty-ico">⏳</div></div></div></div>
+        <div class="card"><div class="card-head"><h2>Device Types</h2></div><div class="card-body" id="act-devices"><div class="empty"><div class="empty-txt">Loading...</div></div></div></div>
+        <div class="card"><div class="card-head"><h2>Visitor Locations</h2></div><div class="card-body" id="act-locations"><div class="empty"><div class="empty-txt">Loading...</div></div></div></div>
       </div>
       <div class="card" style="margin-bottom:16px;">
-        <div class="card-head"><h2>👁 Visit Log</h2><span style="font-size:11px;color:var(--text3);">Most recent first</span></div>
-        <div class="card-body table-wrap" id="act-visit-log"><div class="empty"><div class="empty-ico">⏳</div></div></div>
+        <div class="card-head"><h2>Visit Log</h2><span style="font-size:11px;color:var(--text3);">Most recent first</span></div>
+        <div class="card-body table-wrap" id="act-visit-log"><div class="empty"><div class="empty-txt">Loading...</div></div></div>
       </div>
       <div class="card">
-        <div class="card-head"><h2>⬇ Downloads Log</h2><span style="font-size:11px;color:var(--text3);">Every download recorded</span></div>
-        <div class="card-body table-wrap" id="act-downloads-log"><div class="empty"><div class="empty-ico">⏳</div></div></div>
+        <div class="card-head"><h2>Downloads Log</h2><span style="font-size:11px;color:var(--text3);">Every download recorded</span></div>
+        <div class="card-body table-wrap" id="act-downloads-log"><div class="empty"><div class="empty-txt">Loading...</div></div></div>
       </div>
     </div>
 
@@ -449,11 +445,11 @@ tr:hover td{background:var(--bg2);}
       <div class="ws-layout">
         <div>
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
-            <button id="rev-tab-pending"  onclick="setReviewFilter('pending')"  class="mail-tab-btn" style="background:var(--card);color:var(--text);box-shadow:var(--sh);">⏳ Pending <span id="rev-count-pending" style="font-size:11px;opacity:.6;">0</span></button>
-            <button id="rev-tab-approved" onclick="setReviewFilter('approved')" class="mail-tab-btn" style="background:transparent;color:var(--text2);">✅ Approved <span id="rev-count-approved" style="font-size:11px;opacity:.6;">0</span></button>
-            <button id="rev-tab-all"      onclick="setReviewFilter('all')"      class="mail-tab-btn" style="background:transparent;color:var(--text2);">📋 All <span id="rev-count-all" style="font-size:11px;opacity:.6;">0</span></button>
+            <button id="rev-tab-pending"  onclick="setReviewFilter('pending')"  class="mail-tab-btn" style="background:var(--card);color:var(--text);box-shadow:var(--sh);">Pending <span id="rev-count-pending" style="font-size:11px;opacity:.6;">0</span></button>
+            <button id="rev-tab-approved" onclick="setReviewFilter('approved')" class="mail-tab-btn" style="background:transparent;color:var(--text2);">Approved <span id="rev-count-approved" style="font-size:11px;opacity:.6;">0</span></button>
+            <button id="rev-tab-all"      onclick="setReviewFilter('all')"      class="mail-tab-btn" style="background:transparent;color:var(--text2);">All <span id="rev-count-all" style="font-size:11px;opacity:.6;">0</span></button>
           </div>
-          <div id="reviews-table-wrap"><div class="empty"><div class="empty-ico">⭐</div><div class="empty-txt">Loading reviews…</div></div></div>
+          <div id="reviews-table-wrap"><div class="empty"><div class="empty-txt">Loading reviews…</div></div></div>
         </div>
         <div class="ws-sticky">
           <div class="hint-box"><strong>How reviews work</strong><br><br>Guests submit a review from the event page. Reviews stay <strong>pending</strong> until you approve them — never shown publicly until approved.</div>
@@ -467,19 +463,19 @@ tr:hover td{background:var(--bg2);}
       <div class="ws-layout">
         <div>
           <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px;">
-            <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" class="mail-tab-btn" style="background:var(--card);color:var(--text);box-shadow:var(--sh);">✏️ Compose</button>
-            <button id="mail-tab-inbox-btn"   onclick="switchMailTab('inbox')"   class="mail-tab-btn" style="background:transparent;color:var(--text2);">📥 Inbox</button>
-            <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    class="mail-tab-btn" style="background:transparent;color:var(--text2);">📤 Sent</button>
+            <button id="mail-tab-compose-btn" onclick="switchMailTab('compose')" class="mail-tab-btn" style="background:var(--card);color:var(--text);box-shadow:var(--sh);">Compose</button>
+            <button id="mail-tab-inbox-btn"   onclick="switchMailTab('inbox')"   class="mail-tab-btn" style="background:transparent;color:var(--text2);">Inbox</button>
+            <button id="mail-tab-sent-btn"    onclick="switchMailTab('sent')"    class="mail-tab-btn" style="background:transparent;color:var(--text2);">Sent</button>
           </div>
           <div id="mail-tab-compose">
             <div class="card">
-              <div class="card-head"><h2>✏️ New Email</h2></div>
+              <div class="card-head"><h2>New Email</h2></div>
               <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
                 <div class="field-group"><div class="field-label">To</div><input type="email" id="mail-to" placeholder="guest@email.com"/></div>
                 <div class="field-group"><div class="field-label">Subject</div><input type="text" id="mail-subject" placeholder="Your event photos are ready…"/></div>
                 <div class="field-group"><div class="field-label">Message</div><textarea id="mail-body" rows="10" placeholder="Type your message here…"></textarea></div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                  <button class="btn btn-gold" onclick="sendMail()">📨 Send Email</button>
+                  <button class="btn btn-gold" onclick="sendMail()">Send Email</button>
                   <button class="btn btn-ghost" onclick="clearCompose()">Clear</button>
                   <span style="font-size:11px;color:var(--text3);">Sent from events@impactgridgroup.com via Resend</span>
                 </div>
@@ -489,14 +485,14 @@ tr:hover td{background:var(--bg2);}
           </div>
           <div id="mail-tab-inbox" style="display:none;">
             <div class="card">
-              <div class="card-head"><h2>📥 Inbox</h2><button class="btn btn-ghost btn-sm" onclick="loadInbox()">↻ Refresh</button></div>
-              <div class="card-body" id="mail-inbox-list"><div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">Loading…</div></div></div>
+              <div class="card-head"><h2>Inbox</h2><button class="btn btn-ghost btn-sm" onclick="loadInbox()">↻ Refresh</button></div>
+              <div class="card-body" id="mail-inbox-list"><div class="empty"><div class="empty-txt">Loading…</div></div></div>
             </div>
             <div class="card" id="mail-open-card" style="display:none;">
               <div class="card-head">
                 <div><div style="font-size:13px;font-weight:700;" id="mail-open-subject">—</div><div style="font-size:11px;color:var(--text3);margin-top:2px;" id="mail-open-meta">—</div></div>
                 <div style="display:flex;gap:6px;">
-                  <button class="btn btn-ghost btn-sm" onclick="replyTo()">↩ Reply</button>
+                  <button class="btn btn-ghost btn-sm" onclick="replyTo()">Reply</button>
                   <button class="btn btn-ghost btn-sm" onclick="document.getElementById('mail-open-card').style.display='none'">✕ Close</button>
                 </div>
               </div>
@@ -505,8 +501,8 @@ tr:hover td{background:var(--bg2);}
           </div>
           <div id="mail-tab-sent" style="display:none;">
             <div class="card">
-              <div class="card-head"><h2>📤 Sent</h2><button class="btn btn-ghost btn-sm" onclick="loadSent()">↻ Refresh</button></div>
-              <div class="card-body" id="mail-sent-list"><div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">Loading…</div></div></div>
+              <div class="card-head"><h2>Sent</h2><button class="btn btn-ghost btn-sm" onclick="loadSent()">↻ Refresh</button></div>
+              <div class="card-body" id="mail-sent-list"><div class="empty"><div class="empty-txt">Loading…</div></div></div>
             </div>
           </div>
         </div>
@@ -525,14 +521,14 @@ tr:hover td{background:var(--bg2);}
       </div>
       <div class="card">
         <div class="card-head">
-          <h2>🧾 Invoice History</h2>
+          <h2>Invoice History</h2>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-ghost btn-sm" onclick="loadInvoices()">↻ Refresh</button>
-            <button class="btn btn-gold" onclick="nav('createinvoice',null)">➕ New Invoice</button>
+            <button class="btn btn-gold" onclick="nav('createinvoice',null)">New Invoice</button>
           </div>
         </div>
         <div class="card-body table-wrap" id="invoicesList">
-          <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+          <div class="empty"><div class="empty-txt">Loading…</div></div>
         </div>
       </div>
     </div>
@@ -707,9 +703,9 @@ tr:hover td{background:var(--bg2);}
 
           <!-- ACTIONS -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:8px;">
-            <button class="btn btn-gold" style="justify-content:center;padding:14px;" onclick="saveAndSendInvoice()">📨 Save &amp; Send to Client</button>
-            <button class="btn btn-blue" style="justify-content:center;padding:14px;" onclick="downloadInvoicePDF()">⬇ Download PDF</button>
-            <button class="btn btn-ghost" style="justify-content:center;grid-column:1/-1;" onclick="saveInvoiceOnly()">💾 Save as Draft (no email)</button>
+            <button class="btn btn-gold" style="justify-content:center;padding:14px;" onclick="saveAndSendInvoice()">Save &amp; Send to Client</button>
+            <button class="btn btn-blue" style="justify-content:center;padding:14px;" onclick="downloadInvoicePDF()">Download PDF</button>
+            <button class="btn btn-ghost" style="justify-content:center;grid-column:1/-1;" onclick="saveInvoiceOnly()">Save as Draft (no email)</button>
           </div>
 
         </div><!-- /left -->
@@ -718,7 +714,7 @@ tr:hover td{background:var(--bg2);}
         <div class="ws-sticky">
           <div class="card" style="overflow:hidden;">
             <div style="padding:10px 16px;font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;">
-              <span>👁 Invoice Preview</span>
+              <span>Invoice Preview</span>
               <span style="color:var(--green);font-size:9px;">● Live</span>
             </div>
             <div id="inv-preview-body" style="overflow:hidden;"></div>
@@ -732,7 +728,7 @@ tr:hover td{background:var(--bg2);}
 </div><!-- /.shell -->
 
 <div class="toast" id="toast">
-  <div class="toast-icon" id="toastIco">✅</div>
+  <div class="toast-icon" id="toastIco"></div>
   <div><div class="toast-msg" id="toastMsg"></div><div class="toast-sub" id="toastSub"></div></div>
 </div>
 
@@ -845,7 +841,7 @@ function onDropMulti(e,id){ e.preventDefault(); document.getElementById(id).clas
 /* ══ ALIAS for events-script.js ══ */
 window.createEvent = function(){ if(window.igCreateEvent) window.igCreateEvent(); };
 function printQR(slug,code,name){ window.open('qr-print.html?event='+slug+'&code='+code+'&name='+encodeURIComponent(name)+'&base='+encodeURIComponent(window.location.origin),'_blank','width=740,height=620'); }
-function copyEventLink(slug,code){ var url=window.location.origin+'/event.html?event='+slug+'&code='+code; navigator.clipboard.writeText(url).then(function(){ toast('🔗','Link copied!',''); }).catch(function(){ prompt('Copy this link:',url); }); }
+function copyEventLink(slug,code){ var url=window.location.origin+'/event.html?event='+slug+'&code='+code; navigator.clipboard.writeText(url).then(function(){ toast('','Link copied!',''); }).catch(function(){ prompt('Copy this link:',url); }); }
 
 /* setDefaultExpiry wrapper (calls updateTemplatePreview too) */
 document.addEventListener('DOMContentLoaded', function(){
@@ -892,13 +888,13 @@ async function loadStats(){
 }
 
 /* ══ TEMPLATE PREVIEW ══ */
-var TPL_PREVIEWS={professional:{bg:'#f8f9fc',accent:'#2563eb',text:'#0d1020',text2:'#505878',btnBg:'#2563eb',btnColor:'#fff',name:'Professional',emoji:'📊'},kids:{bg:'#fffbf0',accent:'#f97316',text:'#1c1400',text2:'#7a6000',btnBg:'linear-gradient(135deg,#f97316,#ec4899)',btnColor:'#fff',name:'Kids',emoji:'🎉'},birthday:{bg:'#fff5f8',accent:'#f43f5e',text:'#1a0510',text2:'#7f3045',btnBg:'linear-gradient(135deg,#f43f5e,#a855f7)',btnColor:'#fff',name:'Birthday',emoji:'🎂'},wedding:{bg:'#fdfaf7',accent:'#9b7653',text:'#1a1208',text2:'#6b5a3e',btnBg:'linear-gradient(135deg,#9b7653,#c4a46b)',btnColor:'#fff',name:'Wedding',emoji:'💍'},sports:{bg:'#f0f4ff',accent:'#4f46e5',text:'#0a0e1a',text2:'#3730a3',btnBg:'#4f46e5',btnColor:'#fff',name:'Sports',emoji:'🏆'},nightlife:{bg:'#080612',accent:'#8b5cf6',text:'#f0ecff',text2:'#9d8fff',btnBg:'linear-gradient(135deg,#8b5cf6,#f472b6)',btnColor:'#fff',name:'Nightlife',emoji:'🎧'},gala:{bg:'#0a0804',accent:'#d4af37',text:'#f5f0e8',text2:'#a09070',btnBg:'linear-gradient(135deg,#d4af37,#f0d060)',btnColor:'#000',name:'Gala',emoji:'✦'},ceremony:{bg:'#fafafa',accent:'#7c5c3a',text:'#1a1510',text2:'#6b5c45',btnBg:'linear-gradient(135deg,#7c5c3a,#a07850)',btnColor:'#fff',name:'Ceremony',emoji:'🎓'}};
+var TPL_PREVIEWS={professional:{bg:'#f8f9fc',accent:'#2563eb',text:'#0d1020',text2:'#505878',btnBg:'#2563eb',btnColor:'#fff',name:'Professional',emoji:''},kids:{bg:'#fffbf0',accent:'#f97316',text:'#1c1400',text2:'#7a6000',btnBg:'linear-gradient(135deg,#f97316,#ec4899)',btnColor:'#fff',name:'Kids',emoji:''},birthday:{bg:'#fff5f8',accent:'#f43f5e',text:'#1a0510',text2:'#7f3045',btnBg:'linear-gradient(135deg,#f43f5e,#a855f7)',btnColor:'#fff',name:'Birthday',emoji:''},wedding:{bg:'#fdfaf7',accent:'#9b7653',text:'#1a1208',text2:'#6b5a3e',btnBg:'linear-gradient(135deg,#9b7653,#c4a46b)',btnColor:'#fff',name:'Wedding',emoji:''},sports:{bg:'#f0f4ff',accent:'#4f46e5',text:'#0a0e1a',text2:'#3730a3',btnBg:'#4f46e5',btnColor:'#fff',name:'Sports',emoji:''},nightlife:{bg:'#080612',accent:'#8b5cf6',text:'#f0ecff',text2:'#9d8fff',btnBg:'linear-gradient(135deg,#8b5cf6,#f472b6)',btnColor:'#fff',name:'Nightlife',emoji:''},gala:{bg:'#0a0804',accent:'#d4af37',text:'#f5f0e8',text2:'#a09070',btnBg:'linear-gradient(135deg,#d4af37,#f0d060)',btnColor:'#000',name:'Gala',emoji:'✦'},ceremony:{bg:'#fafafa',accent:'#7c5c3a',text:'#1a1510',text2:'#6b5c45',btnBg:'linear-gradient(135deg,#7c5c3a,#a07850)',btnColor:'#fff',name:'Ceremony',emoji:''}};
 function updateTemplatePreview(){
   var sel=document.getElementById('ev-template');
   var t=TPL_PREVIEWS[sel?sel.value:'professional']||TPL_PREVIEWS.professional;
   var evName=document.getElementById('ev-name').value.trim()||'Your Event Name';
   var inner=document.getElementById('templatePreviewInner');if(!inner)return;
-  inner.innerHTML='<div style="background:'+t.bg+';padding:20px 14px;text-align:center;border-bottom:1px solid rgba(0,0,0,0.08);"><div style="font-size:28px;margin-bottom:8px;">'+t.emoji+'</div><div style="font-size:14px;font-weight:700;color:'+t.text+';margin-bottom:4px;">'+esc(evName)+'</div><div style="font-size:11px;color:'+t.text2+';">'+t.name+' Template</div></div><div style="background:'+t.bg+';padding:12px 14px;display:flex;gap:6px;justify-content:center;"><div style="background:rgba(128,128,128,.1);font-size:9px;padding:4px 10px;border-radius:4px;font-weight:600;color:'+t.text2+';">🔍 Find My Photos</div><div style="background:'+t.btnBg+';color:'+t.btnColor+';font-size:9px;padding:4px 10px;border-radius:4px;font-weight:700;">📥 Request</div></div>';
+  inner.innerHTML='<div style="background:'+t.bg+';padding:20px 14px;text-align:center;border-bottom:1px solid rgba(0,0,0,0.08);"><div style="font-size:14px;font-weight:700;color:'+t.text+';margin-bottom:4px;">'+esc(evName)+'</div><div style="font-size:11px;color:'+t.text2+';">'+t.name+' Template</div></div><div style="background:'+t.bg+';padding:12px 14px;display:flex;gap:6px;justify-content:center;"><div style="background:rgba(128,128,128,.1);font-size:9px;padding:4px 10px;border-radius:4px;font-weight:600;color:'+t.text2+';">Find My Photos</div><div style="background:'+t.btnBg+';color:'+t.btnColor+';font-size:9px;padding:4px 10px;border-radius:4px;font-weight:700;">Request</div></div>';
 }
 
 /* ══ EVENT ACTIVITY ══ */
@@ -953,21 +949,21 @@ async function loadEventActivity(){
   } catch(e){ console.warn('Activity error:', e.message); }
   loadDownloadsLog(eventId);
 }
-function parseDevice(ua){if(!ua)return{type:'Unknown',icon:'❓'};ua=ua.toLowerCase();if(/iphone|android.*mobile|windows phone/.test(ua))return{type:'Mobile',icon:'📱'};if(/ipad|android(?!.*mobile)/.test(ua))return{type:'Tablet',icon:'📲'};if(/mac|windows|linux/.test(ua))return{type:'Desktop',icon:'🖥️'};return{type:'Other',icon:'🌐'};}
+function parseDevice(ua){if(!ua)return{type:'Unknown',icon:''};ua=ua.toLowerCase();if(/iphone|android.*mobile|windows phone/.test(ua))return{type:'Mobile',icon:''};if(/ipad|android(?!.*mobile)/.test(ua))return{type:'Tablet',icon:''};if(/mac|windows|linux/.test(ua))return{type:'Desktop',icon:''};return{type:'Other',icon:''};}
 function renderActivityStats(visits){var uniq={};visits.forEach(function(v){if(v.visitor_id)uniq[v.visitor_id]=true;else if(v.id)uniq[v.id]=true;});var vEl=document.getElementById('act-stat-visits');var uEl=document.getElementById('act-stat-unique');if(vEl)vEl.textContent=visits.length;if(uEl)uEl.textContent=Object.keys(uniq).length||visits.length;}
-function renderDeviceBreakdown(visits){var el=document.getElementById('act-devices');if(!el)return;if(!visits.length){el.innerHTML='<div class="empty"><div class="empty-ico">📱</div><div class="empty-txt">No data yet.</div></div>';return;}var counts={};visits.forEach(function(v){var d=parseDevice(v.user_agent);counts[d.icon+' '+d.type]=(counts[d.icon+' '+d.type]||0)+1;});var total=visits.length;el.innerHTML=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).map(function(k){var pct=Math.round(counts[k]/total*100);return'<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;"><span>'+esc(k)+'</span><span style="color:var(--text3);">'+counts[k]+' ('+pct+'%)</span></div><div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div class="bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--gold),var(--gold2));"></div></div></div>';}).join('');}
-function renderLocationBreakdown(visits){var el=document.getElementById('act-locations');if(!el)return;if(!visits.length){el.innerHTML='<div class="empty"><div class="empty-ico">🌍</div><div class="empty-txt">No data yet.</div></div>';return;}var counts={};visits.forEach(function(v){var loc=(v.city&&v.country)?v.city+', '+v.country:(v.country||v.city||'Unknown');counts[loc]=(counts[loc]||0)+1;});var total=visits.length;el.innerHTML=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).slice(0,8).map(function(k){var pct=Math.round(counts[k]/total*100);return'<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;"><span>🌍 '+esc(k)+'</span><span style="color:var(--text3);">'+counts[k]+' ('+pct+'%)</span></div><div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div class="bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--blue),var(--blue2));"></div></div></div>';}).join('');}
-function renderVisitLog(visits){var el=document.getElementById('act-visit-log');if(!el)return;if(!visits.length){el.innerHTML='<div class="empty"><div class="empty-ico">👁</div><div class="empty-txt">No visits recorded yet.</div></div>';return;}el.innerHTML='<table><thead><tr><th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>Device name</th></tr></thead><tbody>'+visits.slice(0,100).map(function(v){var dev=parseDevice(v.user_agent);var loc=(v.city&&v.country)?v.city+', '+v.country:(v.country||v.city||'—');var dt=new Date(v.visited_at);var ts=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});return'<tr><td style="font-size:11px;color:var(--text3);">'+esc(ts)+'</td><td style="font-size:12px;font-weight:600;">'+esc(v.event_name||v.event_id||'—')+'</td><td>'+dev.icon+' <span style="font-size:11px;color:var(--text2);">'+dev.type+'</span></td><td style="font-size:12px;">'+esc(loc)+'</td><td style="font-family:var(--fm);font-size:11px;color:var(--text3);">'+esc(v.device_name||'—')+'</td></tr>';}).join('')+'</tbody></table>'+(visits.length>100?'<div style="text-align:center;padding:12px;font-size:11px;color:var(--text3);">Showing 100 of '+visits.length+'</div>':'');}
+function renderDeviceBreakdown(visits){var el=document.getElementById('act-devices');if(!el)return;if(!visits.length){el.innerHTML='<div class="empty"><div class="empty-txt">No data yet.</div></div>';return;}var counts={};visits.forEach(function(v){var d=parseDevice(v.user_agent);counts[d.icon+' '+d.type]=(counts[d.icon+' '+d.type]||0)+1;});var total=visits.length;el.innerHTML=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).map(function(k){var pct=Math.round(counts[k]/total*100);return'<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;"><span>'+esc(k)+'</span><span style="color:var(--text3);">'+counts[k]+' ('+pct+'%)</span></div><div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div class="bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--gold),var(--gold2));"></div></div></div>';}).join('');}
+function renderLocationBreakdown(visits){var el=document.getElementById('act-locations');if(!el)return;if(!visits.length){el.innerHTML='<div class="empty"><div class="empty-txt">No data yet.</div></div>';return;}var counts={};visits.forEach(function(v){var loc=(v.city&&v.country)?v.city+', '+v.country:(v.country||v.city||'Unknown');counts[loc]=(counts[loc]||0)+1;});var total=visits.length;el.innerHTML=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).slice(0,8).map(function(k){var pct=Math.round(counts[k]/total*100);return'<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;"><span>'+esc(k)+'</span><span style="color:var(--text3);">'+counts[k]+' ('+pct+'%)</span></div><div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div class="bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--blue),var(--blue2));"></div></div></div>';}).join('');}
+function renderVisitLog(visits){var el=document.getElementById('act-visit-log');if(!el)return;if(!visits.length){el.innerHTML='<div class="empty"><div class="empty-txt">No visits recorded yet.</div></div>';return;}el.innerHTML='<table><thead><tr><th>Time</th><th>Event</th><th>Device</th><th>Location</th><th>Device name</th></tr></thead><tbody>'+visits.slice(0,100).map(function(v){var dev=parseDevice(v.user_agent);var loc=(v.city&&v.country)?v.city+', '+v.country:(v.country||v.city||'—');var dt=new Date(v.visited_at);var ts=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});return'<tr><td style="font-size:11px;color:var(--text3);">'+esc(ts)+'</td><td style="font-size:12px;font-weight:600;">'+esc(v.event_name||v.event_id||'—')+'</td><td>'+dev.icon+' <span style="font-size:11px;color:var(--text2);">'+dev.type+'</span></td><td style="font-size:12px;">'+esc(loc)+'</td><td style="font-family:var(--fm);font-size:11px;color:var(--text3);">'+esc(v.device_name||'—')+'</td></tr>';}).join('')+'</tbody></table>'+(visits.length>100?'<div style="text-align:center;padding:12px;font-size:11px;color:var(--text3);">Showing 100 of '+visits.length+'</div>':'');}
 async function loadDownloadsLog(eventId){
   var el=document.getElementById('act-downloads-log');if(!el)return;
-  el.innerHTML='<div class="empty"><div class="empty-ico">⏳</div></div>';
+  el.innerHTML='<div class="empty"><div class="empty-txt">Loading...</div></div>';
   try{
     var myIds = window._myEventIds || [];
     var data = [];
     if (eventId) {
       /* Verify event belongs to user */
       if (myIds.length && myIds.indexOf(eventId) === -1) {
-        el.innerHTML='<div class="empty"><div class="empty-ico">⬇</div><div class="empty-txt">No downloads yet.</div></div>';return;
+        el.innerHTML='<div class="empty"><div class="empty-txt">No downloads yet.</div></div>';return;
       }
       var snap = await igOwnerDb.collection('photo_downloads').where('event_id','==',eventId).orderBy('created_at','desc').limit(200).get();
       data = snap.docs.map(function(d){ var r=Object.assign({id:d.id},d.data()); if(r.created_at&&r.created_at.toDate)r.created_at=r.created_at.toDate().toISOString(); return r; });
@@ -979,7 +975,7 @@ async function loadDownloadsLog(eventId){
       }
     }
     data.sort(function(a,b){return(b.created_at||'')>(a.created_at||'')?1:-1;});
-    if(!data.length){el.innerHTML='<div class="empty"><div class="empty-ico">⬇</div><div class="empty-txt">No downloads yet.</div></div>';return;}
+    if(!data.length){el.innerHTML='<div class="empty"><div class="empty-txt">No downloads yet.</div></div>';return;}
     el.innerHTML='<table><thead><tr><th>Time</th><th>Event</th><th>Device</th><th>Photo ID</th></tr></thead><tbody>'+data.slice(0,100).map(function(d){var dev=parseDevice(d.user_agent);var dt=new Date(d.created_at);var ts=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});var shortId=d.photo_id?d.photo_id.slice(0,8)+'…':'—';return'<tr><td style="font-size:11px;color:var(--text3);">'+esc(ts)+'</td><td style="font-size:12px;font-weight:600;">'+esc(d.event_name||d.event_id||'—')+'</td><td>'+dev.icon+' <span style="font-size:11px;">'+dev.type+'</span></td><td style="font-family:var(--fm);font-size:10px;color:var(--text3);">'+esc(shortId)+'</td></tr>';}).join('')+'</tbody></table>';
   }catch(e){el.innerHTML='<div class="empty"><div class="empty-txt">Error: '+esc(e.message)+'</div></div>';}
 }
@@ -1010,9 +1006,9 @@ async function sendMail(){
   var to=(document.getElementById('mail-to').value||'').trim();
   var subject=(document.getElementById('mail-subject').value||'').trim();
   var body=(document.getElementById('mail-body').value||'').trim();
-  if(!to){toast('⚠️','Missing recipient','Enter a To address');return;}
-  if(!subject){toast('⚠️','Missing subject','Enter a subject');return;}
-  if(!body){toast('⚠️','Empty message','Write your message first');return;}
+  if(!to){toast('','Missing recipient','Enter a To address');return;}
+  if(!subject){toast('','Missing subject','Enter a subject');return;}
+  if(!body){toast('','Empty message','Write your message first');return;}
   var btn=document.querySelector('#mail-tab-compose .btn-gold');
   if(btn){btn.disabled=true;btn.textContent='Sending…';}
   try{
@@ -1020,24 +1016,24 @@ async function sendMail(){
     var data=await res.json();
     if(!res.ok||!data.success) throw new Error(data.error||'Send failed');
     await getSupabase().from('admin_mail_sent').insert({to_email:to,subject:subject,body:body});
-    toast('✅','Email sent!','To: '+to);
+    toast('','Email sent!','To: '+to);
     clearCompose();
     var s=document.getElementById('mail-send-status');
-    if(s){s.style.display='block';s.innerHTML='<div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--green);">✅ Email delivered to '+esc(to)+'</div>';}
-  }catch(e){toast('⚠️','Failed to send',e.message);}
-  finally{if(btn){btn.disabled=false;btn.textContent='📨 Send Email';}}
+    if(s){s.style.display='block';s.innerHTML='<div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--green);">Email delivered to '+esc(to)+'</div>';}
+  }catch(e){toast('','Failed to send',e.message);}
+  finally{if(btn){btn.disabled=false;btn.textContent='Send Email';}}
 }
 async function loadInbox(){
   var el=document.getElementById('mail-inbox-list');if(!el)return;
-  el.innerHTML='<div class="empty"><div class="empty-ico">⏳</div></div>';
+  el.innerHTML='<div class="empty"><div class="empty-txt">Loading...</div></div>';
   try{
     var {data,error}=await getSupabase().from('admin_mail_inbox').select('*').order('received_at',{ascending:false}).limit(50);
     if(error)throw error;
-    if(!data||!data.length){el.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No messages yet.</div></div>';return;}
+    if(!data||!data.length){el.innerHTML='<div class="empty"><div class="empty-txt">No messages yet.</div></div>';return;}
     var unread=data.filter(function(m){return !m.read;}).length;
     var badge=document.getElementById('mailBadge');
     if(badge){badge.style.display=unread?'':'none';badge.textContent=unread;}
-    el.innerHTML='<div style="display:flex;flex-direction:column;gap:1px;">'+data.map(function(m){var dt=new Date(m.received_at);var time=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});return'<div onclick="openMail(\''+esc(m.id)+'\')" style="display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r);cursor:pointer;background:'+(m.read?'transparent':'var(--blue-dim)')+';border:1px solid '+(m.read?'transparent':'var(--blue-dim)')+';transition:background .15s;" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\''+(m.read?'transparent':'var(--blue-dim)')+'\';">'+'<div style="font-size:18px;flex-shrink:0;">'+(m.read?'📧':'📩')+'</div>'+'<div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;gap:8px;"><span style="font-size:13px;font-weight:'+(m.read?'500':'700')+';">'+esc(m.from_email)+'</span><span style="font-size:10px;color:var(--text3);">'+esc(time)+'</span></div><div style="font-size:12px;font-weight:'+(m.read?'400':'600')+';margin-top:2px;">'+esc(m.subject||'(no subject)')+'</div></div></div>';}).join('')+'</div>';
+    el.innerHTML='<div style="display:flex;flex-direction:column;gap:1px;">'+data.map(function(m){var dt=new Date(m.received_at);var time=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});return'<div onclick="openMail(\''+esc(m.id)+'\')" style="display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r);cursor:pointer;background:'+(m.read?'transparent':'var(--blue-dim)')+';border:1px solid '+(m.read?'transparent':'var(--blue-dim)')+';transition:background .15s;" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\''+(m.read?'transparent':'var(--blue-dim)')+'\';">'+'<div style="font-size:18px;flex-shrink:0;">'+(m.read?'':'')+'</div>'+'<div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;gap:8px;"><span style="font-size:13px;font-weight:'+(m.read?'500':'700')+';">'+esc(m.from_email)+'</span><span style="font-size:10px;color:var(--text3);">'+esc(time)+'</span></div><div style="font-size:12px;font-weight:'+(m.read?'400':'600')+';margin-top:2px;">'+esc(m.subject||'(no subject)')+'</div></div></div>';}).join('')+'</div>';
   }catch(e){el.innerHTML='<div class="empty"><div class="empty-txt">Error: '+esc(e.message)+'</div></div>';}
 }
 async function openMail(id){
@@ -1062,12 +1058,12 @@ function replyTo(){
 }
 async function loadSent(){
   var el=document.getElementById('mail-sent-list');if(!el)return;
-  el.innerHTML='<div class="empty"><div class="empty-ico">⏳</div></div>';
+  el.innerHTML='<div class="empty"><div class="empty-txt">Loading...</div></div>';
   try{
     var {data,error}=await getSupabase().from('admin_mail_sent').select('*').order('created_at',{ascending:false}).limit(50);
     if(error)throw error;
-    if(!data||!data.length){el.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No sent emails yet.</div></div>';return;}
-    el.innerHTML='<div style="display:flex;flex-direction:column;gap:1px;">'+data.map(function(m){var dt=new Date(m.created_at);var time=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});return'<div style="display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r);">📤 <div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;"><span style="font-size:13px;">To: '+esc(m.to_email)+'</span><span style="font-size:10px;color:var(--text3);">'+esc(time)+'</span></div><div style="font-size:12px;margin-top:2px;">'+esc(m.subject||'(no subject)')+'</div></div></div>';}).join('')+'</div>';
+    if(!data||!data.length){el.innerHTML='<div class="empty"><div class="empty-txt">No sent emails yet.</div></div>';return;}
+    el.innerHTML='<div style="display:flex;flex-direction:column;gap:1px;">'+data.map(function(m){var dt=new Date(m.created_at);var time=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});return'<div style="display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r);"><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;"><span style="font-size:13px;">To: '+esc(m.to_email)+'</span><span style="font-size:10px;color:var(--text3);">'+esc(time)+'</span></div><div style="font-size:12px;margin-top:2px;">'+esc(m.subject||'(no subject)')+'</div></div></div>';}).join('')+'</div>';
   }catch(e){el.innerHTML='<div class="empty"><div class="empty-txt">Error: '+esc(e.message)+'</div></div>';}
 }
 
@@ -1401,13 +1397,13 @@ async function confirmSendInvoice(){
     var resp = await res.json();
     if (!res.ok || !resp.success) throw new Error(resp.error || 'Send failed');
     closeInvModal();
-    toast('✅', 'Invoice sent!', 'PDF attached · To: ' + d.clientEmail);
-    invAlert('✅ Invoice saved and sent to ' + d.clientEmail, true);
+    toast('', 'Invoice sent!', 'PDF attached · To: ' + d.clientEmail);
+    invAlert('Invoice saved and sent to ' + d.clientEmail, true);
     resetInvoiceForm();
   } catch(e) {
     invAlert('Error: ' + e.message, false);
-    toast('⚠️', 'Failed', e.message);
-    if (btn) { btn.disabled = false; btn.textContent = '📨 Send Invoice'; }
+    toast('', 'Failed', e.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Send Invoice'; }
   }
 }
 
@@ -1417,8 +1413,8 @@ async function saveInvoiceOnly(){
   if (!d.lines.length) { invAlert('Add at least one line item.', false); return; }
   try {
     await saveInvoiceToDB(d, false);
-    toast('💾', 'Invoice saved!', d.number);
-    invAlert('✅ Invoice saved. Use "Save & Send" to email the client.', true);
+    toast('', 'Invoice saved!', d.number);
+    invAlert('Invoice saved. Use "Save & Send" to email the client.', true);
     resetInvoiceForm();
   } catch(e) {
     invAlert('Error: ' + e.message, false);
@@ -1428,7 +1424,7 @@ async function saveInvoiceOnly(){
 function downloadInvoicePDF(){
   var d = getInvoiceData();
   var win = window.open('', '_blank', 'width=700,height=800');
-  if (!win) { toast('⚠️', 'Pop-up blocked', 'Allow pop-ups to download PDF'); return; }
+  if (!win) { toast('', 'Pop-up blocked', 'Allow pop-ups to download PDF'); return; }
   var dueStr = d.dueDate ? new Date(d.dueDate).toLocaleDateString('en-GB') : 'Due on Receipt';
   var dateStr = d.date ? new Date(d.date).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
   var linesHtml = d.lines.map(function(l, i){
@@ -1478,7 +1474,7 @@ function downloadInvoicePDF(){
     '</table>' +
     '<div class="footer">'+payBlock+(d.notes?'<br><br>'+esc(d.notes):'')+'</div>' +
     '<div class="no-print">' +
-      '<button onclick="window.print()">🖨 Download / Print as PDF</button>' +
+      '<button onclick="window.print()">Download / Print as PDF</button>' +
       '<button onclick="window.close()" style="background:#eee;color:#111;">Close</button>' +
     '</div>' +
     '</body></html>');
@@ -1506,20 +1502,20 @@ function resetInvoiceForm(){
 async function loadInvoices(){
   var el = document.getElementById('invoicesList');
   if (!el) return;
-  el.innerHTML = '<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  el.innerHTML = '<div class="empty"><div class="empty-txt">Loading…</div></div>';
   try {
     var { data, error } = await getSupabase().from('invoices').select('*').eq('owner_id', _currentUser.id).order('created_at', {ascending:false}).limit(100);
     if (error) throw error;
     if (!data || !data.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-ico">🧾</div><div class="empty-txt">No invoices yet. <a href="#" onclick="nav(\'createinvoice\',null);return false;" style="color:var(--gold);">Create one →</a></div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-txt">No invoices yet. <a href="#" onclick="nav(\'createinvoice\',null);return false;" style="color:var(--gold);">Create one →</a></div></div>';
       return;
     }
     el.innerHTML = '<table><thead><tr><th>Invoice #</th><th>Client</th><th>Date</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
       data.map(function(inv){
         var dt = new Date(inv.invoice_date || inv.created_at).toLocaleDateString('en-GB');
         var sentPill = inv.sent
-          ? '<span class="pill pill-active">✅ Sent</span>'
-          : '<span class="pill pill-pending">💾 Draft</span>';
+          ? '<span class="pill pill-active">Sent</span>'
+          : '<span class="pill pill-pending">Draft</span>';
         return '<tr>' +
           '<td style="font-family:var(--fm);font-size:11px;font-weight:600;">'+esc(inv.invoice_number||'—')+'</td>' +
           '<td style="font-weight:600;">'+esc(inv.client_name||'—')+'</td>' +
@@ -1527,8 +1523,8 @@ async function loadInvoices(){
           '<td style="font-weight:700;color:var(--gold);">'+fmtGBP(inv.total||0)+'</td>' +
           '<td>'+sentPill+'</td>' +
           '<td class="td-actions">' +
-            '<button class="btn btn-blue btn-sm" onclick="resendInvoice(\''+inv.id+'\')">📨 Resend</button>' +
-            '<button class="btn btn-ghost btn-sm" onclick="deleteInvoice(\''+inv.id+'\')">🗑</button>' +
+            '<button class="btn btn-blue btn-sm" onclick="resendInvoice(\''+inv.id+'\')">Resend</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="deleteInvoice(\''+inv.id+'\')">Delete</button>' +
           '</td>' +
         '</tr>';
       }).join('') + '</tbody></table>';
@@ -1551,7 +1547,7 @@ async function resendInvoice(id){
       bizName: data.biz_name || '', bizLocation: data.biz_location || '',
       bankName: data.bank_name || '', bankAccount: data.bank_account || '', bankSort: data.bank_sort || ''
     };
-    if (!d.clientEmail) { toast('⚠️', 'No email on file', 'Edit the invoice to add an email'); return; }
+    if (!d.clientEmail) { toast('', 'No email on file', 'Edit the invoice to add an email'); return; }
     /* Get AI message then send with PDF */
     var msgRes  = await fetch(EVENTS_API + '/api/generate-invoice-message', {
       method: 'POST', headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
@@ -1574,18 +1570,18 @@ async function resendInvoice(id){
     var resp = await res.json();
     if (!res.ok || !resp.success) throw new Error(resp.error || 'Send failed');
     await getSupabase().from('invoices').update({ sent: true }).eq('id', id);
-    toast('✅', 'Invoice resent!', 'PDF attached · To: ' + d.clientEmail);
+    toast('', 'Invoice resent!', 'PDF attached · To: ' + d.clientEmail);
     loadInvoices();
-  } catch(e) { toast('⚠️', 'Failed', e.message); }
+  } catch(e) { toast('', 'Failed', e.message); }
 }
 
 async function deleteInvoice(id){
   if (!confirm('Delete this invoice? This cannot be undone.')) return;
   try {
     await getSupabase().from('invoices').delete().eq('id', id);
-    toast('🗑', 'Invoice deleted', '');
+    toast('', 'Invoice deleted', '');
     loadInvoices();
-  } catch(e) { toast('⚠️', 'Error', e.message); }
+  } catch(e) { toast('', 'Error', e.message); }
 }
 
 /* ══ LOGOUT ══ */
@@ -1607,7 +1603,6 @@ async function doLogout(){
     </div>
     <div style="padding:20px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px;">
       <div style="display:flex;gap:10px;padding:12px 14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);align-items:center;">
-        <div style="font-size:18px;">📧</div>
         <div style="flex:1;">
           <div style="font-size:11px;color:var(--text3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;">Sending to</div>
           <div id="inv-modal-to" style="font-size:14px;font-weight:600;"></div>
@@ -1624,13 +1619,12 @@ async function doLogout(){
       </div>
       <textarea id="inv-modal-message" rows="11" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:var(--text);line-height:1.7;resize:vertical;font-family:inherit;" placeholder="Loading AI message…"></textarea>
       <div style="display:flex;gap:10px;padding:12px 14px;background:var(--green-dim);border:1px solid rgba(15,168,118,.2);border-radius:10px;align-items:center;">
-        <div style="font-size:20px;">📎</div>
         <div style="font-size:12px;color:var(--green);line-height:1.5;">Your invoice will be generated as a PDF and attached to this email automatically.</div>
       </div>
     </div>
     <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;">
       <button onclick="closeInvModal()" class="btn btn-ghost" style="flex:1;justify-content:center;">Cancel</button>
-      <button id="inv-modal-send-btn" onclick="confirmSendInvoice()" class="btn btn-gold" style="flex:2;justify-content:center;padding:13px;">📨 Send Invoice</button>
+      <button id="inv-modal-send-btn" onclick="confirmSendInvoice()" class="btn btn-gold" style="flex:2;justify-content:center;padding:13px;">Send Invoice</button>
     </div>
   </div>
 </div>

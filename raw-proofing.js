@@ -277,7 +277,7 @@ async function rpUpload(fileList){
   if(!rpCur){ toast('', 'Save the gallery first', ''); return; }
   var plan = igPlanProofingUpload(fileList), prog = document.getElementById('rpProgress');
   var s = (plan.jpegCount + plan.rawCount + plan.ignored) + ' files detected<br><b>' + plan.jpegCount + ' JPEGs ready for upload</b><br>' + plan.rawCount + ' RAW files ignored (never uploaded)<br>' + plan.pairedCount + ' RAW + JPEG pairs verified';
-  if(plan.orphanRaw.length) s += '<br><span style="color:var(--red);">⚠ ' + plan.orphanRaw.length + ' RAW without a JPEG proof: ' + plan.orphanRaw.slice(0,8).join(', ') + (plan.orphanRaw.length>8?'…':'') + '</span>';
+  if(plan.orphanRaw.length) s += '<br><span style="color:var(--red);">' + plan.orphanRaw.length + ' RAW without a JPEG proof: ' + plan.orphanRaw.slice(0,8).join(', ') + (plan.orphanRaw.length>8?'…':'') + '</span>';
   prog.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.7;">' + s + '</div><div id="rpStatus" style="font-size:12px;"></div>';
   if(!plan.files.length){ toast('', 'No JPEG proofs found', ''); return; }
   if(plan.orphanRaw.length && !confirm(plan.orphanRaw.length + ' RAW file(s) have no matching JPEG and will be skipped. Upload the ' + plan.jpegCount + ' JPEGs anyway?')) return;

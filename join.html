@@ -66,7 +66,7 @@
 .pass-wrap{position:relative;}
 .pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
   background:none;border:none;cursor:pointer;padding:4px;
-  color:var(--text3);font-size:16px;line-height:1;transition:color .2s;
+  color:var(--text3);font-size:12px;font-weight:600;line-height:1;transition:color .2s;
   display:flex;align-items:center;justify-content:center;}
 .pass-eye:hover{color:var(--text2);}
 
@@ -194,7 +194,7 @@
           <input id="pass" class="form-input" type="password" placeholder="Min. 8 characters"
             oninput="checkStrength(this)"
             onkeydown="if(event.key==='Enter')joinCreator()"/>
-          <button type="button" class="pass-eye" onclick="togglePass('pass',this)" aria-label="Show password">👁</button>
+          <button type="button" class="pass-eye" onclick="togglePass('pass',this)" aria-label="Show password">Show</button>
         </div>
         <div class="strength-bar">
           <div class="strength-seg" id="s1"></div>
@@ -210,7 +210,7 @@
         <div class="pass-wrap">
           <input id="pass2" class="form-input" type="password" placeholder="Repeat your password"
             onkeydown="if(event.key==='Enter')joinCreator()"/>
-          <button type="button" class="pass-eye" onclick="togglePass('pass2',this)" aria-label="Show password">👁</button>
+          <button type="button" class="pass-eye" onclick="togglePass('pass2',this)" aria-label="Show password">Show</button>
         </div>
       </div>
 
@@ -220,16 +220,15 @@
       <div class="form-footer">Already have an account? <a href="login.html">Sign in</a></div>
 
       <div class="trust">
-        <div class="trust-item">🔒 Secure</div>
+        <div class="trust-item">Secure</div>
         <div class="trust-item">✦ No card required</div>
-        <div class="trust-item">⚡ Instant access</div>
+        <div class="trust-item">Instant access</div>
       </div>
     </div>
 
     <!-- SUCCESS STATE -->
     <div class="success-card" id="success-card">
-      <div class="success-ico">🎉</div>
-      <div class="success-pill">✅ Account Created</div>
+      <div class="success-pill">Account Created</div>
       <div class="success-title" id="success-title"></div>
       <div class="success-body" id="success-body"></div>
       <a href="dashboard.html" class="btn-dash">Go to Dashboard →</a>
@@ -248,7 +247,7 @@ function togglePass(inputId, btn) {
   var inp = document.getElementById(inputId);
   var hidden = inp.type === 'password';
   inp.type = hidden ? 'text' : 'password';
-  btn.textContent = hidden ? '🙈' : '👁';
+  btn.textContent = hidden ? 'Hide' : 'Show';
 }
 
 /* ── Password strength ── */
