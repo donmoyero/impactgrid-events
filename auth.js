@@ -99,11 +99,12 @@ async function incrementUses() {
 window.incrementAIUse = incrementUses;
 
 /**
- * isAdmin() — enterprise plan OR admin email → full bypass
+ * isAdmin() — admin email only → plan-limit bypass (UI convenience).
+ * NOT a security check: the server (requireAdmin / requireRole) is the real gate.
+ * Plan and user_metadata no longer grant admin.
  */
 function isAdmin() {
   if (IG_IS_ADMIN) return true;
-  if (getPlan() === 'enterprise') return true;
   var user = window.igUser || IG_USER;
   if (user && user.email === 'admin@impactgridgroup.com') return true;
   return false;
@@ -185,11 +186,9 @@ async function initAuth() {
 // ── Internal helpers ──────────────────────────────────────────────────────
 function _applyAdminFlag(user) {
   if (!user) return;
-  if (
-    user.email === 'admin@impactgridgroup.com' ||
-    user.user_metadata?.role === 'admin' ||
-    getPlan() === 'enterprise'
-  ) {
+  /* Admin email only. user_metadata is user-writable and plan is a billing
+     tier, so neither may grant admin. */
+  if (user.email === 'admin@impactgridgroup.com') {
     IG_IS_ADMIN = true;
   }
 }

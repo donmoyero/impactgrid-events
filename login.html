@@ -217,7 +217,8 @@ function showAlert(msg, type) {
 
 /* ── Redirect after login ── */
 function redirectByRole(user, role) {
-  if (role === 'admin' || (user.email && user.email === 'admin@impactgridgroup.com')) {
+  /* Admin by email only — profiles.role is user-editable, so it is not trusted here. */
+  if (user.email && user.email.toLowerCase() === 'admin@impactgridgroup.com') {
     window.location.href = 'admin.html';
   } else {
     window.location.href = 'dashboard.html';

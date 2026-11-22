@@ -257,7 +257,7 @@
             '<div class="u-drop" id="uDrop">' +
               '<div class="dd-email" id="userEmail"></div>' +
               '<div class="dd-div"></div>' +
-              '<a href="admin.html" id="ddDashLink">Admin Panel</a>' +
+              '<a href="dashboard.html" id="ddDashLink">My Dashboard</a>' +
               '<div class="dd-div"></div>' +
               '<button onclick="igSignOut()">Sign out</button>' +
             '</div>' +
@@ -293,7 +293,7 @@
           '</div>' +
           /* Logged-in state — admin only */
           '<div class="mob-in" id="mobIn">' +
-            '<a href="admin.html" id="mobDashCta" class="mob-adash" onclick="closeSidebar()">Admin Panel →</a>' +
+            '<a href="dashboard.html" id="mobDashCta" class="mob-adash" onclick="closeSidebar()">My Dashboard →</a>' +
             '<button class="mob-asignout" onclick="igSignOut()">Sign out</button>' +
           '</div>' +
         '</div>' +
@@ -650,9 +650,11 @@
      so admins go to admin.html, everyone else to dashboard.html
   ───────────────────────────────────────── */
   function _setDashboardLinks(role) {
-    /* Only admin can log in — always link to admin.html */
-    var href  = 'admin.html';
-    var label = 'Admin Panel';
+    /* Admin → Admin Panel. Everyone else → their own dashboard.
+       (UI routing only; admin.html and the admin API enforce access themselves.) */
+    var isAdminUser = (role === 'admin');
+    var href  = isAdminUser ? 'admin.html'      : 'dashboard.html';
+    var label = isAdminUser ? 'Admin Panel'     : 'My Dashboard';
 
     var ddLink = document.getElementById('ddDashLink');
     if (ddLink) { ddLink.href = href; ddLink.textContent = label; }
@@ -750,9 +752,11 @@
     // Dispatch plan-ready event so tools can react immediately
     document.dispatchEvent(new CustomEvent('ig-plan-ready', { detail: { plan: _cachedPlan, aiUses: _cachedAiUses } }));
 
-    // ── Update nav display — only admin can log in ──
-    var effectiveRole = 'admin';
-    var displayName   = 'Admin';
+    // ── Update nav display ──
+    // Admin is decided by email only (UI hint); profiles.role is user-editable.
+    var isAdminEmail  = (fallbackEmail || '').toLowerCase() === 'admin@impactgridgroup.com';
+    var effectiveRole = isAdminEmail ? 'admin' : 'user';
+    var displayName   = isAdminEmail ? 'Admin' : (name || fallbackEmail || 'Account');
     window.setNavUser({ email: fallbackEmail, user_metadata: { full_name: displayName, avatar_url: avatarUrl } });
 
     // ── Update dashboard links ──
