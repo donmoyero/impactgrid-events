@@ -3,6 +3,8 @@
 <head>
 <script src="theme-init.js"></script>
 <script src="consent.js"></script>
+<style>html.ig-gate body{visibility:hidden!important;}</style>
+<script>document.documentElement.classList.add("ig-gate");</script>
 
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -2277,12 +2279,38 @@ window.addEventListener('unhandledrejection', function(e){
   console.error('[unhandled promise rejection]', e.reason);
 });
 
+/*  ADMIN GATE  */
+async function verifyAdminWithServer(token){
+  /* Render's free tier can take a while to wake up, so retry network errors / 5xx. */
+  for(var i=0;i<4;i++){
+    try{
+      var r = await fetch(EVENTS_API + '/api/admin-verify', {headers:{'Authorization':'Bearer '+token}});
+      if(r.ok){ var j = await r.json().catch(function(){return {};}); return j && j.ok === true ? 'ok' : 'error'; }
+      if(r.status === 401) return 'no-session';
+      if(r.status === 403) return 'not-admin';
+    }catch(e){}
+    await new Promise(function(res){ setTimeout(res, 3000); });
+  }
+  return 'error';
+}
+function showGateError(){
+  document.documentElement.classList.remove('ig-gate');
+  document.body.innerHTML = '<div style="font-family:system-ui,sans-serif;padding:40px;text-align:center;">Could not reach the server. <a href="" onclick="location.reload();return false;">Try again</a></div>';
+}
+
 /*  BOOT  */
 document.addEventListener('DOMContentLoaded', async function(){
   var c = getSupabase();
   var { data } = await c.auth.getSession();
   if(!data.session){ window.location.href='login.html'; return; }
-  if(data.session.user.email !== IG_ADMIN_EMAIL){ window.location.href='dashboard.html'; return; }
+  /* Gate: page stays blank until the API confirms this session is the admin.
+     The browser's own email check is not trusted. */
+  var verdict = await verifyAdminWithServer(data.session.access_token);
+  /* Server rejected the token: clear the stale session first, or login.html would bounce straight back here. */
+  if(verdict === 'no-session'){ try{ await c.auth.signOut(); }catch(e){} window.location.href='login.html?logout=1'; return; }
+  if(verdict === 'not-admin'){ window.location.href='dashboard.html'; return; }
+  if(verdict !== 'ok'){ showGateError(); return; }
+  document.documentElement.classList.remove('ig-gate');
   document.getElementById('topbarUser').textContent = data.session.user.email;
   loadStats();
   if(window.loadDashboard) loadDashboard();

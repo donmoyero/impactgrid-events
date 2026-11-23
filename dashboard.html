@@ -3,6 +3,8 @@
 <head>
 <script src="theme-init.js"></script>
 <script src="consent.js"></script>
+<style>html.ig-gate body{visibility:hidden!important;}</style>
+<script>document.documentElement.classList.add("ig-gate");</script>
 
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -754,6 +756,26 @@ tr:hover td{background:var(--bg2);}
 var EVENTS_API = 'https://impactgrid-events-api.onrender.com';
 var _currentUser = null;
 
+/* ══ PHOTOGRAPHER GATE ══ */
+async function verifyPhotographerWithServer(token){
+  /* Also gives a brand-new or older account its photographer role (the server decides). Retries cover Render waking up. */
+  for (var i = 0; i < 4; i++) {
+    try {
+      var r = await fetch(EVENTS_API + '/api/photographer-onboard', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+      if (r.ok) { var j = await r.json().catch(function(){ return {}; }); return j && j.role === 'photographer' ? 'ok' : 'no-role'; }
+      if (r.status === 401) return 'no-session';
+    } catch (e) {}
+    await new Promise(function(res){ setTimeout(res, 3000); });
+  }
+  return 'error';
+}
+function showGateMessage(text, withSignOut){
+  document.documentElement.classList.remove('ig-gate');
+  document.body.innerHTML = '<div style="font-family:system-ui,sans-serif;padding:40px;text-align:center;">' + text + ' ' +
+    (withSignOut ? '<a href="login.html?logout=1" onclick="getSupabase().auth.signOut().then(function(){location.href=\'login.html?logout=1\'});return false;">Sign out</a>'
+                 : '<a href="" onclick="location.reload();return false;">Try again</a>') + '</div>';
+}
+
 /* ══ BOOT ══ */
 document.addEventListener('DOMContentLoaded', async function(){
   var c = getSupabase();
@@ -761,6 +783,16 @@ document.addEventListener('DOMContentLoaded', async function(){
   if (!data.session) { window.location.href = 'login.html'; return; }
 
   _currentUser = data.session.user;
+
+  /* Gate: the page stays blank until the API confirms this account is a photographer. */
+  var _adminEmail0 = (localStorage.getItem('ig_biz_admin_email') || 'admin@impactgridgroup.com').toLowerCase();
+  if ((_currentUser.email || '').toLowerCase() === _adminEmail0) { window.location.href = 'admin.html'; return; }
+  var verdict = await verifyPhotographerWithServer(data.session.access_token);
+  /* The server rejected the token: clear the stale session first, or login.html would bounce straight back here. */
+  if (verdict === 'no-session') { try { await c.auth.signOut(); } catch (e) {} window.location.href = 'login.html?logout=1'; return; }
+  if (verdict === 'no-role') { showGateMessage('This account does not have photographer access.', true); return; }
+  if (verdict !== 'ok') { showGateMessage('Could not reach the server.', false); return; }
+  document.documentElement.classList.remove('ig-gate');
 
   /* Verify role — allow photographer or admin */
   var role = 'photographer';
@@ -779,7 +811,6 @@ document.addEventListener('DOMContentLoaded', async function(){
   }
 
   /* Redirect if wrong role */
-  if (role === 'admin') { window.location.href = 'admin.html'; return; }
 
   loadStats();
 });
