@@ -620,7 +620,7 @@ tr:hover td{background:var(--bg2);}
                     <input type="text" id="inv-number" placeholder="Generating…" style="font-family:var(--fm);letter-spacing:.06em;padding-right:36px;" oninput="updateInvoicePreview()"/>
                     <button onclick="autoInvoiceNumber(true)" title="Regenerate" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:4px;line-height:1;">↺</button>
                   </div>
-                  <div class="field-hint">Editable — tap ↺ to regenerate</div>
+                  <div class="field-hint">Random and unique to your account. Editable, tap ↺ for a new one</div>
                 </div>
                 <div class="field-group" style="margin-bottom:0;">
                   <div class="field-label">Invoice Date</div>
@@ -1271,34 +1271,37 @@ function initInvoiceForm(){
   updateInvoicePreview();
 }
 
+/* Random, unguessable invoice numbers, e.g. INV-2026-K7M3QX9B.
+   Uses crypto.getRandomValues. The alphabet leaves out 0/O and 1/I so it reads clearly over the phone.
+   Uniqueness per photographer is enforced by the database (owner_id, invoice_number). */
+var _lastAutoInvNum = '';
+function genInvoiceNumber(){
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var buf = new Uint8Array(8);
+  (window.crypto || window.msCrypto).getRandomValues(buf);
+  var out = '';
+  for (var i = 0; i < buf.length; i++) out += chars[buf[i] % chars.length];
+  return 'INV-' + new Date().getFullYear() + '-' + out;
+}
+
 async function autoInvoiceNumber(force){
-  /* Instant fallback — field is never blank */
   var el = document.getElementById('inv-number');
-  if (el && (force || !el.value)) {
-    el.value = 'INV-' + String(Date.now()).slice(-6);
-    updateInvoicePreview();
-  }
-  /* Then fetch real sequential number from DB */
+  if (!el || !(force || !el.value)) return;
+  var num = genInvoiceNumber();
+  /* Skip any number this photographer already has (very unlikely, but cheap to check) */
   try {
-    if (!_currentUser || !_currentUser.id) return;
-    var { data } = await getSupabase()
-      .from('invoices')
-      .select('invoice_number')
-      .eq('owner_id', _currentUser.id)
-      .order('created_at', { ascending: false })
-      .limit(1);
-    var next = 'INV-000001';
-    if (data && data.length) {
-      var last = data[0].invoice_number || 'INV-000000';
-      var num  = parseInt(last.replace(/\D/g, ''), 10) || 0;
-      next     = 'INV-' + String(num + 1).padStart(6, '0');
+    if (_currentUser && _currentUser.id) {
+      for (var i = 0; i < 5; i++) {
+        var r = await getSupabase().from('invoices').select('id', { count: 'exact', head: true })
+          .eq('owner_id', _currentUser.id).eq('invoice_number', num);
+        if (r.error || !r.count) break;
+        num = genInvoiceNumber();
+      }
     }
-    var el2 = document.getElementById('inv-number');
-    if (el2 && (force || !el2.value)) el2.value = next;
-    updateInvoicePreview();
-  } catch(e) {
-    updateInvoicePreview();
-  }
+  } catch(e) { /* the save step retries on a clash anyway */ }
+  _lastAutoInvNum = num;
+  el.value = num;
+  updateInvoicePreview();
 }
 
 function addLineItem(){
@@ -1422,7 +1425,7 @@ function buildInvoiceEmailBody(d){
 }
 
 async function saveInvoiceToDB(d, sent){
-  var { data, error } = await getSupabase().from('invoices').insert({
+  var row = {
     owner_id:       _currentUser.id,
     invoice_number: d.number,
     invoice_date:   d.date || new Date().toISOString().split('T')[0],
@@ -1440,9 +1443,23 @@ async function saveInvoiceToDB(d, sent){
     bank_account:   d.bankAccount || null,
     bank_sort:      d.bankSort || null,
     sent:           sent || false
-  }).select().single();
-  if (error) throw error;
-  return data;
+  };
+  for (var attempt = 0; attempt < 4; attempt++) {
+    var { data, error } = await getSupabase().from('invoices').insert(row).select().single();
+    if (!error) return data;
+    var clash = error.code === '23505' || /duplicate key|unique/i.test(error.message || '');
+    if (!clash) throw error;
+    /* Number already used on this account. Auto-generated numbers get replaced and retried;
+       a number the photographer typed themselves is never changed silently. */
+    if (d.number !== _lastAutoInvNum) {
+      throw new Error('Invoice number ' + d.number + ' is already used on your account. Tap the refresh icon next to the number for a new one.');
+    }
+    var fresh = genInvoiceNumber();
+    d.number = fresh; row.invoice_number = fresh; _lastAutoInvNum = fresh;
+    var el = document.getElementById('inv-number'); if (el) el.value = fresh;
+    updateInvoicePreview();
+  }
+  throw new Error('Could not find a free invoice number. Please try again.');
 }
 
 function invAlert(msg, ok){
@@ -1566,7 +1583,11 @@ async function confirmSendInvoice(){
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
   try {
     /* Save once. A retry after a failed send reuses the saved row instead of inserting a duplicate number. */
-    if (!d._savedId) { var _row = await saveInvoiceToDB(d, false); d._savedId = _row.id; }
+    if (!d._savedId) {
+      var _oldNum = d.number;
+      var _row = await saveInvoiceToDB(d, false); d._savedId = _row.id;
+      if (d.number !== _oldNum) message = message.split(_oldNum).join(d.number);
+    }
     var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method : 'POST',
       headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
@@ -1597,6 +1618,8 @@ async function saveInvoiceOnly(){
   var d = getInvoiceData();
   if (!d.clientName) { invAlert('Client name is required.', false); return; }
   if (!d.lines.length) { invAlert('Add at least one line item.', false); return; }
+  if (window._savingInv) return;
+  window._savingInv = true;
   try {
     await saveInvoiceToDB(d, false);
     toast('', 'Invoice saved!', d.number);
@@ -1604,6 +1627,8 @@ async function saveInvoiceOnly(){
     resetInvoiceForm();
   } catch(e) {
     invAlert('Error: ' + e.message, false);
+  } finally {
+    window._savingInv = false;
   }
 }
 
