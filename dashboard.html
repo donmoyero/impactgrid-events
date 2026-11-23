@@ -255,6 +255,13 @@ tr:hover td{background:var(--bg2);}
       </nav>
     </div>
 
+    <div class="sb-section">
+      <div class="sb-section-label">Account</div>
+      <nav class="sb-nav">
+        <a href="#" onclick="return nav('business',this)">Business Details</a>
+      </nav>
+    </div>
+
     <div class="sb-spacer"></div>
     <div class="sb-footer">
       <a href="index.html" class="sb-back">← Back to Site</a>
@@ -537,6 +544,28 @@ tr:hover td{background:var(--bg2);}
     </div>
 
     <!-- ── CREATE INVOICE ── -->
+    <div class="page" id="page-business">
+      <div class="page-header"><div class="page-title">Business Details</div><div class="page-sub">Used on your client emails and invoices. Only you can see and edit this.</div></div>
+      <div class="card" style="max-width:640px;">
+        <div class="card-head"><h2>Your Business</h2></div>
+        <div class="card-body">
+          <div id="biz-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
+          <div class="field-group"><div class="field-label">Business / Trading Name</div><input type="text" id="biz-name" maxlength="60" placeholder="e.g. Dara Photography"/><div class="field-hint">Shown as the sender name and in the first line of the gallery email your clients receive.</div></div>
+          <div class="form-grid">
+            <div class="field-group"><div class="field-label">Location</div><input type="text" id="biz-location" maxlength="120" placeholder="City, Country"/></div>
+            <div class="field-group"><div class="field-label">Phone</div><input type="text" id="biz-phone" maxlength="40" placeholder="Optional"/></div>
+          </div>
+          <div class="field-label" style="margin-top:6px;">Payment details for invoices</div>
+          <div class="form-grid">
+            <div class="field-group"><div class="field-label">Account Name</div><input type="text" id="biz-bank-name" maxlength="80" placeholder="Name on bank account"/></div>
+            <div class="field-group"><div class="field-label">Account Number</div><input type="text" id="biz-bank-account" maxlength="40" placeholder="Account number" style="font-family:var(--fm);letter-spacing:.06em;"/></div>
+          </div>
+          <div class="field-group"><div class="field-label">Sort Code</div><input type="text" id="biz-bank-sort" maxlength="20" placeholder="e.g. 23-14-70, leave blank if not applicable" style="font-family:var(--fm);letter-spacing:.06em;"/></div>
+          <button class="btn btn-gold" id="biz-save-btn" onclick="saveBusinessDetails()">Save Business Details</button>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-createinvoice">
       <div class="page-header">
         <div class="page-title">New Invoice</div>
@@ -813,6 +842,7 @@ document.addEventListener('DOMContentLoaded', async function(){
 
   /* Redirect if wrong role */
 
+  loadBusinessProfile();
   loadStats();
 });
 
@@ -845,7 +875,8 @@ function nav(id, el){
     reviews: 'loadEventReviews',
     activity: 'loadEventActivity',
     invoices: 'loadInvoices',
-    createinvoice: 'initInvoiceForm'
+    createinvoice: 'initInvoiceForm',
+    business: 'loadBusinessDetails'
   };
   if (loaders[id] && window[loaders[id]]) window[loaders[id]]();
   return false;
@@ -1164,6 +1195,62 @@ async function loadSent(){
 }
 
 
+/* ══ BUSINESS DETAILS (saved per photographer on their own profiles row) ══ */
+var _bizProfile = null;
+var BIZ_FIELDS = [
+  ['biz-name','business_name'],['biz-location','business_location'],['biz-phone','business_phone'],
+  ['biz-bank-name','bank_name'],['biz-bank-account','bank_account'],['biz-bank-sort','bank_sort']
+];
+function bizAlert(msg, ok){
+  var el = document.getElementById('biz-alert'); if (!el) return;
+  el.style.display = msg ? 'block' : 'none';
+  el.textContent = msg || '';
+  el.style.background = ok ? 'rgba(34,160,90,.12)' : 'rgba(220,60,60,.12)';
+  el.style.color = ok ? '#1c8a4e' : '#c0392b';
+}
+async function loadBusinessProfile(){
+  try {
+    var r = await getSupabase().from('profiles')
+      .select('business_name,business_location,business_phone,bank_name,bank_account,bank_sort')
+      .eq('user_id', _currentUser.id).maybeSingle();
+    if (r.error) throw r.error;
+    _bizProfile = r.data || {};
+  } catch(e) { _bizProfile = null; }
+}
+async function loadBusinessDetails(){
+  bizAlert('');
+  await loadBusinessProfile();
+  if (_bizProfile === null) { bizAlert('Could not load your saved details. Please refresh and try again.', false); return; }
+  BIZ_FIELDS.forEach(function(p){ var el = document.getElementById(p[0]); if (el) el.value = _bizProfile[p[1]] || ''; });
+}
+async function saveBusinessDetails(){
+  var btn = document.getElementById('biz-save-btn');
+  var patch = {};
+  BIZ_FIELDS.forEach(function(p){ var el = document.getElementById(p[0]); patch[p[1]] = ((el && el.value) || '').trim() || null; });
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  bizAlert('');
+  try {
+    var r = await getSupabase().from('profiles').update(patch).eq('user_id', _currentUser.id).select('user_id');
+    if (r.error) throw r.error;
+    if (!r.data || !r.data.length) throw new Error('No profile found for this account. Sign out and back in, then try again.');
+    _bizProfile = patch;
+    bizAlert('Saved. Your clients will now see this on emails and invoices.', true);
+  } catch(e) {
+    bizAlert('Could not save: ' + (e.message || 'unknown error'), false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Business Details'; }
+  }
+}
+/* Fill the invoice form from saved details. Only fills empty fields, never overwrites typing. */
+function applyBusinessToInvoice(){
+  if (!_bizProfile) return;
+  var map = [['inv-biz-name','business_name'],['inv-biz-location','business_location'],
+             ['inv-bank-name','bank_name'],['inv-bank-account','bank_account'],['inv-bank-sort','bank_sort']];
+  map.forEach(function(p){ var el = document.getElementById(p[0]); if (el && !el.value && _bizProfile[p[1]]) el.value = _bizProfile[p[1]]; });
+}
+window.saveBusinessDetails = saveBusinessDetails;
+window.loadBusinessDetails = loadBusinessDetails;
+
 /* ══ INVOICES ══ */
 var _invLines = [];
 var _invCounter = 0;
@@ -1173,6 +1260,7 @@ function initInvoiceForm(){
   var today = new Date().toISOString().split('T')[0];
   var dateEl = document.getElementById('inv-date');
   if (dateEl && !dateEl.value) dateEl.value = today;
+  applyBusinessToInvoice();
   /* Always auto-generate invoice number for a fresh form */
   autoInvoiceNumber(true);
   /* Seed one line item if none */
@@ -1590,6 +1678,7 @@ function resetInvoiceForm(){
   if (notesEl) notesEl.value = 'Thanks for your business.';
   var wrap = document.getElementById('inv-line-items');
   if (wrap) wrap.innerHTML = '';
+  applyBusinessToInvoice();
   /* Re-generate number for next invoice */
   autoInvoiceNumber(true);
   updateInvoicePreview();
