@@ -1565,7 +1565,8 @@ async function confirmSendInvoice(){
   var btn = document.getElementById('inv-modal-send-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
   try {
-    await saveInvoiceToDB(d, true);
+    /* Save once. A retry after a failed send reuses the saved row instead of inserting a duplicate number. */
+    if (!d._savedId) { var _row = await saveInvoiceToDB(d, false); d._savedId = _row.id; }
     var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method : 'POST',
       headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
@@ -1580,6 +1581,7 @@ async function confirmSendInvoice(){
     });
     var resp = await res.json();
     if (!res.ok || !resp.success) throw new Error(resp.error || 'Send failed');
+    await getSupabase().from('invoices').update({ sent: true }).eq('id', d._savedId);
     closeInvModal();
     toast('', 'Invoice sent!', 'PDF attached · To: ' + d.clientEmail);
     invAlert('Invoice saved and sent to ' + d.clientEmail, true);
