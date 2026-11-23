@@ -206,7 +206,7 @@ var REG = (function () {
 
     card.innerHTML =
       '<div class="rg-success">' +
-        '<h1 class="rg-title">You\'re registered! 🎉</h1>' +
+        '<h1 class="rg-title">You\'re registered!</h1>' +
         '<p class="rg-sub">' + _esc(thankYou) + '</p>' +
         codeBlock +
       '</div>';

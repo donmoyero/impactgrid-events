@@ -74,7 +74,7 @@
 /* eye toggle */
 .pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
   background:none;border:none;cursor:pointer;padding:4px;
-  color:var(--text3);font-size:16px;line-height:1;transition:color .2s;
+  color:var(--text3);font-size:12px;font-weight:600;line-height:1;transition:color .2s;
   display:flex;align-items:center;justify-content:center;}
 .pass-eye:hover{color:var(--text2);}
 
@@ -174,7 +174,7 @@
         <input id="password" class="form-input pw" type="password"
           placeholder="Your password" autocomplete="current-password"
           onkeydown="if(event.key==='Enter')login()"/>
-        <button type="button" class="pass-eye" id="eyeBtn" onclick="togglePw()" aria-label="Show password">👁</button>
+        <button type="button" class="pass-eye" id="eyeBtn" onclick="togglePw()" aria-label="Show password">Show</button>
       </div>
     </div>
 
@@ -187,9 +187,9 @@
     </div>
 
     <div class="trust">
-      <div class="trust-item"><span class="trust-icon">🔒</span>Secure login</div>
+      <div class="trust-item">Secure login</div>
       <div class="trust-item"><span class="trust-icon">✦</span>No card required</div>
-      <div class="trust-item"><span class="trust-icon">⚡</span>Instant access</div>
+      <div class="trust-item">Instant access</div>
     </div>
 
   </div>
@@ -204,8 +204,8 @@
 function togglePw() {
   var inp = document.getElementById('password');
   var btn = document.getElementById('eyeBtn');
-  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
-  else                         { inp.type = 'password'; btn.textContent = '👁'; }
+  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = 'Hide'; }
+  else                         { inp.type = 'password'; btn.textContent = 'Show'; }
 }
 
 /* ── Alert ── */

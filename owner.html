@@ -1060,7 +1060,7 @@ function toggleSelectAll(){
   } else {
     photos.forEach(function(_, i){ selectedPhotos.add(i); });
     document.querySelectorAll('.photo-card').forEach(function(c){ c.classList.add('selected'); });
-    document.getElementById('btnSelectAll').textContent = '☑ Deselect All';
+    document.getElementById('btnSelectAll').textContent = 'Deselect All';
     updateSelectionUI();
   }
 }
@@ -1084,7 +1084,7 @@ function updateSelectionUI(){
   }
   var photos = state ? (state.photos || []) : [];
   if(count === photos.length && photos.length > 0){
-    document.getElementById('btnSelectAll').textContent = '☑ Deselect All';
+    document.getElementById('btnSelectAll').textContent = 'Deselect All';
   }
 }
 

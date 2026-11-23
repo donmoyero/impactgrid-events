@@ -576,42 +576,42 @@
 
         <div class="s-nav-group">Account</div>
         <button class="s-nav-btn active" data-panel="profile">
-          <span class="s-nav-icon">👤</span>Profile
+          Profile
         </button>
         <button class="s-nav-btn" data-panel="account">
-          <span class="s-nav-icon">⚙️</span>Account
+          Account
         </button>
 
         <div class="s-nav-group">Security</div>
         <button class="s-nav-btn" data-panel="security">
-          <span class="s-nav-icon">🔒</span>Password
+          Password
         </button>
         <button class="s-nav-btn" data-panel="sessions">
-          <span class="s-nav-icon">📱</span>Devices & Sessions
+          Devices & Sessions
         </button>
 
         <div class="s-nav-group">Platform</div>
         <button class="s-nav-btn" data-panel="preferences">
-          <span class="s-nav-icon">🎨</span>Preferences
+          Preferences
         </button>
         <div class="s-nav-group">Data</div>
         <button class="s-nav-btn" data-panel="privacy">
-          <span class="s-nav-icon">👁️</span>Privacy
+          Privacy
         </button>
 
         <div class="s-nav-group">Billing</div>
         <button class="s-nav-btn" data-panel="plan">
-          <span class="s-nav-icon">⭐</span>Plan &amp; Usage
+          Plan &amp; Usage
         </button>
 
         <div class="s-nav-group">Account Access</div>
         <!-- Login link (shown when logged out) -->
         <a href="login.html" class="s-nav-btn s-nav-link" id="sidebarLoginBtn" style="text-decoration:none;display:none">
-          <span class="s-nav-icon">🔑</span>Login
+          Login
         </a>
         <!-- Logout button (shown when logged in) -->
         <button class="s-nav-btn s-nav-btn-danger" id="sidebarLogoutBtn" onclick="igSignOut()" style="display:none">
-          <span class="s-nav-icon">🚪</span>Sign Out
+          Sign Out
         </button>
       </aside>
 
@@ -643,7 +643,7 @@
                 <div class="av-btns">
                   <label>
                     <input type="file" id="s-av-upload" accept="image/*" style="display:none" onchange="uploadAvatar(this.files[0])" />
-                    📷 Upload photo
+                    Upload photo
                   </label>
                   <button class="btn-sm btn-sm-ghost" onclick="clearAvatarPhoto()" id="av-clear-btn" style="display:none;">✕ Remove photo</button>
                 </div>
@@ -823,12 +823,10 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;">
-                <div style="font-size:18px;margin-bottom:6px;">✅</div>
                 <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Do</div>
                 <div style="font-size:12px;color:var(--text2);line-height:1.6;">Use 12+ characters, mix uppercase, numbers and symbols. Use a password manager.</div>
               </div>
               <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;">
-                <div style="font-size:18px;margin-bottom:6px;">❌</div>
                 <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Don't</div>
                 <div style="font-size:12px;color:var(--text2);line-height:1.6;">Reuse passwords from other sites or use obvious words like your name or birthday.</div>
               </div>
@@ -845,7 +843,6 @@
 
             <div class="sec-item" style="padding-top:0">
               <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
-                <div style="width:40px;height:40px;border-radius:10px;background:var(--green-dim);border:1px solid rgba(15,168,118,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💻</div>
                 <div class="sec-info">
                   <h4>Current Session</h4>
                   <p id="s-session-info">Loading session info…</p>
@@ -952,7 +949,6 @@
 
           <!-- Trial exhausted banner — shown by JS when aiPct >= 100 -->
           <div class="trial-exhausted-banner" id="trialExhaustedBanner">
-            <div class="teb-icon">🔒</div>
             <div class="teb-text">
               <strong id="teb-heading">You've used all your free AI credits this month</strong>
               <span id="teb-body">AI-powered tools are locked until you upgrade or your credits reset on the 1st.</span>
@@ -969,7 +965,7 @@
 
             <div class="plan-hero">
               <div>
-                <div class="plan-badge-large" id="plan-badge-large">⭐ Free</div>
+                <div class="plan-badge-large" id="plan-badge-large">Free</div>
                 <div class="plan-name-large" id="plan-name-large">Free Plan</div>
                 <div class="plan-tagline" id="plan-tagline">Try Impact Grid with no card needed.</div>
               </div>
@@ -1063,7 +1059,7 @@
   <script src="auth.js"></script>
   <script src="nav.js"></script>
   <script>
-    /* ✅ Restore avatar preview instantly from cache (before DB responds) */
+    /* Restore avatar preview instantly from cache (before DB responds) */
     document.addEventListener('DOMContentLoaded', function() {
       try {
         var cached = localStorage.getItem('ig_avatar');
@@ -1178,7 +1174,7 @@
           if (p.avatar_url) {
             var img = document.getElementById('s-av-img');
             img.src = p.avatar_url; img.style.display = 'block';
-            /* ✅ Keep localStorage in sync with DB value */
+            /* Keep localStorage in sync with DB value */
             try { localStorage.setItem('ig_avatar', p.avatar_url); } catch(e) {}
           }
         }).catch(function() {});
@@ -1283,7 +1279,7 @@
         return;
       }
 
-      alert("Avatar uploaded successfully ✅");
+      alert("Avatar uploaded successfully");
     }
 
     /* ─── Update email ─── */
@@ -1393,7 +1389,7 @@
 
     /* ─── Delete account ─── */
     async function confirmDelete() {
-      if (!confirm('⚠️ Delete your Impact Grid account?\n\nThis permanently removes your profile, applications, and all data. It cannot be undone.')) return;
+      if (!confirm('Delete your Impact Grid account?\n\nThis permanently removes your profile, applications, and all data. It cannot be undone.')) return;
       if (!confirm('Final confirmation — are you absolutely sure?')) return;
       var client     = getSupabase();
       var sessionRes = await client.auth.getSession();
@@ -1664,20 +1660,20 @@
 
     var PLAN_META = {
       free:         { label: 'Free',         tagline: 'Try Impact Grid — no card needed.',              badge: '✦ Free'         },
-      professional: { label: 'Professional', tagline: 'For solo creators and freelancers.',             badge: '⭐ Professional' },
-      enterprise:   { label: 'Enterprise',   tagline: 'For businesses, agencies & serious operators.', badge: '🏆 Enterprise'  },
-      admin:        { label: 'Admin',        tagline: 'Internal admin account — unlimited access.',    badge: '🛡️ Admin'       }
+      professional: { label: 'Professional', tagline: 'For solo creators and freelancers.',             badge: 'Professional' },
+      enterprise:   { label: 'Enterprise',   tagline: 'For businesses, agencies & serious operators.', badge: 'Enterprise'  },
+      admin:        { label: 'Admin',        tagline: 'Internal admin account — unlimited access.',    badge: 'Admin'       }
     };
 
     /* Tools available per plan */
     var ALL_TOOLS = [
-      { icon:'📸', name:'Photo Events',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Browse events', professional:'Full access', enterprise:'Full access', admin:'Full access' } },
-      { icon:'💼', name:'My Portfolio',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3 portfolios (7-day)', professional:'3 portfolios (permanent)', enterprise:'Unlimited (permanent)', admin:'Unlimited' } },
-      { icon:'📊', name:'Dashboard',         href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Read-only', professional:'Full access', enterprise:'Full access', admin:'Full access' } },
-      { icon:'🤖', name:'AI Adviser',        href:'dashboard.html',             plans:['professional','enterprise','admin'],        limit:{ free:'Upgrade to Pro', professional:'10 msgs/mo', enterprise:'Unlimited', admin:'Unlimited' } },
-      { icon:'🔍', name:'AI Evaluator',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3/mo', professional:'10/mo', enterprise:'Unlimited', admin:'Unlimited' } },
-      { icon:'📅', name:'Content Calendar',  href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3/mo', professional:'Unlimited', enterprise:'Unlimited', admin:'Unlimited' } },
-      { icon:'📈', name:'Trend Feed',        href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Read-only', professional:'Full + personalised', enterprise:'Full + personalised', admin:'Full + personalised' } },
+      { icon:'', name:'Photo Events',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Browse events', professional:'Full access', enterprise:'Full access', admin:'Full access' } },
+      { icon:'', name:'My Portfolio',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3 portfolios (7-day)', professional:'3 portfolios (permanent)', enterprise:'Unlimited (permanent)', admin:'Unlimited' } },
+      { icon:'', name:'Dashboard',         href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Read-only', professional:'Full access', enterprise:'Full access', admin:'Full access' } },
+      { icon:'', name:'AI Adviser',        href:'dashboard.html',             plans:['professional','enterprise','admin'],        limit:{ free:'Upgrade to Pro', professional:'10 msgs/mo', enterprise:'Unlimited', admin:'Unlimited' } },
+      { icon:'', name:'AI Evaluator',      href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3/mo', professional:'10/mo', enterprise:'Unlimited', admin:'Unlimited' } },
+      { icon:'', name:'Content Calendar',  href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'3/mo', professional:'Unlimited', enterprise:'Unlimited', admin:'Unlimited' } },
+      { icon:'', name:'Trend Feed',        href:'dashboard.html',             plans:['free','professional','enterprise','admin'], limit:{ free:'Read-only', professional:'Full + personalised', enterprise:'Full + personalised', admin:'Full + personalised' } },
     ];
 
     /* Feature table rows */
@@ -1775,12 +1771,12 @@
           var hasAccess = t.plans.indexOf(plan) !== -1;
           var limitText = t.limit[plan] || '';
           return '<a href="' + (hasAccess ? t.href : '#') + '" class="tool-link' + (hasAccess ? '' : ' locked') + '">' +
-            '<span class="tool-icon">' + t.icon + '</span>' +
+            
             '<span class="tool-info">' +
               '<span class="tool-name">' + t.name + '</span>' +
               '<span class="tool-limit">' + limitText + '</span>' +
             '</span>' +
-            (!hasAccess ? '<span class="tool-lock-badge">🔒 Upgrade</span>' : '') +
+            (!hasAccess ? '<span class="tool-lock-badge">Upgrade</span>' : '') +
           '</a>';
         }).join('');
       }
@@ -1915,7 +1911,7 @@
         overlay.className = 'trial-blur-overlay';
         overlay.innerHTML =
           '<div class="trial-blur-card">' +
-            '<div class="trial-blur-icon">🔒</div>' +
+            '' +
             '<h4>' + _heading + '</h4>' +
             '<p>' + _body + '</p>' +
             _cta +

@@ -63,7 +63,7 @@
 
   /* Social links — shown at the bottom of the nav-links list (desktop)
      and as an icon row in the mobile sidebar.
-     ⚠ Replace these placeholder URLs with your real profile links. */
+     Replace these placeholder URLs with your real profile links. */
   var SOCIAL_LINKS = [
     {
       href : 'https://www.instagram.com/impactgridevents',
@@ -789,7 +789,7 @@
 
   /* ─────────────────────────────────────────
      CHECK AUTH
-     ✅ FIX v5.1: Added retry loop so we wait for the Supabase
+     FIX v5.1: Added retry loop so we wait for the Supabase
      client to be fully initialised (and session token loaded
      from localStorage) before querying the profiles table.
      Previously, checkAuth fired immediately on DOMContentLoaded
@@ -800,7 +800,7 @@
   window.checkAuth = async function() {
     _whenNavReady(async function() {
       try {
-        // ✅ Retry getting client — auth.js IIFE may not have run yet
+        // Retry getting client — auth.js IIFE may not have run yet
         var client = null;
         var attempts = 0;
         while (!client && attempts < 20) {
@@ -815,7 +815,7 @@
           return;
         }
 
-        // ✅ getSession() is synchronous from localStorage — fast and reliable.
+        // getSession() is synchronous from localStorage — fast and reliable.
         //    getUser() makes a network round-trip; we only need that for server-
         //    side validation which is handled by RLS. For nav display, session is enough.
         var res = await client.auth.getSession();

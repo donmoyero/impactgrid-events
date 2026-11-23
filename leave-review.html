@@ -119,11 +119,10 @@
 
       <div id="error"></div>
 
-      <button class="btn" id="submit-btn" onclick="submitReview()">Submit Review ⭐</button>
+      <button class="btn" id="submit-btn" onclick="submitReview()">Submit Review</button>
     </div>
 
     <div id="success">
-      <div class="emoji">🎉</div>
       <h2>Thanks for your review!</h2>
       <p>We really appreciate the feedback.</p>
       <a href="index.html">Back to Homepage</a>
@@ -185,7 +184,7 @@ async function submitReview() {
     errEl.textContent = 'Something went wrong — please try again.';
     errEl.style.display = 'block';
     btn.disabled = false;
-    btn.textContent = 'Submit Review ⭐';
+    btn.textContent = 'Submit Review';
   }
 }
 </script>
