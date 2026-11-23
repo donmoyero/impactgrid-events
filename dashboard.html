@@ -255,6 +255,13 @@ tr:hover td{background:var(--bg2);}
       </nav>
     </div>
 
+    <div class="sb-section">
+      <div class="sb-section-label">Account</div>
+      <nav class="sb-nav">
+        <a href="#" onclick="return nav('business',this)">Business Details</a>
+      </nav>
+    </div>
+
     <div class="sb-spacer"></div>
     <div class="sb-footer">
       <a href="index.html" class="sb-back">← Back to Site</a>
@@ -320,14 +327,15 @@ tr:hover td{background:var(--bg2);}
               <div class="field-group"><div class="field-label">Event Name *</div><input type="text" id="ev-name" placeholder="e.g. Johnson Wedding 2026" oninput="updateTemplatePreview()"/></div>
               <div class="form-grid" style="margin-bottom:12px;">
                 <div class="field-group"><div class="field-label">Owner Name</div><input type="text" id="ev-owner-name" placeholder="e.g. Sarah Johnson"/><div class="field-hint">Personalises the welcome email</div></div>
-                <div class="field-group"><div class="field-label">Owner Email</div><input type="email" id="ev-owner" placeholder="owner@email.com"/></div>
+                <div class="field-group"><div class="field-label">Owner Email</div><input type="email" id="ev-owner" placeholder="owner@email.com"/><div class="field-hint">If set, your client gets an email with the gallery link and code. Replies come to you.</div></div>
               </div>
               <div class="form-grid" style="margin-bottom:12px;">
-                <div class="field-group"><div class="field-label">Expiry Date</div><input type="date" id="ev-expiry"/><div class="field-hint">Default: 30 days from today</div></div>
+                <div class="field-group"><div class="field-label">Event Date *</div><input type="date" id="ev-date" onchange="igSyncExpiry()" oninput="igSyncExpiry()"/><div class="field-hint">The actual date of the event — used in the client's reminder email</div></div>
+                <div class="field-group"><div class="field-label">Gallery Expires</div><input type="date" id="ev-expiry" oninput="_igExpiryTouched=true"/><div class="field-hint">Counted from the event date: 30 days after it unless you change it</div></div>
               </div>
               <div class="form-grid" style="margin-bottom:16px;">
                 <div class="field-group"><div class="field-label">Access Code</div>
-                  <div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/><button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;">Generate</button></div>
+                  <div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Created automatically" readonly style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/></div>
                 </div>
                 <div class="field-group"><div class="field-label">Template *</div>
                   <select id="ev-template" onchange="updateTemplatePreview()" style="width:100%;">
@@ -346,7 +354,7 @@ tr:hover td{background:var(--bg2);}
                 <div class="toggle on" id="ev-code-toggle" onclick="toggleRequireCode()"></div>
                 <div><div style="font-size:13px;font-weight:600;">Require Access Code</div><div style="font-size:11px;color:var(--text3);">Guests must enter the code to view the gallery</div></div>
               </div>
-              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()">Create Event →</button>
+              <button class="btn btn-gold" id="ev-create-btn" style="width:100%;justify-content:center;padding:12px;" onclick="igOwnerCreateEvent()">Create Event →</button>
             </div>
           </div>
         </div>
@@ -536,6 +544,28 @@ tr:hover td{background:var(--bg2);}
     </div>
 
     <!-- ── CREATE INVOICE ── -->
+    <div class="page" id="page-business">
+      <div class="page-header"><div class="page-title">Business Details</div><div class="page-sub">Used on your client emails and invoices. Only you can see and edit this.</div></div>
+      <div class="card" style="max-width:640px;">
+        <div class="card-head"><h2>Your Business</h2></div>
+        <div class="card-body">
+          <div id="biz-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
+          <div class="field-group"><div class="field-label">Business / Trading Name</div><input type="text" id="biz-name" maxlength="60" placeholder="e.g. Dara Photography"/><div class="field-hint">Shown as the sender name and in the first line of the gallery email your clients receive.</div></div>
+          <div class="form-grid">
+            <div class="field-group"><div class="field-label">Location</div><input type="text" id="biz-location" maxlength="120" placeholder="City, Country"/></div>
+            <div class="field-group"><div class="field-label">Phone</div><input type="text" id="biz-phone" maxlength="40" placeholder="Optional"/></div>
+          </div>
+          <div class="field-label" style="margin-top:6px;">Payment details for invoices</div>
+          <div class="form-grid">
+            <div class="field-group"><div class="field-label">Account Name</div><input type="text" id="biz-bank-name" maxlength="80" placeholder="Name on bank account"/></div>
+            <div class="field-group"><div class="field-label">Account Number</div><input type="text" id="biz-bank-account" maxlength="40" placeholder="Account number" style="font-family:var(--fm);letter-spacing:.06em;"/></div>
+          </div>
+          <div class="field-group"><div class="field-label">Sort Code</div><input type="text" id="biz-bank-sort" maxlength="20" placeholder="e.g. 23-14-70, leave blank if not applicable" style="font-family:var(--fm);letter-spacing:.06em;"/></div>
+          <button class="btn btn-gold" id="biz-save-btn" onclick="saveBusinessDetails()">Save Business Details</button>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-createinvoice">
       <div class="page-header">
         <div class="page-title">New Invoice</div>
@@ -812,6 +842,7 @@ document.addEventListener('DOMContentLoaded', async function(){
 
   /* Redirect if wrong role */
 
+  loadBusinessProfile();
   loadStats();
 });
 
@@ -844,7 +875,8 @@ function nav(id, el){
     reviews: 'loadEventReviews',
     activity: 'loadEventActivity',
     invoices: 'loadInvoices',
-    createinvoice: 'initInvoiceForm'
+    createinvoice: 'initInvoiceForm',
+    business: 'loadBusinessDetails'
   };
   if (loaders[id] && window[loaders[id]]) window[loaders[id]]();
   return false;
@@ -870,14 +902,78 @@ function onDrop(e,id,fn){ e.preventDefault(); document.getElementById(id).classL
 function onDropMulti(e,id){ e.preventDefault(); document.getElementById(id).classList.remove('drag'); var files = Array.from(e.dataTransfer.files||[]); if(files.length) uploadPhotos(files); }
 
 /* ══ ALIAS for events-script.js ══ */
-window.createEvent = function(){ if(window.igCreateEvent) window.igCreateEvent(); };
+window.createEvent = function(){ igOwnerCreateEvent(); };
+
+/* ══ CREATE EVENT (photographers) — the server sets owner, code, slug and expiry ══ */
+var _igExpiryTouched = false;
+function igAddDays(ymd, n){
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || '');
+  if(!m) return '';
+  return new Date(Date.UTC(+m[1], +m[2]-1, +m[3] + n)).toISOString().slice(0,10);
+}
+/* Expiry follows the EVENT date (event date + 30 days) until the photographer edits it. */
+function igSyncExpiry(){
+  var d = document.getElementById('ev-date'), x = document.getElementById('ev-expiry');
+  if(!d || !x) return;
+  if(!_igExpiryTouched) x.value = igAddDays(d.value, 30);
+}
+async function igOwnerCreateEvent(){
+  var alertEl = document.getElementById('createEventAlert');
+  var btn = document.getElementById('ev-create-btn');
+  function showAlert(msg, ok){
+    alertEl.textContent = msg;
+    alertEl.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;'
+      + (ok ? 'background:var(--green-dim);border:1px solid rgba(15,168,118,.25);color:var(--green);'
+            : 'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
+  }
+  function val(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  var name = val('ev-name'), eventDate = val('ev-date');
+  if(!name){ showAlert('Event name is required.', false); return; }
+  if(!eventDate){ showAlert('Event date is required — this is what shows up in the client\'s reminder email.', false); return; }
+  var expiry = _igExpiryTouched ? val('ev-expiry') : '';
+  if(expiry && expiry < eventDate){ showAlert('The expiry date cannot be before the event date.', false); return; }
+
+  if(btn){ btn.disabled = true; btn.textContent = 'Creating…'; }
+  try{
+    var res = await fetch(EVENTS_API + '/api/db/owner/create-event', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, await _dashAuthHeader()),
+      body: JSON.stringify({
+        name: name, eventDate: eventDate, expiryDate: expiry || undefined,
+        ownerName: val('ev-owner-name'), ownerEmail: val('ev-owner'),
+        requireCode: !!window.evRequireCode, watermark: window.evWatermark !== false
+      })
+    });
+    var j = {}; try{ j = await res.json(); }catch(e){}
+    if(!res.ok){ showAlert(j.error || ('Could not create the event (error ' + res.status + ').'), false); return; }
+
+    var msg = 'Event created! Code: ' + j.code;
+    if(j.emailSent) msg += ' · Email sent to your client.';
+    else if(j.emailError) msg += ' · ' + j.emailError;
+    showAlert(msg, true);
+    toast('', 'Event created!', name + ' · Code: ' + j.code);
+
+    ['ev-name','ev-owner','ev-owner-name','ev-code','ev-date','ev-expiry'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+    _igExpiryTouched = false;
+    window.evRequireCode = true;
+    var ct = document.getElementById('ev-code-toggle'); if(ct) ct.classList.add('on');
+    setTimeout(function(){ nav('events', null); }, 1500);
+    if(window.loadStats) loadStats();
+  }catch(err){
+    showAlert('Could not reach the server. Please try again.', false);
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Create Event →'; }
+  }
+}
 function printQR(slug,code,name){ window.open('qr-print.html?event='+slug+'&code='+code+'&name='+encodeURIComponent(name)+'&base='+encodeURIComponent(window.location.origin),'_blank','width=740,height=620'); }
 function copyEventLink(slug,code){ var url=window.location.origin+'/event.html?event='+slug+'&code='+code; navigator.clipboard.writeText(url).then(function(){ toast('','Link copied!',''); }).catch(function(){ prompt('Copy this link:',url); }); }
 
 /* setDefaultExpiry wrapper (calls updateTemplatePreview too) */
 document.addEventListener('DOMContentLoaded', function(){
   var base = window.setDefaultExpiry;
-  window.setDefaultExpiry = function(){ updateTemplatePreview(); if(base) base(); };
+  window.setDefaultExpiry = function(){ updateTemplatePreview(); igSyncExpiry(); };
 });
 
 /* ══ STATS (overview) ══ */
@@ -1099,6 +1195,62 @@ async function loadSent(){
 }
 
 
+/* ══ BUSINESS DETAILS (saved per photographer on their own profiles row) ══ */
+var _bizProfile = null;
+var BIZ_FIELDS = [
+  ['biz-name','business_name'],['biz-location','business_location'],['biz-phone','business_phone'],
+  ['biz-bank-name','bank_name'],['biz-bank-account','bank_account'],['biz-bank-sort','bank_sort']
+];
+function bizAlert(msg, ok){
+  var el = document.getElementById('biz-alert'); if (!el) return;
+  el.style.display = msg ? 'block' : 'none';
+  el.textContent = msg || '';
+  el.style.background = ok ? 'rgba(34,160,90,.12)' : 'rgba(220,60,60,.12)';
+  el.style.color = ok ? '#1c8a4e' : '#c0392b';
+}
+async function loadBusinessProfile(){
+  try {
+    var r = await getSupabase().from('profiles')
+      .select('business_name,business_location,business_phone,bank_name,bank_account,bank_sort')
+      .eq('user_id', _currentUser.id).maybeSingle();
+    if (r.error) throw r.error;
+    _bizProfile = r.data || {};
+  } catch(e) { _bizProfile = null; }
+}
+async function loadBusinessDetails(){
+  bizAlert('');
+  await loadBusinessProfile();
+  if (_bizProfile === null) { bizAlert('Could not load your saved details. Please refresh and try again.', false); return; }
+  BIZ_FIELDS.forEach(function(p){ var el = document.getElementById(p[0]); if (el) el.value = _bizProfile[p[1]] || ''; });
+}
+async function saveBusinessDetails(){
+  var btn = document.getElementById('biz-save-btn');
+  var patch = {};
+  BIZ_FIELDS.forEach(function(p){ var el = document.getElementById(p[0]); patch[p[1]] = ((el && el.value) || '').trim() || null; });
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  bizAlert('');
+  try {
+    var r = await getSupabase().from('profiles').update(patch).eq('user_id', _currentUser.id).select('user_id');
+    if (r.error) throw r.error;
+    if (!r.data || !r.data.length) throw new Error('No profile found for this account. Sign out and back in, then try again.');
+    _bizProfile = patch;
+    bizAlert('Saved. Your clients will now see this on emails and invoices.', true);
+  } catch(e) {
+    bizAlert('Could not save: ' + (e.message || 'unknown error'), false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Business Details'; }
+  }
+}
+/* Fill the invoice form from saved details. Only fills empty fields, never overwrites typing. */
+function applyBusinessToInvoice(){
+  if (!_bizProfile) return;
+  var map = [['inv-biz-name','business_name'],['inv-biz-location','business_location'],
+             ['inv-bank-name','bank_name'],['inv-bank-account','bank_account'],['inv-bank-sort','bank_sort']];
+  map.forEach(function(p){ var el = document.getElementById(p[0]); if (el && !el.value && _bizProfile[p[1]]) el.value = _bizProfile[p[1]]; });
+}
+window.saveBusinessDetails = saveBusinessDetails;
+window.loadBusinessDetails = loadBusinessDetails;
+
 /* ══ INVOICES ══ */
 var _invLines = [];
 var _invCounter = 0;
@@ -1108,6 +1260,7 @@ function initInvoiceForm(){
   var today = new Date().toISOString().split('T')[0];
   var dateEl = document.getElementById('inv-date');
   if (dateEl && !dateEl.value) dateEl.value = today;
+  applyBusinessToInvoice();
   /* Always auto-generate invoice number for a fresh form */
   autoInvoiceNumber(true);
   /* Seed one line item if none */
@@ -1412,7 +1565,8 @@ async function confirmSendInvoice(){
   var btn = document.getElementById('inv-modal-send-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
   try {
-    await saveInvoiceToDB(d, true);
+    /* Save once. A retry after a failed send reuses the saved row instead of inserting a duplicate number. */
+    if (!d._savedId) { var _row = await saveInvoiceToDB(d, false); d._savedId = _row.id; }
     var res = await fetch(EVENTS_API + '/api/send-invoice', {
       method : 'POST',
       headers:Object.assign({'Content-Type':'application/json'}, await _dashAuthHeader()),
@@ -1427,6 +1581,7 @@ async function confirmSendInvoice(){
     });
     var resp = await res.json();
     if (!res.ok || !resp.success) throw new Error(resp.error || 'Send failed');
+    await getSupabase().from('invoices').update({ sent: true }).eq('id', d._savedId);
     closeInvModal();
     toast('', 'Invoice sent!', 'PDF attached · To: ' + d.clientEmail);
     invAlert('Invoice saved and sent to ' + d.clientEmail, true);
@@ -1525,6 +1680,7 @@ function resetInvoiceForm(){
   if (notesEl) notesEl.value = 'Thanks for your business.';
   var wrap = document.getElementById('inv-line-items');
   if (wrap) wrap.innerHTML = '';
+  applyBusinessToInvoice();
   /* Re-generate number for next invoice */
   autoInvoiceNumber(true);
   updateInvoicePreview();
