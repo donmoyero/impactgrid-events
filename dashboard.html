@@ -320,15 +320,15 @@ tr:hover td{background:var(--bg2);}
               <div class="field-group"><div class="field-label">Event Name *</div><input type="text" id="ev-name" placeholder="e.g. Johnson Wedding 2026" oninput="updateTemplatePreview()"/></div>
               <div class="form-grid" style="margin-bottom:12px;">
                 <div class="field-group"><div class="field-label">Owner Name</div><input type="text" id="ev-owner-name" placeholder="e.g. Sarah Johnson"/><div class="field-hint">Personalises the welcome email</div></div>
-                <div class="field-group"><div class="field-label">Owner Email</div><input type="email" id="ev-owner" placeholder="owner@email.com"/></div>
+                <div class="field-group"><div class="field-label">Owner Email</div><input type="email" id="ev-owner" placeholder="owner@email.com"/><div class="field-hint">If set, your client gets an email with the gallery link and code. Replies come to you.</div></div>
               </div>
               <div class="form-grid" style="margin-bottom:12px;">
-                <div class="field-group"><div class="field-label">Event Date *</div><input type="date" id="ev-date"/><div class="field-hint">The actual date of the event — used in the client's reminder email</div></div>
-                <div class="field-group"><div class="field-label">Expiry Date</div><input type="date" id="ev-expiry"/><div class="field-hint">Default: 30 days from today</div></div>
+                <div class="field-group"><div class="field-label">Event Date *</div><input type="date" id="ev-date" onchange="igSyncExpiry()" oninput="igSyncExpiry()"/><div class="field-hint">The actual date of the event — used in the client's reminder email</div></div>
+                <div class="field-group"><div class="field-label">Gallery Expires</div><input type="date" id="ev-expiry" oninput="_igExpiryTouched=true"/><div class="field-hint">Counted from the event date: 30 days after it unless you change it</div></div>
               </div>
               <div class="form-grid" style="margin-bottom:16px;">
                 <div class="field-group"><div class="field-label">Access Code</div>
-                  <div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Auto-generated" style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/><button class="btn btn-ghost" onclick="generateCode()" style="flex-shrink:0;">Generate</button></div>
+                  <div style="display:flex;gap:8px;"><input type="text" id="ev-code" placeholder="Created automatically" readonly style="flex:1;font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;"/></div>
                 </div>
                 <div class="field-group"><div class="field-label">Template *</div>
                   <select id="ev-template" onchange="updateTemplatePreview()" style="width:100%;">
@@ -347,7 +347,7 @@ tr:hover td{background:var(--bg2);}
                 <div class="toggle on" id="ev-code-toggle" onclick="toggleRequireCode()"></div>
                 <div><div style="font-size:13px;font-weight:600;">Require Access Code</div><div style="font-size:11px;color:var(--text3);">Guests must enter the code to view the gallery</div></div>
               </div>
-              <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;" onclick="igCreateEvent()">Create Event →</button>
+              <button class="btn btn-gold" id="ev-create-btn" style="width:100%;justify-content:center;padding:12px;" onclick="igOwnerCreateEvent()">Create Event →</button>
             </div>
           </div>
         </div>
@@ -871,14 +871,78 @@ function onDrop(e,id,fn){ e.preventDefault(); document.getElementById(id).classL
 function onDropMulti(e,id){ e.preventDefault(); document.getElementById(id).classList.remove('drag'); var files = Array.from(e.dataTransfer.files||[]); if(files.length) uploadPhotos(files); }
 
 /* ══ ALIAS for events-script.js ══ */
-window.createEvent = function(){ if(window.igCreateEvent) window.igCreateEvent(); };
+window.createEvent = function(){ igOwnerCreateEvent(); };
+
+/* ══ CREATE EVENT (photographers) — the server sets owner, code, slug and expiry ══ */
+var _igExpiryTouched = false;
+function igAddDays(ymd, n){
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || '');
+  if(!m) return '';
+  return new Date(Date.UTC(+m[1], +m[2]-1, +m[3] + n)).toISOString().slice(0,10);
+}
+/* Expiry follows the EVENT date (event date + 30 days) until the photographer edits it. */
+function igSyncExpiry(){
+  var d = document.getElementById('ev-date'), x = document.getElementById('ev-expiry');
+  if(!d || !x) return;
+  if(!_igExpiryTouched) x.value = igAddDays(d.value, 30);
+}
+async function igOwnerCreateEvent(){
+  var alertEl = document.getElementById('createEventAlert');
+  var btn = document.getElementById('ev-create-btn');
+  function showAlert(msg, ok){
+    alertEl.textContent = msg;
+    alertEl.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;'
+      + (ok ? 'background:var(--green-dim);border:1px solid rgba(15,168,118,.25);color:var(--green);'
+            : 'background:var(--red-dim);border:1px solid var(--red-glo);color:var(--red);');
+  }
+  function val(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  var name = val('ev-name'), eventDate = val('ev-date');
+  if(!name){ showAlert('Event name is required.', false); return; }
+  if(!eventDate){ showAlert('Event date is required — this is what shows up in the client\'s reminder email.', false); return; }
+  var expiry = _igExpiryTouched ? val('ev-expiry') : '';
+  if(expiry && expiry < eventDate){ showAlert('The expiry date cannot be before the event date.', false); return; }
+
+  if(btn){ btn.disabled = true; btn.textContent = 'Creating…'; }
+  try{
+    var res = await fetch(EVENTS_API + '/api/db/owner/create-event', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, await _dashAuthHeader()),
+      body: JSON.stringify({
+        name: name, eventDate: eventDate, expiryDate: expiry || undefined,
+        ownerName: val('ev-owner-name'), ownerEmail: val('ev-owner'),
+        requireCode: !!window.evRequireCode, watermark: window.evWatermark !== false
+      })
+    });
+    var j = {}; try{ j = await res.json(); }catch(e){}
+    if(!res.ok){ showAlert(j.error || ('Could not create the event (error ' + res.status + ').'), false); return; }
+
+    var msg = 'Event created! Code: ' + j.code;
+    if(j.emailSent) msg += ' · Email sent to your client.';
+    else if(j.emailError) msg += ' · ' + j.emailError;
+    showAlert(msg, true);
+    toast('', 'Event created!', name + ' · Code: ' + j.code);
+
+    ['ev-name','ev-owner','ev-owner-name','ev-code','ev-date','ev-expiry'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+    _igExpiryTouched = false;
+    window.evRequireCode = true;
+    var ct = document.getElementById('ev-code-toggle'); if(ct) ct.classList.add('on');
+    setTimeout(function(){ nav('events', null); }, 1500);
+    if(window.loadStats) loadStats();
+  }catch(err){
+    showAlert('Could not reach the server. Please try again.', false);
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Create Event →'; }
+  }
+}
 function printQR(slug,code,name){ window.open('qr-print.html?event='+slug+'&code='+code+'&name='+encodeURIComponent(name)+'&base='+encodeURIComponent(window.location.origin),'_blank','width=740,height=620'); }
 function copyEventLink(slug,code){ var url=window.location.origin+'/event.html?event='+slug+'&code='+code; navigator.clipboard.writeText(url).then(function(){ toast('','Link copied!',''); }).catch(function(){ prompt('Copy this link:',url); }); }
 
 /* setDefaultExpiry wrapper (calls updateTemplatePreview too) */
 document.addEventListener('DOMContentLoaded', function(){
   var base = window.setDefaultExpiry;
-  window.setDefaultExpiry = function(){ updateTemplatePreview(); if(base) base(); };
+  window.setDefaultExpiry = function(){ updateTemplatePreview(); igSyncExpiry(); };
 });
 
 /* ══ STATS (overview) ══ */
